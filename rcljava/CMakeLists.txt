@@ -8,7 +8,7 @@ find_package(rcl REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 
-find_host_package(Java COMPONENTS Development)
+find_package(Java COMPONENTS Development)
 include (UseJava)
 
 if (NOT ANDROID)
