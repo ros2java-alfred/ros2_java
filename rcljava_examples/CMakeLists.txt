@@ -7,7 +7,11 @@ find_package(ament_cmake_export_jars REQUIRED)
 find_package(rcljava REQUIRED)
 find_package(std_msgs REQUIRED)
 
-find_package(Java COMPONENTS Development)
+if (ANDROID)
+  find_host_package(Java COMPONENTS Development)
+else()
+  find_package(Java COMPONENTS Development)
+endif()
 include (UseJava)
 
 if (NOT ANDROID)

@@ -8,7 +8,12 @@ find_package(rcl REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 
-find_package(Java COMPONENTS Development)
+if (ANDROID)
+  find_host_package(Java COMPONENTS Development)
+else()
+  find_package(Java COMPONENTS Development)
+endif()
+
 include (UseJava)
 
 if (NOT ANDROID)
@@ -19,28 +24,12 @@ if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif()
 
-# enables using the Python package from the source space
-# This creates a folder in ${CMAKE_CURRENT_BINARY_DIR}/rcljava which has all the
-# as well as the compiled modules from the build space
-# necessary Python code and C Python extensions for running tests.
-
-#ament_python_install_package(${PROJECT_NAME})
-
 macro(target)
   if(NOT "${target_suffix} " STREQUAL " ")
     get_rcl_information("${rmw_implementation}" "rcl${target_suffix}")
   endif()
-  if("${rmw_implementation} " STREQUAL "rmw_connext_dynamic_cpp ")
-    message(STATUS "Skipping tests for '${rmw_implementation}'")
-    return()
-  endif()
-  if("${rmw_implementation} " STREQUAL "rmw_fastrtps_cpp ")
-    message(STATUS "Skipping tests for '${rmw_implementation}'")
-    return()
-  endif()
 
   set(_jni_classes "RCLJava;Node;Publisher")
-  #set(_jni_classes "Node")
 
   foreach(_jni_class ${_jni_classes})
 

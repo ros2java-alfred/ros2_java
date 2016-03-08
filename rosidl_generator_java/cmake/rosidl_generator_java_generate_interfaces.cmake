@@ -17,7 +17,11 @@ find_package(rosidl_generator_c REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(rmw REQUIRED)
 
-find_package(Java COMPONENTS Development)
+if (ANDROID)
+  find_host_package(Java COMPONENTS Development)
+else()
+  find_package(Java COMPONENTS Development)
+endif()
 include (UseJava)
 
 if(NOT ANDROID)
