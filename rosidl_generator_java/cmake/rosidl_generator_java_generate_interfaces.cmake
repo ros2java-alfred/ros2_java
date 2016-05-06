@@ -21,34 +21,17 @@ if (ANDROID)
   find_host_package(Java COMPONENTS Development)
 else()
   find_package(Java COMPONENTS Development)
+  find_package(JNI REQUIRED)
 endif()
 include (UseJava)
 
-if(NOT ANDROID)
-  find_package(JNI REQUIRED)
-endif()
+# Get a list of typesupport implementations from valid rmw implementations.
+rosidl_generator_java_get_typesupports(_typesupport_impls)
 
-# TODO(esteve): force opensplice and connext C type supports only, uncomment
-# the following line when all typesupport implementations are ported to C
-#get_rmw_typesupport(_typesupport_impls ${rmw_implementation})
-set(_typesupport_impls "")
-foreach(_extension IN LISTS AMENT_EXTENSIONS_rosidl_generate_interfaces)
-  string(REPLACE ":" ";" _extension_list "${_extension}")
-  list(LENGTH _extension_list _length)
-  if(NOT _length EQUAL 2)
-    message(FATAL_ERROR "ament_execute_extensions(${extension_point}) "
-      "registered extension '${_extension}' can not be split into package "
-      "name and cmake filename")
-  endif()
-  list(GET _extension_list 0 _pkg_name)
-  list(GET _extension_list 1 _cmake_filename)
-  if("${_pkg_name} " STREQUAL "rosidl_typesupport_opensplice_c ")
-    list(APPEND _typesupport_impls "rosidl_typesupport_opensplice_c")
-  endif()
-  if("${_pkg_name} " STREQUAL "rosidl_typesupport_connext_c ")
-    list(APPEND _typesupport_impls "rosidl_typesupport_connext_c")
-  endif()
-endforeach()
+if("${_typesupport_impls} " STREQUAL " ")
+  message(WARNING "No valid typesupport for Java generator. Java messages will not be generated.")
+  return()
+endif()
 
 set(_output_path
   "${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/${PROJECT_NAME}")
@@ -57,6 +40,7 @@ set(_generated_msg_cpp_files "")
 set(_generated_msg_cpp_common_files "")
 set(_generated_msg_cpp_ts_files "")
 set(_generated_srv_files "")
+
 foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
   get_filename_component(_parent_folder "${_idl_file}" DIRECTORY)
   get_filename_component(_parent_folder "${_parent_folder}" NAME)
@@ -78,7 +62,7 @@ foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
     endforeach()
   elseif("${_parent_folder} " STREQUAL "srv ")
     list(APPEND _generated_srv_files
-      "${_output_path}/${_parent_folder}/_${_module_name}.py"
+      "${_output_path}/${_parent_folder}/${_module_name}.java"
     )
   else()
     message(FATAL_ERROR "Interface file with unknown parent folder: ${_idl_file}")
@@ -276,13 +260,10 @@ if(TARGET ${rosidl_generate_interfaces_TARGET}${_target_suffix})
 else()
   add_custom_target(
     ${rosidl_generate_interfaces_TARGET}${_target_suffix}
-    ALL DEPENDS
+    DEPENDS
     ${_generated_msg_java_files}
     ${_generated_msg_cpp_files}
     ${_generated_srv_files}
-    ${_generated_extension_files}
-    ${_extension_dependencies}
-    ${rosidl_generate_interfaces_TARGET}__rosidl_generator_c
   )
 endif()
 

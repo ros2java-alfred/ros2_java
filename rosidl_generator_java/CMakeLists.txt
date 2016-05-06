@@ -16,7 +16,6 @@ if(AMENT_ENABLE_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  # TODO(esteve): disable tests for now until we resolve the rclpy circular dependency
   set(message_files
     "msg/Bool.msg"
     "msg/Byte.msg"
@@ -40,6 +39,8 @@ if(AMENT_ENABLE_TESTING)
   )
 
   include(cmake/register_java.cmake)
+  include(cmake/rosidl_generator_java_get_typesupports.cmake)
+
   set(rosidl_generator_java_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
   rosidl_generator_java_extras(
@@ -56,7 +57,9 @@ if(AMENT_ENABLE_TESTING)
 endif()
 
 ament_package(
-  CONFIG_EXTRAS "cmake/register_java.cmake" "rosidl_generator_java-extras.cmake.in"
+  CONFIG_EXTRAS "cmake/rosidl_generator_java_get_typesupports.cmake"
+    "cmake/register_java.cmake"
+    "rosidl_generator_java-extras.cmake.in"
 )
 
 install(

@@ -59,36 +59,36 @@ void * @(spec.base_type.pkg_name)_@(type_name)__convert_from_java(jobject _jmsg)
 @[for field in spec.fields]@
 @[if not field.type.is_array]@
 @[if field.type.type == 'string']@
-  auto jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "Ljava/lang/String;");
-  jstring jvalue@(field.name) = static_cast<jstring>(env->GetObjectField(_jmsg, jfid@(field.name)));
-  const char *str = env->GetStringUTFChars(jvalue@(field.name), 0);
+  auto _jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "Ljava/lang/String;");
+  jstring _jvalue@(field.name) = static_cast<jstring>(env->GetObjectField(_jmsg, _jfid@(field.name)));
+  const char * _str@(field.name) = env->GetStringUTFChars(_jvalue@(field.name), 0);
   rosidl_generator_c__String__assign(
-    &ros_message->@(field.name), str);
-  env->ReleaseStringUTFChars(jvalue@(field.name), str);
+    &ros_message->@(field.name), _str@(field.name));
+  env->ReleaseStringUTFChars(_jvalue@(field.name), _str@(field.name));
 @[elif field.type.type == 'bool']@
-  auto jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "Z");
-  ros_message->@(field.name) = env->GetBooleanField(_jmsg, jfid@(field.name));
+  auto _jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "Z");
+  ros_message->@(field.name) = env->GetBooleanField(_jmsg, _jfid@(field.name));
 @[elif field.type.type in ['byte', 'int8', 'uint8']]@
-  auto jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "B");
-  ros_message->@(field.name) = env->GetByteField(_jmsg, jfid@(field.name));
+  auto _jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "B");
+  ros_message->@(field.name) = env->GetByteField(_jmsg, _jfid@(field.name));
 @[elif field.type.type == 'char']@
-  auto jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "C");
-  ros_message->@(field.name) = env->GetCharField(_jmsg, jfid@(field.name));
+  auto _jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "C");
+  ros_message->@(field.name) = env->GetCharField(_jmsg, _jfid@(field.name));
 @[elif field.type.type in ['int16', 'uint16']]@
-  auto jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "S");
-  ros_message->@(field.name) = env->GetShortField(_jmsg, jfid@(field.name));
+  auto _jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "S");
+  ros_message->@(field.name) = env->GetShortField(_jmsg, _jfid@(field.name));
 @[elif field.type.type in ['int32', 'uint32']]@
-  auto jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "I");
-  ros_message->@(field.name) = env->GetIntField(_jmsg, jfid@(field.name));
+  auto _jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "I");
+  ros_message->@(field.name) = env->GetIntField(_jmsg, _jfid@(field.name));
 @[elif field.type.type in ['int64', 'uint64']]@
-  auto jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "J");
-  ros_message->@(field.name) = env->GetLongField(_jmsg, jfid@(field.name));
+  auto _jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "J");
+  ros_message->@(field.name) = env->GetLongField(_jmsg, _jfid@(field.name));
 @[elif field.type.type == 'float32']@
-  auto jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "F");
-  ros_message->@(field.name) = env->GetFloatField(_jmsg, jfid@(field.name));
+  auto _jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "F");
+  ros_message->@(field.name) = env->GetFloatField(_jmsg, _jfid@(field.name));
 @[elif field.type.type == 'float64']@
-  auto jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "D");
-  ros_message->@(field.name) = env->GetDoubleField(_jmsg, jfid@(field.name));
+  auto _jfid@(field.name) = env->GetFieldID(javaclass, "@(field.name)", "D");
+  ros_message->@(field.name) = env->GetDoubleField(_jmsg, _jfid@(field.name));
 @[else]@
   // TODO(esteve): add support for nested types
   assert(false);
