@@ -3,7 +3,7 @@ package io.ebinoma.rcljava;
 public class Node {
    static {
         try {
-            System.loadLibrary("rcljavaNode__rmw_opensplice_cpp");
+            System.loadLibrary("rcljavaNode__rmw_fastrtps_cpp");
         } catch (UnsatisfiedLinkError e) {
             System.err.println("Native code library failed to load.\n" + e);
             System.exit(1);

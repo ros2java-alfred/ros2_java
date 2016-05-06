@@ -56,3 +56,13 @@ JNIEXPORT jlong JNICALL Java_io_ebinoma_rcljava_RCLJava_createNodeHandle
   jlong node_handle = reinterpret_cast<jlong>(node);
   return node_handle;
 }
+
+JNIEXPORT jstring JNICALL Java_io_ebinoma_rcljava_RCLJava_getTypesupportIdentifier
+  (JNIEnv *env, jclass) {
+  return env->NewStringUTF("foo");
+}
+
+JNIEXPORT jstring JNICALL Java_io_ebinoma_rcljava_RCLJava_getRMWIdentifier
+  (JNIEnv *env, jclass) {
+  return env->NewStringUTF("bar");
+}

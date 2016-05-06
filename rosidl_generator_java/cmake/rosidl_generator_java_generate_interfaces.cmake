@@ -238,6 +238,11 @@ foreach(_generated_msg_cpp_ts_file ${_generated_msg_cpp_ts_files})
 endforeach()
 
 set(_jar_deps "")
+find_package(rcljava REQUIRED)
+foreach(_jar_dep ${rcljava_JARS})
+  list(APPEND _jar_deps "${_jar_dep}")
+endforeach()
+
 foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
   find_package(${_pkg_name} REQUIRED)
   foreach(_jar_dep ${${_pkg_name}_JARS})

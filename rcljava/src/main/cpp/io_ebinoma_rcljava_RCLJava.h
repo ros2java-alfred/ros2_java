@@ -23,6 +23,22 @@ JNIEXPORT void JNICALL Java_io_ebinoma_rcljava_RCLJava_rcljavaInit
 JNIEXPORT jlong JNICALL Java_io_ebinoma_rcljava_RCLJava_createNodeHandle
   (JNIEnv *, jclass, jstring);
 
+/*
+ * Class:     io_ebinoma_rcljava_RCLJava
+ * Method:    getTypesupportIdentifier
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_io_ebinoma_rcljava_RCLJava_getTypesupportIdentifier
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     io_ebinoma_rcljava_RCLJava
+ * Method:    getRMWIdentifier
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_io_ebinoma_rcljava_RCLJava_getRMWIdentifier
+  (JNIEnv *, jclass);
+
 #ifdef __cplusplus
 }
 #endif
