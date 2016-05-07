@@ -12,16 +12,15 @@ if (ANDROID)
   find_host_package(Java COMPONENTS Development)
 else()
   find_package(Java COMPONENTS Development)
+  find_package(JNI REQUIRED)
 endif()
 
 include (UseJava)
 
-if (NOT ANDROID)
-  find_package(JNI REQUIRED)
-endif()
+set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
 if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 endif()
 
 macro(target)
@@ -37,7 +36,7 @@ macro(target)
 
     add_library(
       ${_target_name}
-      SHARED src/main/cpp/io_ebinoma_rcljava_${_jni_class}.cpp
+      SHARED src/main/cpp/org_ros2_rcljava_${_jni_class}.cpp
     )
     target_compile_definitions(${_target_name}
       PRIVATE "RMW_IMPLEMENTATION_SUFFIX=${target_suffix}")
@@ -83,9 +82,11 @@ macro(target)
 endmacro()
 
 set(${PROJECT_NAME}_sources
-  "src/main/java/io/ebinoma/rcljava/Node.java"
-  "src/main/java/io/ebinoma/rcljava/RCLJava.java"
-  "src/main/java/io/ebinoma/rcljava/Publisher.java"
+  "src/main/java/org/ros2/rcljava/Node.java"
+  "src/main/java/org/ros2/rcljava/RCLJava.java"
+  "src/main/java/org/ros2/rcljava/Publisher.java"
+  "src/main/java/org/ros2/rcljava/Subscription.java"
+  "src/main/java/org/ros2/rcljava/Consumer.java"
 )
 
 add_jar("${PROJECT_NAME}_jar"
@@ -109,8 +110,8 @@ if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
   set(_install_jar_dir "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}")
   get_property(_jar_file TARGET "${PROJECT_NAME}_jar" PROPERTY "JAR_FILE")
 
-  install_jar("${PROJECT_NAME}_jar" "share/java")
-  ament_export_jars("share/java/${PROJECT_NAME}.jar")
+  install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
+  ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
 endif()
 
 ament_package()

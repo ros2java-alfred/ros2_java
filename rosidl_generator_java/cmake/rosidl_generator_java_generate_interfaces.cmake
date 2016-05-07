@@ -18,12 +18,14 @@ find_package(rmw_implementation_cmake REQUIRED)
 find_package(rmw REQUIRED)
 
 if (ANDROID)
-  find_host_package(Java COMPONENTS Development)
+  find_host_package(Java COMPONENTS Development REQUIRED)
 else()
-  find_package(Java COMPONENTS Development)
+  find_package(Java COMPONENTS Development REQUIRED)
   find_package(JNI REQUIRED)
 endif()
 include (UseJava)
+
+set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
 # Get a list of typesupport implementations from valid rmw implementations.
 rosidl_generator_java_get_typesupports(_typesupport_impls)
@@ -36,8 +38,8 @@ endif()
 set(_output_path
   "${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/${PROJECT_NAME}")
 set(_generated_msg_java_files "")
-set(_generated_msg_cpp_files "")
-set(_generated_msg_cpp_common_files "")
+#set(_generated_msg_cpp_files "")
+#set(_generated_msg_cpp_common_files "")
 set(_generated_msg_cpp_ts_files "")
 set(_generated_srv_files "")
 
@@ -52,10 +54,10 @@ foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
     )
 
     foreach(_typesupport_impl ${_typesupport_impls})
-      list(APPEND _generated_msg_cpp_files
-        "${_output_path}/${_parent_folder}/${_module_name}_s.ep.${_typesupport_impl}.cpp"
-      )
-      list(APPEND _generated_msg_cpp_ts_files
+#      list_append_unique(_generated_msg_cpp_files
+#        "${_output_path}/${_parent_folder}/${_module_name}_s.ep.${_typesupport_impl}.cpp"
+#      )
+      list_append_unique(_generated_msg_cpp_ts_files
         "${_output_path}/${_parent_folder}/${_module_name}_s.ep.${_typesupport_impl}.cpp"
       )
       list(APPEND _type_support_by_generated_msg_cpp_files "${_typesupport_impl}")
@@ -111,8 +113,14 @@ set(_generated_extension_files "")
 set(_extension_dependencies "")
 set(_target_suffix "__java")
 
+set_property(
+  SOURCE
+  ${_generated_msg_java_files} ${_generated_msg_cpp_ts_files} ${_generated_srv_files}
+  PROPERTY GENERATED 1)
+
 add_custom_command(
-  OUTPUT ${_generated_msg_cpp_common_files} ${_generated_msg_java_files} ${_generated_msg_cpp_ts_files} ${_generated_msg_cpp_files} ${_generated_srv_files}
+#  OUTPUT ${_generated_msg_cpp_common_files} ${_generated_msg_java_files} ${_generated_msg_cpp_ts_files} ${_generated_msg_cpp_files} ${_generated_srv_files}
+  OUTPUT ${_generated_msg_java_files} ${_generated_msg_cpp_ts_files} ${_generated_srv_files}
   COMMAND ${PYTHON_EXECUTABLE} ${rosidl_generator_java_BIN}
   --generator-arguments-file "${generator_arguments_file}"
   --typesupport-impl "${_typesupport_impl}"
@@ -122,8 +130,22 @@ add_custom_command(
   VERBATIM
 )
 
+if(TARGET ${rosidl_generate_interfaces_TARGET}${_target_suffix})
+  message(WARNING "Custom target ${rosidl_generate_interfaces_TARGET}${_target_suffix} already exists")
+else()
+  add_custom_target(
+    ${rosidl_generate_interfaces_TARGET}${_target_suffix}
+    DEPENDS
+    ${_generated_msg_java_files}
+    ${_generated_msg_cpp_ts_files}
+    ${_generated_srv_files}
+  )
+endif()
+
 foreach(_generated_msg_cpp_ts_file ${_generated_msg_cpp_ts_files})
   get_filename_component(_full_folder "${_generated_msg_cpp_ts_file}" DIRECTORY)
+  get_filename_component(_package_folder "${_full_folder}" DIRECTORY)
+  get_filename_component(_package_name "${_package_folder}" NAME)
   get_filename_component(_parent_folder "${_full_folder}" NAME)
   get_filename_component(_base_msg_name "${_generated_msg_cpp_ts_file}" NAME_WE)
   get_filename_component(_full_extension_msg_name "${_generated_msg_cpp_ts_file}" EXT)
@@ -137,48 +159,44 @@ foreach(_generated_msg_cpp_ts_file ${_generated_msg_cpp_ts_files})
 
   set(_javaext_suffix "__javaext")
 
-  add_library(${_msg_name}${_javaext_suffix} SHARED
+  add_library(${_package_name}_${_base_msg_name}__${_typesupport_impl} SHARED
     "${_generated_msg_cpp_ts_file}"
   )
 
-  set_target_properties(${_msg_name}${_javaext_suffix} PROPERTIES
+  set_target_properties(${_package_name}_${_base_msg_name}__${_typesupport_impl} PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY "${_output_path}/${_parent_folder}"
     RUNTIME_OUTPUT_DIRECTORY "${_output_path}/${_parent_folder}"
-    OUTPUT_NAME "${_base_msg_name}__${_typesupport_impl}"
   )
 
-  set_target_properties(${_msg_name}${_javaext_suffix} PROPERTIES
+  set_target_properties(${_package_name}_${_base_msg_name}__${_typesupport_impl} PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_DEBUG "${_output_path}/${_parent_folder}"
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${_output_path}/${_parent_folder}"
-    OUTPUT_NAME "${_base_msg_name}__${_typesupport_impl}"
   )
 
-  set_target_properties(${_msg_name}${_javaext_suffix} PROPERTIES
+  set_target_properties(${_package_name}_${_base_msg_name}__${_typesupport_impl} PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_RELEASE "${_output_path}/${_parent_folder}"
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${_output_path}/${_parent_folder}"
-    OUTPUT_NAME "${_base_msg_name}__${_typesupport_impl}"
   )
 
-  set_target_properties(${_msg_name}${_javaext_suffix} PROPERTIES
+  set_target_properties(${_package_name}_${_base_msg_name}__${_typesupport_impl} PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_output_path}/${_parent_folder}"
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_output_path}/${_parent_folder}"
-    OUTPUT_NAME "${_base_msg_name}__${_typesupport_impl}"
   )
 
-  set_target_properties(${_msg_name}${_javaext_suffix} PROPERTIES
+  set_target_properties(${_package_name}_${_base_msg_name}__${_typesupport_impl} PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${_output_path}/${_parent_folder}"
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${_output_path}/${_parent_folder}"
-    OUTPUT_NAME "${_base_msg_name}__${_typesupport_impl}"
   )
 
   add_dependencies(
-    ${_msg_name}${_javaext_suffix}
+    ${_package_name}_${_base_msg_name}__${_typesupport_impl}
     ${rosidl_generate_interfaces_TARGET}__rosidl_generator_c
+    ${rosidl_generate_interfaces_TARGET}${_target_suffix}
   )
 
   set(_extension_compile_flags "")
@@ -187,11 +205,11 @@ foreach(_generated_msg_cpp_ts_file ${_generated_msg_cpp_ts_files})
   endif()
 
   target_link_libraries(
-    ${_msg_name}${_javaext_suffix}
+    ${_package_name}_${_base_msg_name}__${_typesupport_impl}
     ${PROJECT_NAME}__${_typesupport_impl}
   )
 
-  target_include_directories(${_msg_name}${_javaext_suffix}
+  target_include_directories(${_package_name}_${_base_msg_name}__${_typesupport_impl}
     PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_c
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java
@@ -200,46 +218,45 @@ foreach(_generated_msg_cpp_ts_file ${_generated_msg_cpp_ts_files})
 
   foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
     ament_target_dependencies(
-      ${_msg_name}${_javaext_suffix}
+      ${_package_name}_${_base_msg_name}__${_typesupport_impl}
       ${_pkg_name}
     )
   endforeach()
 
-  ament_target_dependencies(${_msg_name}${_javaext_suffix}
+  ament_target_dependencies(${_package_name}_${_base_msg_name}__${_typesupport_impl}
     "rosidl_generator_c"
     "${_typesupport_impl}"
   )
 
-  list(APPEND _extension_dependencies ${_msg_name}${_javaext_suffix})
+  list(APPEND _extension_dependencies ${_package_name}_${_base_msg_name}__${_typesupport_impl})
 
-  ament_target_dependencies(${_msg_name}${_javaext_suffix}
+  ament_target_dependencies(${_package_name}_${_base_msg_name}__${_typesupport_impl}
     ${_typesupport_impl}
   )
-  add_dependencies(${_msg_name}${_javaext_suffix}
+  add_dependencies(${_package_name}_${_base_msg_name}__${_typesupport_impl}
     ${rosidl_generate_interfaces_TARGET}__${_typesupport_impl}
   )
 
-  if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
-    ament_export_libraries("${_base_msg_name}__${_typesupport_impl}")
-
-    install(TARGETS ${_msg_name}${_javaext_suffix}
-      DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}/${_msg_package_dir2}"
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-    )
-  endif()
-
-  ament_target_dependencies(${_msg_name}${_javaext_suffix}
+  ament_target_dependencies(${_package_name}_${_base_msg_name}__${_typesupport_impl}
     "rosidl_generator_c"
     "rosidl_generator_java"
     "${PROJECT_NAME}__rosidl_generator_c"
   )
 
+  if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
+    install(TARGETS ${_package_name}_${_base_msg_name}__${_typesupport_impl}
+      ARCHIVE DESTINATION lib
+      LIBRARY DESTINATION lib
+    )
+
+    ament_export_libraries(${_package_name}_${_base_msg_name}__${_typesupport_impl})
+  endif()
+
 endforeach()
 
 set(_jar_deps "")
-find_package(rcljava REQUIRED)
-foreach(_jar_dep ${rcljava_JARS})
+find_package(rosidl_generator_java REQUIRED)
+foreach(_jar_dep ${rosidl_generator_java_JARS})
   list(APPEND _jar_deps "${_jar_dep}")
 endforeach()
 
@@ -260,18 +277,6 @@ add_jar("${PROJECT_NAME}_jar"
 
 get_property(_jar_file TARGET "${PROJECT_NAME}_jar" PROPERTY "JAR_FILE")
 
-if(TARGET ${rosidl_generate_interfaces_TARGET}${_target_suffix})
-  message(WARNING "Custom target ${rosidl_generate_interfaces_TARGET}${_target_suffix} already exists")
-else()
-  add_custom_target(
-    ${rosidl_generate_interfaces_TARGET}${_target_suffix}
-    DEPENDS
-    ${_generated_msg_java_files}
-    ${_generated_msg_cpp_files}
-    ${_generated_srv_files}
-  )
-endif()
-
 if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
   set(_install_jar_dir "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}")
   if(NOT "${_generated_msg_java_files} " STREQUAL " ")
@@ -279,7 +284,7 @@ if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
     get_filename_component(_msg_package_dir "${_msg_file}" DIRECTORY)
     get_filename_component(_msg_package_dir "${_msg_package_dir}" DIRECTORY)
 
-    install_jar("${PROJECT_NAME}_jar" "share/java")
-    ament_export_jars("share/java/${PROJECT_NAME}.jar")
+    install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
+    ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
   endif()
 endif()

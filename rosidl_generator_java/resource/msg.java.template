@@ -1,20 +1,19 @@
 package @(package_name).@(subfolder);
 
-import io.ebinoma.rcljava.RCLJava;
+import org.ros2.rosidl_generator_java.RCLJavaProxy;
 
 @[for field in spec.fields]@
-@[if not field.type.is_primitive_type()]@
-@[if field.type.pkg_name != spec.base_type.pkg_name]@
+@[    if not field.type.is_primitive_type()]@
+@[        if field.type.pkg_name != spec.base_type.pkg_name]@
 import @(field.type.pkg_name).msg.@(field.type.type);
-@[end if]@
-@[end if]@
+@[        end if]@
+@[    end if]@
 @[end for]@
 
 public class @(type_name) {
    static {
         try {
-            // TODO(esteve): query rcljava and load the appropriate library instead
-            System.loadLibrary("@(type_name)_s__" + RCLJava.getTypesupportIdentifier);
+            System.loadLibrary("@(spec.base_type.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
         } catch (UnsatisfiedLinkError e) {
             System.err.println("Native code library failed to load.\n" + e);
             System.exit(1);
@@ -25,7 +24,41 @@ public class @(type_name) {
     public static native long getToJavaConverter();
     public static native long getTypeSupport();
 
+@[for constant in spec.constants]@
+    public static final @(get_builtin_java_type(constant.type)) @(constant.name) = @(constant_value_to_java(constant.type, constant.value));
+@[end for]@
+
+@{
+def upperfirst(s):
+    return s[0].capitalize() + s[1:]
+}@
 @[for field in spec.fields]@
-    public @(get_java_type(field.type)) @(field.name);
+
+@[    if field.type.is_array]@
+    private java.util.List<@(get_java_type(field.type, use_primitives=False))> @(field.name);
+
+    public void set@(upperfirst(field.name))(java.util.Collection<@(get_java_type(field.type, use_primitives=False))> @(field.name)) {
+        if (@(field.name) != null) {
+            this.@(field.name) = new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>(@(field.name));
+        }
+    }
+
+    public java.util.List<@(get_java_type(field.type, use_primitives=False))> get@(upperfirst(field.name))() {
+        if (this.@(field.name) == null) {
+            return null;
+        }
+        return new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>(this.@(field.name));
+    }
+@[    else]@
+    private @(get_java_type(field.type)) @(field.name);
+
+    public void set@(upperfirst(field.name))(@(get_java_type(field.type)) @(field.name)) {
+        this.@(field.name) = @(field.name);
+    }
+
+    public @(get_java_type(field.type)) get@(upperfirst(field.name))() {
+        return this.@(field.name);
+    }
+@[    end if]@
 @[end for]@
 }
