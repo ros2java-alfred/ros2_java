@@ -113,7 +113,7 @@ The talker and listener example Android apps can be installed via adb, plug your
 Talker:
 
 ```
-adb install ~/ros2_android_ws/install_isolated/ros2_talker_android/ros2_listener_android-debug.apk
+adb install ~/ros2_android_ws/install_isolated/ros2_talker_android/ros2_talker_android-debug.apk
 ```
 
 Listener:
