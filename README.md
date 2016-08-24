@@ -7,6 +7,8 @@ What is this?
 This is a set of projects (bindings, code generator, examples and more) that enables developers to write ROS2
 applications for the JVM and Android.
 
+Besides this repository itself, there's also https://github.com/esteve/ament_java, which adds support for Gradle to Ament. Additionally, examples for Java and Android can be found in https://github.com/esteve/ros2_java_examples and https://github.com/esteve/ros2_android_examples respectively.
+
 Is this Java only?
 ------------------
 
@@ -133,4 +135,4 @@ There's a bunch of features missing, such as services, efficient intraprocess co
 
 Large messages would benefit from Java's NIO.
 
-Finally, this wouldn't be a proper opensource project if it didn't lack tests and documentation, so there's that too.
+And of course, this wouldn't be a proper opensource project if it didn't lack tests and documentation, so there's that too.
