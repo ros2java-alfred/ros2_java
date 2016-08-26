@@ -44,7 +44,7 @@ Desktop
 ```
 mkdir -p ~/ros2_java_ws/src
 cd ~/ros2_java_ws
-wget https://raw.githubusercontent.com/esteve/ament_java/master/ros2_java_desktop.repos
+wget https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_desktop.repos
 vcs import ~/ros2_java_ws/src < ros2_java_desktop.repos
 cd ~/ros2_java_ws/src/ros2/rosidl
 patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_java.diff
@@ -87,7 +87,7 @@ You may download the Android NDK from [the official](https://developer.android.c
 ```
 mkdir -p ~/ros2_android_ws/src
 cd ~/ros2_android_ws
-wget https://raw.githubusercontent.com/esteve/ament_java/master/ros2_java_android.repos
+wget https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_android.repos
 vcs import ~/ros2_android_ws/src < ros2_java_android.repos
 cd ~/ros2_android_ws/src/ros2/rosidl
 patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_android.diff
