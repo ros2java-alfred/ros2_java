@@ -12,13 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava;
+package org.ros2.rcljava.exception;
 
 /**
+ * Raised when there is no rmw implementation with a Java extension available.
  *
+ * @author Mickael Gaillard <mickael.gaillard@gmail.com>
  *
- * @author Esteve Fernandez <esteve@apache.org>
  */
-public interface Consumer<T> {
-    void accept(T t);
+public class NoImplementationAvailableException extends RuntimeException {
+
+    /** Serial ID */
+    private static final long serialVersionUID = -2351440132432398102L;
+
+    /**
+     * Constructor.
+     *
+     * @param cause
+     */
+    public NoImplementationAvailableException(Throwable cause) {
+        super("no rmw implementation with a Java extension available", cause);
+    }
 }

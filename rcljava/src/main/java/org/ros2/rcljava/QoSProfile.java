@@ -15,10 +15,16 @@
 package org.ros2.rcljava;
 
 /**
- *
- *
- * @author Esteve Fernandez <esteve@apache.org>
+ * <h1>Quality of Service</h1>
+ * <p><i>TODO Not full implemented !!</i></p>
+ * @author Mickael Gaillard <mickael.gaillard@gmail.com>
  */
-public interface Consumer<T> {
-    void accept(T t);
+public class QoSProfile {
+
+    public static final QoSProfile DEFAULT = new QoSProfile();
+
+    public QoSProfile() {
+
+    }
+
 }
