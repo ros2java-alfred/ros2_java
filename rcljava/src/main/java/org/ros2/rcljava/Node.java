@@ -46,7 +46,7 @@ public class Node {
             long nodeHandle, Class<T> cls, String topic);
 
     private static native <T> long nativeCreateSubscriptionHandle(
-        long nodeHandle, Class<T> cls, String topic);
+            long nodeHandle, Class<T> cls, String topic);
 
     /**
      * Constructor of Node.
@@ -101,7 +101,10 @@ public class Node {
         return this.subscriptions;
     }
 
-    public Log getLog() {
-        return new Log();
+    /**
+     * Release all Publisher ressource.
+     */
+    public void dispose() {
+        //TODO
     }
 }

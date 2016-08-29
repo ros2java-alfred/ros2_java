@@ -24,22 +24,22 @@ package org.ros2.rcljava;
 public class Subscription<T> {
 
     /** Node Handler. */
-    private long nodeHandle;
+    private final long nodeHandle;
 
     /** Subsciption Hander. */
-    private long subscriptionHandle;
+    private final long subscriptionHandle;
 
     /** Message Type. */
-    private Class<T> messageType;
+    private final Class<T> messageType;
 
     /** Topic subscribed. */
-    private String topic;
+    private final String topic;
 
     /** Callback. */
-    private Consumer<T> callback;
+    private final Consumer<T> callback;
 
     /** Quality of Service profil. */
-    private QoSProfile qosProfile;
+    private final QoSProfile qosProfile;
 
     // Native call.
     private static native void nativeDispose(long nodeHandle, long publisherHandle);
