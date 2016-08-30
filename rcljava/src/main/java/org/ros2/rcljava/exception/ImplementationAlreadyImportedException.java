@@ -17,14 +17,17 @@ package org.ros2.rcljava.exception;
 /**
  * Raised on select_rmw_implemenation() after import_rmw_implementation() has
  * been called.
- * 
+ *
  * @author Mickael Gaillard
  */
 public class ImplementationAlreadyImportedException extends Exception {
 
+    /** Serial ID */
+    private static final long serialVersionUID = 4388424558654481791L;
+
     /**
      * Constructor.
-     * 
+     *
      * @param cause
      */
     public ImplementationAlreadyImportedException(Throwable cause) {

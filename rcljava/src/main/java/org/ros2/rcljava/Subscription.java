@@ -15,8 +15,8 @@
 package org.ros2.rcljava;
 
 /**
- * <h1>Subscrition of node.</h1>
- * <p></p>
+ * Subscrition of node.
+ *
  * @param <T> Message Type.
  * @author Esteve Fernandez <esteve@apache.org>
  * @author Mickael Gaillard <mick.gaillard@gmail.com>

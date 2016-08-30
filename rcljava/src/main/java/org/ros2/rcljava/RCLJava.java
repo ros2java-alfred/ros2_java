@@ -145,7 +145,7 @@ public class RCLJava {
      */
     public static Node createNode(String nodeName) {
         long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName);
-        return new Node(nodeHandle);
+        return new Node(nodeHandle, nodeName);
     }
 
     /**

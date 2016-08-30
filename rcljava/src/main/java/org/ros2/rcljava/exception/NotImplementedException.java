@@ -15,22 +15,20 @@
 package org.ros2.rcljava.exception;
 
 /**
- * Raised when the rcljava implementation is accessed before RclJava().
+ * Raised when there is no implementation.
  *
- * @author Mickael Gaillard
+ * @author Mickael Gaillard <mickael.gaillard@gmail.com>
  *
  */
-public class NotInitializedException extends Exception {
+public class NotImplementedException extends RuntimeException {
 
     /** Serial ID */
-    private static final long serialVersionUID = -5109722435632105485L;
+    private static final long serialVersionUID = -2351440132432398102L;
 
     /**
      * Constructor.
-     *
-     * @param cause
      */
-    public NotInitializedException(Throwable cause) {
-        super("RclJava() has not been called", cause);
+    public NotImplementedException() {
+        super("Not Implemented !!!");
     }
 }

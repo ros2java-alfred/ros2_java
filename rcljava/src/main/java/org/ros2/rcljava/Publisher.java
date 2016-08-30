@@ -15,8 +15,8 @@
 package org.ros2.rcljava;
 
 /**
- * <h1>Publisher of node.</h1>
- * <p></p>
+ * Publisher of node.
+ *
  * @param <T> Message Type.
  * @author Esteve Fernandez <esteve@apache.org>
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
