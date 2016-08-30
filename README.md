@@ -100,12 +100,12 @@ cd ~/ros2_android_ws
 . ~/ament_ws/install_isolated/local_setup.sh
 ament build --isolated --cmake-args \
   -DPYTHON_EXECUTABLE=/usr/bin/python3 -DCMAKE_TOOLCHAIN_FILE=$HOME/ros2_android_ws/src/android-cmake/android-cmake/android.toolchain.cmake \
-  -DANDROID_FUNCTION_LEVEL_LINKING=OFF -DANDROID_NATIVE_API_LEVEL=android-21 -DANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang -DANDROID_STL=gnustl_shared \
+  -DANDROID_FUNCTION_LEVEL_LINKING=OFF -DANDROID_NATIVE_API_LEVEL=android-21 \ -DANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang -DANDROID_STL=gnustl_shared \
   -DANDROID_ABI=armeabi-v7a -DANDROID_NDK=$HOME/android_ndk/android-ndk-r12b -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF -- \
   --ament-cmake-args \
   -DPYTHON_EXECUTABLE=/usr/bin/python3 -DCMAKE_TOOLCHAIN_FILE=$HOME/ros2_android_ws/src/android-cmake/android-cmake/android.toolchain.cmake \
-  -DANDROID_FUNCTION_LEVEL_LINKING=OFF -DANDROID_NATIVE_API_LEVEL=android-21 -DANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang -DANDROID_STL=gnustl_shared \
-  -DANDROID_ABI=armeabi-v7a -DANDROID_NDK=$HOME/android_ndk/android-ndk-r12b -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF --
+  -DANDROID_FUNCTION_LEVEL_LINKING=OFF -DANDROID_NATIVE_API_LEVEL=android-21 \ -DANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang -DANDROID_STL=gnustl_shared \
+  -DANDROID_ABI=armeabi-v7a -DANDROID_NDK=$HOME/android_ndk/android-ndk-r12b -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF -- \
   --ament-gradle-args \
   -Pament.android_stl=gnustl_shared -Pament.android_abi=armeabi-v7a -Pament.android_ndk=$HOME/android_ndk/android-ndk-r12b --
 ```
