@@ -229,7 +229,7 @@ public class Node implements INode {
     public <T> Service<T> createService(
             final Class<T> message,
             final String service,
-            final Consumer<T> callback,
+            final ServiceConsumer<?, ?> callback,
             final QoSProfile qos) {
 
         //TODO
@@ -250,7 +250,7 @@ public class Node implements INode {
     public <T> Service<T> createService(
             final Class<T> message,
             final String service,
-            final Consumer<T> callback) {
+            final ServiceConsumer<?, ?> callback) {
 
         return this.createService(message, service, callback, QoSProfile.PROFILE_DEFAULT);
     }
@@ -317,13 +317,15 @@ public class Node implements INode {
      */
     @Override
     public void notifyGraphChange() {
-
+        //TODO
+        throw new NotImplementedException();
     }
 
     /** Notify any and all blocking node actions that shutdown has occurred. */
     @Override
     public void notifyShutdown() {
-
+        //TODO
+        throw new NotImplementedException();
     }
 
     /**

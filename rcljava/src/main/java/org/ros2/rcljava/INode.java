@@ -111,7 +111,7 @@ public interface INode {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Service instance of the service.
      */
-    <T> Service<T> createService(Class<T> message, String service, Consumer<T> callback, QoSProfile qos);
+    <T> Service<T> createService(Class<T> message, String service, ServiceConsumer<?, ?> callback, QoSProfile qos);
 
     /**
      * Create and return a Service. (Retro-compatibility)
@@ -122,7 +122,7 @@ public interface INode {
      * @param callback The user-defined callback function.
      * @return Service instance of the service.
      */
-    <T> Service<T> createService(Class<T> message, String service, Consumer<T> callback);
+    <T> Service<T> createService(Class<T> message, String service, ServiceConsumer<?, ?> callback);
 
     List<Object> setParameters(List<Object> parameters);
 

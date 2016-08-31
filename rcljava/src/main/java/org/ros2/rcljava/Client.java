@@ -14,6 +14,8 @@
  */
 package org.ros2.rcljava;
 
+import org.ros2.rcljava.exception.NotImplementedException;
+
 /**
  * Service Client.
  *
@@ -47,8 +49,10 @@ public class Client<T> {
         //TODO
     }
 
-    public void sendRequest() {
-
+    public <U, V> V sendRequest(U request) {
+        //TODO
+        throw new NotImplementedException();
+//        return null;
     }
 
     public String getServiceName() {
@@ -57,5 +61,11 @@ public class Client<T> {
 
     public long getClientHandle() {
         return this.clientHandle;
+    }
+
+    public boolean waitForService(int i) {
+      //TODO
+        throw new NotImplementedException();
+//        return false;
     }
 }
