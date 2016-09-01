@@ -12,17 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava.service;
+package org.ros2.rcljava.parameter;
+
+import org.ros2.rcljava.Node;
+import org.ros2.rcljava.QoSProfile;
 
 /**
- * Service Consumer.
+ * Parameter Variant.
  *
- * @param <T> Service Request Type.
- * @param <U> Service Response Type.
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
-public interface ServiceConsumer<T, U> {
+public class ParameterService {
 
-    public void call(T request, U response);
+    public ParameterService(Node node, QoSProfile profileParameter) {
+        // TODO Auto-generated constructor stub
+    }
 
 }

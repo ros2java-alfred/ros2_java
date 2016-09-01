@@ -12,17 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava.service;
+package org.ros2.rcljava.parameter;
 
 /**
- * Service Consumer.
+ * Parameter Consumer.
  *
- * @param <T> Service Request Type.
- * @param <U> Service Response Type.
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
-public interface ServiceConsumer<T, U> {
-
-    public void call(T request, U response);
-
+public interface ParameterConsumer {
+    /**
+     *
+     * @param event
+     */
+    void onEvent(final rcl_interfaces.msg.ParameterEvent event);
 }
