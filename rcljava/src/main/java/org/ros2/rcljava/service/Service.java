@@ -12,17 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava;
-
-import org.ros2.rcljava.exception.NotImplementedException;
+package org.ros2.rcljava.service;
 
 /**
- * Service Client.
+ * Service Server.
  *
- * @param <T> Service Type.
+ * @param <T> Service Type.
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
-public class Client<T> {
+public class Service<T> {
 
     /** Name of the node */
     private final String name;
@@ -30,8 +28,8 @@ public class Client<T> {
     /** Node Handler. */
     private final long nodeHandle;
 
-    /** Client Handler. */
-    private final long clientHandle;
+    /** Service Handler. */
+    private  long serviceHandle;
 
     /**
      * Constructor.
@@ -39,33 +37,25 @@ public class Client<T> {
      * @param nodeHandle
      * @param serviceName
      */
-    public Client(final long nodeHandle, final String serviceName) {
+    public Service(final long nodeHandle, final String serviceName) {
         this.name = serviceName;
         this.nodeHandle = nodeHandle;
-        this.clientHandle = 0L; //TODO rcl_client_init()
+        this.serviceHandle = 0L; //TODO rcl_service_init()
     }
 
     public void dispose() {
         //TODO
     }
 
-    public <U, V> V sendRequest(U request) {
-        //TODO
-        throw new NotImplementedException();
-//        return null;
+    public void sendResponse() {
+
     }
 
     public String getServiceName() {
         return this.name;
     }
 
-    public long getClientHandle() {
-        return this.clientHandle;
-    }
-
-    public boolean waitForService(int i) {
-      //TODO
-        throw new NotImplementedException();
-//        return false;
+    public long getServiceHandle() {
+        return this.serviceHandle;
     }
 }

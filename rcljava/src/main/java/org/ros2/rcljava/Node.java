@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.ros2.rcljava.exception.NotImplementedException;
+import org.ros2.rcljava.service.Client;
+import org.ros2.rcljava.service.Service;
+import org.ros2.rcljava.service.ServiceConsumer;
 
 /**
  * Node ROS2.

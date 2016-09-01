@@ -17,6 +17,10 @@ package org.ros2.rcljava;
 import java.util.HashMap;
 import java.util.List;
 
+import org.ros2.rcljava.service.Client;
+import org.ros2.rcljava.service.Service;
+import org.ros2.rcljava.service.ServiceConsumer;
+
 /**
  * ROS2 Client API.
  *
