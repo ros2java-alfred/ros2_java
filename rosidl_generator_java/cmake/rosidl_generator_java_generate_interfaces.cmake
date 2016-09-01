@@ -269,6 +269,7 @@ endforeach()
 
 add_jar("${PROJECT_NAME}_jar"
   "${_generated_msg_java_files}"
+  "${_generated_srv_files}"
   OUTPUT_NAME
   "${PROJECT_NAME}"
   INCLUDE_JARS
