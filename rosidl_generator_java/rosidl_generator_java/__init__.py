@@ -76,11 +76,13 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
             for generated_filename in generated_filenames:
                 data = {
                     'constant_value_to_java': constant_value_to_java,
-                     'convert_camel_case_to_lower_case_underscore': convert_camel_case_to_lower_case_underscore,
+                    'convert_camel_case_to_lower_case_underscore': convert_camel_case_to_lower_case_underscore,
                     'get_builtin_java_type': get_builtin_java_type,
-                    'module_name': module_name, 'package_name': package_name,
+                    'module_name': module_name,
+                    'package_name': package_name,
                     'jni_package_name': jni_package_name,
-                    'spec': spec, 'subfolder': subfolder,
+                    'spec': spec,
+                    'subfolder': subfolder,
                     'typesupport_impl': type_support_impl_by_filename.get(generated_filename, ''),
                     'typesupport_impls': typesupport_impls,
                     'type_name': type_name,
