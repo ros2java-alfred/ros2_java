@@ -85,6 +85,7 @@ public class Subscription<T> {
      * Release all Publisher ressource.
      */
     public void dispose() {
-        Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
+        //TODO implement to JNI
+        // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
     }
 }

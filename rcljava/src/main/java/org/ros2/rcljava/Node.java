@@ -18,6 +18,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.service.Client;
@@ -32,14 +33,12 @@ import org.ros2.rcljava.service.ServiceConsumer;
  */
 public class Node implements INode {
 
+    private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
+
+
     // Loading JNI library.
     static {
-        try {
-            System.loadLibrary("rcljavaNode__" + RCLJava.getRMWIdentifier());
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native code library failed to load.\n" + e);
-            System.exit(1);
-        }
+        RCLJava.loadLibrary("rcljavaNode__" + RCLJava.getRMWIdentifier());
     }
 
     /** Name of the node */
@@ -89,6 +88,7 @@ public class Node implements INode {
      */
     @Override
     public void dispose() {
+      //TODO Implement on JNI
         this.publishers.clear();
         this.subscriptions.clear();
     }
@@ -119,6 +119,8 @@ public class Node implements INode {
             final Class<T> message,
             final String topic,
             final QoSProfile qos) {
+
+        logger.fine("Create Publisher : " + topic);
         long publisherHandle = Node.nativeCreatePublisherHandle(this.nodeHandle, message, topic);
 
         Publisher<T> publisher = new Publisher<T>(this.nodeHandle, publisherHandle, message, topic, qos);
@@ -159,9 +161,17 @@ public class Node implements INode {
             final String topic,
             final Consumer<T> callback,
             final QoSProfile qos) {
+
+        logger.fine("Create Subscription : " + topic);
         long subscriptionHandle = Node.nativeCreateSubscriptionHandle(this.nodeHandle, message, topic);
 
-        Subscription<T> subscription = new Subscription<T>(this.nodeHandle, subscriptionHandle, message, topic, callback, qos);
+        Subscription<T> subscription = new Subscription<T>(
+                this.nodeHandle,
+                subscriptionHandle,
+                message,
+                topic,
+                callback,
+                qos);
         this.subscriptions.add(subscription);
         return subscription;
     }
