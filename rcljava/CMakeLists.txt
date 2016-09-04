@@ -89,6 +89,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/Consumer.java"
   "src/main/java/org/ros2/rcljava/Log.java"
   "src/main/java/org/ros2/rcljava/QoSProfile.java"
+  "src/main/java/org/ros2/rcljava/NativeUtils.java"
   "src/main/java/org/ros2/rcljava/exception/ImplementationAlreadyImportedException.java"
   "src/main/java/org/ros2/rcljava/exception/InvalidRCLJAVAImplementation.java"
   "src/main/java/org/ros2/rcljava/exception/NoImplementationAvailableException.java"

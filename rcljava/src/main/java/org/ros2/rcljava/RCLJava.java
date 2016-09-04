@@ -17,6 +17,10 @@ package org.ros2.rcljava;
 import java.lang.ref.WeakReference;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
 
@@ -30,6 +34,10 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * @author Esteve Fernandez <esteve@apache.org>
  */
 public class RCLJava {
+
+    public static final String LOG_NAME = RCLJava.class.getName();
+
+    private static Logger logger = Logger.getLogger(LOG_NAME);
 
     /** Global List/Queue of publishers. */
     public static Queue<WeakReference> publisherReferences = new LinkedBlockingQueue();
@@ -68,8 +76,16 @@ public class RCLJava {
 
     /** Release all ressources at shutdown. */
     static {
+        logger.setLevel(Level.ALL);
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setFormatter(new SimpleFormatter());
+        logger.addHandler(handler);
+        handler.setLevel(Level.INFO);
+
+
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
+                logger.fine("Shutdown...");
                 for(WeakReference<Publisher<?>> publisherReference : RCLJava.publisherReferences) {
                     if(publisherReference.get() != null) {
                         publisherReference.get().dispose();
@@ -93,19 +109,24 @@ public class RCLJava {
     public static void rclJavaInit() {
         synchronized (RCLJava.class) {
             if (!RCLJava.initialized) {
+                String libpath = System.getProperty("java.library.path");
+                logger.fine("Native Library path : \n" + libpath.replace(':', '\n'));
+
                 if (RCLJava.rmwImplementation == null) {
                     for (Map.Entry<String, String> entry : rmwToTypesupport.entrySet()) {
                         try {
+                            logger.config("Try to load native " + entry.getKey() + "...");
                             RCLJava.setRMWImplementation(entry.getKey());
+                            logger.config(entry.getKey() + " loaded !");
                             break;
                         } catch (NoImplementationAvailableException e) {
-                            // TODO(esteve): handle exception
+                            logger.config(entry.getKey() + " not available ! (" + e.getMessage() + ")");
                         }
                     }
                 }
 
                 if (RCLJava.rmwImplementation == null) {
-                    System.err.println("No RMW implementation found");
+                    logger.severe("No RMW implementation found...");
                     System.exit(1);
                 } else {
                     RCLJava.nativeRCLJavaInit();
@@ -122,6 +143,7 @@ public class RCLJava {
      * @return Instance of Node Reference.
      */
     public static Node createNode(String nodeName) {
+        logger.fine("Create Node stack : " + nodeName);
         long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName);
 
         return new Node(nodeHandle);
@@ -172,6 +194,7 @@ public class RCLJava {
      * </p>
      */
     public static void shutdown() {
+        logger.fine("Shutdown...");
         RCLJava.nativeShutdown();
     }
 
@@ -205,13 +228,33 @@ public class RCLJava {
             throws NoImplementationAvailableException {
 
         synchronized(RCLJava.class) {
+            String file = "rcljavaRCLJava__" + rmwImplementation;
+            logger.fine("Load native file : lib" + file + ".so");
+
             try {
-                System.loadLibrary("rcljavaRCLJava__" + rmwImplementation);
+                System.loadLibrary(file);
                 RCLJava.rmwImplementation = rmwImplementation;
             } catch (UnsatisfiedLinkError ule) {
                 throw new NoImplementationAvailableException(ule);
             } catch (Exception e) {
-                throw new NoImplementationAvailableException(e);
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * <h1>Load Native ROS library</h1>
+     * <p>load from java.library.path .</p>
+     * @param name Name of the library.
+     */
+    public static void loadLibrary(String name) {
+        synchronized(RCLJava.class) {
+            logger.fine("Load native file : lib" + name + ".so");
+            try {
+                System.loadLibrary(name);
+            } catch (UnsatisfiedLinkError e) {
+                System.err.println("Native code library failed to load.\n" + e);
+                System.exit(1);
             }
         }
     }

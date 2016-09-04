@@ -17,6 +17,7 @@ package org.ros2.rcljava;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * <h1>Node ROS2.</h1>
@@ -25,14 +26,10 @@ import java.util.List;
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class Node {
+    private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
 
     static {
-        try {
-            System.loadLibrary("rcljavaNode__" + RCLJava.getRMWIdentifier());
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native code library failed to load.\n" + e);
-            System.exit(1);
-        }
+        RCLJava.loadLibrary("rcljavaNode__" + RCLJava.getRMWIdentifier());
     }
 
     /** Node handler */
@@ -67,6 +64,7 @@ public class Node {
      * @return Publisher instance.
      */
     public <T> Publisher<T> createPublisher(Class<T> message, String topic,  QoSProfile qos) {
+        logger.fine("Create Publisher : " + topic);
         long publisherHandle = Node.nativeCreatePublisherHandle(this.nodeHandle, message, topic);
 
         Publisher<T> publisher = new Publisher<T>(this.nodeHandle, publisherHandle, message, topic, qos);
@@ -85,10 +83,21 @@ public class Node {
      * @param qos QOS profile.
      * @return
      */
-    public <T> Subscription<T> createSubscription(Class<T> message, String topic, Consumer<T> callback, QoSProfile qos) {
+    public <T> Subscription<T> createSubscription(
+            Class<T> message,
+            String topic,
+            Consumer<T> callback,
+            QoSProfile qos) {
+        logger.fine("Create Subscription : " + topic);
         long subscriptionHandle = Node.nativeCreateSubscriptionHandle(this.nodeHandle, message, topic);
 
-        Subscription<T> subscription = new Subscription<T>(this.nodeHandle, subscriptionHandle, message, topic, callback, qos);
+        Subscription<T> subscription = new Subscription<T>(
+                this.nodeHandle,
+                subscriptionHandle,
+                message,
+                topic,
+                callback,
+                qos);
         this.subscriptions.add(subscription);
         return subscription;
     }
@@ -105,6 +114,6 @@ public class Node {
      * Release all Publisher ressource.
      */
     public void dispose() {
-        //TODO
+        //TODO Implement on JNI
     }
 }

@@ -43,12 +43,7 @@ public class Publisher<T> {
     private static native void nativeDispose(long nodeHandle, long publisherHandle);
 
     static {
-        try {
-            System.loadLibrary("rcljavaPublisher__" + RCLJava.getRMWIdentifier());
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native code library failed to load.\n" + e);
-            System.exit(1);
-        }
+        RCLJava.loadLibrary("rcljavaPublisher__" + RCLJava.getRMWIdentifier());
     }
 
     /**
@@ -96,6 +91,7 @@ public class Publisher<T> {
      * Release all Publisher ressource.
      */
     public void dispose() {
-        Publisher.nativeDispose(this.nodeHandle, this.publisherHandle);
+        //TODO implement to JNI
+        //Publisher.nativeDispose(this.nodeHandle, this.publisherHandle);
     }
 }
