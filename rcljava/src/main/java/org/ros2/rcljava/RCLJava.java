@@ -86,6 +86,15 @@ public class RCLJava {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 logger.fine("Shutdown...");
+
+                String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
+                StringBuilder msgLog = new StringBuilder();
+                for (String key : list) {
+                    msgLog.append(key);
+                    msgLog.append("\n");
+                }
+                logger.fine("Native libraries Loaded: \n" + msgLog.toString());
+
                 for(WeakReference<Publisher<?>> publisherReference : RCLJava.publisherReferences) {
                     if(publisherReference.get() != null) {
                         publisherReference.get().dispose();
