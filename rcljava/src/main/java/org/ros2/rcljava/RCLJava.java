@@ -83,13 +83,6 @@ public class RCLJava {
 
     /** Release all ressources at shutdown. */
     static {
-        logger.setLevel(Level.ALL);
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleFormatter());
-        logger.addHandler(handler);
-        handler.setLevel(Level.INFO);
-
-
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 logger.fine("Shutdown...");
