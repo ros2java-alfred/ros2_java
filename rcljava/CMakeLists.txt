@@ -63,6 +63,10 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/exception/NoImplementationAvailableException.java"
   "src/main/java/org/ros2/rcljava/exception/NotImplementedException.java"
   "src/main/java/org/ros2/rcljava/exception/NotInitializedException.java"
+
+  "src/test/java/org/ros2/rcljava/test/NodeTest.java"
+  "src/test/java/org/ros2/rcljava/test/RCLJavaTest.java"
+  "src/test/java/org/ros2/rcljava/test/RmwTest.java"
 )
 
 ### Macro ###
