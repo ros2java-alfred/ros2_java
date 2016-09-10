@@ -1,4 +1,4 @@
-/* Copyright 2016 Open Source Robotics Foundation, Inc.
+/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,7 @@ package org.ros2.rcljava;
 import java.lang.ref.WeakReference;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
 
@@ -78,26 +75,28 @@ public class RCLJava {
     private static native void nativeWaitSetAddSubscription(long waitSetHandle, long subscriptionHandle);
     private static native void nativeWait(long waitSetHandle);
     private static native Object nativeTake(long SubscriptionHandle, Class<?> msgType);
-    private static native ArrayList<String> nativeGetNodeNames();
-    private static native HashMap<String, Class<?>> nativeGetRemoteTopicNamesAndTypes();
+    //private static native ArrayList<String> nativeGetNodeNames();
+    //private static native HashMap<String, Class<?>> nativeGetRemoteTopicNamesAndTypes();
 
     /** Release all ressources at shutdown. */
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                logger.fine("Shutdown...");
+                if (RCLJava.initialized) {
+                    logger.fine("Final Shutdown...");
 
-                String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
-                StringBuilder msgLog = new StringBuilder();
-                for (String key : list) {
-                    msgLog.append(key);
-                    msgLog.append("\n");
-                }
-                logger.fine("Native libraries Loaded: \n" + msgLog.toString());
+                    String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
+                    StringBuilder msgLog = new StringBuilder();
+                    for (String key : list) {
+                        msgLog.append(key);
+                        msgLog.append("\n");
+                    }
+                    logger.fine("Native libraries Loaded: \n" + msgLog.toString());
 
-                for(WeakReference<Publisher<?>> publisherReference : RCLJava.publisherReferences) {
-                    if(publisherReference.get() != null) {
-                        publisherReference.get().dispose();
+                    for(WeakReference<Publisher<?>> publisherReference : RCLJava.publisherReferences) {
+                        if(publisherReference.get() != null) {
+                            publisherReference.get().dispose();
+                        }
                     }
                 }
             }
@@ -116,10 +115,10 @@ public class RCLJava {
     public static void rclJavaInit(String... args) {
         synchronized (RCLJava.class) {
             if (!RCLJava.initialized) {
-                String libpath = System.getProperty("java.library.path");
-                logger.fine("Native Library path : \n" + libpath.replace(':', '\n'));
-
                 if (RCLJava.rmwImplementation == null) {
+                    String libpath = System.getProperty("java.library.path");
+                    logger.fine("Native Library path : \n" + libpath.replace(':', '\n'));
+
                     for (Map.Entry<String, String> entry : rmwToTypesupport.entrySet()) {
                         try {
                             logger.config("Try to load native " + entry.getKey() + "...");
@@ -149,7 +148,8 @@ public class RCLJava {
      * @return
      */
     public static ArrayList<String> getNodeNames() {
-        return RCLJava.nativeGetNodeNames();
+        return new ArrayList<String>();
+//        return RCLJava.nativeGetNodeNames();
     }
 
     /**
@@ -157,7 +157,8 @@ public class RCLJava {
      * @return
      */
     public static HashMap<String, Class<?>> getRemoteTopic() {
-        return RCLJava.nativeGetRemoteTopicNamesAndTypes();
+        return new HashMap<String, Class<?>>();
+//        return RCLJava.nativeGetRemoteTopicNamesAndTypes();
     }
 
     /**
@@ -169,6 +170,7 @@ public class RCLJava {
     public static Node createNode(String nodeName) {
         logger.fine("Create Node stack : " + nodeName);
         long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName);
+
         return new Node(nodeHandle, nodeName);
     }
 
@@ -262,6 +264,8 @@ public class RCLJava {
     public static void shutdown() {
         logger.fine("Shutdown...");
         RCLJava.nativeShutdown();
+        RCLJava.initialized = false;
+        //RCLJava.rmwImplementation = null; // For check test
     }
 
     /**
