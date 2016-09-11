@@ -8,23 +8,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.ros2.rcljava.Node;
 import org.ros2.rcljava.RCLJava;
 
-public class RCLJavaTest extends TestCase {
+
+public class RCLJavaTest{
     private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
 
     @BeforeClass
-    public void setUp() {
+    public static void setUp() {
         logger.setLevel(Level.ALL);
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleFormatter());
         logger.addHandler(handler);
-        handler.setLevel(Level.INFO);
+        handler.setLevel(Level.ALL);
     }
 
     @Test
@@ -38,7 +40,7 @@ public class RCLJavaTest extends TestCase {
         }
 
         RCLJava.shutdown();
-        TestCase.assertTrue("failed to initialize rclJava", test);
+        Assert.assertTrue("failed to initialize rclJava", test);
     }
 
     @Test
@@ -52,7 +54,7 @@ public class RCLJavaTest extends TestCase {
             test = false;
         }
 
-        TestCase.assertTrue("failed to shutdown rclJava", test);
+        Assert.assertTrue("failed to shutdown rclJava", test);
     }
 
     @Test
@@ -68,7 +70,7 @@ public class RCLJavaTest extends TestCase {
             test = false;
         }
 
-        TestCase.assertTrue("failed to initialize rclJava after shutdown", test);
+        Assert.assertTrue("failed to initialize rclJava after shutdown", test);
     }
 
     @Test
@@ -83,7 +85,7 @@ public class RCLJavaTest extends TestCase {
         }
 
         RCLJava.shutdown();
-        TestCase.assertTrue("Expected Runtime error when initializing rclJava twice", test);
+        Assert.assertTrue("Expected Runtime error when initializing rclJava twice", test);
     }
 
     @Test
@@ -98,9 +100,10 @@ public class RCLJavaTest extends TestCase {
             test = true;
         }
 
-        TestCase.assertTrue("Expected Runtime error when shutting down rclJava twice", test);
+        Assert.assertTrue("Expected Runtime error when shutting down rclJava twice", test);
     }
 
+    @Ignore
     @Test
     public void testGetNodeName() {
         boolean test = true;
@@ -115,10 +118,11 @@ public class RCLJavaTest extends TestCase {
         }
 
         RCLJava.shutdown();
-        TestCase.assertTrue("Expected Runtime error.", test);
-        TestCase.assertEquals("Bad result", names, names);
+        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertEquals("Bad result", names, names);
     }
 
+    @Ignore
     @Test
     public void testGetRemoteTopic() {
         boolean test = true;
@@ -133,8 +137,8 @@ public class RCLJavaTest extends TestCase {
         }
 
         RCLJava.shutdown();
-        TestCase.assertTrue("Expected Runtime error.", test);
-        TestCase.assertEquals("Bad result", topics, topics);
+        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertEquals("Bad result", topics, topics);
     }
 
     @Test
@@ -151,8 +155,8 @@ public class RCLJavaTest extends TestCase {
         }
 
         RCLJava.shutdown();
-        TestCase.assertTrue("Expected Runtime error.", test);
-        TestCase.assertEquals("Bad result", node, node);
+        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertEquals("Bad result", node, node);
     }
 
     @Test
@@ -168,6 +172,6 @@ public class RCLJavaTest extends TestCase {
         }
 
         RCLJava.shutdown();
-        TestCase.assertTrue("Expected Runtime error.", test);
+        Assert.assertTrue("Expected Runtime error.", test);
     }
 }

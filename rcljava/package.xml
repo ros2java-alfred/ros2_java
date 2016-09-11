@@ -18,8 +18,10 @@
   <build_depend>rmw_implementation_cmake</build_depend>
   <build_depend>rcl</build_depend>
   <build_depend>rmw</build_depend>
+  <build_depend>std_msgs</build_depend>
 
   <exec_depend>rcl</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
 
 <!--
   <depend>rmw_implementation</depend>

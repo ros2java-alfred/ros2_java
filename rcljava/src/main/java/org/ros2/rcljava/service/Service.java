@@ -29,7 +29,7 @@ public class Service<T> {
     private final long nodeHandle;
 
     /** Service Handler. */
-    private  long serviceHandle;
+    private final long serviceHandle;
 
     /**
      * Constructor.

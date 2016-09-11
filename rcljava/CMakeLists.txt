@@ -38,6 +38,14 @@ find_jar(JUNIT_JAR
         4
 )
 
+find_jar(MSG_JARS
+    NAMES
+        std_msgs
+    PATHS
+        "${CMAKE_INSTALL_PREFIX}/../std_msgs/share/std_msgs/java/"
+)
+message(WARNING "MSG_JARS : ${MSG_JARS}")
+
 # Bug in find_jar for Junit4 : https://sourceforge.net/p/rdkit/mailman/message/35301727/
 set(JUNIT_JAR "/usr/share/java/junit4.jar")
 
@@ -63,7 +71,9 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/exception/NoImplementationAvailableException.java"
   "src/main/java/org/ros2/rcljava/exception/NotImplementedException.java"
   "src/main/java/org/ros2/rcljava/exception/NotInitializedException.java"
+)
 
+set(${${PROJECT_NAME}_tests}
   "src/test/java/org/ros2/rcljava/test/NodeTest.java"
   "src/test/java/org/ros2/rcljava/test/RCLJavaTest.java"
   "src/test/java/org/ros2/rcljava/test/RmwTest.java"
@@ -128,6 +138,7 @@ macro(target)
       install(TARGETS ${_target_name}
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
       )
     endif()
   endforeach()
@@ -144,22 +155,23 @@ add_jar("${PROJECT_NAME}_jar"
   "${PROJECT_NAME}"
 )
 
-set(TEST_COMMAND ${Java_JAVA_EXECUTABLE} ${JVMARGS} -classpath ${JUNIT_JAR}:${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar -Djava.library.path=${CMAKE_INSTALL_PREFIX}/lib/ org.junit.runner.JUnitCore)
-
-#add_test(
-#    NAME RmwTest
-#    COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RmwTest
-#)
-
-add_test(
-    NAME RCLJavaTest
-    COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RCLJavaTest
+add_jar("${PROJECT_NAME}_test_jar"
+  SOURCES
+    "${${PROJECT_NAME}_sources}"
+    "${${PROJECT_NAME}_tests}"
+  INCLUDE_JARS
+    "${JUNIT_JAR}"
+    "${MSG_JARS}"
+  OUTPUT_NAME
+    "${PROJECT_NAME}_test"
 )
 
-#add_test(
-#    NAME NodeTest
-#    COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.NodeTest
-#)
+### Test ###
+set(TEST_COMMAND ${Java_JAVA_EXECUTABLE} ${JVMARGS} -classpath ${JUNIT_JAR}:${MSG_JARS}:${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar:${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/java/${PROJECT_NAME}_test.jar -Djava.library.path=${CMAKE_INSTALL_PREFIX}/lib/:${CMAKE_INSTALL_PREFIX}/../std_msgs/lib/ org.junit.runner.JUnitCore)
+
+add_test(NAME RmwTest COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RmwTest)
+add_test(NAME RCLJavaTest COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RCLJavaTest)
+add_test(NAME NodeTest COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.NodeTest)
 
 ## loop for all RMW target.
 call_for_each_rmw_implementation(target)

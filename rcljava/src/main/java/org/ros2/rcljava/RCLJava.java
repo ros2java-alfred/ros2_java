@@ -135,6 +135,7 @@ public class RCLJava {
                     logger.severe("No RMW implementation found...");
                     System.exit(1);
                 } else {
+                    logger.fine("Initialize rclJava with " + RCLJava.rmwImplementation);
                     RCLJava.nativeRCLJavaInit();
                     RCLJava.initialized = true;
                 }
@@ -265,7 +266,6 @@ public class RCLJava {
         logger.fine("Shutdown...");
         RCLJava.nativeShutdown();
         RCLJava.initialized = false;
-        //RCLJava.rmwImplementation = null; // For check test
     }
 
     /**
@@ -302,16 +302,21 @@ public class RCLJava {
             throws NoImplementationAvailableException {
 
         synchronized(RCLJava.class) {
-            String file = "rcljavaRCLJava__" + rmwImplementation;
-            logger.fine("Load native file : lib" + file + ".so");
+            if (rmwImplementation != null && !rmwImplementation.isEmpty()) {
+                String file = "rcljavaRCLJava__" + rmwImplementation;
+                logger.fine("Load native RMW file : lib" + file + ".so");
 
-            try {
-                System.loadLibrary(file);
-                RCLJava.rmwImplementation = rmwImplementation;
-            } catch (UnsatisfiedLinkError ule) {
-                throw new NoImplementationAvailableException(ule);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                try {
+                    System.loadLibrary(file);
+                    RCLJava.rmwImplementation = rmwImplementation;
+                } catch (UnsatisfiedLinkError ule) {
+                    throw new NoImplementationAvailableException(ule);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                logger.fine("Disable RMW !");
+                RCLJava.rmwImplementation = null;
             }
         }
     }
