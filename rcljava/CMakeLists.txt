@@ -21,6 +21,7 @@ endif()
 
 # https://cmake.org/cmake/help/v3.0/module/UseJava.html?highlight=java
 include (UseJava)
+enable_testing()
 
 ### Definitions ###
 set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
@@ -44,7 +45,6 @@ find_jar(MSG_JARS
     PATHS
         "${CMAKE_INSTALL_PREFIX}/../std_msgs/share/std_msgs/java/"
 )
-message(WARNING "MSG_JARS : ${MSG_JARS}")
 
 # Bug in find_jar for Junit4 : https://sourceforge.net/p/rdkit/mailman/message/35301727/
 set(JUNIT_JAR "/usr/share/java/junit4.jar")
@@ -73,7 +73,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/exception/NotInitializedException.java"
 )
 
-set(${${PROJECT_NAME}_tests}
+set(${PROJECT_NAME}_tests
   "src/test/java/org/ros2/rcljava/test/NodeTest.java"
   "src/test/java/org/ros2/rcljava/test/RCLJavaTest.java"
   "src/test/java/org/ros2/rcljava/test/RmwTest.java"
@@ -148,26 +148,26 @@ endmacro()
 ### Main ###
 add_jar("${PROJECT_NAME}_jar"
   SOURCES
-  "${${PROJECT_NAME}_sources}"
+    "${${PROJECT_NAME}_sources}"
   INCLUDE_JARS
-  "${JUNIT_JAR}"
+    "${JUNIT_JAR}"
   OUTPUT_NAME
-  "${PROJECT_NAME}"
+    "${PROJECT_NAME}"
 )
 
 add_jar("${PROJECT_NAME}_test_jar"
   SOURCES
-    "${${PROJECT_NAME}_sources}"
     "${${PROJECT_NAME}_tests}"
   INCLUDE_JARS
     "${JUNIT_JAR}"
     "${MSG_JARS}"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_test.jar"
   OUTPUT_NAME
     "${PROJECT_NAME}_test"
 )
 
 ### Test ###
-set(TEST_COMMAND ${Java_JAVA_EXECUTABLE} ${JVMARGS} -classpath ${JUNIT_JAR}:${MSG_JARS}:${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar:${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/java/${PROJECT_NAME}_test.jar -Djava.library.path=${CMAKE_INSTALL_PREFIX}/lib/:${CMAKE_INSTALL_PREFIX}/../std_msgs/lib/ org.junit.runner.JUnitCore)
+set(TEST_COMMAND ${Java_JAVA_EXECUTABLE} ${JVMARGS} -classpath ${JUNIT_JAR}:${MSG_JARS}:${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_test.jar -Djava.library.path=${CMAKE_INSTALL_PREFIX}/lib/:${CMAKE_INSTALL_PREFIX}/../std_msgs/lib/ org.junit.runner.JUnitCore)
 
 add_test(NAME RmwTest COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RmwTest)
 add_test(NAME RCLJavaTest COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RCLJavaTest)
@@ -178,8 +178,6 @@ call_for_each_rmw_implementation(target)
 
 ### Testing ###
 if(AMENT_ENABLE_TESTING)
-  enable_testing()
-
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
@@ -195,6 +193,7 @@ if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
 
   install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
   ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
+  ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}_test.jar")
 endif()
 
 ament_package()
