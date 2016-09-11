@@ -135,6 +135,7 @@ macro(target)
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
       )
+
       install(TARGETS ${_target_name}
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
@@ -157,6 +158,7 @@ add_jar("${PROJECT_NAME}_jar"
 
 add_jar("${PROJECT_NAME}_test_jar"
   SOURCES
+    "${${PROJECT_NAME}_sources}"
     "${${PROJECT_NAME}_tests}"
   INCLUDE_JARS
     "${JUNIT_JAR}"

@@ -14,7 +14,7 @@
  */
 package org.ros2.rcljava;
 
-import org.ros2.rcljava.exception.NoImplementationAvailableException;
+import org.ros2.rcljava.exception.NotImplementedException;
 
 /**
  * Not define in ROS2.
@@ -26,11 +26,11 @@ public class Log {
     public Log() { }
 
     public void fatal(Exception e) {
-        throw new NoImplementationAvailableException(e);
+        throw new NotImplementedException();
     }
 
     public void info(String string) {
-        throw new NoImplementationAvailableException(new Exception(string));
+        throw new NotImplementedException();
     }
 
 }

@@ -17,6 +17,7 @@ package org.ros2.rcljava;
 /**
  * <h1>Quality of Service Profile</h1>
  * <p><i>TODO Not full implemented !!</i></p>
+ *
  * @author Mickael Gaillard <mickael.gaillard@gmail.com>
  */
 public class QoSProfile {

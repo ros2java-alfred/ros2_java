@@ -19,7 +19,9 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
+import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
+import org.ros2.rcljava.exception.NotInitializedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +34,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * <p>JNI call of ROS2 c client.</p>
  *
  * @author Esteve Fernandez <esteve@apache.org>
+ * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class RCLJava {
 
@@ -119,16 +122,7 @@ public class RCLJava {
                     String libpath = System.getProperty("java.library.path");
                     logger.fine("Native Library path : \n" + libpath.replace(':', '\n'));
 
-                    for (Map.Entry<String, String> entry : rmwToTypesupport.entrySet()) {
-                        try {
-                            logger.config("Try to load native " + entry.getKey() + "...");
-                            RCLJava.setRMWImplementation(entry.getKey());
-                            logger.config(entry.getKey() + " loaded !");
-                            break;
-                        } catch (NoImplementationAvailableException e) {
-                            logger.config(entry.getKey() + " not available ! (" + e.getMessage() + ")");
-                        }
-                    }
+                    RCLJava.autoLoadRmw();
                 }
 
                 if (RCLJava.rmwImplementation == null) {
@@ -139,6 +133,28 @@ public class RCLJava {
                     RCLJava.nativeRCLJavaInit();
                     RCLJava.initialized = true;
                 }
+            } else {
+                NotInitializedException ex = new NotInitializedException("Cannot intialized twice !");
+                logger.severe(ex.getMessage());
+                throw ex;
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    private static void autoLoadRmw() {
+        for (Map.Entry<String, String> entry : rmwToTypesupport.entrySet()) {
+            try {
+                logger.config("Try to load native " + entry.getKey() + "...");
+                RCLJava.setRMWImplementation(entry.getKey());
+                logger.config(entry.getKey() + " loaded !");
+                break;
+            } catch (NoImplementationAvailableException e) {
+                logger.config(entry.getKey() + " not available ! (" + e.getMessage() + ")");
+            } catch (ImplementationAlreadyImportedException e) {
+                logger.config(e.getMessage());
             }
         }
     }
@@ -149,6 +165,10 @@ public class RCLJava {
      * @return
      */
     public static ArrayList<String> getNodeNames() {
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
         return new ArrayList<String>();
 //        return RCLJava.nativeGetNodeNames();
     }
@@ -158,6 +178,10 @@ public class RCLJava {
      * @return
      */
     public static HashMap<String, Class<?>> getRemoteTopic() {
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
         return new HashMap<String, Class<?>>();
 //        return RCLJava.nativeGetRemoteTopicNamesAndTypes();
     }
@@ -170,6 +194,11 @@ public class RCLJava {
      */
     public static Node createNode(String nodeName) {
         logger.fine("Create Node stack : " + nodeName);
+
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
         long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName);
 
         return new Node(nodeHandle, nodeName);
@@ -182,6 +211,10 @@ public class RCLJava {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static void spinOnce(Node node) {
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
         long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
 
         RCLJava.nativeWaitSetInit(waitSetHandle, node.getSubscriptions().size(), 0, 0);
@@ -218,6 +251,10 @@ public class RCLJava {
      * @return
      */
     public static Object waitForMessage(Node node, String topic) {
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
         Object msg = null;
         long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
 
@@ -251,6 +288,10 @@ public class RCLJava {
      * @return true if the node is valid, else false.
      */
     public static boolean ok() {
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
         return RCLJava.nativeOk();
     }
 
@@ -264,6 +305,11 @@ public class RCLJava {
      */
     public static void shutdown() {
         logger.fine("Shutdown...");
+
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
         RCLJava.nativeShutdown();
         RCLJava.initialized = false;
     }
@@ -274,6 +320,10 @@ public class RCLJava {
      * @return indentifier.
      */
     public static String getRMWIdentifier() {
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
         return RCLJava.nativeGetRMWIdentifier();
     }
 
@@ -299,20 +349,25 @@ public class RCLJava {
      * @throws NoImplementationAvailableException
      */
     public static void setRMWImplementation(String rmwImplementation)
-            throws NoImplementationAvailableException {
+            throws NoImplementationAvailableException, ImplementationAlreadyImportedException {
 
         synchronized(RCLJava.class) {
             if (rmwImplementation != null && !rmwImplementation.isEmpty()) {
-                String file = "rcljavaRCLJava__" + rmwImplementation;
-                logger.fine("Load native RMW file : lib" + file + ".so");
+                if (!rmwImplementation.equals(RCLJava.rmwImplementation)) {
 
-                try {
-                    System.loadLibrary(file);
-                    RCLJava.rmwImplementation = rmwImplementation;
-                } catch (UnsatisfiedLinkError ule) {
-                    throw new NoImplementationAvailableException(ule);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    String file = "rcljavaRCLJava__" + rmwImplementation;
+                    logger.fine("Load native RMW file : lib" + file + ".so");
+
+                    try {
+                        System.loadLibrary(file);
+                        RCLJava.rmwImplementation = rmwImplementation;
+                    } catch (UnsatisfiedLinkError e) {
+                        throw new NoImplementationAvailableException(e);
+                    } catch (Exception e) {
+                        throw new NoImplementationAvailableException(e);
+                    }
+                } else {
+                    throw new ImplementationAlreadyImportedException();
                 }
             } else {
                 logger.fine("Disable RMW !");
@@ -329,6 +384,11 @@ public class RCLJava {
     public static void loadLibrary(String name) {
         synchronized(RCLJava.class) {
             logger.fine("Load native file : lib" + name + ".so");
+
+            if (!RCLJava.initialized) {
+                throw new NotInitializedException();
+            }
+
             try {
                 System.loadLibrary(name);
             } catch (UnsatisfiedLinkError e) {
