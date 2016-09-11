@@ -37,10 +37,10 @@ public class Service<T> {
      * @param nodeHandle
      * @param serviceName
      */
-    public Service(final long nodeHandle, final String serviceName) {
+    public Service(final long nodeHandle, final long serviceHandle, final String serviceName) {
         this.name = serviceName;
         this.nodeHandle = nodeHandle;
-        this.serviceHandle = 0L; //TODO rcl_service_init()
+        this.serviceHandle = serviceHandle;
     }
 
     public void dispose() {

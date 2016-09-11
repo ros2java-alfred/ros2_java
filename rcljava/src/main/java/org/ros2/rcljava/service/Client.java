@@ -39,10 +39,10 @@ public class Client<T> {
      * @param nodeHandle
      * @param serviceName
      */
-    public Client(final long nodeHandle, final String serviceName) {
+    public Client(final long nodeHandle, long clientHandle, final String serviceName) {
         this.name = serviceName;
         this.nodeHandle = nodeHandle;
-        this.clientHandle = 0L; //TODO rcl_client_init()
+        this.clientHandle = clientHandle;
     }
 
     public void dispose() {

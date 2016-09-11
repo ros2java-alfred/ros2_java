@@ -93,3 +93,16 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateSubscriptionHandl
 
   return jsubscription;
 }
+
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateClientHandle
+  (JNIEnv *, jclass, jlong node_handle, jclass jmessage_class, jstring jservice) {
+
+  return -1;
+}
+
+
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle
+  (JNIEnv *, jclass, jlong node_handle, jclass jmessage_class, jstring jservice) {
+
+  return -1;
+}

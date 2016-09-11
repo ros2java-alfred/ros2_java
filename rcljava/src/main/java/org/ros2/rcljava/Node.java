@@ -69,6 +69,12 @@ public class Node implements INode {
     private static native <T> long nativeCreateSubscriptionHandle(
             long nodeHandle, Class<T> cls, String topic);
 
+    private static native <T> long nativeCreateClientHandle(
+            long nodeHandle, Class<T> cls, String service);
+
+    private static native <T> long nativeCreateServiceHandle(
+            long nodeHandle, Class<T> cls, String service);
+
     /**
      * Constructor of Node.
      * @param nodeHandle Handler to the node.
@@ -208,9 +214,15 @@ public class Node implements INode {
             final String service,
             final QoSProfile qos) {
 
-        //TODO
-        throw new NotImplementedException();
-//        return new Client<T>();
+        logger.fine("Create Client : " + service);
+        long clientHandle = Node.nativeCreateClientHandle(
+                this.nodeHandle,
+                message,
+                service);
+
+        Client<T> client = new Client<T>(this.nodeHandle, clientHandle, service);
+        this.clients.add(client);
+        return client;
     }
 
     /**
@@ -245,9 +257,12 @@ public class Node implements INode {
             final ServiceConsumer<?, ?> callback,
             final QoSProfile qos) {
 
-        //TODO
-        throw new NotImplementedException();
-//        return new Service<T>();
+        logger.fine("Create Service : " + service);
+        long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service);
+
+        Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
+        this.services.add(srv);
+        return srv;
     }
 
     /**

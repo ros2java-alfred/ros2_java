@@ -4,7 +4,7 @@ import org.ros2.rosidl_generator_java.RCLJavaProxy;
 
 @[for field in spec.fields]@
 @[    if not field.type.is_primitive_type()]@
-@[        if field.type.pkg_name != spec.base_type.pkg_name]@
+@[        if ((field.type.pkg_name != spec.base_type.pkg_name) or (subfolder == 'srv'))]@
 import @(field.type.pkg_name).msg.@(field.type.type);
 @[        end if]@
 @[    end if]@
