@@ -128,6 +128,13 @@ You can try out running the talker on the desktop and the listener on your Andro
 
 Enjoy!
 
+Acknowledgements
+----------------
+
+Thanks all those who have contributed:
+
+Mickael Gaillard (https://github.com/Theosakamg)
+
 TODO
 ----
 
