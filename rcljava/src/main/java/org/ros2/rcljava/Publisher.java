@@ -14,6 +14,8 @@
  */
 package org.ros2.rcljava;
 
+import java.util.logging.Logger;
+
 /**
  * Publisher of node.
  *
@@ -22,6 +24,8 @@ package org.ros2.rcljava;
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class Publisher<T> {
+
+    private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
 
     /** Node Handler. */
     private final long nodeHandle;
@@ -91,7 +95,8 @@ public class Publisher<T> {
      * Release all Publisher ressource.
      */
     public void dispose() {
-        //TODO implement to JNI
-        //Publisher.nativeDispose(this.nodeHandle, this.publisherHandle);
+        logger.fine("Destroy Publisher of topic : " + this.topic);
+
+        Publisher.nativeDispose(this.nodeHandle, this.publisherHandle);
     }
 }

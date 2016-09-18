@@ -7,6 +7,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * Class:     org_ros2_rcljava_Node
  * Method:    nativeCreatePublisherHandle
@@ -42,7 +43,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle
 /*
  * Class:     org_ros2_rcljava_Node
  * Method:    nativeDispose
- * Signature: TODO
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_Node_nativeDispose
   (JNIEnv *, jclass, jlong);
@@ -50,7 +51,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_Node_nativeDispose
 /*
  * Class:     org_ros2_rcljava_Node
  * Method:    nativeGetName
- * Signature: TODO
+ * Signature: (J)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_Node_nativeGetName
   (JNIEnv *, jclass, jlong);

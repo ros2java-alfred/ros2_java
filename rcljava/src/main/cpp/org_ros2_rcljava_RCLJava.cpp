@@ -18,10 +18,14 @@
  */
 JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit
-  (JNIEnv *env, jclass) {
+  (JNIEnv *env, jclass, jobjectArray arg) {
 
   // TODO(esteve): parse args
-  rcl_ret_t ret = rcl_init(0, nullptr, rcl_get_default_allocator());
+  int argc = arg != NULL ? env->GetArrayLength(arg) : 0;
+  char ** argv = nullptr;
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+
+  rcl_ret_t ret = rcl_init(argc, argv, allocator);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to init: " +
         std::string(rcl_get_error_string_safe()));
@@ -83,7 +87,7 @@ JNICALL Java_org_ros2_rcljava_RCLJava_nativeOk
  */
 JNIEXPORT jlong
 JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWaitSet
-  (JNIEnv *env, jclass) {
+  (JNIEnv *, jclass) {
 
   rcl_wait_set_t * wait_set = makeInstance<rcl_wait_set_t>();
 

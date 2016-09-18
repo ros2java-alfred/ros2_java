@@ -66,7 +66,7 @@ public class RCLJava {
     };
 
     // Natives definitions
-    private static native void nativeRCLJavaInit();
+    private static native void nativeRCLJavaInit(String args[]);
     private static native long nativeCreateNodeHandle(String nodeName);
     private static native boolean nativeOk();
     private static native String nativeGetRMWIdentifier();
@@ -115,7 +115,7 @@ public class RCLJava {
      * after each call to rcl_shutdown. Repeated calls will fail with
      * RCL_RET_ALREADY_INIT. This function is not thread safe.</p>
      */
-    public static void rclJavaInit(String... args) {
+    public static void rclJavaInit(String args[]) {
         synchronized (RCLJava.class) {
             if (!RCLJava.initialized) {
                 if (RCLJava.rmwImplementation == null) {
@@ -130,7 +130,7 @@ public class RCLJava {
                     System.exit(1);
                 } else {
                     logger.fine("Initialize rclJava with " + RCLJava.rmwImplementation);
-                    RCLJava.nativeRCLJavaInit();
+                    RCLJava.nativeRCLJavaInit(args);
                     RCLJava.initialized = true;
                 }
             } else {
@@ -139,6 +139,10 @@ public class RCLJava {
                 throw ex;
             }
         }
+    }
+
+    public static void rclJavaInit() {
+        RCLJava.rclJavaInit(null);
     }
 
     /**

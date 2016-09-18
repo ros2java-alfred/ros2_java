@@ -7,13 +7,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * Class:     org_ros2_rcljava_RCLJava
  * Method:    nativeRCLJavaInit
- * Signature: ()V
+ * Signature: ([Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit
-  (JNIEnv *, jclass);
+  (JNIEnv *, jclass, jobjectArray);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava

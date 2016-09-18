@@ -74,8 +74,8 @@ public class NodeTest {
         Node node = null;
 
         RCLJava.rclJavaInit();
+        node = RCLJava.createNode("testNode");
         try {
-            node = RCLJava.createNode("testNode");
             node.dispose();
         } catch (Exception e) {
             test = false;
@@ -123,7 +123,7 @@ public class NodeTest {
 
             Assert.assertTrue("Bad count.", node.countPublishers("testChannel") == 1);
 
-            //TODO pub.dispose();
+            pub.dispose();
             node.dispose();
         } catch (Exception e) {
             test = false;
