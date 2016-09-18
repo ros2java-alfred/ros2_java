@@ -64,16 +64,16 @@ public class Node implements INode {
 
     // Native call.
     private static native <T> long nativeCreatePublisherHandle(
-            long nodeHandle, Class<T> cls, String topic);
+            long nodeHandle, Class<T> cls, String topic, QoSProfile qos);
 
     private static native <T> long nativeCreateSubscriptionHandle(
-            long nodeHandle, Class<T> cls, String topic);
+            long nodeHandle, Class<T> cls, String topic, QoSProfile qos);
 
     private static native <T> long nativeCreateClientHandle(
-            long nodeHandle, Class<T> cls, String service);
+            long nodeHandle, Class<T> cls, String service, QoSProfile qos);
 
     private static native <T> long nativeCreateServiceHandle(
-            long nodeHandle, Class<T> cls, String service);
+            long nodeHandle, Class<T> cls, String service, QoSProfile qos);
 
     /**
      * Constructor of Node.
@@ -127,7 +127,7 @@ public class Node implements INode {
             final QoSProfile qos) {
 
         logger.fine("Create Publisher : " + topic);
-        long publisherHandle = Node.nativeCreatePublisherHandle(this.nodeHandle, message, topic);
+        long publisherHandle = Node.nativeCreatePublisherHandle(this.nodeHandle, message, topic, qos);
 
         Publisher<T> publisher = new Publisher<T>(this.nodeHandle, publisherHandle, message, topic, qos);
         RCLJava.publisherReferences.add(new WeakReference<Publisher<?>>(publisher));
@@ -169,7 +169,7 @@ public class Node implements INode {
             final QoSProfile qos) {
 
         logger.fine("Create Subscription : " + topic);
-        long subscriptionHandle = Node.nativeCreateSubscriptionHandle(this.nodeHandle, message, topic);
+        long subscriptionHandle = Node.nativeCreateSubscriptionHandle(this.nodeHandle, message, topic, qos);
 
         Subscription<T> subscription = new Subscription<T>(
                 this.nodeHandle,
@@ -218,7 +218,8 @@ public class Node implements INode {
         long clientHandle = Node.nativeCreateClientHandle(
                 this.nodeHandle,
                 message,
-                service);
+                service,
+                qos);
 
         Client<T> client = new Client<T>(this.nodeHandle, clientHandle, service);
         this.clients.add(client);
@@ -258,7 +259,7 @@ public class Node implements INode {
             final QoSProfile qos) {
 
         logger.fine("Create Service : " + service);
-        long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service);
+        long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service, qos);
 
         Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
         this.services.add(srv);

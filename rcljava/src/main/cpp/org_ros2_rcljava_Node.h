@@ -10,34 +10,34 @@ extern "C" {
 /*
  * Class:     org_ros2_rcljava_Node
  * Method:    nativeCreatePublisherHandle
- * Signature: (JLjava/lang/Class;Ljava/lang/String;)J
+ * Signature: (JLjava/lang/Class;Ljava/lang/String;Lorg/ros2/rcljava/QoSProfile;)J
  */
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreatePublisherHandle
-  (JNIEnv *, jclass, jlong, jclass, jstring);
+  (JNIEnv *, jclass, jlong, jclass, jstring, jobject);
 
 /*
  * Class:     org_ros2_rcljava_Node
  * Method:    nativeCreateSubscriptionHandle
- * Signature: (JLjava/lang/Class;Ljava/lang/String;)J
+ * Signature: (JLjava/lang/Class;Ljava/lang/String;Lorg/ros2/rcljava/QoSProfile;)J
  */
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateSubscriptionHandle
-  (JNIEnv *, jclass, jlong, jclass, jstring);
+  (JNIEnv *, jclass, jlong, jclass, jstring, jobject);
 
 /*
  * Class:     org_ros2_rcljava_Node
  * Method:    nativeCreateClientHandle
- * Signature: (JLjava/lang/Class;Ljava/lang/String;)J
+ * Signature: (JLjava/lang/Class;Ljava/lang/String;Lorg/ros2/rcljava/QoSProfile;)J
  */
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateClientHandle
-  (JNIEnv *, jclass, jlong, jclass, jstring);
+  (JNIEnv *, jclass, jlong, jclass, jstring, jobject);
 
 /*
  * Class:     org_ros2_rcljava_Node
  * Method:    nativeCreateServiceHandle
- * Signature: (JLjava/lang/Class;Ljava/lang/String;)J
+ * Signature: (JLjava/lang/Class;Ljava/lang/String;Lorg/ros2/rcljava/QoSProfile;)J
  */
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle
-  (JNIEnv *, jclass, jlong, jclass, jstring);
+  (JNIEnv *, jclass, jlong, jclass, jstring, jobject);
 
 #ifdef __cplusplus
 }

@@ -68,7 +68,7 @@ public class Publisher<T> {
      * @param msg Message to publish.
      */
     public void publish(T msg) {
-        Publisher.nativePublish(this.publisherHandle, msg); //TODO(theos) add qosProfile
+        Publisher.nativePublish(this.publisherHandle, msg);
     }
 
     /**

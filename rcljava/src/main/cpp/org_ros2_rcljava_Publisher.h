@@ -10,13 +10,13 @@ extern "C" {
 /*
  * Class:     org_ros2_rcljava_Publisher
  * Method:    nativePublish
- * Signature: (JLjava/lang/Object;)
+ * Signature: (JLjava/lang/Object)V
  */
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_Publisher_nativePublish
   (JNIEnv *, jclass, jlong, jobject);
 
 /*
- * Class:     org_ros2_rcljava_Node
+ * Class:     org_ros2_rcljava_Publisher
  * Method:    nativeDispose
  * Signature: (JJ)V
  */
