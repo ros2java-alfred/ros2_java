@@ -172,3 +172,35 @@ JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle(
   jlong jservice = instance2Handle(service);
   return jservice;
 }
+
+/*
+ *
+ */
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_Node_nativeDispose
+  (JNIEnv *env, jclass , jlong jnode_handle) {
+
+  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
+
+  rcl_ret_t ret = rcl_node_fini(node);
+  if (ret != RCL_RET_OK) {
+    std::string message("Failed finish node: " +
+        std::string(rcl_get_error_string_safe()));
+    throwException(env, message);
+  }
+}
+
+/*
+ *
+ */
+JNIEXPORT jstring
+JNICALL Java_org_ros2_rcljava_Node_nativeGetName
+  (JNIEnv *env, jclass, jlong jnode_handle) {
+
+  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
+
+  const char *name_tmp = rcl_node_get_name(node);
+
+  jstring name = env->NewStringUTF(name_tmp);
+  return name;
+}

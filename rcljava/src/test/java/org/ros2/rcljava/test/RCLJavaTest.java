@@ -29,8 +29,6 @@ import org.junit.Test;
 
 import org.ros2.rcljava.Node;
 import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
-import org.ros2.rcljava.exception.NoImplementationAvailableException;
 import org.ros2.rcljava.exception.NotInitializedException;
 
 /**
@@ -170,6 +168,7 @@ public class RCLJavaTest{
 
         try {
             node = RCLJava.createNode("testNode");
+            node.dispose();
         } catch (Exception e) {
             test = false;
         }

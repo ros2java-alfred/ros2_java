@@ -42,7 +42,7 @@ public class Node implements INode {
     }
 
     /** Name of the node */
-    private final String name;
+    private String name;
 
     /** Node handler */
     private final long nodeHandle;
@@ -75,18 +75,22 @@ public class Node implements INode {
     private static native <T> long nativeCreateServiceHandle(
             long nodeHandle, Class<T> cls, String service, QoSProfile qos);
 
+    private static native void nativeDispose(long nodeHandle);
+
+    private static native String nativeGetName(long nodeHandle);
+
     /**
      * Constructor of Node.
      * @param nodeHandle Handler to the node.
      */
     public Node(final long nodeHandle, final String nodeName) {
-        this.name = nodeName;
-        this.nodeHandle = nodeHandle;
-        this.subscriptions = new ArrayList<Subscription<?>>();
-        this.publishers = new ArrayList<Publisher<?>>();
-        this.clients = new ArrayList<Client<?>>();
-        this.services = new ArrayList<Service<?>>();
-        this.parameters = new HashMap<String, Object>();
+        this.name           = nodeName;
+        this.nodeHandle     = nodeHandle;
+        this.subscriptions  = new ArrayList<Subscription<?>>();
+        this.publishers     = new ArrayList<Publisher<?>>();
+        this.clients        = new ArrayList<Client<?>>();
+        this.services       = new ArrayList<Service<?>>();
+        this.parameters     = new HashMap<String, Object>();
     }
 
     /**
@@ -94,7 +98,9 @@ public class Node implements INode {
      */
     @Override
     public void dispose() {
-      //TODO Implement on JNI
+        logger.fine("Destroy Node stack : " + this.name);
+
+        Node.nativeDispose(this.nodeHandle);
         this.publishers.clear();
         this.subscriptions.clear();
     }
@@ -106,9 +112,15 @@ public class Node implements INode {
      */
     @Override
     public String getName() {
-      //TODO
-        throw new NotImplementedException();
-//        return null;
+        String name = Node.nativeGetName(this.nodeHandle);
+
+        if (!this.name.equals(name)) {
+            logger.fine("Node name has change ! from " + this.name + " to " + name);
+            this.name = name;
+        }
+
+        logger.fine("Get Node name stack : " + this.name);
+        return name;
     }
 
     /**

@@ -16,9 +16,18 @@ package org.ros2.rcljava.test;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import org.ros2.rcljava.Consumer;
 import org.ros2.rcljava.Node;
+import org.ros2.rcljava.Publisher;
+import org.ros2.rcljava.QoSProfile;
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.Subscription;
+import org.ros2.rcljava.service.Client;
+import org.ros2.rcljava.service.Service;
+import org.ros2.rcljava.service.ServiceConsumer;
 
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -49,34 +58,174 @@ public class NodeTest {
         RCLJava.rclJavaInit();
         try {
             node = RCLJava.createNode("testNode");
+            node.dispose();
         } catch (Exception e) {
             test = false;
         }
-
         RCLJava.shutdown();
+
         Assert.assertTrue("Expected Runtime error.", test);
         Assert.assertEquals("Bad result", node, node);
     }
 
-//    @Ignore
-//    @Test
-//    public void testPublisher() {
-//        boolean test = true;
-//        Node node = null;
-//        Publisher<std_msgs.msg.String> pub = null;
-//
-//        RCLJava.rclJavaInit();
-//        std_msgs.msg.String msg = new std_msgs.msg.String();
-//        try {
-//            node = RCLJava.createNode("testPublisher");
-//            pub = node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class, "testChannel", QoSProfile.PROFILE_DEFAULT);
-//
-//        } catch (Exception e) {
-//            test = false;
-//        }
-//
-//        RCLJava.shutdown();
-//        Assert.assertTrue("Expected Runtime error.", test);
-//        Assert.assertNotNull("Bad result", pub);
-//    }
+    @Test
+    public void testDestroyNode() {
+        boolean test = true;
+        Node node = null;
+
+        RCLJava.rclJavaInit();
+        try {
+            node = RCLJava.createNode("testNode");
+            node.dispose();
+        } catch (Exception e) {
+            test = false;
+        }
+        RCLJava.shutdown();
+
+        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertEquals("Bad result", node, node);
+    }
+
+    @Test
+    public void testGetNodeName() {
+        boolean test = true;
+        Node node = null;
+        String nodeName = null;
+
+        RCLJava.rclJavaInit();
+        try {
+            node = RCLJava.createNode("testNodeName");
+            nodeName = node.getName();
+            node.dispose();
+        } catch (Exception e) {
+            test = false;
+        }
+        RCLJava.shutdown();
+
+        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertEquals("Bad result", "testNodeName", nodeName);
+    }
+
+    @Ignore
+    @Test
+    public void testPublisher() {
+        boolean test = true;
+        Node node = null;
+        Publisher<std_msgs.msg.String> pub = null;
+
+        RCLJava.rclJavaInit();
+        try {
+            node = RCLJava.createNode("testPublisher");
+            pub = node.<std_msgs.msg.String>createPublisher(
+                    std_msgs.msg.String.class,
+                    "testChannel",
+                    QoSProfile.PROFILE_DEFAULT);
+
+            Assert.assertTrue("Bad count.", node.countPublishers("testChannel") == 1);
+
+            //TODO pub.dispose();
+            node.dispose();
+        } catch (Exception e) {
+            test = false;
+        }
+        RCLJava.shutdown();
+
+        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertNotNull("Bad result", pub);
+    }
+
+    @Ignore
+    @Test
+    public void testSubscription() {
+        boolean test = true;
+        Node node = null;
+        Subscription<std_msgs.msg.String> sub = null;
+
+        Consumer<std_msgs.msg.String> callback = new Consumer<std_msgs.msg.String>() {
+            @Override
+            public void accept(std_msgs.msg.String msg) { }
+        };
+
+        RCLJava.rclJavaInit();
+        try {
+            node = RCLJava.createNode("testSubscription");
+            sub = node.<std_msgs.msg.String>createSubscription(
+                    std_msgs.msg.String.class,
+                    "testChannel",
+                    callback,
+                    QoSProfile.PROFILE_DEFAULT);
+
+            Assert.assertTrue("Bad count.", node.countSubscribers("testChannel") == 1);
+
+          //TODO sub.dispose();
+            node.dispose();
+        } catch (Exception e) {
+            test = false;
+        }
+        RCLJava.shutdown();
+
+        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertNotNull("Bad result", sub);
+    }
+
+    @Ignore
+    @Test
+    public void testClient() {
+        boolean test = true;
+        Node node = null;
+        Client<std_msgs.msg.String> clt = null;
+
+        RCLJava.rclJavaInit();
+        try {
+            node = RCLJava.createNode("testClient");
+            clt = node.<std_msgs.msg.String>createClient(
+                    std_msgs.msg.String.class,
+                    "testChannel",
+                    QoSProfile.PROFILE_DEFAULT);
+          //TODO clt.dispose();
+            node.dispose();
+        } catch (Exception e) {
+            test = false;
+        }
+        RCLJava.shutdown();
+
+        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertNotNull("Bad result", clt);
+    }
+
+    @Ignore
+    @Test
+    public void testService() {
+        boolean test = true;
+        Node node = null;
+        Service<std_msgs.msg.String> srv = null;
+
+        ServiceConsumer<std_msgs.msg.String, std_msgs.msg.String> callback =
+                new ServiceConsumer<std_msgs.msg.String, std_msgs.msg.String>() {
+            @Override
+            public void call(std_msgs.msg.String request, std_msgs.msg.String response) { }
+        };
+
+        RCLJava.rclJavaInit();
+        try {
+            node = RCLJava.createNode("testSubscription");
+            srv = node.<std_msgs.msg.String>createService(
+                    std_msgs.msg.String.class,
+                    "testChannel",
+                    callback,
+                    QoSProfile.PROFILE_DEFAULT);
+          //TODO srv.dispose();
+            node.dispose();
+        } catch (Exception e) {
+            test = false;
+        }
+        RCLJava.shutdown();
+
+        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertNotNull("Bad result", srv);
+    }
+
+    //TODO Test Parameters
+
+
 }

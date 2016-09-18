@@ -39,6 +39,22 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateClientHandle
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle
   (JNIEnv *, jclass, jlong, jclass, jstring, jobject);
 
+/*
+ * Class:     org_ros2_rcljava_Node
+ * Method:    nativeDispose
+ * Signature: TODO
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_Node_nativeDispose
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_Node
+ * Method:    nativeGetName
+ * Signature: TODO
+ */
+JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_Node_nativeGetName
+  (JNIEnv *, jclass, jlong);
+
 #ifdef __cplusplus
 }
 #endif
