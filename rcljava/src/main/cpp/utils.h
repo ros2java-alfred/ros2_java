@@ -13,6 +13,7 @@
 #include <cassert>
 #include <cstdio>
 #include <jni.h>
+#include <rcl/graph.h>
 
 /*
  * Convert jstring to std::string.
@@ -163,6 +164,32 @@ throwException(JNIEnv *env, std::string message)
   assert(exception_class != NULL); // nullptr
 
   env->ThrowNew(exception_class, message.c_str());
+}
+
+/*
+ *
+ */
+jobject
+makeJTopics(JNIEnv *env, rcl_topic_names_and_types_t *topic_names_and_types)
+{
+  env->PushLocalFrame(256); // fix for local references
+
+  jsize map_len   = topic_names_and_types->topic_count;
+  jclass mapClass = env->FindClass("java/util/HashMap");
+  jmethodID init  = env->GetMethodID(mapClass, "<init>", "(I)V");
+  jobject hashMap = env->NewObject(mapClass, init, map_len);
+  jmethodID put   = env->GetMethodID(mapClass, "put",
+      "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+
+  for (int i = 0; i < map_len; i = i + 1) {
+    env->CallObjectMethod(hashMap, put,
+        env->NewStringUTF(topic_names_and_types->topic_names[i]),
+        env->NewStringUTF(topic_names_and_types->type_names[i]));
+  }
+
+  env->PopLocalFrame(hashMap);
+
+  return hashMap;
 }
 
 #endif /* SRC_RCL_UTILS_H_ */

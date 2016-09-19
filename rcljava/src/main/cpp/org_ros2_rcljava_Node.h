@@ -56,6 +56,31 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_Node_nativeDispose
 JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_Node_nativeGetName
   (JNIEnv *, jclass, jlong);
 
+/*
+ * Class:     org_ros2_rcljava_Node
+ * Method:    nativeCountPublishers
+ * Signature: (JLjava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_org_ros2_rcljava_Node_nativeCountPublishers
+  (JNIEnv *, jclass, jlong, jstring);
+
+/*
+ * Class:     org_ros2_rcljava_Node
+ * Method:    nativeCountSubscribers
+ * Signature: (JLjava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_org_ros2_rcljava_Node_nativeCountSubscribers
+  (JNIEnv *, jclass, jlong, jstring);
+
+/*
+ * Class:     org_ros2_rcljava_Node
+ * Method:    getListTopics
+ * Signature: (J)Ljava/util/HashMap;
+ */
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_Node_getListTopics
+  (JNIEnv *, jclass, jlong);
+
+
 #ifdef __cplusplus
 }
 #endif

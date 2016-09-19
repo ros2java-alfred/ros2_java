@@ -18,6 +18,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.ros2.rcljava.exception.NotImplementedException;
@@ -78,6 +79,14 @@ public class Node implements INode {
     private static native void nativeDispose(long nodeHandle);
 
     private static native String nativeGetName(long nodeHandle);
+
+    private static native int nativeCountPublishers(long nodeHandle, String topic);
+
+    private static native int nativeCountSubscribers(long nodeHandle, String topic);
+
+    private static native HashMap<String, String> getListTopics(long nodeHandle);
+
+//    private static native  ; //rcl_service_server_is_available
 
     /**
      * Constructor of Node.
@@ -320,20 +329,23 @@ public class Node implements INode {
 
     @Override
     public HashMap<String, String> getTopicNamesAndTypes() {
-        //TODO
-        throw new NotImplementedException();
-//        return new HashMap<String, String>();
-    }
+        HashMap<String, String> topics =  Node.getListTopics(this.nodeHandle);
 
+        for (Entry<String, String> entry : topics.entrySet()) {
+            logger.fine("\t - Topics: " + entry.getKey() + "\t Value: " + entry.getValue());
+        }
+
+        return topics;
+    }
 
     @Override
     public int countPublishers(final String topic) {
-        return this.publishers.size();
+        return Node.nativeCountPublishers(this.nodeHandle, topic);
     }
 
     @Override
     public int countSubscribers(final String topic) {
-        return this.subscriptions.size();
+        return Node.nativeCountSubscribers(this.nodeHandle, topic);
     }
 
     /**

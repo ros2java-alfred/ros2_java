@@ -7,6 +7,7 @@
 #include <rcl/error_handling.h>
 #include <rcl/rcl.h>
 #include <rcl/node.h>
+#include <rcl/graph.h>
 #include <rosidl_generator_c/message_type_support_struct.h>
 
 #include "org_ros2_rcljava_Node.h"
@@ -111,10 +112,20 @@ JNICALL Java_org_ros2_rcljava_Node_nativeCreateClientHandle(
 
   rcl_client_t *client = makeInstance<rcl_client_t>();
 
+  bool is_available = false;
+  rcl_ret_t ret = rcl_service_server_is_available(node, client, &is_available);
+  if (ret != RCL_RET_OK || !is_available) {
+    std::string message("Failed to conect to server: " +
+        std::string(rcl_get_error_string_safe()));
+    throwException(env, message);
+
+    return -1;
+  }
+
   rcl_client_options_t client_ops = rcl_client_get_default_options();
   //  publisher_ops.qos =
 
-  rcl_ret_t ret = rcl_client_init(
+  ret = rcl_client_init(
       client,
       node,
       msg_type,
@@ -200,7 +211,79 @@ JNICALL Java_org_ros2_rcljava_Node_nativeGetName
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
 
   const char *name_tmp = rcl_node_get_name(node);
-
   jstring name = env->NewStringUTF(name_tmp);
+
   return name;
 }
+
+/*
+ *
+ */
+JNIEXPORT jint
+JNICALL Java_org_ros2_rcljava_Node_nativeCountPublishers
+  (JNIEnv *env, jclass, jlong jnode_handle, jstring jtopic) {
+
+  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
+  std::string topic = jstring2String(env, jtopic);
+
+  size_t count = -1;
+  rcl_ret_t ret = rcl_count_publishers(node, topic.c_str(), &count);
+  if (ret != RCL_RET_OK) {
+    std::string message("Failed to count Publishers: " +
+        std::string(rcl_get_error_string_safe()));
+    throwException(env, message);
+  }
+
+  return count;
+}
+
+/*
+ *
+ */
+JNIEXPORT jint
+JNICALL Java_org_ros2_rcljava_Node_nativeCountSubscribers
+  (JNIEnv *env, jclass, jlong jnode_handle, jstring jtopic) {
+
+  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
+  std::string topic = jstring2String(env, jtopic);
+
+  size_t count = 0;
+  rcl_ret_t ret = rcl_count_subscribers(node, topic.c_str(), &count);
+  if (ret != RCL_RET_OK) {
+    std::string message("Failed to count Publishers: " +
+        std::string(rcl_get_error_string_safe()));
+    throwException(env, message);
+  }
+
+  return count;
+}
+
+JNIEXPORT jobject
+JNICALL Java_org_ros2_rcljava_Node_getListTopics
+  (JNIEnv *env, jclass, jlong jnode_handle) {
+
+  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
+  rcl_topic_names_and_types_t *topic_names_and_types = makeInstance<rcl_topic_names_and_types_t>();
+
+  rcl_ret_t ret = rcl_get_topic_names_and_types(node, topic_names_and_types);
+  if (ret != RCL_RET_OK) {
+    std::string message("Failed get list of topics: " +
+        std::string(rcl_get_error_string_safe()));
+    throwException(env, message);
+  }
+
+  jobject topics = makeJTopics(env, topic_names_and_types);
+
+  // TODO
+//  rcl_destroy_topic_names_and_types(topic_names_and_types);
+//  if (ret != RCL_RET_OK) {
+//    std::string message("Failed get list of topics: " +
+//        std::string(rcl_get_error_string_safe()));
+//    throwException(env, message);
+//  }
+
+  return topics;
+
+}
+
+
