@@ -21,7 +21,7 @@ package org.ros2.rcljava;
  * @author Esteve Fernandez <esteve@apache.org>
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
-public class Subscription<T> {
+public class Subscription<T extends Message> {
 
     /** Node Handler. */
     private final long nodeHandle;
@@ -85,7 +85,6 @@ public class Subscription<T> {
      * Release all Publisher ressource.
      */
     public void dispose() {
-        //TODO implement to JNI
         // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
     }
 }

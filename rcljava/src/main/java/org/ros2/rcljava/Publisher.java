@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * @author Esteve Fernandez <esteve@apache.org>
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
-public class Publisher<T> {
+public class Publisher<T extends Message> {
 
     private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
 
@@ -43,7 +43,7 @@ public class Publisher<T> {
     private final QoSProfile qosProfile;
 
     // Native call.
-    private static native <T> void nativePublish(long publisherHandle, T msg);
+    private static native <T extends Message> void nativePublish(long publisherHandle, T msg);
     private static native void nativeDispose(long nodeHandle, long publisherHandle);
 
     static {

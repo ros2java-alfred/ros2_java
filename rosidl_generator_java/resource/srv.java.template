@@ -4,19 +4,14 @@ import org.ros2.rosidl_generator_java.RCLJavaProxy;
 import @(package_name).@(subfolder).@(type_name)_Request;
 import @(package_name).@(subfolder).@(type_name)_Response;
 
-public abstract class @(type_name) {
+public abstract class @(spec.srv_name) {
     static {
-        try {
-            System.loadLibrary("@(package_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native code library failed to load.\n" + e);
-            System.exit(1);
-        }
+        RCLJavaProxy.loadLibrary("@(package_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
     }
 
-    public static native long getFromJavaConverter();
-    public static native long getToJavaConverter();
-    public static native long getTypeSupport();
+//    public static native long getFromJavaConverter();
+//    public static native long getToJavaConverter();
+//    public static native long getTypeSupport();
 
     public static class Request extends @(type_name)_Request {}
     public static class Response extends @(type_name)_Response {}

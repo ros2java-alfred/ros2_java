@@ -51,10 +51,10 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWa
 /*
  * Class:     org_ros2_rcljava_RCLJava
  * Method:    nativeWaitSetInit
- * Signature: (JIII)V
+ * Signature: (JIIIII)V
  */
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetInit
-  (JNIEnv *, jclass, jlong, jint, jint, jint);
+  (JNIEnv *, jclass, jlong, jint, jint, jint, jint, jint);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava
@@ -95,6 +95,15 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTake
  */
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown
   (JNIEnv *, jclass);
+
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeWaitSetFini
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetFini
+  (JNIEnv *, jclass, jlong);
+
 
 #ifdef __cplusplus
 }

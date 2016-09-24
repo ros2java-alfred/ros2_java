@@ -274,7 +274,7 @@ JNICALL Java_org_ros2_rcljava_Node_getListTopics
 
   jobject topics = makeJTopics(env, topic_names_and_types);
 
-  // TODO
+  free(topic_names_and_types);
 //  rcl_destroy_topic_names_and_types(topic_names_and_types);
 //  if (ret != RCL_RET_OK) {
 //    std::string message("Failed get list of topics: " +

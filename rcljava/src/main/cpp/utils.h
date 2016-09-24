@@ -86,7 +86,6 @@ void *
 jobject2Message(JNIEnv *env, jobject jmessage)
 {
   jclass jmessage_class = env->GetObjectClass(jmessage);
-
   jmethodID mid = env->GetStaticMethodID(jmessage_class, "getFromJavaConverter", "()J");
   jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, mid);
 

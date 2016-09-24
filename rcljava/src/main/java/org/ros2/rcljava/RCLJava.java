@@ -23,8 +23,6 @@ import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
 import org.ros2.rcljava.exception.NotInitializedException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -66,20 +64,29 @@ public class RCLJava {
     };
 
     // Natives definitions
+    // rcl.h
     private static native void nativeRCLJavaInit(String args[]);
-    private static native long nativeCreateNodeHandle(String nodeName);
+    private static native void nativeShutdown();
     private static native boolean nativeOk();
     private static native String nativeGetRMWIdentifier();
-    private static native void nativeShutdown();
+
+    // Node.h
+    private static native long nativeCreateNodeHandle(String nodeName);
+
+    // Wait.h
     private static native long nativeGetZeroInitializedWaitSet();
     private static native void nativeWaitSetInit(
-            long waitSetHandle, int numberOfSubscriptions, int numberOfGuardConditions, int numberOfTimers);
+            long waitSetHandle,
+            int numberOfSubscriptions,
+            int numberOfGuardConditions,
+            int numberOfTimers,
+            int numberOfClients,
+            int numberOfServices);
     private static native void nativeWaitSetClearSubscriptions(long waitSetHandle);
     private static native void nativeWaitSetAddSubscription(long waitSetHandle, long subscriptionHandle);
     private static native void nativeWait(long waitSetHandle);
-    private static native Object nativeTake(long SubscriptionHandle, Class<?> msgType);
-    //private static native ArrayList<String> nativeGetNodeNames();
-    //private static native HashMap<String, Class<?>> nativeGetRemoteTopicNamesAndTypes();
+    private static native Message nativeTake(long SubscriptionHandle, Class<?> msgType);
+    private static native void nativeWaitSetFini(long waitSetHandle);
 
     /** Release all ressources at shutdown. */
     static {
@@ -146,51 +153,6 @@ public class RCLJava {
     }
 
     /**
-     *
-     */
-    private static void autoLoadRmw() {
-        for (Map.Entry<String, String> entry : rmwToTypesupport.entrySet()) {
-            try {
-                logger.config("Try to load native " + entry.getKey() + "...");
-                RCLJava.setRMWImplementation(entry.getKey());
-                logger.config(entry.getKey() + " loaded !");
-                break;
-            } catch (NoImplementationAvailableException e) {
-                logger.config(entry.getKey() + " not available ! (" + e.getMessage() + ")");
-            } catch (ImplementationAlreadyImportedException e) {
-                logger.config(e.getMessage());
-            }
-        }
-    }
-
-    /**
-     * Get Node name
-     *
-     * @return
-     */
-    public static ArrayList<String> getNodeNames() {
-        if (!RCLJava.initialized) {
-            throw new NotInitializedException();
-        }
-
-        return new ArrayList<String>();
-//        return RCLJava.nativeGetNodeNames();
-    }
-
-    /**
-     * Get Topic (name & type).
-     * @return
-     */
-    public static HashMap<String, Class<?>> getRemoteTopic() {
-        if (!RCLJava.initialized) {
-            throw new NotInitializedException();
-        }
-
-        return new HashMap<String, Class<?>>();
-//        return RCLJava.nativeGetRemoteTopicNamesAndTypes();
-    }
-
-    /**
      * Node Reference of native node.
      *
      * @param nodeName Name of the node.
@@ -214,16 +176,23 @@ public class RCLJava {
      * @param node
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static void spinOnce(Node node) {
+    public static void spinOnce(final Node node) {
         if (!RCLJava.initialized) {
             throw new NotInitializedException();
         }
 
         long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
 
-        RCLJava.nativeWaitSetInit(waitSetHandle, node.getSubscriptions().size(), 0, 0);
+        RCLJava.nativeWaitSetInit(
+                waitSetHandle,
+                node.getSubscriptions().size(),
+                0,
+                0,
+                node.getClients().size(),
+                node.getServices().size());
 
         RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
+
         for(Subscription<?> subscription : node.getSubscriptions()) {
             RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
         }
@@ -231,18 +200,20 @@ public class RCLJava {
         RCLJava.nativeWait(waitSetHandle);
 
         for(Subscription subscription : node.getSubscriptions()) {
-            Object msg = RCLJava.nativeTake(subscription.getSubscriptionHandle(), subscription.getMsgType());
+            Message msg = RCLJava.nativeTake(subscription.getSubscriptionHandle(), subscription.getMsgType());
             if (msg != null) {
                 subscription.getCallback().accept(msg);
             }
         }
+
+        RCLJava.nativeWaitSetFini(waitSetHandle);
     }
 
     /**
      * Helper Spin.
      * @param node
      */
-    public static void spin(Node node) {
+    public static void spin(final Node node) {
         while(RCLJava.ok()) {
             RCLJava.spinOnce(node);
         }
@@ -254,15 +225,15 @@ public class RCLJava {
      * @param topic
      * @return
      */
-    public static Object waitForMessage(Node node, String topic) {
+    public static Message waitForMessage(Node node, String topic) {
         if (!RCLJava.initialized) {
             throw new NotInitializedException();
         }
 
-        Object msg = null;
+        Message msg = null;
         long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
 
-        RCLJava.nativeWaitSetInit(waitSetHandle, 1, 0, 0);
+        RCLJava.nativeWaitSetInit(waitSetHandle, 1, 0, 0, 0, 0);
 
         RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
         for(Subscription<?> subscription : node.getSubscriptions()) {
@@ -281,6 +252,8 @@ public class RCLJava {
                 }
             }
         }
+
+        RCLJava.nativeWaitSetFini(waitSetHandle);
 
         return msg;
     }
@@ -398,6 +371,24 @@ public class RCLJava {
             } catch (UnsatisfiedLinkError e) {
                 System.err.println("Native code library failed to load.\n" + e);
                 System.exit(1);
+            }
+        }
+    }
+
+    /**
+     * Load RMW.
+     */
+    private static void autoLoadRmw() {
+        for (Map.Entry<String, String> entry : rmwToTypesupport.entrySet()) {
+            try {
+                logger.config("Try to load native " + entry.getKey() + "...");
+                RCLJava.setRMWImplementation(entry.getKey());
+                logger.config(entry.getKey() + " loaded !");
+                break;
+            } catch (NoImplementationAvailableException e) {
+                logger.config(entry.getKey() + " not available ! (" + e.getMessage() + ")");
+            } catch (ImplementationAlreadyImportedException e) {
+                logger.config(e.getMessage());
             }
         }
     }

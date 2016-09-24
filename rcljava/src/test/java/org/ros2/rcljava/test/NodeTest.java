@@ -30,7 +30,6 @@ import org.ros2.rcljava.service.Service;
 import org.ros2.rcljava.service.ServiceConsumer;
 
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;

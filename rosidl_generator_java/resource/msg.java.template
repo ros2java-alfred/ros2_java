@@ -1,6 +1,7 @@
 package @(package_name).@(subfolder);
 
 import org.ros2.rosidl_generator_java.RCLJavaProxy;
+import org.ros2.rcljava.Message;
 
 @[for field in spec.fields]@
 @[    if not field.type.is_primitive_type()]@
@@ -10,8 +11,8 @@ import @(field.type.pkg_name).msg.@(field.type.type);
 @[    end if]@
 @[end for]@
 
-public class @(type_name) {
-   static {
+public class @(type_name) implements Message{
+    static {
         RCLJavaProxy.loadLibrary("@(spec.base_type.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
     }
 

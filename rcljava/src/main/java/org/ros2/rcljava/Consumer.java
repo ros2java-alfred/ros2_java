@@ -19,6 +19,6 @@ package org.ros2.rcljava;
  *
  * @author Esteve Fernandez <esteve@apache.org>
  */
-public interface Consumer<T> {
+public interface Consumer<T extends Message> {
     void accept(T t);
 }

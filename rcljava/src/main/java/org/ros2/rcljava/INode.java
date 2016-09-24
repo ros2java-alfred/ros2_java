@@ -49,7 +49,7 @@ public interface INode {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Publisher instance of the created publisher.
      */
-    <T> Publisher<T> createPublisher(Class<T> message, String topic, QoSProfile qos);
+    <T extends Message> Publisher<T> createPublisher(Class<T> message, String topic, QoSProfile qos);
 
     /**
      * Create and return a Publisher. (Retro-compatibility)
@@ -59,7 +59,7 @@ public interface INode {
      * @param topic The topic for this publisher to publish on.
      * @return Publisher instance of the created publisher.
      */
-    <T> Publisher<T> createPublisher(Class<T> message, String topic);
+    <T extends Message> Publisher<T> createPublisher(Class<T> message, String topic);
 
     /**
      * Create and return a Subscription.
@@ -71,7 +71,7 @@ public interface INode {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Subscription instance of the created subscription.
      */
-    <T> Subscription<T> createSubscription(Class<T> message, String topic, Consumer<T> callback, QoSProfile qos);
+    <T extends Message> Subscription<T> createSubscription(Class<T> message, String topic, Consumer<T> callback, QoSProfile qos);
 
     /**
      * Create and return a Subscription. (Retro-compatibility)
@@ -82,7 +82,7 @@ public interface INode {
      * @param callback The user-defined callback function.
      * @return Subscription instance of the created subscription.
      */
-    <T> Subscription<T> createSubscription(Class<T> message, String topic, Consumer<T> callback);
+    <T extends Message> Subscription<T> createSubscription(Class<T> message, String topic, Consumer<T> callback);
 
     /**
      * Create and return a Client.
@@ -194,6 +194,6 @@ public interface INode {
      *
      * @param User defined callback function, It is expected to atomically set parameters.
      */
-    <T> void registerParamChangeCallback(Consumer<T> callback);
+    <T extends Message> void registerParamChangeCallback(Consumer<T> callback);
 
 }

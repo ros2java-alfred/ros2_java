@@ -36,6 +36,44 @@ JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit
 /*
  *
  */
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown
+  (JNIEnv *env, jclass) {
+
+  rcl_ret_t ret = rcl_shutdown();
+  if (ret != RCL_RET_OK) {
+    std::string message("Failed to shutdown: " +
+        std::string(rcl_get_error_string_safe()));
+    throwException(env, message);
+  }
+}
+
+/*
+ *
+ */
+JNIEXPORT jboolean
+JNICALL Java_org_ros2_rcljava_RCLJava_nativeOk
+  (JNIEnv *, jclass) {
+
+  return rcl_ok();
+}
+
+/*
+ *
+ */
+JNIEXPORT jstring
+JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier
+  (JNIEnv *env, jclass) {
+
+  const char * rmw_implementation_identifier = rmw_get_implementation_identifier();
+
+  return env->NewStringUTF(rmw_implementation_identifier);
+}
+
+
+/*
+ *
+ */
 JNIEXPORT jlong
 JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle
   (JNIEnv *env, jclass, jstring jnode_name) {
@@ -60,27 +98,7 @@ JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle
   return node_handle;
 }
 
-/*
- *
- */
-JNIEXPORT jstring
-JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier
-  (JNIEnv *env, jclass) {
 
-  const char * rmw_implementation_identifier = rmw_get_implementation_identifier();
-
-  return env->NewStringUTF(rmw_implementation_identifier);
-}
-
-/*
- *
- */
-JNIEXPORT jboolean
-JNICALL Java_org_ros2_rcljava_RCLJava_nativeOk
-  (JNIEnv *, jclass) {
-
-  return rcl_ok();
-}
 
 /*
  *
@@ -89,8 +107,8 @@ JNIEXPORT jlong
 JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWaitSet
   (JNIEnv *, jclass) {
 
+  // ~ rcl_get_zero_initialized_wait_set();
   rcl_wait_set_t * wait_set = makeInstance<rcl_wait_set_t>();
-
   wait_set->subscriptions = nullptr;
   wait_set->size_of_subscriptions = 0;
   wait_set->guard_conditions = nullptr;
@@ -111,12 +129,16 @@ JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWaitSet
  *
  */
 JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetInit
-  (JNIEnv *env, jclass, jlong wait_set_handle, jint number_of_subscriptions,
-   jint number_of_guard_conditions, jint number_of_timers) {
-
-  jint number_of_clients = 0;
-  jint number_of_services = 0;
+JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetInit(
+    JNIEnv *env,
+    jclass ,
+     jlong wait_set_handle,
+      jint number_of_subscriptions,
+      jint number_of_guard_conditions,
+      jint number_of_timers,
+      jint number_of_clients,
+      jint number_of_services
+    ) {
 
   rcl_wait_set_t * wait_set = handle2Instance<rcl_wait_set_t>(wait_set_handle);
 
@@ -201,7 +223,6 @@ JNICALL Java_org_ros2_rcljava_RCLJava_nativeTake
   void * taken_msg = jclass2Message(env, jmessage_class);
 
   rcl_ret_t ret = rcl_take(subscription, taken_msg, nullptr);
-
   if (ret != RCL_RET_OK && ret != RCL_RET_SUBSCRIPTION_TAKE_FAILED) {
     std::string message("Failed to take from a subscription: " +
         std::string(rcl_get_error_string_safe()));
@@ -221,13 +242,15 @@ JNICALL Java_org_ros2_rcljava_RCLJava_nativeTake
  *
  */
 JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown
-  (JNIEnv *env, jclass) {
+JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetFini
+  (JNIEnv *env, jclass, jlong wait_set_handle) {
 
-  rcl_ret_t ret = rcl_shutdown();
+  rcl_wait_set_t * wait_set = handle2Instance<rcl_wait_set_t>(wait_set_handle);
+
+  rcl_ret_t ret = rcl_wait_set_fini(wait_set);
   if (ret != RCL_RET_OK) {
-    std::string message("Failed to shutdown: " +
-        std::string(rcl_get_error_string_safe()));
-    throwException(env, message);
-  }
+      std::string message("Failed to release wait set: " +
+          std::string(rcl_get_error_string_safe()));
+      throwException(env, message);
+    }
 }

@@ -64,10 +64,10 @@ public class Node implements INode {
     private final HashMap<String, Object> parameters;
 
     // Native call.
-    private static native <T> long nativeCreatePublisherHandle(
+    private static native <T extends Message> long nativeCreatePublisherHandle(
             long nodeHandle, Class<T> cls, String topic, QoSProfile qos);
 
-    private static native <T> long nativeCreateSubscriptionHandle(
+    private static native <T extends Message> long nativeCreateSubscriptionHandle(
             long nodeHandle, Class<T> cls, String topic, QoSProfile qos);
 
     private static native <T> long nativeCreateClientHandle(
@@ -86,6 +86,7 @@ public class Node implements INode {
 
     private static native HashMap<String, String> getListTopics(long nodeHandle);
 
+
 //    private static native  ; //rcl_service_server_is_available
 
     /**
@@ -103,7 +104,7 @@ public class Node implements INode {
     }
 
     /**
-     * Release all ressource.
+     * Release all resource.
      */
     @Override
     public void dispose() {
@@ -142,7 +143,7 @@ public class Node implements INode {
      * @return Publisher instance of the created publisher.
      */
     @Override
-    public <T> Publisher<T> createPublisher(
+    public <T extends Message> Publisher<T> createPublisher(
             final Class<T> message,
             final String topic,
             final QoSProfile qos) {
@@ -166,7 +167,7 @@ public class Node implements INode {
      * @return Publisher instance of the created publisher.
      */
     @Override
-    public <T> Publisher<T> createPublisher(
+    public <T extends Message> Publisher<T> createPublisher(
             final Class<T> message,
             final String topic) {
         return this.createPublisher(message, topic, QoSProfile.PROFILE_DEFAULT);
@@ -183,7 +184,7 @@ public class Node implements INode {
      * @return Subscription instance of the created subscription.
      */
     @Override
-    public <T> Subscription<T> createSubscription(
+    public <T extends Message> Subscription<T> createSubscription(
             final Class<T> message,
             final String topic,
             final Consumer<T> callback,
@@ -213,7 +214,7 @@ public class Node implements INode {
      * @return Subscription instance of the created subscription.
      */
     @Override
-    public <T> Subscription<T> createSubscription(
+    public <T extends Message> Subscription<T> createSubscription(
             final Class<T> message,
             final String topic,
             final Consumer<T> callback) {
@@ -427,7 +428,7 @@ public class Node implements INode {
      * @param User defined callback function, It is expected to atomically set parameters.
      */
     @Override
-    public <T> void registerParamChangeCallback(Consumer<T> callback) {
+    public <T extends Message> void registerParamChangeCallback(Consumer<T> callback) {
         //TODO
         throw new NotImplementedException();
     }
@@ -439,4 +440,22 @@ public class Node implements INode {
     public List<Subscription<?>> getSubscriptions() {
         return this.subscriptions;
     }
+
+    /**
+     * Get list of Clients.
+     * @return ArrayList of Clients
+     */
+    public List<Client<?>> getClients() {
+        return this.clients;
+    }
+
+    /**
+     * Get list of Services.
+     * @return ArrayList of Services
+     */
+    public List<Service<?>> getServices() {
+        return this.services;
+    }
+
+
 }

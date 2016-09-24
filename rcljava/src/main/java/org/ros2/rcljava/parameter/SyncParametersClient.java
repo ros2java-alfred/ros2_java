@@ -56,7 +56,7 @@ public class SyncParametersClient {
         return null;
     }
 
-    public Subscription<rcl_interfaces.msg.ParameterEvent> onParameterEvent(final ParameterConsumer parameterConsumer) {
+    public Subscription<?> onParameterEvent(final ParameterConsumer parameterConsumer) { // rcl_interfaces.msg.ParameterEvent
         // TODO Auto-generated method stub
         return null;
     }

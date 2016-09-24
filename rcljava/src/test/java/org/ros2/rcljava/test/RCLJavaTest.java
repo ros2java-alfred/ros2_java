@@ -121,44 +121,6 @@ public class RCLJavaTest{
         Assert.assertTrue("Expected Runtime error when shutting down rclJava twice", test);
     }
 
-    @Ignore
-    @Test
-    public void testGetNodeName() {
-        boolean test = true;
-        ArrayList<String> names = new ArrayList<String>();
-
-        RCLJava.rclJavaInit();
-
-        try {
-            names = RCLJava.getNodeNames();
-        } catch (Exception e) {
-            test = false;
-        }
-
-        RCLJava.shutdown();
-        Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", names, names);
-    }
-
-    @Ignore
-    @Test
-    public void testGetRemoteTopic() {
-        boolean test = true;
-        HashMap<String, Class<?>> topics = new HashMap<String, Class<?>>();
-
-        RCLJava.rclJavaInit();
-
-        try {
-            topics = RCLJava.getRemoteTopic();
-        } catch (Exception e) {
-            test = false;
-        }
-
-        RCLJava.shutdown();
-        Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", topics, topics);
-    }
-
     @Test
     public void testCreateNode() {
         boolean test = true;
