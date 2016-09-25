@@ -260,7 +260,7 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
 
   jclass _jmessage_class = env->FindClass("@(spec.base_type.pkg_name)/@(subfolder)/@(spec.base_type.type)");
   jmethodID _jmessage_constructor = env->GetMethodID(_jmessage_class, "<init>", "()V");
-  jobject _jmessage_obj = env->NewObject(_jmessage_class, _jmessage_constructor)
+  jobject _jmessage_obj = env->NewObject(_jmessage_class, _jmessage_constructor);
 @[for field in spec.fields]@
 
 @[    if field.type.is_array]@

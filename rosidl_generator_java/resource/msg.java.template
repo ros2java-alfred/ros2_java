@@ -47,7 +47,7 @@ def upperfirst(s):
      * @(upperfirst(field.name)) setter.
      * @@param @(field.name)
      */
-    public void set@(upperfirst(field.name))(java.util.Collection<@(get_java_type(field.type, use_primitives=False))> @(field.name)) {
+    public void set@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))(java.util.Collection<@(get_java_type(field.type, use_primitives=False))> @(field.name)) {
         if (@(field.name) != null) {
             this.@(field.name) = new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>(@(field.name));
         }
@@ -57,7 +57,7 @@ def upperfirst(s):
      * @(upperfirst(field.name)) getter.
      * @@return @(get_java_type(field.type, use_primitives=False))
      */
-    public java.util.List<@(get_java_type(field.type, use_primitives=False))> get@(upperfirst(field.name))() {
+    public java.util.List<@(get_java_type(field.type, use_primitives=False))> get@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))() {
         if (this.@(field.name) == null) {
             return null;
         }
@@ -71,7 +71,7 @@ def upperfirst(s):
      * @(upperfirst(field.name)) setter.
      * @@param @(field.name)
      */
-    public void set@(upperfirst(field.name))(@(get_java_type(field.type)) @(field.name)) {
+    public void set@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))(@(get_java_type(field.type)) @(field.name)) {
         this.@(field.name) = @(field.name);
     }
 
@@ -79,7 +79,7 @@ def upperfirst(s):
      * @(upperfirst(field.name)) getter.
      * @@return @(get_java_type(field.type))
      */
-    public @(get_java_type(field.type)) get@(upperfirst(field.name))() {
+    public @(get_java_type(field.type)) get@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))() {
         return this.@(field.name);
     }
 @[    end if]@
