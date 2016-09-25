@@ -10,14 +10,14 @@
 #include <rcl/node.h>
 #include <jni.h>
 
-#include "org_ros2_rcljava_Publisher.h"
+#include "org_ros2_rcljava_node_topic_Publisher.h"
 #include "utils.h"
 
 /*
  * nativePublish
  */
 JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_Publisher_nativePublish(
+JNICALL Java_org_ros2_rcljava_node_topic_Publisher_nativePublish(
     JNIEnv *env,
     jclass ,
      jlong jpublisher_handle,
@@ -39,7 +39,7 @@ JNICALL Java_org_ros2_rcljava_Publisher_nativePublish(
  * nativeDispose
  */
 JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_Publisher_nativeDispose(
+JNICALL Java_org_ros2_rcljava_node_topic_Publisher_nativeDispose(
     JNIEnv *env,
     jclass ,
      jlong jnode_handle,

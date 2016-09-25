@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava.parameter;
+package org.ros2.rcljava.node.parameter;
 
-import org.ros2.rcljava.Node;
 import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.node.Node;
 
 /**
  * Parameter Variant.

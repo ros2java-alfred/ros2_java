@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava;
+package org.ros2.rcljava.node;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -21,10 +21,16 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
-import org.ros2.rcljava.service.Client;
-import org.ros2.rcljava.service.Service;
-import org.ros2.rcljava.service.ServiceConsumer;
+import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.service.Client;
+import org.ros2.rcljava.node.service.Service;
+import org.ros2.rcljava.node.service.ServiceConsumer;
+import org.ros2.rcljava.node.topic.Consumer;
+import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Subscription;
 
 /**
  * Node ROS2.
@@ -39,7 +45,7 @@ public class Node implements INode {
 
     // Loading JNI library.
     static {
-        RCLJava.loadLibrary("rcljavaNode__" + RCLJava.getRMWIdentifier());
+        RCLJava.loadLibrary("rcljavanode_Node__" + RCLJava.getRMWIdentifier());
     }
 
     /** Name of the node */

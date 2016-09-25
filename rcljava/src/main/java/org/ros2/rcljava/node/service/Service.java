@@ -12,52 +12,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava.parameter;
+package org.ros2.rcljava.node.service;
 
 /**
- * Parameter Variant.
+ * Service Server.
  *
- * @param <T> Parameter Type.
+ * @param <T> Service Type.
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
-public class ParameterVariant<T> {
+public class Service<T> {
 
+    /** Name of the node */
     private final String name;
 
-    private T value;
+    /** Node Handler. */
+    private final long nodeHandle;
 
-    public ParameterVariant(String name, T value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    /**
-     * @return the key
-     */
-    public String getName() {
-        return name;
-    }
+    /** Service Handler. */
+    private final long serviceHandle;
 
     /**
-     * @param value the value to set
+     * Constructor.
+     *
+     * @param nodeHandle
+     * @param serviceName
      */
-    public void setValue(T value) {
-        this.value = value;
+    public Service(final long nodeHandle, final long serviceHandle, final String serviceName) {
+        this.name = serviceName;
+        this.nodeHandle = nodeHandle;
+        this.serviceHandle = serviceHandle;
     }
 
-    /**
-     * @return the value
-     */
-    public T getValue() {
-        return value;
+    public void dispose() {
+        //TODO
     }
 
-    public String getTypeName() {
-        // TODO Auto-generated method stub
-        return null;
+    public void sendResponse() {
+
     }
 
-    public String valueToString() {
-        return this.value.toString();
+    public String getServiceName() {
+        return this.name;
+    }
+
+    public long getServiceHandle() {
+        return this.serviceHandle;
     }
 }

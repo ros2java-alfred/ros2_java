@@ -14,9 +14,6 @@
  */
 package org.ros2.rcljava.test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,12 +21,10 @@ import java.util.logging.SimpleFormatter;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import org.ros2.rcljava.Node;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotInitializedException;
+import org.ros2.rcljava.node.Node;
 
 /**
  *

@@ -12,14 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava;
+package org.ros2.rcljava.node;
 
 import java.util.HashMap;
 import java.util.List;
 
-import org.ros2.rcljava.service.Client;
-import org.ros2.rcljava.service.Service;
-import org.ros2.rcljava.service.ServiceConsumer;
+import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.service.Client;
+import org.ros2.rcljava.node.service.Service;
+import org.ros2.rcljava.node.service.ServiceConsumer;
+import org.ros2.rcljava.node.topic.Consumer;
+import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Subscription;
 
 /**
  * ROS2 Client API.

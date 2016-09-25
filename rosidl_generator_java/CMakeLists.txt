@@ -68,7 +68,7 @@ endif()
 
 set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rosidl_generator_java/RCLJavaProxy.java"
-  "src/main/java/org/ros2/Message.java"
+  "src/main/java/org/ros2/internal/message/Message.java"
 )
 
 add_jar("${PROJECT_NAME}_jar"

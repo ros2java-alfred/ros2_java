@@ -1,7 +1,7 @@
 /**
- * 
+ *
  */
-package org.ros2.rcljava;
+package org.ros2.rcljava.internal.message;
 
 /**
  * @author micky

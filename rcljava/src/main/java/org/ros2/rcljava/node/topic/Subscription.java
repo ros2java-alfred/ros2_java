@@ -12,7 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava;
+package org.ros2.rcljava.node.topic;
+
+import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.internal.message.Message;
 
 /**
  * Subscrition of node.

@@ -1,4 +1,4 @@
-/* Copyright 2016 Open Source Robotics Foundation, Inc.
+/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,17 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava.parameter;
+package org.ros2.rcljava.node.topic;
+
+import org.ros2.rcljava.internal.message.Message;
 
 /**
- * Parameter Consumer.
  *
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
+ *
+ * @author Esteve Fernandez <esteve@apache.org>
  */
-public interface ParameterConsumer {
-    /**
-     *
-     * @param event
-     */
-    void onEvent(final rcl_interfaces.msg.ParameterEvent event);
+public interface Consumer<T extends Message> {
+    void accept(T t);
 }

@@ -22,6 +22,10 @@ import java.util.logging.Logger;
 import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
 import org.ros2.rcljava.exception.NotInitializedException;
+import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Subscription;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;

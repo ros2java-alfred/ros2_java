@@ -12,9 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava;
+package org.ros2.rcljava.node.topic;
 
 import java.util.logging.Logger;
+
+import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.internal.message.Message;
 
 /**
  * Publisher of node.
@@ -47,7 +51,7 @@ public class Publisher<T extends Message> {
     private static native void nativeDispose(long nodeHandle, long publisherHandle);
 
     static {
-        RCLJava.loadLibrary("rcljavaPublisher__" + RCLJava.getRMWIdentifier());
+        RCLJava.loadLibrary("rcljavanode_topic_Publisher__" + RCLJava.getRMWIdentifier());
     }
 
     /**

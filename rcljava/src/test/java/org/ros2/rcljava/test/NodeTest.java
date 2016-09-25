@@ -18,16 +18,15 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import org.ros2.rcljava.Consumer;
-import org.ros2.rcljava.Node;
-import org.ros2.rcljava.Publisher;
 import org.ros2.rcljava.QoSProfile;
 import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.Subscription;
-import org.ros2.rcljava.service.Client;
-import org.ros2.rcljava.service.Service;
-import org.ros2.rcljava.service.ServiceConsumer;
+import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.service.Client;
+import org.ros2.rcljava.node.service.Service;
+import org.ros2.rcljava.node.service.ServiceConsumer;
+import org.ros2.rcljava.node.topic.Consumer;
+import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Subscription;
 
 import java.util.HashMap;
 import java.util.logging.ConsoleHandler;

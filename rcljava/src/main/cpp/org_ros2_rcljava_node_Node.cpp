@@ -10,14 +10,14 @@
 #include <rcl/graph.h>
 #include <rosidl_generator_c/message_type_support_struct.h>
 
-#include "org_ros2_rcljava_Node.h"
+#include "org_ros2_rcljava_node_Node.h"
 #include "utils.h"
 
 /*
  * nativeCreatePublisherHandle
  */
 JNIEXPORT jlong
-JNICALL Java_org_ros2_rcljava_Node_nativeCreatePublisherHandle(
+JNICALL Java_org_ros2_rcljava_node_Node_nativeCreatePublisherHandle(
     JNIEnv *env,
     jclass ,
      jlong jnode_handle,
@@ -58,7 +58,7 @@ JNICALL Java_org_ros2_rcljava_Node_nativeCreatePublisherHandle(
  * nativeCreateSubscriptionHandle
  */
 JNIEXPORT jlong
-JNICALL Java_org_ros2_rcljava_Node_nativeCreateSubscriptionHandle(
+JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateSubscriptionHandle(
     JNIEnv *env,
     jclass ,
      jlong jnode_handle,
@@ -98,7 +98,7 @@ JNICALL Java_org_ros2_rcljava_Node_nativeCreateSubscriptionHandle(
  * nativeCreateClientHandle
  */
 JNIEXPORT jlong
-JNICALL Java_org_ros2_rcljava_Node_nativeCreateClientHandle(
+JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateClientHandle(
     JNIEnv *env,
     jclass ,
      jlong jnode_handle,
@@ -148,7 +148,7 @@ JNICALL Java_org_ros2_rcljava_Node_nativeCreateClientHandle(
  * nativeCreateServiceHandle
  */
 JNIEXPORT jlong
-JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle(
+JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateServiceHandle(
     JNIEnv *env,
     jclass ,
      jlong jnode_handle,
@@ -188,7 +188,7 @@ JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle(
  *
  */
 JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_Node_nativeDispose
+JNICALL Java_org_ros2_rcljava_node_Node_nativeDispose
   (JNIEnv *env, jclass , jlong jnode_handle) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
@@ -205,7 +205,7 @@ JNICALL Java_org_ros2_rcljava_Node_nativeDispose
  *
  */
 JNIEXPORT jstring
-JNICALL Java_org_ros2_rcljava_Node_nativeGetName
+JNICALL Java_org_ros2_rcljava_node_Node_nativeGetName
   (JNIEnv *env, jclass, jlong jnode_handle) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
@@ -220,7 +220,7 @@ JNICALL Java_org_ros2_rcljava_Node_nativeGetName
  *
  */
 JNIEXPORT jint
-JNICALL Java_org_ros2_rcljava_Node_nativeCountPublishers
+JNICALL Java_org_ros2_rcljava_node_Node_nativeCountPublishers
   (JNIEnv *env, jclass, jlong jnode_handle, jstring jtopic) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
@@ -241,7 +241,7 @@ JNICALL Java_org_ros2_rcljava_Node_nativeCountPublishers
  *
  */
 JNIEXPORT jint
-JNICALL Java_org_ros2_rcljava_Node_nativeCountSubscribers
+JNICALL Java_org_ros2_rcljava_node_Node_nativeCountSubscribers
   (JNIEnv *env, jclass, jlong jnode_handle, jstring jtopic) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
@@ -259,7 +259,7 @@ JNICALL Java_org_ros2_rcljava_Node_nativeCountSubscribers
 }
 
 JNIEXPORT jobject
-JNICALL Java_org_ros2_rcljava_Node_getListTopics
+JNICALL Java_org_ros2_rcljava_node_Node_getListTopics
   (JNIEnv *env, jclass, jlong jnode_handle) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);

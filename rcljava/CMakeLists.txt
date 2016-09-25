@@ -50,23 +50,23 @@ find_jar(MSG_JARS
 set(JUNIT_JAR "/usr/share/java/junit4.jar")
 
 set(${PROJECT_NAME}_sources
-  "src/main/java/org/ros2/rcljava/Message.java"
-  "src/main/java/org/ros2/rcljava/INode.java"
-  "src/main/java/org/ros2/rcljava/Node.java"
-  "src/main/java/org/ros2/rcljava/RCLJava.java"
-  "src/main/java/org/ros2/rcljava/Publisher.java"
-  "src/main/java/org/ros2/rcljava/Subscription.java"
-  "src/main/java/org/ros2/rcljava/Consumer.java"
   "src/main/java/org/ros2/rcljava/Log.java"
   "src/main/java/org/ros2/rcljava/QoSProfile.java"
   "src/main/java/org/ros2/rcljava/NativeUtils.java"
-  "src/main/java/org/ros2/rcljava/service/Client.java"
-  "src/main/java/org/ros2/rcljava/service/Service.java"
-  "src/main/java/org/ros2/rcljava/service/ServiceConsumer.java"
-#  "src/main/java/org/ros2/rcljava/parameter/ParameterConsumer.java"
-#  "src/main/java/org/ros2/rcljava/parameter/ParameterService.java"
-#  "src/main/java/org/ros2/rcljava/parameter/ParameterVariant.java"
-#  "src/main/java/org/ros2/rcljava/parameter/SyncParametersClient.java"
+  "src/main/java/org/ros2/rcljava/RCLJava.java"
+  "src/main/java/org/ros2/rcljava/internal/message/Message.java"
+  "src/main/java/org/ros2/rcljava/node/INode.java"
+  "src/main/java/org/ros2/rcljava/node/Node.java"
+  "src/main/java/org/ros2/rcljava/node/topic/Publisher.java"
+  "src/main/java/org/ros2/rcljava/node/topic/Subscription.java"
+  "src/main/java/org/ros2/rcljava/node/topic/Consumer.java"
+  "src/main/java/org/ros2/rcljava/node/service/Client.java"
+  "src/main/java/org/ros2/rcljava/node/service/Service.java"
+  "src/main/java/org/ros2/rcljava/node/service/ServiceConsumer.java"
+#  "src/main/java/org/ros2/rcljava/node/parameter/ParameterConsumer.java"
+#  "src/main/java/org/ros2/rcljava/node/parameter/ParameterService.java"
+#  "src/main/java/org/ros2/rcljava/node/parameter/ParameterVariant.java"
+#  "src/main/java/org/ros2/rcljava/node/parameter/SyncParametersClient.java"
   "src/main/java/org/ros2/rcljava/exception/ImplementationAlreadyImportedException.java"
   "src/main/java/org/ros2/rcljava/exception/InvalidRCLJAVAImplementation.java"
   "src/main/java/org/ros2/rcljava/exception/NoImplementationAvailableException.java"
@@ -86,7 +86,7 @@ macro(target)
     get_rcl_information("${rmw_implementation}" "rcl${target_suffix}")
   endif()
 
-  set(_jni_classes "RCLJava;Node;Publisher")
+  set(_jni_classes "RCLJava;node_Node;node_topic_Publisher")
 
   foreach(_jni_class ${_jni_classes})
     set(_target_name "${PROJECT_NAME}${_jni_class}${target_suffix}")
