@@ -1,3 +1,4 @@
+// INCLUDES
 #include <jni.h>
 #include <stdio.h>
 #include <cassert>
@@ -19,9 +20,11 @@
 @[    end if]@
 @[end for]@
 
+// JNI HEADER
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * Class:     @(jni_package_name)_@(subfolder)_@(type_name)
  * Method:    getFromJavaConverter
@@ -54,6 +57,8 @@ JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(type_name)_getTy
 msg_typename = '%s__%s__%s' % (spec.base_type.pkg_name, subfolder, spec.base_type.type)
 }@
 
+// INTERNAL FUNCTION
+
 static_assert(sizeof(jlong) >= sizeof(intptr_t), "jlong must be able to store pointers");
 
 static JavaVM* g_vm = nullptr;
@@ -69,7 +74,9 @@ static JavaVM* g_vm = nullptr;
   @(msg_typename) * ros_message = @(msg_typename)__create();
   auto _jmessage_class = env->GetObjectClass(_jmessage_obj);
 @[for field in spec.fields]@
+
 @[    if field.type.is_array]
+  // Convert @(field.name) collection.
   auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Ljava/util/List;");
   jclass _jlist_@(field.name)_class = env->FindClass("java/util/List");
   jobject _jlist_@(field.name)_object = env->GetObjectField(_jmessage_obj, _jfield_@(field.name)_fid);
@@ -177,6 +184,7 @@ static JavaVM* g_vm = nullptr;
     }
   }
 @[    else]@
+  // Convert @(field.name) field.
 @[        if field.type.type == 'string']@
   auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Ljava/lang/String;");
   jstring _jvalue@(field.name) = static_cast<jstring>(env->GetObjectField(_jmessage_obj, _jfield_@(field.name)_fid));
@@ -237,6 +245,7 @@ static JavaVM* g_vm = nullptr;
 @[        end if]@
 @[    end if]@
 @[end for]@
+
   assert(ros_message != nullptr);
   return ros_message;
 }
@@ -251,12 +260,12 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
 
   jclass _jmessage_class = env->FindClass("@(spec.base_type.pkg_name)/@(subfolder)/@(spec.base_type.type)");
   jmethodID _jmessage_constructor = env->GetMethodID(_jmessage_class, "<init>", "()V");
-  jobject _jmessage_obj = env->NewObject(_jmessage_class, _jmessage_constructor);
-
+  jobject _jmessage_obj = env->NewObject(_jmessage_class, _jmessage_constructor)
 @[for field in spec.fields]@
+
 @[    if field.type.is_array]@
 @[        if field.type.is_primitive_type()]@
-
+  // Convert @(field.name) field.
 @[            if field.type.array_size is None or field.type.is_upper_bound]@
   auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Ljava/util/List;");
   jclass _jarray_list_@(field.name)_class = env->FindClass("java/util/ArrayList");
@@ -315,6 +324,7 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
 @[            end if]@
 @[        end if]@
 @[    else]@
+  // Convert @(field.name) field.
 @[        if field.type.type == 'string']@
   auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Ljava/lang/String;");
   if (_ros_message->@(field.name).data != nullptr) {
@@ -366,9 +376,9 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
 
   env->SetObjectField(_jmessage_obj, _jfield_@(field.name)_fid, _jfield_@(field.name)_obj);
 @[        end if]@
-
 @[    end if]@
 @[end for]@
+
   assert(_jmessage_obj != nullptr);
   return _jmessage_obj;
 }
@@ -381,6 +391,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
   return JNI_VERSION_1_6;
 }
 
+// JNI BODY
 JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(type_name)_getFromJavaConverter
   (JNIEnv *, jclass)
 {
