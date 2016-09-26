@@ -32,6 +32,8 @@ import org.ros2.rcljava.node.topic.Consumer;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 
+import builtin_interfaces.msg.Time;
+
 /**
  * Node ROS2.
  *
@@ -463,5 +465,8 @@ public class Node implements INode {
         return this.services;
     }
 
+    public Time getCurrentTime() {
+		return null;
+    }
 
 }

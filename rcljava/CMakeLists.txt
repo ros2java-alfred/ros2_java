@@ -30,20 +30,11 @@ if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 endif()
 
-find_jar(JUNIT_JAR
-    NAMES
-        junit
-    PATHS
-        /usr/share/java
-    VERSIONS
-        4
-)
-
-find_jar(MSG_JARS
-    NAMES
-        std_msgs
-    PATHS
-        "${CMAKE_INSTALL_PREFIX}/../std_msgs/share/std_msgs/java/"
+find_jar(JUNIT_JAR NAMES junit PATHS /usr/share/java VERSIONS 4)
+find_jar(STD_MSGS_JARS NAMES std_msgs
+	PATHS "${CMAKE_INSTALL_PREFIX}/../std_msgs/share/std_msgs/java/")
+find_jar(BUILTIN_MSGS_JARS NAMES builtin_interfaces
+    PATHS "${CMAKE_INSTALL_PREFIX}/../builtin_interfaces/share/builtin_interfaces/java/"
 )
 
 # Bug in find_jar for Junit4 : https://sourceforge.net/p/rdkit/mailman/message/35301727/
@@ -148,29 +139,25 @@ macro(target)
 endmacro()
 
 ### Main ###
+set(CMAKE_JAVA_INCLUDE_PATH "${BUILDING_JARS}")
 add_jar("${PROJECT_NAME}_jar"
   SOURCES
     "${${PROJECT_NAME}_sources}"
-  INCLUDE_JARS
-    "${JUNIT_JAR}"
   OUTPUT_NAME
     "${PROJECT_NAME}"
 )
 
+set(CMAKE_JAVA_INCLUDE_PATH "${BUILDING_JARS}:${STD_MSGS_JARS}:${JUNIT_JAR}")
 add_jar("${PROJECT_NAME}_test_jar"
   SOURCES
     "${${PROJECT_NAME}_sources}"
     "${${PROJECT_NAME}_tests}"
-  INCLUDE_JARS
-    "${JUNIT_JAR}"
-    "${MSG_JARS}"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_test.jar"
   OUTPUT_NAME
     "${PROJECT_NAME}_test"
 )
 
 ### Test ###
-set(TEST_COMMAND ${Java_JAVA_EXECUTABLE} ${JVMARGS} -classpath ${JUNIT_JAR}:${MSG_JARS}:${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_test.jar -Djava.library.path=${CMAKE_INSTALL_PREFIX}/lib/:${CMAKE_INSTALL_PREFIX}/../std_msgs/lib/ org.junit.runner.JUnitCore)
+set(TEST_COMMAND ${Java_JAVA_EXECUTABLE} ${JVMARGS} -classpath ${CMAKE_JAVA_INCLUDE_PATH}:${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_test.jar -Djava.library.path=${CMAKE_INSTALL_PREFIX}/lib/:${CMAKE_INSTALL_PREFIX}/../std_msgs/lib/ org.junit.runner.JUnitCore)
 
 add_test(NAME RmwTest COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RmwTest)
 add_test(NAME RCLJavaTest COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RCLJavaTest)
