@@ -10,7 +10,7 @@ repositories:
   eProsima/ROS-RMW-Fast-RTPS-cpp:
     type: git
     url: https://github.com/esteve/ROS-RMW-Fast-RTPS-cpp.git
-    version: array-serialization
+    version: master
   ros2/common_interfaces:
     type: git
     url: https://github.com/ros2/common_interfaces.git
