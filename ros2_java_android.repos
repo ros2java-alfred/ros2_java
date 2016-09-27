@@ -9,7 +9,7 @@ repositories:
     version: cpp11-android
   eProsima/ROS-RMW-Fast-RTPS-cpp:
     type: git
-    url: https://github.com/esteve/ROS-RMW-Fast-RTPS-cpp.git
+    url: https://github.com/eProsima/ROS-RMW-Fast-RTPS-cpp.git
     version: master
   ros2/common_interfaces:
     type: git
