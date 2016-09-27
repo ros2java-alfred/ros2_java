@@ -10,7 +10,7 @@ repositories:
   eProsima/ROS-RMW-Fast-RTPS-cpp:
     type: git
     url: https://github.com/esteve/ROS-RMW-Fast-RTPS-cpp.git
-    version: array-serialization
+    version: master
   ros/geometry2:
     type: git
     url: https://github.com/ros/geometry2.git
