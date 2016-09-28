@@ -37,6 +37,22 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreatePublisherHandle
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateSubscriptionHandle
   (JNIEnv *, jclass, jlong, jclass, jstring);
 
+/*
+ * Class:     org_ros2_rcljava_Node
+ * Method:    nativeCreateServiceHandle
+ * Signature: (JLjava/lang/Class;Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle
+  (JNIEnv *, jclass, jlong, jclass, jstring);
+
+/*
+ * Class:     org_ros2_rcljava_Node
+ * Method:    nativeCreateClientHandle
+ * Signature: (JLjava/lang/Class;Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateClientHandle
+  (JNIEnv *, jclass, jlong, jclass, jstring);
+
 #ifdef __cplusplus
 }
 #endif
