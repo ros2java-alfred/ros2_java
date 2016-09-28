@@ -31,8 +31,9 @@ if(NOT WIN32)
 endif()
 
 find_jar(JUNIT_JAR NAMES junit PATHS /usr/share/java VERSIONS 4)
+find_jar(LOG_JAR NAMES commons-logging PATHS /usr/share/java )
 find_jar(STD_MSGS_JARS NAMES std_msgs
-	PATHS "${CMAKE_INSTALL_PREFIX}/../std_msgs/share/std_msgs/java/")
+  PATHS "${CMAKE_INSTALL_PREFIX}/../std_msgs/share/std_msgs/java/")
 find_jar(BUILTIN_MSGS_JARS NAMES builtin_interfaces
     PATHS "${CMAKE_INSTALL_PREFIX}/../builtin_interfaces/share/builtin_interfaces/java/"
 )
@@ -46,6 +47,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/NativeUtils.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
   "src/main/java/org/ros2/rcljava/internal/message/Message.java"
+  "src/main/java/org/ros2/rcljava/namespace/GraphName.java"
   "src/main/java/org/ros2/rcljava/node/INode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
   "src/main/java/org/ros2/rcljava/node/topic/Publisher.java"
@@ -139,7 +141,7 @@ macro(target)
 endmacro()
 
 ### Main ###
-set(CMAKE_JAVA_INCLUDE_PATH "${BUILDING_JARS}")
+set(CMAKE_JAVA_INCLUDE_PATH "${BUILDING_JARS}:${LOG_JAR}")
 add_jar("${PROJECT_NAME}_jar"
   SOURCES
     "${${PROJECT_NAME}_sources}"
@@ -147,7 +149,7 @@ add_jar("${PROJECT_NAME}_jar"
     "${PROJECT_NAME}"
 )
 
-set(CMAKE_JAVA_INCLUDE_PATH "${BUILDING_JARS}:${STD_MSGS_JARS}:${JUNIT_JAR}")
+set(CMAKE_JAVA_INCLUDE_PATH "${LOG_JAR}:${BUILDING_JARS}:${STD_MSGS_JARS}:${JUNIT_JAR}")
 add_jar("${PROJECT_NAME}_test_jar"
   SOURCES
     "${${PROJECT_NAME}_sources}"

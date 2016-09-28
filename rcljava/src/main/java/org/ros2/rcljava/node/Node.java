@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import org.ros2.rcljava.Log;
 import org.ros2.rcljava.QoSProfile;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
@@ -43,7 +44,6 @@ import builtin_interfaces.msg.Time;
 public class Node implements INode {
 
     private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
-
 
     // Loading JNI library.
     static {
@@ -466,7 +466,10 @@ public class Node implements INode {
     }
 
     public Time getCurrentTime() {
-		return null;
+        return null;
     }
 
+    public Log getLog() {
+        return new Log(this);
+    }
 }
