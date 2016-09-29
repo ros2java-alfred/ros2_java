@@ -104,6 +104,14 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetFini
   (JNIEnv *, jclass, jlong);
 
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeGetNodeNames
+ * Signature: ()Ljava/util/List;
+ */
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetNodeNames
+  (JNIEnv *, jclass);
+
 
 #ifdef __cplusplus
 }

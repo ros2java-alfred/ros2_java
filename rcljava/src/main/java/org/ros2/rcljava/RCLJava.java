@@ -27,6 +27,7 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -91,6 +92,7 @@ public class RCLJava {
     private static native void nativeWait(long waitSetHandle);
     private static native Message nativeTake(long SubscriptionHandle, Class<?> msgType);
     private static native void nativeWaitSetFini(long waitSetHandle);
+    private static native List<String> nativeGetNodeNames();
 
     /** Release all ressources at shutdown. */
     static {
@@ -306,6 +308,10 @@ public class RCLJava {
         }
 
         return RCLJava.nativeGetRMWIdentifier();
+    }
+
+    public static List<String> getNodeNames() {
+        return RCLJava.nativeGetNodeNames();
     }
 
     /**

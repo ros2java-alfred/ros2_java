@@ -254,3 +254,10 @@ JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetFini
       throwException(env, message);
     }
 }
+
+JNIEXPORT jobject
+JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetNodeNames
+  (JNIEnv *env, jclass) {
+
+  return NULL;
+}
