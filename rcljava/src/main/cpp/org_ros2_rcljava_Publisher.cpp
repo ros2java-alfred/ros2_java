@@ -22,11 +22,11 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_Publisher_nativePublish
   jmethodID mid = env->GetStaticMethodID(jmessage_class, "getFromJavaConverter", "()J");
   jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, mid);
 
-  using convert_from_java_signature = void * (*)(jobject);
+  using convert_from_java_signature = void * (*)(jobject, void *);
   convert_from_java_signature convert_from_java =
     reinterpret_cast<convert_from_java_signature>(jfrom_java_converter);
 
-  void * raw_ros_message = convert_from_java(jmsg);
+  void * raw_ros_message = convert_from_java(jmsg, nullptr);
 
   rcl_ret_t ret = rcl_publish(publisher, raw_ros_message);
   if (ret != RCL_RET_OK) {
