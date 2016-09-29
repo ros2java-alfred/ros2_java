@@ -63,7 +63,7 @@ static_assert(sizeof(jlong) >= sizeof(intptr_t), "jlong must be able to store po
 
 static JavaVM* g_vm = nullptr;
 
-@(msg_typename) * @(spec.base_type.pkg_name)_@(type_name)__convert_from_java(jobject _jmessage_obj)
+@(msg_typename) * @(spec.base_type.pkg_name)_@(type_name)__convert_from_java(jobject _jmessage_obj, @(msg_typename) * ros_message)
 {
   JNIEnv *env = nullptr;
   // TODO(esteve): check return status
@@ -71,7 +71,10 @@ static JavaVM* g_vm = nullptr;
   g_vm->GetEnv((void**)&env, JNI_VERSION_1_6);
   assert(env != nullptr);
 
-  @(msg_typename) * ros_message = @(msg_typename)__create();
+  if (ros_message == nullptr)
+  {
+    ros_message = @(msg_typename)__create();
+  }
   auto _jmessage_class = env->GetObjectClass(_jmessage_obj);
 @[for field in spec.fields]@
 
@@ -174,12 +177,12 @@ static JavaVM* g_vm = nullptr;
         jlong _jfield_@(field.name)_from_java_converter_ptr = env->CallStaticLongMethod(
           _jfield_@(field.name)_class, _jfield_@(field.name)_from_java_converter_mid);
 
-        using _convert_from_java_signature_@(field.name) = @(field.type.pkg_name)__msg__@(get_java_type(field.type)) * (*)(jobject);
+        using _convert_from_java_signature_@(field.name) = @(field.type.pkg_name)__msg__@(get_java_type(field.type)) * (*)(jobject, @(field.type.pkg_name)__msg__@(get_java_type(field.type)) *);
 
         _convert_from_java_signature_@(field.name) convert_from_java_@(field.name) =
           reinterpret_cast<_convert_from_java_signature_@(field.name)>(_jfield_@(field.name)_from_java_converter_ptr);
 
-        _dest_@(field.name)[i] = *convert_from_java_@(field.name)(element);
+        _dest_@(field.name)[i] = *convert_from_java_@(field.name)(element, nullptr);
 @[        end if]@
     }
   }
@@ -235,12 +238,12 @@ static JavaVM* g_vm = nullptr;
     jlong _jfield_@(field.name)_from_java_converter_ptr = env->CallStaticLongMethod(
       _jfield_@(field.name)_class, _jfield_@(field.name)_from_java_converter_mid);
 
-    using _convert_from_java_signature_@(field.name) = @(field.type.pkg_name)__msg__@(get_java_type(field.type)) * (*)(jobject);
+    using _convert_from_java_signature_@(field.name) = @(field.type.pkg_name)__msg__@(get_java_type(field.type)) * (*)(jobject, @(field.type.pkg_name)__msg__@(get_java_type(field.type)) *);
 
     _convert_from_java_signature_@(field.name) convert_from_java_@(field.name) =
       reinterpret_cast<_convert_from_java_signature_@(field.name)>(_jfield_@(field.name)_from_java_converter_ptr);
 
-    ros_message->@(field.name) = *convert_from_java_@(field.name)(_jfield_@(field.name)_obj);
+    ros_message->@(field.name) = *convert_from_java_@(field.name)(_jfield_@(field.name)_obj, nullptr);
   }
 @[        end if]@
 @[    end if]@
@@ -250,7 +253,7 @@ static JavaVM* g_vm = nullptr;
   return ros_message;
 }
 
-jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename) * _ros_message)
+jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename) * _ros_message, jobject _jmessage_obj)
 {
   JNIEnv *env = nullptr;
   // TODO(esteve): check return status
@@ -259,8 +262,12 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
   assert(env != nullptr);
 
   jclass _jmessage_class = env->FindClass("@(spec.base_type.pkg_name)/@(subfolder)/@(spec.base_type.type)");
-  jmethodID _jmessage_constructor = env->GetMethodID(_jmessage_class, "<init>", "()V");
-  jobject _jmessage_obj = env->NewObject(_jmessage_class, _jmessage_constructor);
+  if (_jmessage_obj == nullptr)
+  {
+    jmethodID _jmessage_constructor = env->GetMethodID(_jmessage_class, "<init>", "()V");
+    _jmessage_obj = env->NewObject(_jmessage_class, _jmessage_constructor);
+  }
+
 @[for field in spec.fields]@
 
 @[    if field.type.is_array]@
@@ -367,12 +374,12 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
   jlong _jfield_@(field.name)_to_java_converter_ptr = env->CallStaticLongMethod(
     _jfield_@(field.name)_class, _jfield_@(field.name)_to_java_converter_mid);
 
-  using _convert_to_java_signature_@(field.name) = jobject (*)(@(field.type.pkg_name)__msg__@(get_java_type(field.type)) *);
+  using _convert_to_java_signature_@(field.name) = jobject (*)(@(field.type.pkg_name)__msg__@(get_java_type(field.type)) *, jobject);
 
   _convert_to_java_signature_@(field.name) convert_to_java_@(field.name) =
     reinterpret_cast<_convert_to_java_signature_@(field.name)>(_jfield_@(field.name)_to_java_converter_ptr);
 
-  jobject _jfield_@(field.name)_obj = convert_to_java_@(field.name)(&(_ros_message->@(field.name)));
+  jobject _jfield_@(field.name)_obj = convert_to_java_@(field.name)(&(_ros_message->@(field.name)), nullptr);
 
   env->SetObjectField(_jmessage_obj, _jfield_@(field.name)_fid, _jfield_@(field.name)_obj);
 @[        end if]@

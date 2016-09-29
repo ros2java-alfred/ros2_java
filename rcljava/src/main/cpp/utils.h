@@ -54,14 +54,14 @@ jclass2Message(JNIEnv *env, jclass jmessage_class)
   jmethodID jfrom_mid = env->GetStaticMethodID(jmessage_class, "getFromJavaConverter", "()J");
   jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, jfrom_mid);
 
-  using convert_from_java_signature = void * (*)(jobject);
+  using convert_from_java_signature = void * (*)(jobject, void *);
   convert_from_java_signature convert_from_java =
       reinterpret_cast<convert_from_java_signature>(jfrom_java_converter);
 
   jmethodID jconstructor = env->GetMethodID(jmessage_class, "<init>", "()V");
   jobject jmsg = env->NewObject(jmessage_class, jconstructor);
 
-  void *taken_msg = convert_from_java(jmsg);
+  void *taken_msg = convert_from_java(jmsg, nullptr);
   return taken_msg;
 }
 
@@ -71,11 +71,11 @@ jclass2JMessage(JNIEnv *env, jclass jmessage_class, void * taken_msg)
   jmethodID jto_mid = env->GetStaticMethodID(jmessage_class, "getToJavaConverter", "()J");
   jlong jto_java_converter = env->CallStaticLongMethod(jmessage_class, jto_mid);
 
-  using convert_to_java_signature = jobject (*)(void *);
+  using convert_to_java_signature = jobject (*)(void *, jobject);
   convert_to_java_signature convert_to_java =
       reinterpret_cast<convert_to_java_signature>(jto_java_converter);
 
-  jobject jtaken_msg = convert_to_java(taken_msg);
+  jobject jtaken_msg = convert_to_java(taken_msg, nullptr);
   return jtaken_msg;
 }
 
@@ -179,8 +179,10 @@ makeJTopics(JNIEnv *env, rcl_topic_names_and_types_t *topic_names_and_types)
   jobject hashMap = env->NewObject(mapClass, init, map_len);
   jmethodID put   = env->GetMethodID(mapClass, "put",
       "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+  printf("Test %d \n", topic_names_and_types->topic_count);
 
-  for (int i = 0; i < map_len; i = i + 1) {
+  for (size_t i = 0; i < topic_names_and_types->topic_count; ++i) {
+    printf("%d\n", i);
     env->CallObjectMethod(hashMap, put,
         env->NewStringUTF(topic_names_and_types->topic_names[i]),
         env->NewStringUTF(topic_names_and_types->type_names[i]));
