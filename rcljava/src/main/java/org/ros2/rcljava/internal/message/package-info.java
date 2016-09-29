@@ -1,6 +1,6 @@
 /**
- * ROS2 exceptions.
+ * ROS2 Message
  *
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
-package org.ros2.rcljava.exception;
+package org.ros2.rcljava.internal.message;
