@@ -22,7 +22,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_Publisher_nativePublish
   jmethodID mid = env->GetStaticMethodID(jmessage_class, "getFromJavaConverter", "()J");
   jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, mid);
 
-  typedef void * (* convert_from_java_signature)(jobject);
+  using convert_from_java_signature = void * (*)(jobject);
   convert_from_java_signature convert_from_java =
     reinterpret_cast<convert_from_java_signature>(jfrom_java_converter);
 
