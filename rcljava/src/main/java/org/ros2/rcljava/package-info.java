@@ -13,19 +13,7 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava;
-
 /**
- * This is a copy of {@link java.util.funcion.Consumer} for platforms that don't
- * support Java 8's API (e.g. Android &lt; 7.0)
- *
- * @param <T> - the type of the input to the operation
+ * An API for using ROS2 with Java.
  */
-public interface Consumer<T> {
-  /**
-   * Performs this operation on the given argument.
-   *
-   * @param input - the input argument
-   */
-  void accept(T input);
-}
+package org.ros2.rcljava;

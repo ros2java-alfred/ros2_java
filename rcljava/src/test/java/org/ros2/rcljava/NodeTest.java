@@ -15,17 +15,16 @@
 
 package org.ros2.rcljava;
 
-/**
- * This is a copy of {@link java.util.funcion.Consumer} for platforms that don't
- * support Java 8's API (e.g. Android &lt; 7.0)
- *
- * @param <T> - the type of the input to the operation
- */
-public interface Consumer<T> {
-  /**
-   * Performs this operation on the given argument.
-   *
-   * @param input - the input argument
-   */
-  void accept(T input);
+import static org.junit.Assert.assertNotEquals;
+
+import org.junit.Test;
+
+public class NodeTest {
+
+  @Test
+  public void testCreate() {
+    RCLJava.rclJavaInit();
+    Node node = RCLJava.createNode("test_node");
+    assertNotEquals(0, node.getNodeHandle());
+  }
 }
