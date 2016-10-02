@@ -14,6 +14,10 @@
 #include <cstdio>
 #include <jni.h>
 #include <rcl/graph.h>
+#include <rmw/rmw.h>
+
+#include <rmw/types.h>
+#include <rosidl_generator_c/message_type_support.h>
 
 /*
  * Convert jstring to std::string.
@@ -179,10 +183,8 @@ makeJTopics(JNIEnv *env, rcl_topic_names_and_types_t *topic_names_and_types)
   jobject hashMap = env->NewObject(mapClass, init, map_len);
   jmethodID put   = env->GetMethodID(mapClass, "put",
       "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-  printf("Test %d \n", topic_names_and_types->topic_count);
 
   for (size_t i = 0; i < topic_names_and_types->topic_count; ++i) {
-    printf("%d\n", i);
     env->CallObjectMethod(hashMap, put,
         env->NewStringUTF(topic_names_and_types->topic_names[i]),
         env->NewStringUTF(topic_names_and_types->type_names[i]));
@@ -192,5 +194,27 @@ makeJTopics(JNIEnv *env, rcl_topic_names_and_types_t *topic_names_and_types)
 
   return hashMap;
 }
+
+/*
+jobject
+makeJNames(rmw_ros_meta_t * ros_meta)
+{
+  java_util_ArrayList      = static_cast<jclass>(env->NewGlobalRef(env->FindClass("java/util/ArrayList")));
+  java_util_ArrayList_     = env->GetMethodID(java_util_ArrayList, "<init>", "(I)V");
+  java_util_ArrayList_size = env->GetMethodID (java_util_ArrayList, "size", "()I");
+//  java_util_ArrayList_get  = env->GetMethodID(java_util_ArrayList, "get", "(I)Ljava/lang/Object;");
+  java_util_ArrayList_add  = env->GetMethodID(java_util_ArrayList, "add", "(Ljava/lang/Object;)Z");
+
+  jobject result = env->NewObject(java_util_ArrayList, java_util_ArrayList_, vector.size());
+
+  for (size_t i = 0; i < rmw_ros_meta_t->topic_count; ++i) {
+    jstring element = env->NewStringUTF(ros_meta_data->node_names[i].c_str());
+
+    env->CallBooleanMethod(result, java_util_ArrayList_add, element);
+    env->DeleteLocalRef(element);
+  }
+  return result;
+}
+*/
 
 #endif /* SRC_RCL_UTILS_H_ */

@@ -63,7 +63,8 @@ JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateSubscriptionHandle(
     jclass ,
      jlong jnode_handle,
     jclass jmessage_class,
-   jstring jtopic, jobject jqos) {
+   jstring jtopic,
+   jobject jqos) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
   rosidl_message_type_support_t *msg_type = jclass2MessageType(env, jmessage_class);
@@ -266,7 +267,6 @@ JNICALL Java_org_ros2_rcljava_node_Node_getListTopics
   rcl_topic_names_and_types_t topic_names_and_types {};
 
   rcl_ret_t ret = rcl_get_topic_names_and_types(node, &topic_names_and_types);
-  printf(">>> %d", topic_names_and_types.topic_count);
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of topics: " +
         std::string(rcl_get_error_string_safe()));
