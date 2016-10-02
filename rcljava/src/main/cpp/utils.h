@@ -93,11 +93,11 @@ jobject2Message(JNIEnv *env, jobject jmessage)
   jmethodID mid = env->GetStaticMethodID(jmessage_class, "getFromJavaConverter", "()J");
   jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, mid);
 
-  typedef void * (* convert_from_java_signature)(jobject);
+  using convert_from_java_signature = void * (*)(jobject, void *);
   convert_from_java_signature convert_from_java =
     reinterpret_cast<convert_from_java_signature>(jfrom_java_converter);
 
-  void * raw_ros_message = convert_from_java(jmessage);
+  void * raw_ros_message = convert_from_java(jmessage, nullptr);
   return raw_ros_message;
 }
 

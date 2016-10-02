@@ -37,6 +37,9 @@ find_jar(STD_MSGS_JARS NAMES std_msgs
 find_jar(BUILTIN_MSGS_JARS NAMES builtin_interfaces
   PATHS "${CMAKE_INSTALL_PREFIX}/../builtin_interfaces/share/builtin_interfaces/java/"
 )
+find_jar(BUILTIN_COMMON_JARS NAMES rosidl_generator_java
+  PATHS "${CMAKE_INSTALL_PREFIX}/../rosidl_generator_java/share/rosidl_generator_java/java/"
+)
 
 # Bug in find_jar for Junit4 : https://sourceforge.net/p/rdkit/mailman/message/35301727/
 set(JUNIT_JAR "/usr/share/java/junit4.jar")
@@ -46,8 +49,8 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/QoSProfile.java"
   "src/main/java/org/ros2/rcljava/NativeUtils.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
-  "src/main/java/org/ros2/rcljava/internal/message/Message.java"
   "src/main/java/org/ros2/rcljava/namespace/GraphName.java"
+#  "src/main/java/org/ros2/rcljava/internal/message/Message.java"
   "src/main/java/org/ros2/rcljava/node/INode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
   "src/main/java/org/ros2/rcljava/node/topic/Publisher.java"
@@ -141,7 +144,7 @@ macro(target)
 endmacro()
 
 ### Main ###
-set(CMAKE_JAVA_INCLUDE_PATH "${BUILTIN_MSGS_JARS}:${LOG_JAR}")
+set(CMAKE_JAVA_INCLUDE_PATH "${BUILTIN_COMMON_JARS}:${BUILTIN_MSGS_JARS}:${LOG_JAR}")
 add_jar("${PROJECT_NAME}_jar"
   SOURCES
     "${${PROJECT_NAME}_sources}"
@@ -149,7 +152,7 @@ add_jar("${PROJECT_NAME}_jar"
     "${PROJECT_NAME}"
 )
 
-set(CMAKE_JAVA_INCLUDE_PATH "${LOG_JAR}:${BUILTIN_MSGS_JARS}:${STD_MSGS_JARS}:${JUNIT_JAR}")
+set(CMAKE_JAVA_INCLUDE_PATH "${LOG_JAR}:${BUILTIN_COMMON_JARS}:${BUILTIN_MSGS_JARS}:${STD_MSGS_JARS}:${JUNIT_JAR}")
 add_jar("${PROJECT_NAME}_test_jar"
   SOURCES
     "${${PROJECT_NAME}_sources}"
