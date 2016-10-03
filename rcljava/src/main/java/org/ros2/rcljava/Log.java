@@ -27,7 +27,7 @@ import org.ros2.rcljava.node.Node;
 /**
  * Not define in ROS2.
  *
- * @author Mickael Gaillard
+ * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class Log {
 
