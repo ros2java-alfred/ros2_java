@@ -2,4 +2,4 @@
 
 CLASS_MAIN="@(type_name)"
 
-java -cp $JAVAPATH -D$LD_LIBRARY_PATH $CLASS_MAIN $*
+java -cp $JAVAPATH -D$LD_LIBRARY_PATH $CLASS_MAIN "$@"
