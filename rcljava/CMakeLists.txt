@@ -33,13 +33,15 @@ endif()
 find_jar(JUNIT_JAR NAMES junit PATHS /usr/share/java VERSIONS 4)
 find_jar(LOG_JAR NAMES commons-logging PATHS /usr/share/java )
 find_jar(STD_MSGS_JARS NAMES std_msgs
-  PATHS "${CMAKE_INSTALL_PREFIX}/../std_msgs/share/std_msgs/java/")
+  PATHS "${CMAKE_BINARY_DIR}/../std_msgs/")
 find_jar(BUILTIN_MSGS_JARS NAMES builtin_interfaces
-  PATHS "${CMAKE_INSTALL_PREFIX}/../builtin_interfaces/share/builtin_interfaces/java/"
-)
+  PATHS "${CMAKE_BINARY_DIR}/../builtin_interfaces/")
 find_jar(BUILTIN_COMMON_JARS NAMES rosidl_generator_java
-  PATHS "${CMAKE_INSTALL_PREFIX}/../rosidl_generator_java/share/rosidl_generator_java/java/"
-)
+  PATHS "${CMAKE_BINARY_DIR}/../rosidl_generator_java/")
+
+set(STD_MSGS_JARS "${CMAKE_BINARY_DIR}/../std_msgs/std_msgs.jar")
+set(BUILTIN_MSGS_JARS "${CMAKE_BINARY_DIR}/../builtin_interfaces/builtin_interfaces.jar")
+set(BUILTIN_COMMON_JARS NAMES "${CMAKE_BINARY_DIR}/../rosidl_generator_java/rosidl_generator_java.jar")
 
 # Bug in find_jar for Junit4 : https://sourceforge.net/p/rdkit/mailman/message/35301727/
 set(JUNIT_JAR "/usr/share/java/junit4.jar")
