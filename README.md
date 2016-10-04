@@ -53,7 +53,10 @@ cd ~/ros2_java_ws
 ament build --symlink-install --isolated
 ```
 
-Now you can just run the talker and listener Java examples.
+Now you can just run a couple of examples.
+
+Talker and Listener
+-------------------
 
 Talker:
 
@@ -61,7 +64,7 @@ Talker:
 . ~/ament_ws/install_isolated/local_setup.sh
 . ~/ros2_java_ws/install_isolated/local_setup.sh
 cd ~/ros2_java_ws
-java -cp install_isolated/rosidl_generator_java/share/rosidl_generator_java/java/rosidl_generator_java.jar:install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar org.ros2.rcljava.examples.Talker
+java -cp install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.Talker
 ```
 
 Listener:
@@ -70,10 +73,31 @@ Listener:
 . ~/ament_ws/install_isolated/local_setup.sh
 . ~/ros2_java_ws/install_isolated/local_setup.sh
 cd ~/ros2_java_ws
-java -cp install_isolated/rosidl_generator_java/share/rosidl_generator_java/java/rosidl_generator_java.jar:install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar org.ros2.rcljava.examples.Listener
+java -cp install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.Listener
 ```
 
-You can also combine any scenario where the talker or the listener are written in Java, Python and C++ and they should talk to each other.
+Client and Service
+------------------
+
+Client:
+
+```
+. ~/ament_ws/install_isolated/local_setup.sh
+. ~/ros2_java_ws/install_isolated/local_setup.sh
+cd ~/ros2_java_ws
+java -cp install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.AddTwoIntsClient
+```
+
+Service:
+
+```
+. ~/ament_ws/install_isolated/local_setup.sh
+. ~/ros2_java_ws/install_isolated/local_setup.sh
+cd ~/ros2_java_ws
+java -cp install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.AddTwoIntsService
+```
+
+You can also combine any scenario where the talker/listener or client/service are written in Java, Python and C++ and they should talk to each other.
 
 Android
 -------
