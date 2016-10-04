@@ -16,14 +16,19 @@ find_package(ament_cmake_export_jars REQUIRED)
 find_package(rosidl_generator_c REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(rmw REQUIRED)
+find_package(rcljava_common REQUIRED)
 
-if (ANDROID)
+if(ANDROID)
   find_host_package(Java COMPONENTS Development REQUIRED)
 else()
   find_package(Java COMPONENTS Development REQUIRED)
   find_package(JNI REQUIRED)
 endif()
-include (UseJava)
+include(UseJava)
+
+if(NOT WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
+endif()
 
 set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
@@ -225,22 +230,16 @@ foreach(_generated_msg_cpp_ts_file ${_generated_msg_cpp_ts_files})
 
   ament_target_dependencies(${_package_name}_${_base_msg_name}__${_typesupport_impl}
     "rosidl_generator_c"
+    "rosidl_generator_java"
+    "rcljava_common"
     "${_typesupport_impl}"
+    "${PROJECT_NAME}__rosidl_generator_c"
   )
 
   list(APPEND _extension_dependencies ${_package_name}_${_base_msg_name}__${_typesupport_impl})
 
-  ament_target_dependencies(${_package_name}_${_base_msg_name}__${_typesupport_impl}
-    ${_typesupport_impl}
-  )
   add_dependencies(${_package_name}_${_base_msg_name}__${_typesupport_impl}
     ${rosidl_generate_interfaces_TARGET}__${_typesupport_impl}
-  )
-
-  ament_target_dependencies(${_package_name}_${_base_msg_name}__${_typesupport_impl}
-    "rosidl_generator_c"
-    "rosidl_generator_java"
-    "${PROJECT_NAME}__rosidl_generator_c"
   )
 
   if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
@@ -255,8 +254,8 @@ foreach(_generated_msg_cpp_ts_file ${_generated_msg_cpp_ts_files})
 endforeach()
 
 set(_jar_deps "")
-find_package(rosidl_generator_java REQUIRED)
-foreach(_jar_dep ${rosidl_generator_java_JARS})
+find_package(rcljava_common REQUIRED)
+foreach(_jar_dep ${rcljava_common_JARS})
   list(APPEND _jar_deps "${_jar_dep}")
 endforeach()
 

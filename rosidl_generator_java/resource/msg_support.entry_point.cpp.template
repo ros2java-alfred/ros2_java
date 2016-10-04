@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <cassert>
 #include <cstdint>
+#include <string>
 
 #include <@(spec.base_type.pkg_name)/@(subfolder)/@(module_name).h>
 #include <rosidl_generator_c/message_type_support.h>
@@ -11,6 +12,9 @@
 
 #include <rosidl_generator_c/primitives_array.h>
 #include <rosidl_generator_c/primitives_array_functions.h>
+
+#include <rcljava_common/exceptions.h>
+#include <rcljava_common/signatures.h>
 
 @[for field in spec.fields]@
 @[    if not field.type.is_primitive_type()]@
@@ -84,16 +88,16 @@ static JavaVM* g_vm = nullptr;
     jint _jlist_@(field.name)_size = env->CallIntMethod(_jlist_@(field.name)_object, _jlist_@(field.name)_size_mid);
 @[                if field.type.type == 'string']@
     if (!rosidl_generator_c__String__Array__init(&(ros_message->@(field.name)), _jlist_@(field.name)_size)) {
-      assert(false); // PyErr_SetString(PyExc_RuntimeError, "unable to create String__Array ros_message");
+      rcljava_throw_exception(env, "java/lang/IllegalStateException", "unable to create String__Array ros_message");
     }
 @[                else]@
 @[                    if field.type.is_primitive_type()]@
     if (!rosidl_generator_c__@(field.type.type)__Array__init(&(ros_message->@(field.name)), _jlist_@(field.name)_size)) {
-      assert(false); // TODO(esteve): error PyErr_SetString(PyExc_RuntimeError, "unable to create @(field.type.type)__Array ros_message");
+      rcljava_throw_exception(env, "java/lang/IllegalStateException", "unable to create @(field.type.type)__Array ros_message");
     }
 @[                    else]@
     if (!@(field.type.pkg_name)__msg__@(field.type.type)__Array__init(&(ros_message->@(field.name)), _jlist_@(field.name)_size)) {
-      assert(false); // TODO(esteve): error PyErr_SetString(PyExc_RuntimeError, "unable to create @(field.type.type)__Array ros_message");
+      rcljava_throw_exception(env, "java/lang/IllegalStateException", "unable to create @(field.type.type)__Array ros_message");
     }
 
 @[                    end if]@
