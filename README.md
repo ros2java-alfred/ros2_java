@@ -7,7 +7,11 @@ What is this?
 This is a set of projects (bindings, code generator, examples and more) that enables developers to write ROS2
 applications for the JVM and Android.
 
-Besides this repository itself, there's also https://github.com/esteve/ament_java, which adds support for Gradle to Ament. Additionally, examples for Java and Android can be found in https://github.com/esteve/ros2_java_examples and https://github.com/esteve/ros2_android_examples respectively.
+Besides this repository itself, there's also:
+- https://github.com/esteve/ament_java, which adds support for Gradle to Ament
+- https://github.com/esteve/ament_gradle_plugin, a Gradle plugin that makes it easier to use ROS2 in Java and Android project, and which can be found published at the Gradle Central at https://plugins.gradle.org/plugin/org.ros2.tools.gradle
+- https://github.com/esteve/ros2_java_examples, examples for the Java Runtime Environment
+- https://github.com/esteve/ros2_android_examples, examples for Android
 
 Is this Java only?
 ------------------
@@ -162,7 +166,7 @@ Mickael Gaillard (https://github.com/Theosakamg)
 TODO
 ----
 
-There's a bunch of features missing, such as services, efficient intraprocess communication, DDS domain separation and QoS profiles.
+There's a bunch of features missing, efficient intraprocess communication, DDS domain separation and QoS profiles.
 
 Large messages would benefit from Java's NIO.
 
