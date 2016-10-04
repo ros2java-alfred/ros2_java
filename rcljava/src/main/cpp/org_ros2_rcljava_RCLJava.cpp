@@ -29,6 +29,10 @@
 
 #include "org_ros2_rcljava_RCLJava.h"
 
+jobject convert_rmw_request_id_to_java(JNIEnv *, rmw_request_id_t *);
+
+rmw_request_id_t * convert_rmw_request_id_from_java(JNIEnv *, jobject);
+
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit(JNIEnv * env, jclass)
 {
   // TODO(esteve): parse args
@@ -75,7 +79,7 @@ JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_RCLJava_nativeOk(JNIEnv *, jcla
   return rcl_ok();
 }
 
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWaitSet(JNIEnv * env,
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWaitSet(JNIEnv *,
   jclass)
 {
   rcl_wait_set_t * wait_set = static_cast<rcl_wait_set_t *>(malloc(sizeof(rcl_wait_set_t)));
@@ -97,11 +101,9 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWa
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetInit(JNIEnv * env, jclass,
   jlong wait_set_handle,
   jint number_of_subscriptions,
-  jint number_of_guard_conditions, jint number_of_timers)
+  jint number_of_guard_conditions, jint number_of_timers,
+  jint number_of_clients, jint number_of_services)
 {
-  jint number_of_clients = 0;
-  jint number_of_services = 0;
-
   rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
 
   rcl_ret_t ret = rcl_wait_set_init(
@@ -203,4 +205,230 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown(JNIEnv * env
       env, "java/lang/IllegalStateException",
       "Failed to shutdown: " + std::string(rcl_get_error_string_safe()));
   }
+}
+
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearServices(JNIEnv * env,
+  jclass,
+  jlong wait_set_handle)
+{
+  rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
+  rcl_ret_t ret = rcl_wait_set_clear_services(wait_set);
+  if (ret != RCL_RET_OK) {
+    rcljava_throw_exception(
+      env, "java/lang/IllegalStateException",
+      "Failed to clear services from wait set: " + std::string(rcl_get_error_string_safe()));
+  }
+}
+
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddService(JNIEnv * env, jclass,
+  jlong wait_set_handle,
+  jlong service_handle)
+{
+  rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
+  rcl_service_t * service = reinterpret_cast<rcl_service_t *>(service_handle);
+  rcl_ret_t ret = rcl_wait_set_add_service(wait_set, service);
+  if (ret != RCL_RET_OK) {
+    rcljava_throw_exception(
+      env, "java/lang/IllegalStateException",
+      "Failed to add service to wait set: " + std::string(rcl_get_error_string_safe()));
+  }
+}
+
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearClients(JNIEnv * env,
+  jclass,
+  jlong wait_set_handle)
+{
+  rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
+  rcl_ret_t ret = rcl_wait_set_clear_clients(wait_set);
+  if (ret != RCL_RET_OK) {
+    rcljava_throw_exception(
+      env, "java/lang/IllegalStateException",
+      "Failed to clear clients from wait set: " + std::string(rcl_get_error_string_safe()));
+  }
+}
+
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddClient(JNIEnv * env, jclass,
+  jlong wait_set_handle,
+  jlong client_handle)
+{
+  rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
+  rcl_client_t * client = reinterpret_cast<rcl_client_t *>(client_handle);
+  rcl_ret_t ret = rcl_wait_set_add_client(wait_set, client);
+  if (ret != RCL_RET_OK) {
+    rcljava_throw_exception(
+      env, "java/lang/IllegalStateException",
+      "Failed to add client to wait set: " + std::string(rcl_get_error_string_safe()));
+  }
+}
+
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeRequest(JNIEnv * env, jclass,
+  jlong service_handle,
+  jlong jrequest_from_java_converter_handle,
+  jlong jrequest_to_java_converter_handle, jobject jrequest_msg)
+{
+  assert(service_handle != 0);
+  assert(jrequest_from_java_converter_handle != 0);
+  assert(jrequest_to_java_converter_handle != 0);
+  assert(jrequest_msg != nullptr);
+
+  rcl_service_t * service = reinterpret_cast<rcl_service_t *>(service_handle);
+
+  convert_from_java_signature convert_from_java =
+    reinterpret_cast<convert_from_java_signature>(jrequest_from_java_converter_handle);
+
+  convert_to_java_signature convert_to_java =
+    reinterpret_cast<convert_to_java_signature>(jrequest_to_java_converter_handle);
+
+  void * taken_msg = convert_from_java(jrequest_msg, nullptr);
+
+  rmw_request_id_t header;
+
+  rcl_ret_t ret = rcl_take_request(service, &header, taken_msg);
+
+  if (ret != RCL_RET_OK && ret != RCL_RET_SERVICE_TAKE_FAILED) {
+    rcljava_throw_exception(
+      env, "java/lang/IllegalStateException",
+      "Failed to take request from a service: " + std::string(rcl_get_error_string_safe()));
+    return nullptr;
+  }
+
+  if (ret != RCL_RET_SERVICE_TAKE_FAILED) {
+    jobject jtaken_msg = convert_to_java(taken_msg, jrequest_msg);
+
+    assert(jtaken_msg != nullptr);
+
+    jobject jheader = convert_rmw_request_id_to_java(env, &header);
+    return jheader;
+  }
+
+  return nullptr;
+}
+
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeSendServiceResponse(JNIEnv * env, jclass,
+  jlong service_handle,
+  jobject jrequest_id,
+  jlong jresponse_from_java_converter_handle, jlong jresponse_to_java_converter_handle,
+  jobject jresponse_msg)
+{
+  assert(service_handle != 0);
+  assert(jresponse_from_java_converter_handle != 0);
+  assert(jresponse_to_java_converter_handle != 0);
+  assert(jresponse_msg != nullptr);
+
+  rcl_service_t * service = reinterpret_cast<rcl_service_t *>(service_handle);
+
+  convert_from_java_signature convert_from_java =
+    reinterpret_cast<convert_from_java_signature>(jresponse_from_java_converter_handle);
+
+  void * response_msg = convert_from_java(jresponse_msg, nullptr);
+
+  rmw_request_id_t * request_id = convert_rmw_request_id_from_java(env, jrequest_id);
+
+  rcl_ret_t ret = rcl_send_response(service, request_id, response_msg);
+
+  if (ret != RCL_RET_OK) {
+    rcljava_throw_exception(
+      env, "java/lang/IllegalStateException",
+      "Failed to send response from a service: " + std::string(rcl_get_error_string_safe()));
+  }
+}
+
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeResponse(JNIEnv * env, jclass,
+  jlong client_handle,
+  jlong jresponse_from_java_converter_handle,
+  jlong jresponse_to_java_converter_handle, jobject jresponse_msg)
+{
+  assert(client_handle != 0);
+  assert(jresponse_from_java_converter_handle != 0);
+  assert(jresponse_to_java_converter_handle != 0);
+  assert(jresponse_msg != nullptr);
+
+  rcl_client_t * client = reinterpret_cast<rcl_client_t *>(client_handle);
+
+  convert_from_java_signature convert_from_java =
+    reinterpret_cast<convert_from_java_signature>(jresponse_from_java_converter_handle);
+
+  convert_to_java_signature convert_to_java =
+    reinterpret_cast<convert_to_java_signature>(jresponse_to_java_converter_handle);
+
+  void * taken_msg = convert_from_java(jresponse_msg, nullptr);
+
+  rmw_request_id_t header;
+
+  rcl_ret_t ret = rcl_take_response(client, &header, taken_msg);
+
+  if (ret != RCL_RET_OK && ret != RCL_RET_CLIENT_TAKE_FAILED) {
+    rcljava_throw_exception(
+      env, "java/lang/IllegalStateException",
+      "Failed to take request from a service: " + std::string(rcl_get_error_string_safe()));
+    return nullptr;
+  }
+
+  if (ret != RCL_RET_CLIENT_TAKE_FAILED) {
+    jobject jtaken_msg = convert_to_java(taken_msg, jresponse_msg);
+
+    assert(jtaken_msg != nullptr);
+
+    jobject jheader = convert_rmw_request_id_to_java(env, &header);
+    return jheader;
+  }
+
+  return nullptr;
+}
+
+
+jobject convert_rmw_request_id_to_java(JNIEnv * env, rmw_request_id_t * request_id)
+{
+  jclass jrequest_id_class = env->FindClass("org/ros2/rcljava/RMWRequestId");
+  assert(jrequest_id_class != nullptr);
+
+  jmethodID jconstructor = env->GetMethodID(jrequest_id_class, "<init>", "()V");
+  assert(jconstructor != nullptr);
+
+  jobject jrequest_id = env->NewObject(jrequest_id_class, jconstructor);
+
+  jfieldID jsequence_number_field_id = env->GetFieldID(jrequest_id_class, "sequenceNumber", "J");
+  jfieldID jwriter_guid_field_id = env->GetFieldID(jrequest_id_class, "writerGUID", "[B");
+
+  assert(jsequence_number_field_id != nullptr);
+  assert(jwriter_guid_field_id != nullptr);
+
+  int8_t * writer_guid = request_id->writer_guid;
+  int64_t sequence_number = request_id->sequence_number;
+
+  env->SetLongField(jrequest_id, jsequence_number_field_id, sequence_number);
+
+  jsize writer_guid_len = 16;  // See rmw/rmw/include/rmw/types.h
+
+  jbyteArray jwriter_guid = env->NewByteArray(writer_guid_len);
+  env->SetByteArrayRegion(jwriter_guid, 0, writer_guid_len, reinterpret_cast<jbyte *>(writer_guid));
+  env->SetObjectField(jrequest_id, jwriter_guid_field_id, jwriter_guid);
+
+  return jrequest_id;
+}
+
+rmw_request_id_t * convert_rmw_request_id_from_java(JNIEnv * env, jobject jrequest_id)
+{
+  assert(jrequest_id != nullptr);
+
+  jclass jrequest_id_class = env->GetObjectClass(jrequest_id);
+  assert(jrequest_id_class != nullptr);
+
+  jfieldID jsequence_number_field_id = env->GetFieldID(jrequest_id_class, "sequenceNumber", "J");
+  jfieldID jwriter_guid_field_id = env->GetFieldID(jrequest_id_class, "writerGUID", "[B");
+
+  assert(jsequence_number_field_id != nullptr);
+  assert(jwriter_guid_field_id != nullptr);
+
+  rmw_request_id_t * request_id = static_cast<rmw_request_id_t *>(malloc(sizeof(rmw_request_id_t)));
+
+  int8_t * writer_guid = request_id->writer_guid;
+  request_id->sequence_number = env->GetLongField(jrequest_id, jsequence_number_field_id);
+
+  jsize writer_guid_len = 16;  // See rmw/rmw/include/rmw/types.h
+
+  jbyteArray jwriter_guid = (jbyteArray)env->GetObjectField(jrequest_id, jwriter_guid_field_id);
+  env->GetByteArrayRegion(jwriter_guid, 0, writer_guid_len, reinterpret_cast<jbyte *>(writer_guid));
+
+  return request_id;
 }

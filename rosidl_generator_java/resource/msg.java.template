@@ -4,9 +4,7 @@ import org.ros2.rcljava.common.RCLJavaProxy;
 
 @[for field in spec.fields]@
 @[    if not field.type.is_primitive_type()]@
-@[        if field.type.pkg_name != spec.base_type.pkg_name]@
 import @(field.type.pkg_name).msg.@(field.type.type);
-@[        end if]@
 @[    end if]@
 @[end for]@
 

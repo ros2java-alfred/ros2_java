@@ -18,6 +18,7 @@
 
 #ifndef ORG_ROS2_RCLJAVA_RCLJAVA_H_
 #define ORG_ROS2_RCLJAVA_RCLJAVA_H_
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -55,6 +56,14 @@ JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_RCLJava_nativeOk
 
 /*
  * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeShutdown
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     org_ros2_rcljava_RCLJava
  * Method:    nativeGetZeroInitializedWaitSet
  * Signature: ()J
  */
@@ -64,10 +73,10 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWa
 /*
  * Class:     org_ros2_rcljava_RCLJava
  * Method:    nativeWaitSetInit
- * Signature: (JIII)V
+ * Signature: (JIIIII)V
  */
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetInit
-  (JNIEnv *, jclass, jlong, jint, jint, jint);
+  (JNIEnv *, jclass, jlong, jint, jint, jint, jint, jint);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava
@@ -103,13 +112,70 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTake
 
 /*
  * Class:     org_ros2_rcljava_RCLJava
- * Method:    nativeShutdown
- * Signature: ()V
+ * Method:    nativeWaitSetClearServices
+ * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown
-  (JNIEnv *, jclass);
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearServices
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeWaitSetAddService
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddService
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeWaitSetClearClients
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearClients
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeWaitSetAddClient
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddClient
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeTakeRequest
+ * Signature: (JJJLjava/lang/Object;)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeRequest
+  (JNIEnv *, jclass, jlong, jlong, jlong, jobject);
+
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeSendServiceResponse
+ * Signature: (JLjava/lang/Object;JJLjava/lang/Object;)V
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeSendServiceResponse
+  (JNIEnv *, jclass, jlong, jobject, jlong, jlong, jobject);
+
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeSendClientRequest
+ * Signature: (JJLjava/lang/Object;JJ)V
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeSendClientRequest
+  (JNIEnv *, jclass, jlong, jlong, jlong, jlong, jobject);
+
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeTakeResponse
+ * Signature: (JJJLjava/lang/Object;)Ljava/lang/Object;
+ */
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeResponse
+  (JNIEnv *, jclass, jlong, jlong, jlong, jobject);
 
 #ifdef __cplusplus
 }
 #endif
+
 #endif  // ORG_ROS2_RCLJAVA_RCLJAVA_H_

@@ -15,6 +15,9 @@
 
 package org.ros2.rcljava;
 
+import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -49,6 +52,16 @@ public class Node {
   private final Queue<Publisher> publishers;
 
   /**
+   * All the @{link Service}s that have been created through this instance.
+   */
+  private final Queue<Service> services;
+
+  /**
+   * All the @{link Client}s that have been created through this instance.
+   */
+  private final Queue<Client> clients;
+
+  /**
    * Constructor.
    *
    * @param nodeHandle A pointer to the underlying ROS2 node structure. Must not
@@ -58,6 +71,8 @@ public class Node {
     this.nodeHandle = nodeHandle;
     this.publishers = new LinkedBlockingQueue<Publisher>();
     this.subscriptions = new LinkedBlockingQueue<Subscription>();
+    this.services = new LinkedBlockingQueue<Service>();
+    this.clients = new LinkedBlockingQueue<Client>();
   }
 
   /**
@@ -165,5 +180,75 @@ public class Node {
 
   public final long getNodeHandle() {
     return this.nodeHandle;
+  }
+
+  private static native <T> long nativeCreateServiceHandle(
+      long nodeHandle, Class<T> cls, String serviceName);
+
+  public <T> Service<T> createService(Class<T> serviceType, String serviceName,
+      TriConsumer<RMWRequestId, ?, ?> callback) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+
+    Class requestType = (Class)serviceType.getField("RequestType").get(null);
+
+    Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+    long requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Class<?> []) null);
+
+    Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+    long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Class<?> []) null);
+
+    Class responseType = (Class)serviceType.getField("ResponseType").get(null);
+
+    Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+    long responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Class<?> []) null);
+
+    Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+    long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Class<?> []) null);
+
+    long serviceHandle = nativeCreateServiceHandle(this.nodeHandle, serviceType, serviceName);
+    Service<T> service = new Service<T>(this.nodeHandle, serviceHandle, serviceType, serviceName, callback, requestType, responseType,
+      requestFromJavaConverterHandle, requestToJavaConverterHandle, responseFromJavaConverterHandle,
+      responseToJavaConverterHandle);
+    this.services.add(service);
+    return service;
+  }
+
+  public final Queue<Service> getServices() {
+    return this.services;
+  }
+
+  public <T> Client<T> createClient(Class<T> serviceType, String serviceName) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+
+    Class requestType = (Class)serviceType.getField("RequestType").get(null);
+
+    Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+    long requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Class<?> []) null);
+
+    Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+    long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Class<?> []) null);
+
+    Class responseType = (Class)serviceType.getField("ResponseType").get(null);
+
+    Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+    long responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Class<?> []) null);
+
+    Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+    long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Class<?> []) null);
+
+
+    long clientHandle = nativeCreateClientHandle(this.nodeHandle, serviceType, serviceName);
+    Client<T> client = new Client<T>(new WeakReference<Node>(this),
+      this.nodeHandle, clientHandle, serviceType, serviceName,
+      requestType, responseType,
+      requestFromJavaConverterHandle, requestToJavaConverterHandle, responseFromJavaConverterHandle,
+      responseToJavaConverterHandle);
+    this.clients.add(client);
+    return client;
+  }
+
+  private static native <T> long nativeCreateClientHandle(
+      long nodeHandle, Class<T> cls, String serviceName);
+
+  public final Queue<Client> getClients() {
+    return this.clients;
   }
 }

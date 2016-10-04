@@ -1,1 +1,20 @@
-// Empty
+package @(package_name).@(subfolder);
+
+import org.ros2.rcljava.common.RCLJavaProxy;
+
+public class @(type_name) {
+  static {
+    try {
+      System.loadLibrary("@(spec.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
+    } catch (UnsatisfiedLinkError e) {
+      System.err.println("Native code library failed to load.\n" + e);
+      System.exit(1);
+    }
+  }
+
+  public static native long getServiceTypeSupport();
+
+  public static final Class<@(type_name)_Request> RequestType = @(type_name)_Request.class;
+
+  public static final Class<@(type_name)_Response> ResponseType = @(type_name)_Response.class;
+}

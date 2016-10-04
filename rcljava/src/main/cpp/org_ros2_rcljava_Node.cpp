@@ -102,3 +102,81 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateSubscriptionHandl
   jlong jsubscription = reinterpret_cast<jlong>(subscription);
   return jsubscription;
 }
+
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle(JNIEnv * env, jclass,
+  jlong node_handle, jclass jservice_class, jstring jservice_name)
+{
+  jmethodID mid = env->GetStaticMethodID(jservice_class, "getServiceTypeSupport", "()J");
+
+  assert(mid != NULL);
+
+  jlong jts = env->CallStaticLongMethod(jservice_class, mid);
+
+  assert(jts != 0);
+
+  const char * service_name_tmp = env->GetStringUTFChars(jservice_name, 0);
+
+  std::string service_name(service_name_tmp);
+
+  env->ReleaseStringUTFChars(jservice_name, service_name_tmp);
+
+  rcl_node_t * node = reinterpret_cast<rcl_node_t *>(node_handle);
+
+  rosidl_service_type_support_t * ts =
+    reinterpret_cast<rosidl_service_type_support_t *>(jts);
+
+  rcl_service_t * service = static_cast<rcl_service_t *>(malloc(sizeof(rcl_service_t)));
+  service->impl = NULL;
+  rcl_service_options_t service_ops = rcl_service_get_default_options();
+
+  rcl_ret_t ret = rcl_service_init(service, node, ts, service_name.c_str(), &service_ops);
+
+  if (ret != RCL_RET_OK) {
+    rcljava_throw_exception(
+      env, "java/lang/IllegalStateException",
+      "Failed to create service: " + std::string(rcl_get_error_string_safe()));
+    return 0;
+  }
+
+  jlong jservice = reinterpret_cast<jlong>(service);
+  return jservice;
+}
+
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateClientHandle(JNIEnv * env, jclass,
+  jlong node_handle, jclass jservice_class, jstring jservice_name)
+{
+  jmethodID mid = env->GetStaticMethodID(jservice_class, "getServiceTypeSupport", "()J");
+
+  assert(mid != NULL);
+
+  jlong jts = env->CallStaticLongMethod(jservice_class, mid);
+
+  assert(jts != 0);
+
+  const char * service_name_tmp = env->GetStringUTFChars(jservice_name, 0);
+
+  std::string service_name(service_name_tmp);
+
+  env->ReleaseStringUTFChars(jservice_name, service_name_tmp);
+
+  rcl_node_t * node = reinterpret_cast<rcl_node_t *>(node_handle);
+
+  rosidl_service_type_support_t * ts =
+    reinterpret_cast<rosidl_service_type_support_t *>(jts);
+
+  rcl_client_t * client = static_cast<rcl_client_t *>(malloc(sizeof(rcl_client_t)));
+  client->impl = NULL;
+  rcl_client_options_t client_ops = rcl_client_get_default_options();
+
+  rcl_ret_t ret = rcl_client_init(client, node, ts, service_name.c_str(), &client_ops);
+
+  if (ret != RCL_RET_OK) {
+    rcljava_throw_exception(
+      env, "java/lang/IllegalStateException",
+      "Failed to create client: " + std::string(rcl_get_error_string_safe()));
+    return 0;
+  }
+
+  jlong jclient = reinterpret_cast<jlong>(client);
+  return jclient;
+}

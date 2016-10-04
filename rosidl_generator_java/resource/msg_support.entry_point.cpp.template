@@ -31,7 +31,7 @@ extern "C" {
  * Method:    getFromJavaConverter
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(type_name)_getFromJavaConverter
+JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_getFromJavaConverter
   (JNIEnv *, jclass);
 
 /*
@@ -39,7 +39,7 @@ JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(type_name)_getFr
  * Method:    getToJavaConverter
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(type_name)_getToJavaConverter
+JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_getToJavaConverter
   (JNIEnv *, jclass);
 
 /*
@@ -47,7 +47,7 @@ JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(type_name)_getTo
  * Method:    getTypeSupport
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(type_name)_getTypeSupport
+JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_getTypeSupport
   (JNIEnv *, jclass);
 
 #ifdef __cplusplus
@@ -390,23 +390,23 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
   return JNI_VERSION_1_6;
 }
 
-JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(type_name)_getFromJavaConverter
+JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_getFromJavaConverter
   (JNIEnv *, jclass)
 {
   jlong ptr = reinterpret_cast<jlong>(&@(spec.base_type.pkg_name)_@(type_name)__convert_from_java);
   return ptr;
 }
 
-JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(type_name)_getToJavaConverter
+JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_getToJavaConverter
   (JNIEnv *, jclass)
 {
   jlong ptr = reinterpret_cast<jlong>(@(spec.base_type.pkg_name)_@(type_name)__convert_to_java);
   return ptr;
 }
 
-JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(type_name)_getTypeSupport
+JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_getTypeSupport
   (JNIEnv *, jclass)
 {
-  jlong ptr = reinterpret_cast<jlong>(ROSIDL_GET_MSG_TYPE_SUPPORT(@(spec.base_type.pkg_name), @(spec.msg_name)));
+  jlong ptr = reinterpret_cast<jlong>(ROSIDL_GET_TYPE_SUPPORT(@(spec.base_type.pkg_name), @(subfolder), @(spec.msg_name)));
   return ptr;
 }

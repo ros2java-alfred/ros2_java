@@ -32,7 +32,7 @@ macro(target)
     get_rcl_information("${rmw_implementation}" "rcl${target_suffix}")
   endif()
 
-  set(_jni_classes "RCLJava;Node;Publisher")
+  set(_jni_classes "RCLJava;Node;Publisher;Client")
 
   foreach(_jni_class ${_jni_classes})
 
@@ -80,11 +80,17 @@ macro(target)
 endmacro()
 
 set(${PROJECT_NAME}_sources
+  "src/main/java/org/ros2/rcljava/BiConsumer.java"
+  "src/main/java/org/ros2/rcljava/Client.java"
   "src/main/java/org/ros2/rcljava/Consumer.java"
   "src/main/java/org/ros2/rcljava/Node.java"
   "src/main/java/org/ros2/rcljava/Publisher.java"
+  "src/main/java/org/ros2/rcljava/RCLFuture.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
+  "src/main/java/org/ros2/rcljava/RMWRequestId.java"
+  "src/main/java/org/ros2/rcljava/Service.java"
   "src/main/java/org/ros2/rcljava/Subscription.java"
+  "src/main/java/org/ros2/rcljava/TriConsumer.java"
 )
 
 add_jar("${PROJECT_NAME}_jar"
