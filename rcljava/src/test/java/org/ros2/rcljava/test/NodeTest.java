@@ -20,10 +20,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.ros2.rcljava.QoSProfile;
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceConsumer;
+import org.ros2.rcljava.node.service.TriConsumer;
 import org.ros2.rcljava.node.topic.Consumer;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
@@ -196,10 +198,10 @@ public class NodeTest {
         Node node = null;
         Service<std_msgs.msg.String> srv = null;
 
-        ServiceConsumer<std_msgs.msg.String, std_msgs.msg.String> callback =
-                new ServiceConsumer<std_msgs.msg.String, std_msgs.msg.String>() {
+        TriConsumer<RMWRequestId, std_msgs.msg.String, std_msgs.msg.String> callback =
+                new TriConsumer<RMWRequestId, std_msgs.msg.String, std_msgs.msg.String>() {
             @Override
-            public void call(std_msgs.msg.String request, std_msgs.msg.String response) { }
+            public void accept(RMWRequestId header, std_msgs.msg.String request, std_msgs.msg.String response) { }
         };
 
         RCLJava.rclJavaInit();

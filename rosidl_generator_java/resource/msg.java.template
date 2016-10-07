@@ -2,21 +2,19 @@
 package @(package_name).@(subfolder);
 
 // IMPORTS
-import org.ros2.rosidl_generator_java.RCLJavaProxy;
+import org.ros2.rcljava.common.RCLJavaProxy;
 import org.ros2.rcljava.internal.message.Message;
 
 @[for field in spec.fields]@
 @[    if not field.type.is_primitive_type()]@
-@[        if ((field.type.pkg_name != spec.base_type.pkg_name) or (subfolder == 'srv'))]@
 import @(field.type.pkg_name).msg.@(field.type.type);
-@[        end if]@
 @[    end if]@
 @[end for]@
 
 /**
  * @(type_name) java message for ROS2(idl).
  */
-public class @(type_name) implements Message {
+public final class @(type_name) implements Message {
     /** AutoLoader JNI library. */
     static {
         RCLJavaProxy.loadLibrary("@(spec.base_type.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
@@ -47,7 +45,7 @@ def upperfirst(s):
      * @(upperfirst(field.name)) setter.
      * @@param @(field.name)
      */
-    public void set@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))(java.util.Collection<@(get_java_type(field.type, use_primitives=False))> @(field.name)) {
+    public final void set@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))(final java.util.Collection<@(get_java_type(field.type, use_primitives=False))> @(field.name)) {
         if (@(field.name) != null) {
             this.@(field.name) = new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>(@(field.name));
         }
@@ -57,7 +55,7 @@ def upperfirst(s):
      * @(upperfirst(field.name)) getter.
      * @@return @(get_java_type(field.type, use_primitives=False))
      */
-    public java.util.List<@(get_java_type(field.type, use_primitives=False))> get@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))() {
+    public final java.util.List<@(get_java_type(field.type, use_primitives=False))> get@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))() {
         if (this.@(field.name) == null) {
             return null;
         }
@@ -71,7 +69,7 @@ def upperfirst(s):
      * @(upperfirst(field.name)) setter.
      * @@param @(field.name)
      */
-    public void set@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))(@(get_java_type(field.type)) @(field.name)) {
+    public final void set@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))(final @(get_java_type(field.type)) @(field.name)) {
         this.@(field.name) = @(field.name);
     }
 
@@ -79,7 +77,7 @@ def upperfirst(s):
      * @(upperfirst(field.name)) getter.
      * @@return @(get_java_type(field.type))
      */
-    public @(get_java_type(field.type)) get@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))() {
+    public final @(get_java_type(field.type)) get@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))() {
         return this.@(field.name);
     }
 @[    end if]@

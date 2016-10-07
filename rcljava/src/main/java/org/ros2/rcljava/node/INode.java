@@ -18,10 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceConsumer;
+import org.ros2.rcljava.node.service.TriConsumer;
 import org.ros2.rcljava.node.topic.Consumer;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
@@ -98,7 +100,7 @@ public interface INode {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Client instance of the service.
      */
-    <T> Client<T> createClient(Class<T> message, String service, QoSProfile qos);
+    <T> Client<T> createClient(Class<T> message, String service, QoSProfile qos) throws Exception;
 
     /**
      * Create and return a Client. (Retro-compatibility)
@@ -108,7 +110,7 @@ public interface INode {
      * @param service The service to subscribe on.
      * @return Client instance of the service.
      */
-    <T> Client<T> createClient(Class<T> message, String service);
+    <T> Client<T> createClient(Class<T> message, String service) throws Exception ;
 
     /**
      * Create and return a Service.
@@ -120,7 +122,10 @@ public interface INode {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Service instance of the service.
      */
-    <T> Service<T> createService(Class<T> message, String service, ServiceConsumer<?, ?> callback, QoSProfile qos);
+    <T> Service<T> createService(final Class<T> serviceType,
+            final String serviceName,
+            final TriConsumer<RMWRequestId, ?, ?> callback,
+            final QoSProfile qos) throws Exception;
 
     /**
      * Create and return a Service. (Retro-compatibility)
@@ -131,7 +136,9 @@ public interface INode {
      * @param callback The user-defined callback function.
      * @return Service instance of the service.
      */
-    <T> Service<T> createService(Class<T> message, String service, ServiceConsumer<?, ?> callback);
+    <T> Service<T> createService(final Class<T> serviceType,
+            final String serviceName,
+            final TriConsumer<RMWRequestId, ?, ?> callback) throws Exception;
 
     List<Object> setParameters(List<Object> parameters);
 

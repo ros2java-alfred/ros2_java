@@ -13,9 +13,22 @@
  * limitations under the License.
  */
 
+package org.ros2.rcljava.node.service;
+
 /**
- * An API for using ROS2 with Java.
- * @author Esteve Fernandez <esteve@apache.org>
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
+ * Based on {@link java.util.funcion.BiConsumer}
+ *
+ * @param <T> - the type of the first input to the operation
+ * @param <U> - the type of the second input to the operation
+ * @param <V> - the type of the third input to the operation
  */
-package org.ros2.rcljava;
+public interface TriConsumer<T, U, V> {
+  /**
+   * Performs this operation on the given argument.
+   *
+   * @param input1 - the first input argument
+   * @param input2 - the second input argument
+   * @param input3 - the third input argument
+   */
+  void accept(T input1, U input2, V input3);
+}

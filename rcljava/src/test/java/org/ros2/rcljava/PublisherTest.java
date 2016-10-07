@@ -13,9 +13,25 @@
  * limitations under the License.
  */
 
-/**
- * An API for using ROS2 with Java.
- * @author Esteve Fernandez <esteve@apache.org>
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
- */
 package org.ros2.rcljava;
+
+import static org.junit.Assert.assertNotEquals;
+
+import org.junit.Test;
+import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.topic.Publisher;
+
+public class PublisherTest {
+
+  @Test
+  public void testCreate() {
+    RCLJava.rclJavaInit();
+    Node node = RCLJava.createNode("test_node");
+    Publisher<std_msgs.msg.String> publisher = node.
+      <std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
+      "test_topic");
+    assertNotEquals(node.getNodeHandle(), publisher.getNodeHandle());
+    assertNotEquals(0, publisher.getNodeHandle());
+    assertNotEquals(0, publisher.getPublisherHandle());
+  }
+}

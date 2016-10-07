@@ -1,4 +1,4 @@
-/* Copyright 2016 Open Source Robotics Foundation, Inc.
+/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,15 @@
  */
 package org.ros2.rcljava.node.service;
 
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Future;
+
+import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.exception.NotImplementedException;
+import org.ros2.rcljava.node.Node;
 
 /**
  * Service Client.
@@ -24,8 +32,20 @@ import org.ros2.rcljava.exception.NotImplementedException;
  */
 public class Client<T> {
 
-    /** Name of the node */
-    private final String name;
+    // Loading JNI library.
+    static {
+        RCLJava.loadLibrary("rcljavanode_service_Client__" + RCLJava.getRMWIdentifier());
+    }
+
+    private static native void nativeSendClientRequest(
+            long clientHandle,
+            long sequenceNumber,
+            long requestFromJavaConverterHandle,
+            long requestToJavaConverterHandle,
+            Object requestMessage);
+
+
+    private final WeakReference<Node> nodeReference;
 
     /** Node Handler. */
     private final long nodeHandle;
@@ -33,34 +53,111 @@ public class Client<T> {
     /** Client Handler. */
     private final long clientHandle;
 
+    private final Class<T> serviceType;
+    private final String serviceName;
+    private long sequenceNumber = 0;
+    private Map<Long, RCLFuture<?>> pendingRequests;
+
+    private long requestFromJavaConverterHandle = 0;
+    private long requestToJavaConverterHandle = 0;
+
+    private long responseFromJavaConverterHandle = 0;
+    private long responseToJavaConverterHandle = 0;
+
+    private final Class<?> requestType;
+    private final Class<?> responseType;
+
     /**
      * Constructor.
      *
-     * @param nodeHandle
-     * @param serviceName
      */
-    public Client(final long nodeHandle, long clientHandle, final String serviceName) {
-        this.name = serviceName;
+    public Client(
+            final WeakReference<Node> nodeReference,
+            final long nodeHandle,
+            final long clientHandle,
+            final Class<T> serviceType,
+            final String serviceName,
+            final Class<?> requestType,
+            final Class<?> responseType,
+            final long requestFromJavaConverterHandle,
+            final long requestToJavaConverterHandle,
+            final long responseFromJavaConverterHandle,
+            final long responseToJavaConverterHandle) {
+        this.nodeReference = nodeReference;
         this.nodeHandle = nodeHandle;
         this.clientHandle = clientHandle;
+        this.serviceType = serviceType;
+        this.serviceName = serviceName;
+        this.requestType = requestType;
+        this.responseType = responseType;
+        this.requestFromJavaConverterHandle = requestFromJavaConverterHandle;
+        this.requestToJavaConverterHandle = requestToJavaConverterHandle;
+        this.responseFromJavaConverterHandle = responseFromJavaConverterHandle;
+        this.responseToJavaConverterHandle = responseToJavaConverterHandle;
+        this.pendingRequests = new HashMap<Long, RCLFuture<?>>();
     }
 
     public void dispose() {
         //TODO
     }
 
-    public <U, V> V sendRequest(U request) {
-        //TODO
-        throw new NotImplementedException();
-//        return null;
+    public <U, V> Future<V> sendRequest(U request) {
+        synchronized(this.pendingRequests) {
+              this.sequenceNumber++;
+              Client.nativeSendClientRequest(
+                      this.clientHandle,
+                      this.sequenceNumber,
+                      this.requestFromJavaConverterHandle,
+                      this.requestToJavaConverterHandle,
+                      request);
+              RCLFuture<V> future = new RCLFuture<V>(this.nodeReference);
+              pendingRequests.put(sequenceNumber, future);
+              return future;
+            }
+    }
+
+    public <V> void handleResponse(RMWRequestId header, V response) {
+        synchronized(pendingRequests) {
+            long sequenceNumber = header.sequenceNumber;
+            RCLFuture<V> future = (RCLFuture<V>) pendingRequests.remove(sequenceNumber);
+            future.set(response);
+        }
+    }
+
+    public final Class<?> getRequestType() {
+        return this.requestType;
+    }
+
+    public final Class<?> getResponseType() {
+        return this.responseType;
     }
 
     public String getServiceName() {
-        return this.name;
+        return this.serviceName;
     }
 
-    public long getClientHandle() {
-        return this.clientHandle;
+    public final Class<T> getServiceType() {
+        return serviceType;
+    }
+
+    public final long getClientHandle() {
+        return clientHandle;
+    }
+
+    public final long getRequestFromJavaConverterHandle() {
+        return this.requestFromJavaConverterHandle;
+    }
+
+    public final long getRequestToJavaConverterHandle() {
+        return this.requestToJavaConverterHandle;
+    }
+
+    public final long getResponseFromJavaConverterHandle() {
+        return this.responseFromJavaConverterHandle;
+    }
+
+    public final long getResponseToJavaConverterHandle() {
+        return this.responseToJavaConverterHandle;
     }
 
     public boolean waitForService(int i) {

@@ -1,6 +1,21 @@
+// Copyright 2016 Esteve Fernandez <esteve@apache.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <string>
 #include <cstdlib>
 #include <cstdio>
+#include <cassert>
 #include <jni.h>
 
 #include <rmw/rmw.h>
@@ -10,14 +25,16 @@
 #include <rcl/graph.h>
 #include <rosidl_generator_c/message_type_support_struct.h>
 
+#include "rcljava_common/exceptions.h"
+#include "rcljava_common/signatures.h"
+
 #include "org_ros2_rcljava_node_Node.h"
 #include "utils.h"
 
 /*
  * nativeCreatePublisherHandle
  */
-JNIEXPORT jlong
-JNICALL Java_org_ros2_rcljava_node_Node_nativeCreatePublisherHandle(
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreatePublisherHandle(
     JNIEnv *env,
     jclass ,
      jlong jnode_handle,
@@ -57,8 +74,7 @@ JNICALL Java_org_ros2_rcljava_node_Node_nativeCreatePublisherHandle(
 /*
  * nativeCreateSubscriptionHandle
  */
-JNIEXPORT jlong
-JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateSubscriptionHandle(
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateSubscriptionHandle(
     JNIEnv *env,
     jclass ,
      jlong jnode_handle,
@@ -98,35 +114,37 @@ JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateSubscriptionHandle(
 /*
  * nativeCreateClientHandle
  */
-JNIEXPORT jlong
-JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateClientHandle(
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateClientHandle(
     JNIEnv *env,
     jclass ,
      jlong jnode_handle,
-    jclass jmessage_class,
+    jclass jservice_class,
    jstring jservice_topic,
    jobject jqos) {
 
+
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
-  rosidl_service_type_support_t *msg_type = jclass2ServiceType(env, jmessage_class);
+  rosidl_service_type_support_t *msg_type = jclass2ServiceType(env, jservice_class);
   std::string service_topic = jstring2String(env, jservice_topic);
 
   rcl_client_t *client = makeInstance<rcl_client_t>();
+  client->impl = NULL;
 
-  bool is_available = false;
-  rcl_ret_t ret = rcl_service_server_is_available(node, client, &is_available);
-  if (ret != RCL_RET_OK || !is_available) {
-    std::string message("Failed to conect to server: " +
-        std::string(rcl_get_error_string_safe()));
-    throwException(env, message);
-
-    return -1;
-  }
+//  bool is_available = false;
+//  rcl_ret_t ret = rcl_service_server_is_available(node, client, &is_available);
+//  printf("===> is available\n");
+//  if (ret != RCL_RET_OK || !is_available) {
+//    std::string message("Failed to connect to server: " +
+//        std::string(rcl_get_error_string_safe()));
+//    throwException(env, message);
+//
+//    return -1;
+//  }
 
   rcl_client_options_t client_ops = rcl_client_get_default_options();
   //  publisher_ops.qos =
 
-  ret = rcl_client_init(
+  rcl_ret_t ret = rcl_client_init(
       client,
       node,
       msg_type,
@@ -148,20 +166,21 @@ JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateClientHandle(
 /*
  * nativeCreateServiceHandle
  */
-JNIEXPORT jlong
-JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateServiceHandle(
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateServiceHandle(
     JNIEnv *env,
     jclass ,
      jlong jnode_handle,
-    jclass jmessage_class,
+    jclass jservice_class,
    jstring jservice_topic,
    jobject jqos) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
-  rosidl_service_type_support_t *msg_type = jclass2ServiceType(env, jmessage_class);
+  rosidl_service_type_support_t *msg_type = jclass2ServiceType(env, jservice_class);
   std::string service_topic = jstring2String(env, jservice_topic);
 
+
   rcl_service_t *service = makeInstance<rcl_service_t>();
+  service->impl = NULL;
 
   rcl_service_options_t service_ops = rcl_service_get_default_options();
   //  publisher_ops.qos =
@@ -188,8 +207,7 @@ JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateServiceHandle(
 /*
  *
  */
-JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_node_Node_nativeDispose
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_Node_nativeDispose
   (JNIEnv *env, jclass , jlong jnode_handle) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
@@ -205,8 +223,7 @@ JNICALL Java_org_ros2_rcljava_node_Node_nativeDispose
 /*
  *
  */
-JNIEXPORT jstring
-JNICALL Java_org_ros2_rcljava_node_Node_nativeGetName
+JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_node_Node_nativeGetName
   (JNIEnv *env, jclass, jlong jnode_handle) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
@@ -220,8 +237,7 @@ JNICALL Java_org_ros2_rcljava_node_Node_nativeGetName
 /*
  *
  */
-JNIEXPORT jint
-JNICALL Java_org_ros2_rcljava_node_Node_nativeCountPublishers
+JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_Node_nativeCountPublishers
   (JNIEnv *env, jclass, jlong jnode_handle, jstring jtopic) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
@@ -241,8 +257,7 @@ JNICALL Java_org_ros2_rcljava_node_Node_nativeCountPublishers
 /*
  *
  */
-JNIEXPORT jint
-JNICALL Java_org_ros2_rcljava_node_Node_nativeCountSubscribers
+JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_Node_nativeCountSubscribers
   (JNIEnv *env, jclass, jlong jnode_handle, jstring jtopic) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
@@ -259,8 +274,7 @@ JNICALL Java_org_ros2_rcljava_node_Node_nativeCountSubscribers
   return count;
 }
 
-JNIEXPORT jobject
-JNICALL Java_org_ros2_rcljava_node_Node_getListTopics
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_Node_getListTopics
   (JNIEnv *env, jclass, jlong jnode_handle) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);

@@ -17,10 +17,17 @@ package org.ros2.rcljava.node.topic;
 import org.ros2.rcljava.internal.message.Message;
 
 /**
+ * This is a copy of {@link java.util.funcion.Consumer} for platforms that don't
+ * support Java 8's API (e.g. Android &lt; 7.0)
  *
- *
- * @author Esteve Fernandez <esteve@apache.org>
+ * @param <T> - the type of the input to the operation
  */
 public interface Consumer<T extends Message> {
-    void accept(T t);
+
+    /**
+       * Performs this operation on the given argument.
+       *
+       * @param message - the input argument
+       */
+    void accept(T message);
 }

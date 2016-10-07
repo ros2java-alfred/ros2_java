@@ -108,9 +108,11 @@ rosidl_service_type_support_t *
 jclass2ServiceType(JNIEnv *env, jclass jmessage_class)
 {
   jmethodID mid =
-      env->GetStaticMethodID(jmessage_class, "getTypeSupport", "()J");
+      env->GetStaticMethodID(jmessage_class, "getServiceTypeSupport", "()J");
+  assert(mid != NULL);
 
   jlong jts = env->CallStaticLongMethod(jmessage_class, mid);
+  assert(jts != 0);
 
   rosidl_service_type_support_t *ts =
       reinterpret_cast<rosidl_service_type_support_t *>(jts);

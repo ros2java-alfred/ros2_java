@@ -13,9 +13,27 @@
  * limitations under the License.
  */
 
-/**
- * An API for using ROS2 with Java.
- * @author Esteve Fernandez <esteve@apache.org>
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
- */
 package org.ros2.rcljava;
+
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+public class RCLJavaTest {
+
+  @Test
+  public void testInit() {
+    assertEquals(false, RCLJava.isInitialized());
+    RCLJava.rclJavaInit();
+    assertEquals(true, RCLJava.isInitialized());
+  }
+
+  @Test
+  public void testOk() {
+    RCLJava.rclJavaInit();
+    assertEquals(true, RCLJava.ok());
+    RCLJava.shutdown();
+    assertEquals(false, RCLJava.ok());
+  }
+
+}

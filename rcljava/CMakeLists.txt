@@ -7,6 +7,9 @@ find_package(ament_cmake_export_jars REQUIRED)
 find_package(rcl REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
+find_package(rcljava_common REQUIRED)
+find_package(JavaExtra MODULE)
+
 
 if (ANDROID)
   # https://cmake.org/cmake/help/v3.0/module/FindJava.html?highlight=java
@@ -30,6 +33,8 @@ if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 endif()
 
+include_directories(include)
+
 find_jar(JUNIT_JAR NAMES junit PATHS /usr/share/java VERSIONS 4)
 find_jar(LOG_JAR NAMES commons-logging PATHS /usr/share/java )
 find_jar(STD_MSGS_JARS NAMES std_msgs
@@ -37,11 +42,11 @@ find_jar(STD_MSGS_JARS NAMES std_msgs
 find_jar(BUILTIN_MSGS_JARS NAMES builtin_interfaces
   PATHS "${CMAKE_BINARY_DIR}/../builtin_interfaces/")
 find_jar(BUILTIN_COMMON_JARS NAMES rosidl_generator_java
-  PATHS "${CMAKE_BINARY_DIR}/../rosidl_generator_java/")
+  PATHS "${CMAKE_BINARY_DIR}/../rosjava_common/")
 
 set(STD_MSGS_JARS "${CMAKE_BINARY_DIR}/../std_msgs/std_msgs.jar")
 set(BUILTIN_MSGS_JARS "${CMAKE_BINARY_DIR}/../builtin_interfaces/builtin_interfaces.jar")
-set(BUILTIN_COMMON_JARS NAMES "${CMAKE_BINARY_DIR}/../rosidl_generator_java/rosidl_generator_java.jar")
+set(BUILTIN_COMMON_JARS NAMES "${CMAKE_BINARY_DIR}/../rosjava_common/rosjava_common.jar")
 
 # Bug in find_jar for Junit4 : https://sourceforge.net/p/rdkit/mailman/message/35301727/
 set(JUNIT_JAR "/usr/share/java/junit4.jar")
@@ -52,15 +57,17 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/NativeUtils.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
   "src/main/java/org/ros2/rcljava/namespace/GraphName.java"
-#  "src/main/java/org/ros2/rcljava/internal/message/Message.java"
   "src/main/java/org/ros2/rcljava/node/INode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
   "src/main/java/org/ros2/rcljava/node/topic/Publisher.java"
   "src/main/java/org/ros2/rcljava/node/topic/Subscription.java"
   "src/main/java/org/ros2/rcljava/node/topic/Consumer.java"
   "src/main/java/org/ros2/rcljava/node/service/Client.java"
+  "src/main/java/org/ros2/rcljava/node/service/BiConsumer.java"
+  "src/main/java/org/ros2/rcljava/node/service/RCLFuture.java"
   "src/main/java/org/ros2/rcljava/node/service/Service.java"
   "src/main/java/org/ros2/rcljava/node/service/ServiceConsumer.java"
+  "src/main/java/org/ros2/rcljava/node/service/TriConsumer.java"
 #  "src/main/java/org/ros2/rcljava/node/parameter/ParameterConsumer.java"
 #  "src/main/java/org/ros2/rcljava/node/parameter/ParameterService.java"
 #  "src/main/java/org/ros2/rcljava/node/parameter/ParameterVariant.java"
@@ -70,12 +77,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/exception/NoImplementationAvailableException.java"
   "src/main/java/org/ros2/rcljava/exception/NotImplementedException.java"
   "src/main/java/org/ros2/rcljava/exception/NotInitializedException.java"
-)
-
-set(${PROJECT_NAME}_tests
-  "src/test/java/org/ros2/rcljava/test/NodeTest.java"
-  "src/test/java/org/ros2/rcljava/test/RCLJavaTest.java"
-  "src/test/java/org/ros2/rcljava/test/RmwTest.java"
+  "src/main/java/org/ros2/rcljava/RMWRequestId.java"
 )
 
 ### Macro ###
@@ -84,7 +86,7 @@ macro(target)
     get_rcl_information("${rmw_implementation}" "rcl${target_suffix}")
   endif()
 
-  set(_jni_classes "RCLJava;node_Node;node_topic_Publisher")
+  set(_jni_classes "RCLJava;node_Node;node_topic_Publisher;node_service_Client")
 
   foreach(_jni_class ${_jni_classes})
     set(_target_name "${PROJECT_NAME}${_jni_class}${target_suffix}")
@@ -118,6 +120,7 @@ macro(target)
 
     ament_target_dependencies(${_target_name}
       "rcl${target_suffix}"
+      "rcljava_common"
     )
 
     target_include_directories(
@@ -128,69 +131,81 @@ macro(target)
 
     if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
       ament_export_libraries(${_target_name})
-
-      install(TARGETS ${_msg_name}${_javaext_suffix}
-        DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}/${_msg_package_dir2}"
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-      )
-
-      install(TARGETS ${_target_name}
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin
-      )
     endif()
+
+    install(TARGETS ${_target_name}
+      ARCHIVE DESTINATION lib
+      LIBRARY DESTINATION lib
+    )
+
   endforeach()
 
 endmacro()
 
-### Main ###
 set(CMAKE_JAVA_INCLUDE_PATH "${BUILTIN_COMMON_JARS}:${BUILTIN_MSGS_JARS}:${LOG_JAR}")
 add_jar("${PROJECT_NAME}_jar"
-  SOURCES
-    "${${PROJECT_NAME}_sources}"
+  "${${PROJECT_NAME}_sources}"
+  INCLUDE_JARS
+  "${std_msgs_JARS}"
+  "${rcljava_common_JARS}"
+  "${_jar_file}"
   OUTPUT_NAME
-    "${PROJECT_NAME}"
+  "${PROJECT_NAME}"
 )
 
-set(CMAKE_JAVA_INCLUDE_PATH "${LOG_JAR}:${BUILTIN_COMMON_JARS}:${BUILTIN_MSGS_JARS}:${STD_MSGS_JARS}:${JUNIT_JAR}")
-add_jar("${PROJECT_NAME}_test_jar"
-  SOURCES
-    "${${PROJECT_NAME}_sources}"
-    "${${PROJECT_NAME}_tests}"
-  OUTPUT_NAME
-    "${PROJECT_NAME}_test"
-)
-
-### Test ###
-set(TEST_COMMAND ${Java_JAVA_EXECUTABLE} ${JVMARGS} -classpath ${CMAKE_JAVA_INCLUDE_PATH}:${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_test.jar -Djava.library.path=${CMAKE_INSTALL_PREFIX}/lib/:${CMAKE_INSTALL_PREFIX}/../std_msgs/lib/ org.junit.runner.JUnitCore)
-
-add_test(NAME RmwTest COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RmwTest)
-add_test(NAME RCLJavaTest COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RCLJavaTest)
-add_test(NAME NodeTest COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.NodeTest)
-
-## loop for all RMW target.
 call_for_each_rmw_implementation(target)
 
-### Testing ###
-if(AMENT_ENABLE_TESTING)
+set(_install_jar_dir "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}")
+get_property(_jar_file TARGET "${PROJECT_NAME}_jar" PROPERTY "JAR_FILE")
+
+install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
+ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
+
+if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  ament_add_nose_test(rcljavatests test
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+  set(${PROJECT_NAME}_test_sources
+    "src/test/java/org/ros2/rcljava/NodeTest.java"
+    "src/test/java/org/ros2/rcljava/PublisherTest.java"
+    "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
+    "src/test/java/org/ros2/rcljava/SubscriptionTest.java"
   )
-endif()
 
-### Install ###
-if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
-  set(_install_jar_dir "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}")
-  get_property(_jar_file TARGET "${PROJECT_NAME}_jar" PROPERTY "JAR_FILE")
+  set(${PROJECT_NAME}_tests
+    "src/test/java/org/ros2/rcljava/test/NodeTest.java"
+    "src/test/java/org/ros2/rcljava/test/RCLJavaTest.java"
+    "src/test/java/org/ros2/rcljava/test/RmwTest.java"
+  )
 
-  install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
-  ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
-  ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}_test.jar")
+  set(${PROJECT_NAME}_testsuites
+    "org.ros2.rcljava.NodeTest"
+    "org.ros2.rcljava.PublisherTest"
+    "org.ros2.rcljava.RCLJavaTest"
+    "org.ros2.rcljava.SubscriptionTest"
+  )
+
+  set(_deps_library_paths "")
+  foreach(_dep_lib ${std_msgs_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list(APPEND _deps_library_paths ${_dep_dir})
+  endforeach()
+  list(APPEND _deps_library_paths ${CMAKE_CURRENT_BINARY_DIR})
+
+  foreach(testsuite ${${PROJECT_NAME}_testsuites})
+  add_junit_tests("${PROJECT_NAME}_tests_${testsuite}"
+    "${${PROJECT_NAME}_test_sources}"
+    TESTS
+    "${testsuite}"
+    INCLUDE_JARS
+    "${std_msgs_JARS}"
+    "${rcljava_common_JARS}"
+    "${_jar_file}"
+    LIBRARY_PATHS
+    "${_deps_library_paths}"
+  )
+  endforeach()
+
 endif()
 
 ament_package()

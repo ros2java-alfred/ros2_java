@@ -5,24 +5,26 @@ project(rosidl_generator_java)
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_export_jars REQUIRED)
 find_package(ament_cmake_python REQUIRED)
-#find_package(rosidl_cmake REQUIRED)
+find_package(rosidl_cmake REQUIRED)
 find_package(rosidl_generator_c REQUIRED)
+
+find_package(rcljava_common REQUIRED)
 
 ament_export_dependencies(rosidl_cmake)
 
 ament_python_install_package(${PROJECT_NAME})
 
-if (ANDROID)
+if(ANDROID)
   find_host_package(Java COMPONENTS Development REQUIRED)
 else()
   find_package(Java COMPONENTS Development REQUIRED)
   find_package(JNI REQUIRED)
 endif()
-include (UseJava)
+include(UseJava)
 
 set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
-if(AMENT_ENABLE_TESTING)
+if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
@@ -66,17 +68,6 @@ if(AMENT_ENABLE_TESTING)
 # TODO(esteve): add support for JUnit tests
 endif()
 
-set(${PROJECT_NAME}_sources
-  "src/main/java/org/ros2/rosidl_generator_java/RCLJavaProxy.java"
-  "src/main/java/org/ros2/internal/message/Message.java"
-)
-
-add_jar("${PROJECT_NAME}_jar"
-  "${${PROJECT_NAME}_sources}"
-  OUTPUT_NAME
-  "${PROJECT_NAME}"
-)
-
 install(
   PROGRAMS bin/rosidl_generator_java
   DESTINATION lib/rosidl_generator_java
@@ -86,9 +77,6 @@ install(
   DIRECTORY cmake resource
   DESTINATION share/${PROJECT_NAME}
 )
-
-install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
-ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
 
 ament_package(
   CONFIG_EXTRAS "cmake/rosidl_generator_java_get_typesupports.cmake"

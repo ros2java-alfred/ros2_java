@@ -1,4 +1,4 @@
-/* Copyright 2016 Open Source Robotics Foundation, Inc.
+/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  */
 package org.ros2.rcljava.node.service;
 
+import org.ros2.rcljava.RMWRequestId;
+
 /**
  * Service Server.
  *
@@ -23,13 +25,26 @@ package org.ros2.rcljava.node.service;
 public class Service<T> {
 
     /** Name of the node */
-    private final String name;
+    private final String serviceName;
 
     /** Node Handler. */
-    private final long nodeHandle;
+//    private final long nodeHandle;
 
     /** Service Handler. */
     private final long serviceHandle;
+
+    private final Class<T> serviceType;
+
+    private final TriConsumer<RMWRequestId, ?, ?> callback;
+
+    private final long requestFromJavaConverterHandle;
+    private final long requestToJavaConverterHandle;
+
+    private final long responseFromJavaConverterHandle;
+    private final long responseToJavaConverterHandle;
+
+    private final Class<?> requestType;
+    private final Class<?> responseType;
 
     /**
      * Constructor.
@@ -37,10 +52,29 @@ public class Service<T> {
      * @param nodeHandle
      * @param serviceName
      */
-    public Service(final long nodeHandle, final long serviceHandle, final String serviceName) {
-        this.name = serviceName;
-        this.nodeHandle = nodeHandle;
+    public Service(
+            final long nodeHandle,
+            final long serviceHandle,
+            final Class<T> serviceType,
+            final String serviceName,
+            final TriConsumer<RMWRequestId, ?, ?> callback,
+            final Class<?> requestType,
+            final Class<?> responseType,
+            final long requestFromJavaConverterHandle,
+            final long requestToJavaConverterHandle,
+            final long responseFromJavaConverterHandle,
+            final long responseToJavaConverterHandle) {
+//        this.nodeHandle = nodeHandle;
         this.serviceHandle = serviceHandle;
+        this.serviceType = serviceType;
+        this.serviceName = serviceName;
+        this.callback = callback;
+        this.requestType = requestType;
+        this.responseType = responseType;
+        this.requestFromJavaConverterHandle = requestFromJavaConverterHandle;
+        this.requestToJavaConverterHandle = requestToJavaConverterHandle;
+        this.responseFromJavaConverterHandle = responseFromJavaConverterHandle;
+        this.responseToJavaConverterHandle = responseToJavaConverterHandle;
     }
 
     public void dispose() {
@@ -52,10 +86,42 @@ public class Service<T> {
     }
 
     public String getServiceName() {
-        return this.name;
+        return this.serviceName;
     }
 
-    public long getServiceHandle() {
+    public final TriConsumer<RMWRequestId, ?, ?> getCallback() {
+        return callback;
+    }
+
+    public final Class<T> getServiceType() {
+        return serviceType;
+    }
+
+    public final long getServiceHandle() {
         return this.serviceHandle;
+    }
+
+    public final long getRequestFromJavaConverterHandle() {
+        return this.requestFromJavaConverterHandle;
+    }
+
+    public final long getRequestToJavaConverterHandle() {
+        return this.requestToJavaConverterHandle;
+    }
+
+    public final long getResponseFromJavaConverterHandle() {
+        return this.responseFromJavaConverterHandle;
+    }
+
+    public final long getResponseToJavaConverterHandle() {
+        return this.responseToJavaConverterHandle;
+    }
+
+    public final Class<?> getRequestType() {
+        return this.requestType;
+    }
+
+    public final Class<?> getResponseType() {
+        return this.responseType;
     }
 }

@@ -13,9 +13,21 @@
  * limitations under the License.
  */
 
+package org.ros2.rcljava.node.service;
+
 /**
- * An API for using ROS2 with Java.
- * @author Esteve Fernandez <esteve@apache.org>
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
+ * This is a copy of {@link java.util.funcion.BiConsumer} for platforms that don't
+ * support Java 8's API (e.g. Android &lt; 7.0)
+ *
+ * @param <T> - the type of the first input to the operation
+ * @param <U> - the type of the second input to the operation
  */
-package org.ros2.rcljava;
+public interface BiConsumer<T, U> {
+  /**
+   * Performs this operation on the given argument.
+   *
+   * @param input1 - the first input argument
+   * @param input2 - the second input argument
+   */
+  void accept(T input1, U input2);
+}

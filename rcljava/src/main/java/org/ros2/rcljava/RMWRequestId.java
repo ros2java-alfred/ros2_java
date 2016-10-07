@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-/**
- * An API for using ROS2 with Java.
- * @author Esteve Fernandez <esteve@apache.org>
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
- */
 package org.ros2.rcljava;
+
+public class RMWRequestId {
+  public byte writerGUID[] = new byte[16];
+  public long sequenceNumber;
+}

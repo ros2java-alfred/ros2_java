@@ -39,6 +39,8 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
 
     mapping_srvs = {
         os.path.join(template_dir, 'srv.java.template'): ['%s.java'],
+        os.path.join(template_dir, 'srv_support.entry_point.cpp.template'):
+        type_support_impl_by_filename.keys(),
     }
 
     for template_file in mapping_msgs.keys():
@@ -72,6 +74,7 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
         modules[subfolder].append((module_name, type_name))
         package_name = args['package_name']
         jni_package_name = package_name.replace('_', '_1')
+        jni_type_name = type_name.replace('_', '_1')
         for template_file, generated_filenames in mapping.items():
             for generated_filename in generated_filenames:
                 data = {
@@ -84,6 +87,8 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
                     'jni_package_name': jni_package_name,
                     'spec': spec,
                     'subfolder': subfolder,
+                    'jni_type_name': jni_type_name,
+                    'spec': spec, 'subfolder': subfolder,
                     'typesupport_impl': type_support_impl_by_filename.get(generated_filename, ''),
                     'typesupport_impls': typesupport_impls,
                     'type_name': type_name,

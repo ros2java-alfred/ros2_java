@@ -14,8 +14,8 @@
  */
 
 /**
- * An API for using ROS2 with Java.
- * @author Esteve Fernandez <esteve@apache.org>
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
+ * Contains a utility class for retrieving information about the RMW and
+ * typesupport implemnetations via reflection, to avoid a circular
+ * dependency between rcljava and generated messages.
  */
-package org.ros2.rcljava;
+package org.ros2.rcljava.common;

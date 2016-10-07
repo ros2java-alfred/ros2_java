@@ -12,11 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rosidl_generator_java;
+package org.ros2.rcljava.common;
 
 import java.lang.reflect.Method;
 
-public class RCLJavaProxy {
+/**
+ * Utility class that allows generated messages to retrieve the typesupport and
+ * the RMW implementation via reflection.
+ * This prevents a circular dependency between generated messages and rcljava.
+ */
+public final class RCLJavaProxy {
+    /**
+     * Private constructor so this cannot be instantiated.
+     */
+    private RCLJavaProxy() { }
+
+    /**
+       * @return a pointer to the underlying typesupport via reflection.
+       */
     public static synchronized String getTypesupportIdentifier() {
         try {
             Class c = Class.forName("org.ros2.rcljava.RCLJava");
@@ -29,6 +42,9 @@ public class RCLJavaProxy {
         }
     }
 
+    /**
+     * @return a pointer to the underlying typesupport via reflection.
+     */
     public static synchronized String getRMWIdentifier() {
         try {
             Class c = Class.forName("org.ros2.rcljava.RCLJava");
@@ -41,6 +57,9 @@ public class RCLJavaProxy {
         }
     }
 
+    /**
+     * @return a pointer to the underlying load native library via reflection.
+     */
     public static synchronized void loadLibrary(String name) {
         try {
             Class c = Class.forName("org.ros2.rcljava.RCLJava");
