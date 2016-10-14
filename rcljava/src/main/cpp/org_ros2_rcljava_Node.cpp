@@ -32,7 +32,8 @@
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreatePublisherHandle(JNIEnv * env, jclass,
   jlong node_handle,
   jclass jmessage_class,
-  jstring jtopic)
+  jstring jtopic,
+  jlong qos_profile_handle)
 {
   jmethodID mid = env->GetStaticMethodID(jmessage_class, "getTypeSupport", "()J");
   jlong jts = env->CallStaticLongMethod(jmessage_class, mid);
@@ -52,6 +53,9 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreatePublisherHandle(J
   publisher->impl = NULL;
   rcl_publisher_options_t publisher_ops = rcl_publisher_get_default_options();
 
+  rmw_qos_profile_t * qos_profile = reinterpret_cast<rmw_qos_profile_t *>(qos_profile_handle);
+  publisher_ops.qos = *qos_profile;
+
   rcl_ret_t ret = rcl_publisher_init(publisher, node, ts, topic.c_str(), &publisher_ops);
 
   if (ret != RCL_RET_OK) {
@@ -69,7 +73,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateSubscriptionHandl
   jclass,
   jlong node_handle,
   jclass jmessage_class,
-  jstring jtopic)
+  jstring jtopic,
+  jlong qos_profile_handle)
 {
   jmethodID mid = env->GetStaticMethodID(jmessage_class, "getTypeSupport", "()J");
   jlong jts = env->CallStaticLongMethod(jmessage_class, mid);
@@ -90,6 +95,9 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateSubscriptionHandl
   subscription->impl = NULL;
   rcl_subscription_options_t subscription_ops = rcl_subscription_get_default_options();
 
+  rmw_qos_profile_t * qos_profile = reinterpret_cast<rmw_qos_profile_t *>(qos_profile_handle);
+  subscription_ops.qos = *qos_profile;
+
   rcl_ret_t ret = rcl_subscription_init(subscription, node, ts, topic.c_str(), &subscription_ops);
 
   if (ret != RCL_RET_OK) {
@@ -104,7 +112,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateSubscriptionHandl
 }
 
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle(JNIEnv * env, jclass,
-  jlong node_handle, jclass jservice_class, jstring jservice_name)
+  jlong node_handle, jclass jservice_class, jstring jservice_name, jlong qos_profile_handle)
 {
   jmethodID mid = env->GetStaticMethodID(jservice_class, "getServiceTypeSupport", "()J");
 
@@ -129,6 +137,9 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle(JNI
   service->impl = NULL;
   rcl_service_options_t service_ops = rcl_service_get_default_options();
 
+  rmw_qos_profile_t * qos_profile = reinterpret_cast<rmw_qos_profile_t *>(qos_profile_handle);
+  service_ops.qos = *qos_profile;
+
   rcl_ret_t ret = rcl_service_init(service, node, ts, service_name.c_str(), &service_ops);
 
   if (ret != RCL_RET_OK) {
@@ -143,7 +154,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateServiceHandle(JNI
 }
 
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateClientHandle(JNIEnv * env, jclass,
-  jlong node_handle, jclass jservice_class, jstring jservice_name)
+  jlong node_handle, jclass jservice_class, jstring jservice_name, jlong qos_profile_handle)
 {
   jmethodID mid = env->GetStaticMethodID(jservice_class, "getServiceTypeSupport", "()J");
 
@@ -167,6 +178,9 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Node_nativeCreateClientHandle(JNIE
   rcl_client_t * client = static_cast<rcl_client_t *>(malloc(sizeof(rcl_client_t)));
   client->impl = NULL;
   rcl_client_options_t client_ops = rcl_client_get_default_options();
+
+  rmw_qos_profile_t * qos_profile = reinterpret_cast<rmw_qos_profile_t *>(qos_profile_handle);
+  client_ops.qos = *qos_profile;
 
   rcl_ret_t ret = rcl_client_init(client, node, ts, service_name.c_str(), &client_ops);
 

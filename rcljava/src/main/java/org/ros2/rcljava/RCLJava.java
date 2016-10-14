@@ -15,6 +15,8 @@
 
 package org.ros2.rcljava;
 
+import org.ros2.rcljava.qos.QoSProfile;
+
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -337,4 +339,24 @@ public final class RCLJava {
   private static native Object nativeTakeResponse(
       long clientHandle, long responseFromJavaConverterHandle,
       long responseToJavaConverterHandle, Object responseMessage);
+
+  public static long convertQoSProfileToHandle(final QoSProfile qosProfile) {
+    int history = qosProfile.getHistory().getValue();
+    int depth = qosProfile.getDepth();
+    int reliability = qosProfile.getReliability().getValue();
+    int durability = qosProfile.getDurability().getValue();
+
+    return nativeConvertQoSProfileToHandle(history, depth, reliability,
+      durability);
+  }
+
+  private static native long nativeConvertQoSProfileToHandle(
+      int history, int depth, int reliability, int durability);
+
+  public static void disposeQoSProfile(final long qosProfileHandle) {
+    nativeDisposeQoSProfile(qosProfileHandle);
+  }
+
+  private static native void nativeDisposeQoSProfile(
+      long qosProfileHandle);
 }
