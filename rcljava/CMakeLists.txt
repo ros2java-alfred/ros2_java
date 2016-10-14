@@ -138,6 +138,7 @@ if(BUILD_TESTING)
     TESTS
     "${testsuite}"
     INCLUDE_JARS
+    "${rcljava_common_JARS}"
     "${std_msgs_JARS}"
     "${_jar_file}"
     LIBRARY_PATHS

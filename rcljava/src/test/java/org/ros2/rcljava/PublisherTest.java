@@ -15,6 +15,7 @@
 
 package org.ros2.rcljava;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
@@ -28,7 +29,7 @@ public class PublisherTest {
     Publisher<std_msgs.msg.String> publisher = node.
       <std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
       "test_topic");
-    assertNotEquals(node.getNodeHandle(), publisher.getNodeHandle());
+    assertEquals(node.getNodeHandle(), publisher.getNodeHandle());
     assertNotEquals(0, publisher.getNodeHandle());
     assertNotEquals(0, publisher.getPublisherHandle());
   }

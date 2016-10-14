@@ -15,6 +15,7 @@
 
 package org.ros2.rcljava;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class SubscriptionTest {
         }
       }
     );
-    assertNotEquals(node.getNodeHandle(), subscription.getNodeHandle());
+    assertEquals(node.getNodeHandle(), subscription.getNodeHandle());
     assertNotEquals(0, subscription.getNodeHandle());
     assertNotEquals(0, subscription.getSubscriptionHandle());
   }
