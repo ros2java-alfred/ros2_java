@@ -302,13 +302,6 @@ public class Node implements INode {
             final QoSProfile qos) throws Exception {
 
         logger.fine("Create Client : " + serviceName);
-//        long clientHandle = Node.nativeCreateClientHandle(
-//                this.nodeHandle,
-//                message,
-//                service,
-//                qos);
-//
-//        Client<T> client = new Client<T>(this.nodeHandle, clientHandle, service);
 
         Class<?> requestType = (Class<?>)serviceType.getField("RequestType").get(null);
 

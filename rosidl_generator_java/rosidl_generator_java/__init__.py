@@ -88,7 +88,6 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
                     'spec': spec,
                     'subfolder': subfolder,
                     'jni_type_name': jni_type_name,
-                    'spec': spec, 'subfolder': subfolder,
                     'typesupport_impl': type_support_impl_by_filename.get(generated_filename, ''),
                     'typesupport_impls': typesupport_impls,
                     'type_name': type_name,

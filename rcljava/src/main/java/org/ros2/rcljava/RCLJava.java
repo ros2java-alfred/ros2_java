@@ -16,7 +16,6 @@
 package org.ros2.rcljava;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
 
 import java.util.Map;
 import java.util.Queue;
@@ -337,19 +336,14 @@ public class RCLJava {
         }
 
         for (Client<?> client : node.getClients()) {
-            long requestFromJavaConverterHandle = client.getRequestFromJavaConverterHandle();
-            long requestToJavaConverterHandle = client.getRequestToJavaConverterHandle();
             long responseFromJavaConverterHandle = client.getResponseFromJavaConverterHandle();
             long responseToJavaConverterHandle = client.getResponseToJavaConverterHandle();
 
-            Class<?> requestType = client.getRequestType();
             Class<?> responseType = client.getResponseType();
 
-            Object requestMessage = null;
             Object responseMessage = null;
 
             try {
-                requestMessage = requestType.newInstance();
                 responseMessage = responseType.newInstance();
             } catch (InstantiationException ie) {
                 ie.printStackTrace();
@@ -359,8 +353,12 @@ public class RCLJava {
                 continue;
             }
 
-            RMWRequestId rmwRequestId = (RMWRequestId) nativeTakeResponse(client.getClientHandle(),
-                    responseFromJavaConverterHandle, responseToJavaConverterHandle, responseMessage);
+            RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeResponse(
+                    client.getClientHandle(),
+                    responseFromJavaConverterHandle,
+                    responseToJavaConverterHandle,
+                    responseMessage);
+
 
             if (rmwRequestId != null) {
                 client.handleResponse(rmwRequestId, responseMessage);

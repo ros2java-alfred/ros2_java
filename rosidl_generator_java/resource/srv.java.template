@@ -1,31 +1,53 @@
-/* Generated Service class from rosidl_generator_java */
+// generated from rosidl_generator_java/resource/srv.java.template
+// generated code does not contain a copyright notice
+
+@##########################################################################
+@# EmPy template for generating <srv> files Java
+@# Context:
+@#  - spec (rosidl_parser.MessageSpecification)
+@#    Parsed specification of the .msg file
+@#  - module_name (string)
+@#  - jni_package_name (string)
+@#  - subfolder (string)
+@#    The subfolder / subnamespace of the message
+@#    Either 'msg' or 'srv'
+@##########################################################################
+@
 package @(package_name).@(subfolder);
 
 // IMPORTS
 import org.ros2.rcljava.common.RCLJavaProxy;
+import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.internal.service.Service;
+
 import @(package_name).@(subfolder).@(type_name)_Request;
 import @(package_name).@(subfolder).@(type_name)_Response;
 
 /**
  * Java Service for ROS2(idl) of @(type_name).
  */
-public class @(type_name) {
+public class @(type_name) implements Service {
+
     /** AutoLoader JNI library. */
     static {
         RCLJavaProxy.loadLibrary("@(spec.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
     }
 
     // NATIVES
-      public static native long getServiceTypeSupport();
+    public static native long getServiceTypeSupport();
 
     // INTERNALS COMPONENTS
-    /** Request of Service. */
-    //public static class Request extends @(type_name)_Request {}
-
-    /** Response of Service. */
-    //public static class Response extends @(type_name)_Response {}
-
     public static final Class<@(type_name)_Request> RequestType = @(type_name)_Request.class;
 
     public static final Class<@(type_name)_Response> ResponseType = @(type_name)_Response.class;
+
+    @@Override
+    public Class<? extends Message> getRequestType() {
+        return @(type_name)_Request.class;
+    }
+
+    @@Override
+    public Class<? extends Message> getResponseType() {
+        return @(type_name)_Response.class;
+    }
 }

@@ -1,4 +1,23 @@
-/* Generated Message class from rosidl_generator_java */
+@{
+def upperfirst(s):
+    return s[0].capitalize() + s[1:]
+}@
+@
+// generated from rosidl_generator_java/resource/msg.java.template
+// generated code does not contain a copyright notice
+
+@##########################################################################
+@# EmPy template for generating <msg> files Java
+@# Context:
+@#  - spec (rosidl_parser.MessageSpecification)
+@#    Parsed specification of the .msg file
+@#  - module_name (string)
+@#  - jni_package_name (string)
+@#  - subfolder (string)
+@#    The subfolder / subnamespace of the message
+@#    Either 'msg' or 'srv'
+@##########################################################################
+@
 package @(package_name).@(subfolder);
 
 // IMPORTS
@@ -12,9 +31,10 @@ import @(field.type.pkg_name).msg.@(field.type.type);
 @[end for]@
 
 /**
- * @(type_name) java message for ROS2(idl).
+ * Java Message for ROS2(idl) of @(type_name).
  */
 public final class @(type_name) implements Message {
+
     /** AutoLoader JNI library. */
     static {
         RCLJavaProxy.loadLibrary("@(spec.base_type.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
@@ -30,16 +50,11 @@ public final class @(type_name) implements Message {
     public static final @(get_builtin_java_type(constant.type)) @(constant.name) = @(constant_value_to_java(constant.type, constant.value));
 @[end for]@
 
-@{
-def upperfirst(s):
-    return s[0].capitalize() + s[1:]
-}@
-
     // FIELDS
 @[for field in spec.fields]@
 @[    if field.type.is_array]@
     /** List of @(field.name). */
-    private java.util.List<@(get_java_type(field.type, use_primitives=False))> @(field.name);
+    private java.util.List<@(get_java_type(field.type, use_primitives=False))> @(field.name) = new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>();
 
     /**
      * @(upperfirst(field.name)) setter.
@@ -63,7 +78,11 @@ def upperfirst(s):
     }
 @[    else]@
     /** @(field.name) field. */
+@[        if (not field.type.is_primitive_type()) or (field.type.type == "string") ]@
+    private @(get_java_type(field.type)) @(field.name) = new @(get_java_type(field.type))();
+@[        else]@
     private @(get_java_type(field.type)) @(field.name);
+@[        end if]@
 
     /**
      * @(upperfirst(field.name)) setter.
