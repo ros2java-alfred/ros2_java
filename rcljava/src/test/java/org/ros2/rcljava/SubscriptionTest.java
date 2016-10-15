@@ -23,15 +23,15 @@ import org.junit.Test;
 public class SubscriptionTest {
 
   @Test
-  public void testCreate() {
+  public final void testCreate() {
     RCLJava.rclJavaInit();
     Node node = RCLJava.createNode("test_node");
-    Subscription<std_msgs.msg.String> subscription = node.
-      <std_msgs.msg.String>createSubscription(std_msgs.msg.String.class,
-      "test_topic", new Consumer<std_msgs.msg.String>() {
-        public void accept(std_msgs.msg.String msg) {
+    Subscription<std_msgs.msg.String> subscription = node
+        .<std_msgs.msg.String>createSubscription(std_msgs.msg.String.class,
+        "test_topic", new Consumer<std_msgs.msg.String>() {
+          public void accept(final std_msgs.msg.String msg) {
+          }
         }
-      }
     );
     assertEquals(node.getNodeHandle(), subscription.getNodeHandle());
     assertNotEquals(0, subscription.getNodeHandle());

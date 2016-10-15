@@ -22,14 +22,14 @@ import org.junit.Test;
 public class RCLJavaTest {
 
   @Test
-  public void testInit() {
+  public final void testInit() {
     assertEquals(false, RCLJava.isInitialized());
     RCLJava.rclJavaInit();
     assertEquals(true, RCLJava.isInitialized());
   }
 
   @Test
-  public void testOk() {
+  public final void testOk() {
     RCLJava.rclJavaInit();
     assertEquals(true, RCLJava.ok());
     RCLJava.shutdown();

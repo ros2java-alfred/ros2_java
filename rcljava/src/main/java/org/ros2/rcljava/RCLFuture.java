@@ -15,9 +15,7 @@
 
 package org.ros2.rcljava;
 
-import java.lang.InterruptedException;
 import java.lang.ref.WeakReference;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -29,11 +27,11 @@ public class RCLFuture<V> implements Future<V> {
   private boolean done = false;
   private V value = null;
 
-  public RCLFuture(WeakReference<Node> nodeReference) {
+  public RCLFuture(final WeakReference<Node> nodeReference) {
     this.nodeReference = nodeReference;
   }
 
-  public V get() throws InterruptedException, ExecutionException {
+  public final V get() throws InterruptedException, ExecutionException {
     while (RCLJava.ok() && !isDone()) {
       Node node = nodeReference.get();
       if (node != null) {
@@ -45,24 +43,24 @@ public class RCLFuture<V> implements Future<V> {
     return value;
   }
 
-  public V get(long timeout, TimeUnit unit) throws InterruptedException,
-      ExecutionException, TimeoutException {
+  public final V get(final long timeout, final TimeUnit unit) throws
+      InterruptedException, ExecutionException, TimeoutException {
     return null;
   }
 
-  public boolean isDone() {
+  public final boolean isDone() {
     return done;
   }
 
-  public boolean isCancelled() {
+  public final boolean isCancelled() {
     return false;
   }
 
-  public boolean cancel(boolean mayInterruptIfRunning) {
+  public final boolean cancel(final boolean mayInterruptIfRunning) {
     return false;
   }
 
-  public synchronized void set(V value) {
+  public final synchronized void set(final V value) {
     this.value = value;
     done = true;
   }

@@ -15,8 +15,6 @@
 
 package org.ros2.rcljava;
 
-import java.lang.reflect.Method;
-
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -184,7 +182,8 @@ public final class RCLJava {
   public static void spinOnce(final Node node) {
     long waitSetHandle = nativeGetZeroInitializedWaitSet();
 
-    nativeWaitSetInit(waitSetHandle, node.getSubscriptions().size(), 0, 0, node.getClients().size(), node.getServices().size());
+    nativeWaitSetInit(waitSetHandle, node.getSubscriptions().size(), 0, 0,
+        node.getClients().size(), node.getServices().size());
 
     nativeWaitSetClearSubscriptions(waitSetHandle);
 
@@ -217,10 +216,14 @@ public final class RCLJava {
     }
 
     for (Service service : node.getServices()) {
-      long requestFromJavaConverterHandle = service.getRequestFromJavaConverterHandle();
-      long requestToJavaConverterHandle = service.getRequestToJavaConverterHandle();
-      long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
-      long responseToJavaConverterHandle = service.getResponseToJavaConverterHandle();
+      long requestFromJavaConverterHandle =
+          service.getRequestFromJavaConverterHandle();
+      long requestToJavaConverterHandle =
+          service.getRequestToJavaConverterHandle();
+      long responseFromJavaConverterHandle =
+          service.getResponseFromJavaConverterHandle();
+      long responseToJavaConverterHandle =
+          service.getResponseToJavaConverterHandle();
 
       Class requestType = service.getRequestType();
       Class responseType = service.getResponseType();
@@ -239,18 +242,28 @@ public final class RCLJava {
         continue;
       }
 
-      RMWRequestId rmwRequestId = (RMWRequestId)nativeTakeRequest(service.getServiceHandle(), requestFromJavaConverterHandle, requestToJavaConverterHandle, requestMessage);
+      RMWRequestId rmwRequestId =
+          (RMWRequestId) nativeTakeRequest(service.getServiceHandle(),
+          requestFromJavaConverterHandle, requestToJavaConverterHandle,
+          requestMessage);
       if (rmwRequestId != null) {
-        service.getCallback().accept(rmwRequestId, requestMessage, responseMessage);
-        nativeSendServiceResponse(service.getServiceHandle(), rmwRequestId, responseFromJavaConverterHandle, responseToJavaConverterHandle, responseMessage);
+        service.getCallback().accept(rmwRequestId, requestMessage,
+            responseMessage);
+        nativeSendServiceResponse(service.getServiceHandle(), rmwRequestId,
+            responseFromJavaConverterHandle, responseToJavaConverterHandle,
+            responseMessage);
       }
     }
 
     for (Client client : node.getClients()) {
-      long requestFromJavaConverterHandle = client.getRequestFromJavaConverterHandle();
-      long requestToJavaConverterHandle = client.getRequestToJavaConverterHandle();
-      long responseFromJavaConverterHandle = client.getResponseFromJavaConverterHandle();
-      long responseToJavaConverterHandle = client.getResponseToJavaConverterHandle();
+      long requestFromJavaConverterHandle =
+          client.getRequestFromJavaConverterHandle();
+      long requestToJavaConverterHandle =
+          client.getRequestToJavaConverterHandle();
+      long responseFromJavaConverterHandle =
+          client.getResponseFromJavaConverterHandle();
+      long responseToJavaConverterHandle =
+          client.getResponseToJavaConverterHandle();
 
       Class requestType = client.getRequestType();
       Class responseType = client.getResponseType();
@@ -305,19 +318,21 @@ public final class RCLJava {
 
   private static native void nativeWaitSetClearServices(long waitSetHandle);
 
-  private static native void nativeWaitSetAddService(long waitSetHandle, long serviceHandle);
+  private static native void nativeWaitSetAddService(long waitSetHandle,
+      long serviceHandle);
 
   private static native void nativeWaitSetClearClients(long waitSetHandle);
 
-  private static native void nativeWaitSetAddClient(long waitSetHandle, long clientHandle);
+  private static native void nativeWaitSetAddClient(long waitSetHandle,
+      long clientHandle);
 
   private static native Object nativeTakeRequest(
       long serviceHandle, long requestFromJavaConverterHandle,
       long requestToJavaConverterHandle, Object requestMessage);
 
-  private static native void nativeSendServiceResponse(long serviceHandle, Object header,
-      long responseFromJavaConverterHandle, long responseToJavaConverterHandle,
-      Object responseMessage);
+  private static native void nativeSendServiceResponse(long serviceHandle,
+      Object header, long responseFromJavaConverterHandle,
+      long responseToJavaConverterHandle, Object responseMessage);
 
   private static native Object nativeTakeResponse(
       long clientHandle, long responseFromJavaConverterHandle,

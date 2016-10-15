@@ -23,12 +23,12 @@ import org.junit.Test;
 public class PublisherTest {
 
   @Test
-  public void testCreate() {
+  public final void testCreate() {
     RCLJava.rclJavaInit();
     Node node = RCLJava.createNode("test_node");
-    Publisher<std_msgs.msg.String> publisher = node.
-      <std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
-      "test_topic");
+    Publisher<std_msgs.msg.String> publisher = node
+        .<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
+        "test_topic");
     assertEquals(node.getNodeHandle(), publisher.getNodeHandle());
     assertNotEquals(0, publisher.getNodeHandle());
     assertNotEquals(0, publisher.getPublisherHandle());

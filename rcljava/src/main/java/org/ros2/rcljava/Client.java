@@ -16,7 +16,6 @@
 package org.ros2.rcljava;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -49,10 +48,13 @@ public class Client<T> {
   private final Class responseType;
 
   public Client(final WeakReference<Node> nodeReference,
-      final long nodeHandle, final long clientHandle, final Class<T> serviceType, final String serviceName,
+      final long nodeHandle, final long clientHandle,
+      final Class<T> serviceType, final String serviceName,
       final Class requestType, final Class responseType,
-      final long requestFromJavaConverterHandle, final long requestToJavaConverterHandle,
-      final long responseFromJavaConverterHandle, final long responseToJavaConverterHandle) {
+      final long requestFromJavaConverterHandle,
+      final long requestToJavaConverterHandle,
+      final long responseFromJavaConverterHandle,
+      final long responseToJavaConverterHandle) {
     this.nodeReference = nodeReference;
     this.nodeHandle = nodeHandle;
     this.clientHandle = clientHandle;
@@ -67,19 +69,21 @@ public class Client<T> {
     this.pendingRequests = new HashMap<Long, RCLFuture>();
   }
 
-  public <U, V> Future<V> sendRequest(U request) {
-    synchronized(pendingRequests) {
+  public final <U, V> Future<V> sendRequest(final U request) {
+    synchronized (pendingRequests) {
       sequenceNumber++;
       nativeSendClientRequest(clientHandle, sequenceNumber,
-      requestFromJavaConverterHandle, requestToJavaConverterHandle, request);
+          requestFromJavaConverterHandle, requestToJavaConverterHandle,
+          request);
       RCLFuture<V> future = new RCLFuture<V>(this.nodeReference);
       pendingRequests.put(sequenceNumber, future);
       return future;
     }
   }
 
-  public <U> void handleResponse(RMWRequestId header, U response) {
-    synchronized(pendingRequests) {
+  public final <U> void handleResponse(final RMWRequestId header,
+      final U response) {
+    synchronized (pendingRequests) {
       long sequenceNumber = header.sequenceNumber;
       RCLFuture<U> future = pendingRequests.remove(sequenceNumber);
       future.set(response);
@@ -94,9 +98,9 @@ public class Client<T> {
     return clientHandle;
   }
 
-  private static native void nativeSendClientRequest(long clientHandle, long sequenceNumber,
-      long requestFromJavaConverterHandle, long requestToJavaConverterHandle, Object requestMessage);
-
+  private static native void nativeSendClientRequest(long clientHandle,
+      long sequenceNumber, long requestFromJavaConverterHandle,
+      long requestToJavaConverterHandle, Object requestMessage);
 
   public final long getRequestFromJavaConverterHandle() {
     return this.requestFromJavaConverterHandle;

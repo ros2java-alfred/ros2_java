@@ -22,7 +22,7 @@ import org.junit.Test;
 public class NodeTest {
 
   @Test
-  public void testCreate() {
+  public final void testCreate() {
     RCLJava.rclJavaInit();
     Node node = RCLJava.createNode("test_node");
     assertNotEquals(0, node.getNodeHandle());

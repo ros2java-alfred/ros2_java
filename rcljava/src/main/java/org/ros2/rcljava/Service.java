@@ -36,8 +36,10 @@ public class Service<T> {
       final Class<T> serviceType, final String serviceName,
       final TriConsumer<RMWRequestId, ?, ?> callback,
       final Class requestType, final Class responseType,
-      final long requestFromJavaConverterHandle, final long requestToJavaConverterHandle,
-      final long responseFromJavaConverterHandle, final long responseToJavaConverterHandle) {
+      final long requestFromJavaConverterHandle,
+      final long requestToJavaConverterHandle,
+      final long responseFromJavaConverterHandle,
+      final long responseToJavaConverterHandle) {
     this.nodeHandle = nodeHandle;
     this.serviceHandle = serviceHandle;
     this.serviceType = serviceType;

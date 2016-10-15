@@ -16,7 +16,7 @@
 package org.ros2.rcljava;
 
 /**
- * Based on {@link java.util.funcion.BiConsumer}
+ * Based on {@link java.util.funcion.BiConsumer}.
  *
  * @param <T> - the type of the first input to the operation
  * @param <U> - the type of the second input to the operation
