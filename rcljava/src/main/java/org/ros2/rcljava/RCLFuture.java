@@ -34,18 +34,47 @@ public class RCLFuture<V> implements Future<V> {
   public final V get() throws InterruptedException, ExecutionException {
     while (RCLJava.ok() && !isDone()) {
       Node node = nodeReference.get();
-      if (node != null) {
-        RCLJava.spinOnce(node);
-      } else {
+      if (node == null) {
         return null; // TODO(esteve) do something
       }
+
+      RCLJava.spinOnce(node);
     }
     return value;
   }
 
   public final V get(final long timeout, final TimeUnit unit) throws
       InterruptedException, ExecutionException, TimeoutException {
-    return null;
+    if (isDone()) {
+      return value;
+    }
+
+    long endTime = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+
+    long timeoutNS = TimeUnit.NANOSECONDS.convert(timeout, unit);
+
+    if (timeoutNS > 0) {
+      endTime += timeoutNS;
+    }
+
+    while (RCLJava.ok()) {
+      Node node = nodeReference.get();
+      if (node == null) {
+        return null; // TODO(esteve) do something
+      }
+
+      RCLJava.spinOnce(node);
+
+      if (isDone()) {
+        return value;
+      }
+
+      long now = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+      if (now >= endTime) {
+        throw new TimeoutException();
+      }
+    }
+    throw new InterruptedException();
   }
 
   public final boolean isDone() {

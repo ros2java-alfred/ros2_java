@@ -15,16 +15,61 @@
 
 package org.ros2.rcljava;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
+import java.lang.ref.WeakReference;
+
 public class NodeTest {
+
+  public class TestConsumer implements Consumer<std_msgs.msg.String> {
+    private final RCLFuture future;
+
+    TestConsumer(final RCLFuture<std_msgs.msg.String> future) {
+      this.future = future;
+    }
+
+    public final void accept(final std_msgs.msg.String msg) {
+      if(!this.future.isDone()) {
+        this.future.set(msg);
+      }
+    }
+  }
 
   @Test
   public final void testCreate() {
     RCLJava.rclJavaInit();
     Node node = RCLJava.createNode("test_node");
     assertNotEquals(0, node.getNodeHandle());
+  }
+
+  @Test
+  public final void testPubSub() throws Exception {
+    RCLJava.rclJavaInit();
+    Node node = RCLJava.createNode("test_node");
+    assertNotEquals(0, node.getNodeHandle());
+
+    Publisher<std_msgs.msg.String> publisher = node
+        .<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
+        "test_topic");
+
+    RCLFuture<std_msgs.msg.String> future = new RCLFuture<std_msgs.msg.String>(new WeakReference<Node>(node));
+
+    Subscription<std_msgs.msg.String> subscription = node
+        .<std_msgs.msg.String>createSubscription(std_msgs.msg.String.class,
+        "test_topic", new TestConsumer(future));
+
+    std_msgs.msg.String msg = new std_msgs.msg.String();
+    msg.setData("Hello");
+
+    while (RCLJava.ok() && !future.isDone()) {
+      publisher.publish(msg);
+      RCLJava.spinOnce(node);
+    }
+
+    std_msgs.msg.String value = future.get();
+    assertEquals("Hello", value.getData());
   }
 }
