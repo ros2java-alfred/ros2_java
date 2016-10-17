@@ -2,7 +2,7 @@
 // generated code does not contain a copyright notice
 
 @##########################################################################
-@# EmPy template for generating <msg> files for Java
+@# EmPy template for generating <srv> files for Java
 @# Context:
 @#  - spec (rosidl_parser.MessageSpecification)
 @#    Parsed specification of the .msg file
