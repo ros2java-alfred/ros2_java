@@ -230,6 +230,7 @@ static jmethodID global_@(internalMsg(type))_from_java_converter_mid;
   // Initialize ROS Native message.
   if (ros_message == nullptr) {
     ros_message = @(msg_typename)__create();
+    assert(ros_message != nullptr);
   }
 @
 @## Loop on fields
@@ -342,7 +343,6 @@ static jmethodID global_@(internalMsg(type))_from_java_converter_mid;
     const char * _str_@(field.name) = env->GetStringUTFChars(_jvalue_@(field.name), 0);
     rosidl_generator_c__String__assign(&ros_message->@(field.name), _str_@(field.name));
     env->ReleaseStringUTFChars(_jvalue_@(field.name), _str_@(field.name));
-    env->DeleteLocalRef(_jvalue_@(field.name));
   }
 @[    elif field.type.type == 'bool']@
   ros_message->@(field.name) = env->GetBooleanField(_jmessage_obj, jmessage_field_@(field.name)_fid);
@@ -403,6 +403,7 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
   // Initialize ROS Java message.
   if (_jmessage_obj == nullptr) {
     _jmessage_obj = env->NewObject(jmessage_class, jmessage_constructor);
+    assert(_jmessage_obj != nullptr);
   }
 @## Loop on fields
 @[for field in spec.fields]@
@@ -554,13 +555,16 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
     g_vm = vm;
 
     JNIEnv* env;
-    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+    if (g_vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
       return JNI_ERR;
     } else {
       //// Add Message Java
       jclass _jmessage_class = env->FindClass("@(spec.base_type.pkg_name)/@(subfolder)/@(spec.base_type.type)");
-      jmessage_class = (jclass) env->NewGlobalRef(_jmessage_class);
+      jmessage_class = reinterpret_cast<jclass> (env->NewGlobalRef(_jmessage_class));
+      env->DeleteLocalRef(_jmessage_class);
+      assert(jmessage_class != nullptr);
       jmessage_constructor = env->GetMethodID(jmessage_class, "<init>", "()V");
+      assert(jmessage_constructor != nullptr);
 
       //// Add Fields Java
 @[for field in spec.fields]@
@@ -568,6 +572,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       // @(field.name) field. (@(field.type))
 @[  if field.type.is_array]@
       jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "Ljava/util/List;");
+      assert(jmessage_field_@(field.name)_fid != nullptr);
 @[  elif field.type.type == 'bool']@
       jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "Z");
 @[  elif field.type.type in ['byte', 'int8', 'uint8']]@
@@ -585,7 +590,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
 @[  elif field.type.type == 'float64']@
       jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "D");
 @[  elif field.type.type == 'string']@
-      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "Ljava/lang/String");
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "Ljava/lang/String;");
+      assert(jmessage_field_@(field.name)_fid != nullptr);
 @[  else]@
       jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "L@(field.type.pkg_name)/msg/@(get_java_type(field.type));");
       assert(jmessage_field_@(field.name)_fid != nullptr);
@@ -597,6 +603,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
 @[if has_array]@
       jclass _list_class = env->FindClass("java/util/ArrayList");
       global_jlist_class = (jclass) env->NewGlobalRef(_list_class);
+      env->DeleteLocalRef(_jmessage_class);
+      assert(jmessage_class != nullptr);
       global_jlist_init_mid = env->GetMethodID(global_jlist_class, "<init>", "()V");
       global_jlist_add_mid  = env->GetMethodID(global_jlist_class, "add", "(Ljava/lang/Object;)Z");
       global_jlist_get_mid  = env->GetMethodID(global_jlist_class, "get", "(I)Ljava/lang/Object;");
@@ -609,6 +617,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       // Bool Type
       jclass _jbool_class = env->FindClass("java/lang/Boolean");
       global_jbool_class = (jclass) env->NewGlobalRef(_jbool_class);
+      env->DeleteLocalRef(_jbool_class);
+      assert(global_jbool_class != nullptr);
       global_jbool_init_mid  = env->GetMethodID(global_jbool_class, "<init>", "(Z)V");
       global_jbool_value_mid = env->GetMethodID(global_jbool_class, "booleanValue", "()Z");
 
@@ -618,6 +628,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       // Byte Type
       jclass _jbyte_class = env->FindClass("java/lang/Byte");
       global_jbyte_class = (jclass) env->NewGlobalRef(_jbyte_class);
+      env->DeleteLocalRef(_jbyte_class);
+      assert(global_jbyte_class != nullptr);
       global_jbyte_init_mid  = env->GetMethodID(global_jbyte_class, "<init>", "(B)V");
       global_jbyte_value_mid = env->GetMethodID(global_jbyte_class, "byteValue", "()B");
 
@@ -627,6 +639,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       // Char Type
       jclass _jchar_class = env->FindClass("java/lang/Char");
       global_jchar_class = (jclass) env->NewGlobalRef(_jchar_class);
+      env->DeleteLocalRef(_jchar_class);
+      assert(global_jchar_class != nullptr);
       global_jchar_init_mid  = env->GetMethodID(global_jchar_class, "<init>", "(C)V");
       global_jchar_value_mid = env->GetMethodID(global_jchar_class, "charValue", "()C");
 
@@ -636,6 +650,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       // Short Type
       jclass _jshort_class = env->FindClass("java/lang/Short");
       global_jshort_class = (jclass) env->NewGlobalRef(_jshort_class);
+      env->DeleteLocalRef(_jshort_class);
+      assert(global_jshort_class != nullptr);
       global_jshort_init_mid  = env->GetMethodID(global_jshort_class, "<init>", "(S)V");
       global_jshort_value_mid = env->GetMethodID(global_jshort_class, "shortValue", "()S");
 
@@ -645,6 +661,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       // Integer Type
       jclass _jint_class = env->FindClass("java/lang/Integer");
       global_jint_class = (jclass) env->NewGlobalRef(_jint_class);
+      env->DeleteLocalRef(_jint_class);
+      assert(global_jint_class != nullptr);
       global_jint_init_mid  = env->GetMethodID(global_jint_class, "<init>", "(I)V");
       global_jint_value_mid = env->GetMethodID(global_jint_class, "intValue", "()I");
 
@@ -654,6 +672,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       // Long Type
       jclass _jlong_class = env->FindClass("java/lang/Long");
       global_jlong_class = (jclass) env->NewGlobalRef(_jlong_class);
+      env->DeleteLocalRef(_jlong_class);
+      assert(global_jlong_class != nullptr);
       global_jlong_init_mid  = env->GetMethodID(global_jlong_class, "<init>", "(J)V");
       global_jlong_value_mid = env->GetMethodID(global_jlong_class, "longValue", "()J");
 
@@ -663,6 +683,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       // Float Type
       jclass _jfloat_class = env->FindClass("java/lang/Float");
       global_jfloat_class = (jclass) env->NewGlobalRef(_jfloat_class);
+      env->DeleteLocalRef(_jfloat_class);
+      assert(global_jfloat_class != nullptr);
       global_jfloat_init_mid  = env->GetMethodID(global_jfloat_class, "<init>", "(F)V");
       global_jfloat_value_mid = env->GetMethodID(global_jfloat_class, "floatValue", "()F");
 
@@ -672,6 +694,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       // Double Type
       jclass _jdouble_class = env->FindClass("java/lang/Double");
       global_jdouble_class = (jclass) env->NewGlobalRef(_jdouble_class);
+      env->DeleteLocalRef(_jdouble_class);
+      assert(global_jdouble_class != nullptr);
       global_jdouble_init_mid  = env->GetMethodID(global_jdouble_class, "<init>", "(D)V");
       global_jdouble_value_mid = env->GetMethodID(global_jdouble_class, "doubleValue", "()D");
 
@@ -684,96 +708,100 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       jclass _@(internalMsg(type))_class = env->FindClass("@(type.pkg_name)/msg/@(get_java_type(type))");
       assert(_@(internalMsg(type))_class != nullptr);
       global_@(internalMsg(type))_class = (jclass) env->NewGlobalRef(_@(internalMsg(type))_class);
+      env->DeleteLocalRef(_@(internalMsg(type))_class);
+      assert(global_@(internalMsg(type))_class != nullptr);
       global_@(internalMsg(type))_to_java_converter_mid = env->GetStaticMethodID(global_@(internalMsg(type))_class, "getToJavaConverter", "()J");
       global_@(internalMsg(type))_from_java_converter_mid = env->GetStaticMethodID(global_@(internalMsg(type))_class, "getFromJavaConverter", "()J");
 
 @[end for]@
-      }
+@
+    }
   }
 
   return JNI_VERSION_1_6;
 }
 
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void*) {
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *, void*) {
   JNIEnv* env;
-  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+  if (g_vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return;
   } else {
     // delete global references so the GC can collect them
-    if (jmessage_class != NULL) {
+    if (jmessage_class != nullptr) {
       env->DeleteGlobalRef(jmessage_class);
     }
 
 @[if has_array]@
-    if (global_jlist_class != NULL) {
+    if (global_jlist_class != nullptr) {
       env->DeleteGlobalRef(global_jlist_class);
     }
 
 @[end if]@
 @
 @[if has_bool]@
-    if (global_jbool_class != NULL) {
+    if (global_jbool_class != nullptr) {
       env->DeleteGlobalRef(global_jbool_class);
     }
 
 @[end if]@
 @
 @[if has_byte]@
-    if (global_jbyte_class != NULL) {
+    if (global_jbyte_class != nullptr) {
       env->DeleteGlobalRef(global_jbyte_class);
     }
 
 @[end if]@
 @
 @[if has_char]@
-    if (global_jchar_class != NULL) {
+    if (global_jchar_class != nullptr) {
       env->DeleteGlobalRef(global_jchar_class);
     }
 
 @[end if]@
 @
 @[if has_short]@
-    if (global_jshort_class != NULL) {
+    if (global_jshort_class != nullptr) {
       env->DeleteGlobalRef(global_jshort_class);
     }
 
 @[end if]@
 @
 @[if has_int]@
-    if (global_jint_class != NULL) {
+    if (global_jint_class != nullptr) {
       env->DeleteGlobalRef(global_jint_class);
     }
 
 @[end if]@
 @
 @[if has_long]@
-    if (global_jlong_class != NULL) {
+    if (global_jlong_class != nullptr) {
       env->DeleteGlobalRef(global_jlong_class);
     }
 
 @[end if]@
 @
 @[if has_float]@
-    if (global_jfloat_class != NULL) {
+    if (global_jfloat_class != nullptr) {
       env->DeleteGlobalRef(global_jfloat_class);
     }
 
 @[end if]@
 @
 @[if has_double]@
-    if (global_jdouble_class != NULL) {
+    if (global_jdouble_class != nullptr) {
       env->DeleteGlobalRef(global_jdouble_class);
     }
 
 @[end if]@
 @
 @[for type in use_types]@
-    if (global_@(internalMsg(type))_class != NULL) {
+    if (global_@(internalMsg(type))_class != nullptr) {
       env->DeleteGlobalRef(global_@(internalMsg(type))_class);
     }
 
 @[end for]@
   }
+  return;
 }
 
 
