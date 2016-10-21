@@ -263,9 +263,9 @@ public class RCLJava {
             throw new NotInitializedException();
         }
 
-        if (node.getClients().size() > 0 &&
-                node.getPublishers().size() > 0 &&
-                node.getServices().size() > 0 &&
+        if (node.getClients().size() > 0 ||
+                node.getPublishers().size() > 0 ||
+                node.getServices().size() > 0 ||
                 node.getSubscriptions().size() > 0) {
             long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
 
