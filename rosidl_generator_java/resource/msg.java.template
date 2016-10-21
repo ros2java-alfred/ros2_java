@@ -26,7 +26,9 @@ import org.ros2.rcljava.internal.message.Message;
 
 @[for field in spec.fields]@
 @[    if not field.type.is_primitive_type()]@
+@
 import @(field.type.pkg_name).msg.@(field.type.type);
+@
 @[    end if]@
 @[end for]@
 
@@ -47,12 +49,16 @@ public final class @(type_name) implements Message {
 
     // CONSTANTS
 @[for constant in spec.constants]@
+@
     public static final @(get_builtin_java_type(constant.type)) @(constant.name) = @(constant_value_to_java(constant.type, constant.value));
+@
 @[end for]@
 
     // FIELDS
 @[for field in spec.fields]@
+@
 @[    if field.type.is_array]@
+@
     /** List of @(field.name). */
     private java.util.List<@(get_java_type(field.type, use_primitives=False))> @(field.name) = new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>();
 
@@ -76,13 +82,21 @@ public final class @(type_name) implements Message {
         }
         return new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>(this.@(field.name));
     }
+@
 @[    else]@
+@
     /** @(field.name) field. */
+@
 @[        if (not field.type.is_primitive_type()) or (field.type.type == "string") ]@
+@
     private @(get_java_type(field.type)) @(field.name) = new @(get_java_type(field.type))();
+@
 @[        else]@
+@
     private @(get_java_type(field.type)) @(field.name);
+@
 @[        end if]@
+@
 
     /**
      * @(upperfirst(field.name)) setter.
@@ -99,7 +113,9 @@ public final class @(type_name) implements Message {
     public final @(get_java_type(field.type)) get@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))() {
         return this.@(field.name);
     }
+@
 @[    end if]@
+@
 
 @[end for]@
 }

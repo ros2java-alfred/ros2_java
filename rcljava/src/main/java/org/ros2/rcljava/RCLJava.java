@@ -263,105 +263,117 @@ public class RCLJava {
             throw new NotInitializedException();
         }
 
-        long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
+        if (node.getClients().size() > 0 &&
+                node.getPublishers().size() > 0 &&
+                node.getServices().size() > 0 &&
+                node.getSubscriptions().size() > 0) {
+            long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
 
-        RCLJava.nativeWaitSetInit(
-                waitSetHandle,
-                node.getSubscriptions().size(),
-                0,
-                0,
-                node.getClients().size(),
-                node.getServices().size());
+            RCLJava.nativeWaitSetInit(
+                    waitSetHandle,
+                    node.getSubscriptions().size(),
+                    0,
+                    0,
+                    node.getClients().size(),
+                    node.getServices().size());
 
-        RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
-        RCLJava.nativeWaitSetClearServices(waitSetHandle);
-        RCLJava.nativeWaitSetClearClients(waitSetHandle);
+            RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
+            RCLJava.nativeWaitSetClearServices(waitSetHandle);
+            RCLJava.nativeWaitSetClearClients(waitSetHandle);
 
-        for (Subscription<?> subscription : node.getSubscriptions()) {
-            RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
-        }
-
-        for (Service<?> service : node.getServices()) {
-            RCLJava.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
-        }
-
-        for (Client<?> client : node.getClients()) {
-            RCLJava.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
-        }
-
-        RCLJava.nativeWait(waitSetHandle);
-        RCLJava.nativeWaitSetFini(waitSetHandle);
-
-        for (Subscription subscription : node.getSubscriptions()) {
-            Message message = RCLJava.nativeTake(subscription.getSubscriptionHandle(), subscription.getMessageType());
-            if (message != null) {
-                subscription.getCallback().accept(message);
+            for (Subscription<?> subscription : node.getSubscriptions()) {
+                RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
             }
-        }
 
-        for (Service service : node.getServices()) {
-            long requestFromJavaConverterHandle = service.getRequestFromJavaConverterHandle();
-            long requestToJavaConverterHandle = service.getRequestToJavaConverterHandle();
-            long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
-            long responseToJavaConverterHandle = service.getResponseToJavaConverterHandle();
+            for (Service<?> service : node.getServices()) {
+                RCLJava.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
+            }
 
-            Class<?> requestType = service.getRequestType();
-            Class<?> responseType = service.getResponseType();
+            for (Client<?> client : node.getClients()) {
+                RCLJava.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
+            }
 
-            Object requestMessage = null;
-            Object responseMessage = null;
+            RCLJava.nativeWait(waitSetHandle);
+            RCLJava.nativeWaitSetFini(waitSetHandle);
 
+            for (Subscription subscription : node.getSubscriptions()) {
+                Message message = RCLJava.nativeTake(subscription.getSubscriptionHandle(), subscription.getMessageType());
+                if (message != null) {
+                    subscription.getCallback().accept(message);
+                }
+            }
+
+            for (Service service : node.getServices()) {
+                long requestFromJavaConverterHandle = service.getRequestFromJavaConverterHandle();
+                long requestToJavaConverterHandle = service.getRequestToJavaConverterHandle();
+                long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
+                long responseToJavaConverterHandle = service.getResponseToJavaConverterHandle();
+
+                Class<?> requestType = service.getRequestType();
+                Class<?> responseType = service.getResponseType();
+
+                Object requestMessage = null;
+                Object responseMessage = null;
+
+                try {
+                    requestMessage = requestType.newInstance();
+                    responseMessage = responseType.newInstance();
+                } catch (InstantiationException ie) {
+                    ie.printStackTrace();
+                    continue;
+                } catch (IllegalAccessException iae) {
+                    iae.printStackTrace();
+                    continue;
+                }
+
+                RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
+                        service.getServiceHandle(),
+                        requestFromJavaConverterHandle,
+                        requestToJavaConverterHandle,
+                        requestMessage);
+
+                if (rmwRequestId != null) {
+                    service.getCallback().accept(rmwRequestId, requestMessage, responseMessage);
+                    RCLJava.nativeSendServiceResponse(service.getServiceHandle(), rmwRequestId, responseFromJavaConverterHandle,
+                            responseToJavaConverterHandle, responseMessage);
+                }
+            }
+
+            for (Client<?> client : node.getClients()) {
+                long responseFromJavaConverterHandle = client.getResponseFromJavaConverterHandle();
+                long responseToJavaConverterHandle = client.getResponseToJavaConverterHandle();
+
+                Class<?> responseType = client.getResponseType();
+
+                Object responseMessage = null;
+
+                try {
+                    responseMessage = responseType.newInstance();
+                } catch (InstantiationException ie) {
+                    ie.printStackTrace();
+                    continue;
+                } catch (IllegalAccessException iae) {
+                    iae.printStackTrace();
+                    continue;
+                }
+
+                RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeResponse(
+                        client.getClientHandle(),
+                        responseFromJavaConverterHandle,
+                        responseToJavaConverterHandle,
+                        responseMessage);
+
+
+                if (rmwRequestId != null) {
+                    client.handleResponse(rmwRequestId, responseMessage);
+                }
+            }
+        } else {
+            // TODO fix to rate sleep.
             try {
-                requestMessage = requestType.newInstance();
-                responseMessage = responseType.newInstance();
-            } catch (InstantiationException ie) {
-                ie.printStackTrace();
-                continue;
-            } catch (IllegalAccessException iae) {
-                iae.printStackTrace();
-                continue;
-            }
-
-            RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
-                    service.getServiceHandle(),
-                    requestFromJavaConverterHandle,
-                    requestToJavaConverterHandle,
-                    requestMessage);
-
-            if (rmwRequestId != null) {
-                service.getCallback().accept(rmwRequestId, requestMessage, responseMessage);
-                RCLJava.nativeSendServiceResponse(service.getServiceHandle(), rmwRequestId, responseFromJavaConverterHandle,
-                        responseToJavaConverterHandle, responseMessage);
-            }
-        }
-
-        for (Client<?> client : node.getClients()) {
-            long responseFromJavaConverterHandle = client.getResponseFromJavaConverterHandle();
-            long responseToJavaConverterHandle = client.getResponseToJavaConverterHandle();
-
-            Class<?> responseType = client.getResponseType();
-
-            Object responseMessage = null;
-
-            try {
-                responseMessage = responseType.newInstance();
-            } catch (InstantiationException ie) {
-                ie.printStackTrace();
-                continue;
-            } catch (IllegalAccessException iae) {
-                iae.printStackTrace();
-                continue;
-            }
-
-            RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeResponse(
-                    client.getClientHandle(),
-                    responseFromJavaConverterHandle,
-                    responseToJavaConverterHandle,
-                    responseMessage);
-
-
-            if (rmwRequestId != null) {
-                client.handleResponse(rmwRequestId, responseMessage);
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
