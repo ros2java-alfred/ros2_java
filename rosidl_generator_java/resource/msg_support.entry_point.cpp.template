@@ -633,8 +633,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
 @[if has_array]@
       jclass _list_class = env->FindClass("java/util/ArrayList");
       global_jlist_class = (jclass) env->NewGlobalRef(_list_class);
-      env->DeleteLocalRef(_jmessage_class);
-      assert(jmessage_class != nullptr);
+      env->DeleteLocalRef(_list_class);
+      assert(global_jlist_class != nullptr);
       global_jlist_init_mid = env->GetMethodID(global_jlist_class, "<init>", "()V");
       global_jlist_add_mid  = env->GetMethodID(global_jlist_class, "add", "(Ljava/lang/Object;)Z");
       global_jlist_get_mid  = env->GetMethodID(global_jlist_class, "get", "(I)Ljava/lang/Object;");
