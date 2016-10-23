@@ -20,6 +20,7 @@ import java.util.List;
 import org.ros2.rcljava.QoSProfile;
 import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.parameter.ParameterVariant;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceConsumer;
@@ -27,6 +28,8 @@ import org.ros2.rcljava.node.service.TriConsumer;
 import org.ros2.rcljava.node.topic.Consumer;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
+
+import rcl_interfaces.msg.SetParametersResult;
 
 /**
  * ROS2 Client API.
@@ -140,17 +143,17 @@ public interface INode {
             final String serviceName,
             final TriConsumer<RMWRequestId, ?, ?> callback) throws Exception;
 
-    List<Object> setParameters(List<Object> parameters);
+    List<SetParametersResult> setParameters(final List<ParameterVariant<?>> parameters);
 
-    List<Object> getParameters(List<String> names);
+    List<ParameterVariant<?>> getParameters(final List<String> names);
 
-    Object getParameter(String name);
+    ParameterVariant<?> getParameter(final String name);
 
     HashMap<String, String> getTopicNamesAndTypes();
 
-    int countPublishers(String topic);
+    int countPublishers(final String topic);
 
-    int countSubscribers(String topic);
+    int countSubscribers(final String topic);
 
     /**
      * Return the rcl_node_t node handle (non-const version).

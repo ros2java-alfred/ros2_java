@@ -8,6 +8,9 @@ find_package(rcl REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(rcljava_common REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(rcl_interfaces REQUIRED)
+find_package(builtin_interfaces REQUIRED)
 find_package(JavaExtra MODULE)
 
 
@@ -39,6 +42,8 @@ find_jar(JUNIT_JAR NAMES junit PATHS /usr/share/java VERSIONS 4)
 find_jar(LOG_JAR NAMES commons-logging PATHS /usr/share/java )
 find_jar(STD_MSGS_JARS NAMES std_msgs
   PATHS "${CMAKE_BINARY_DIR}/../std_msgs/")
+find_jar(RCLINTERFACE_MSGS_JARS NAMES rcl_interfaces
+  PATHS "${CMAKE_BINARY_DIR}/../rcl_interfaces/")
 find_jar(BUILTIN_MSGS_JARS NAMES builtin_interfaces
   PATHS "${CMAKE_BINARY_DIR}/../builtin_interfaces/")
 find_jar(BUILTIN_COMMON_JARS NAMES rosidl_generator_java
@@ -46,6 +51,7 @@ find_jar(BUILTIN_COMMON_JARS NAMES rosidl_generator_java
 
 set(STD_MSGS_JARS "${CMAKE_BINARY_DIR}/../std_msgs/std_msgs.jar")
 set(BUILTIN_MSGS_JARS "${CMAKE_BINARY_DIR}/../builtin_interfaces/builtin_interfaces.jar")
+set(RCLINTERFACE_MSGS_JARS NAMES "${CMAKE_BINARY_DIR}/../rcl_interfaces/rcl_interfaces.jar")
 set(BUILTIN_COMMON_JARS NAMES "${CMAKE_BINARY_DIR}/../rosjava_common/rosjava_common.jar")
 
 # Bug in find_jar for Junit4 : https://sourceforge.net/p/rdkit/mailman/message/35301727/
@@ -68,10 +74,10 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/node/service/Service.java"
   "src/main/java/org/ros2/rcljava/node/service/ServiceConsumer.java"
   "src/main/java/org/ros2/rcljava/node/service/TriConsumer.java"
-#  "src/main/java/org/ros2/rcljava/node/parameter/ParameterConsumer.java"
-#  "src/main/java/org/ros2/rcljava/node/parameter/ParameterService.java"
-#  "src/main/java/org/ros2/rcljava/node/parameter/ParameterVariant.java"
-#  "src/main/java/org/ros2/rcljava/node/parameter/SyncParametersClient.java"
+  "src/main/java/org/ros2/rcljava/node/parameter/ParameterConsumer.java"
+  "src/main/java/org/ros2/rcljava/node/parameter/ParameterService.java"
+  "src/main/java/org/ros2/rcljava/node/parameter/ParameterVariant.java"
+  "src/main/java/org/ros2/rcljava/node/parameter/SyncParametersClient.java"
   "src/main/java/org/ros2/rcljava/exception/ImplementationAlreadyImportedException.java"
   "src/main/java/org/ros2/rcljava/exception/InvalidRCLJAVAImplementation.java"
   "src/main/java/org/ros2/rcljava/exception/NoImplementationAvailableException.java"
@@ -147,6 +153,8 @@ add_jar("${PROJECT_NAME}_jar"
   "${${PROJECT_NAME}_sources}"
   INCLUDE_JARS
   "${std_msgs_JARS}"
+  "${rcl_interfaces_JARS}"
+  "${builtin_interfaces_JARS}"
   "${rcljava_common_JARS}"
   "${_jar_file}"
   OUTPUT_NAME

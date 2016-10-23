@@ -12,6 +12,7 @@ has_int    = 0;
 has_long   = 0;
 has_float  = 0;
 has_double = 0;
+has_string = 0;
 use_types  = [];
 
 for field in spec.fields:
@@ -25,6 +26,7 @@ for field in spec.fields:
         if field.type.type in ['int64', 'uint64'] : has_long = 1;
         if field.type.type == 'float32' : has_float = 1;
         if field.type.type == 'float64' : has_double = 1;
+        if field.type.type == 'string' : has_string = 1;
     else:
         # Make disctinc list of message
         use_types.append(field.type);
@@ -69,12 +71,20 @@ msg_typename = '%s__%s__%s' % (spec.base_type.pkg_name, subfolder, spec.base_typ
 #include <@(spec.base_type.pkg_name)/@(subfolder)/@(module_name).h>
 #include <rosidl_generator_c/message_type_support.h>
 
+@[if has_string]@
+@
 #include <rosidl_generator_c/string.h>
 #include <rosidl_generator_c/string_functions.h>
 
+@[end if]@
+@
+@[if has_array]@
+@
 #include <rosidl_generator_c/primitives_array.h>
 #include <rosidl_generator_c/primitives_array_functions.h>
 
+@[end if]@
+@
 @#### Include internal function
 @[for type in use_types]@
 @
@@ -205,6 +215,13 @@ static jmethodID global_jdouble_init_mid;
 
 @[end if]@
 @
+@[if has_string]@
+//static jclass    global_jstring_class;
+//static jmethodID global_jstring_value_mid;
+//static jmethodID global_jstring_init_mid;
+
+@[end if]@
+@
 @[for type in use_types]@
 static jclass    global_@(internalMsg(type))_class;
 static jmethodID global_@(internalMsg(type))_to_java_converter_mid;
@@ -311,9 +328,13 @@ static jmethodID global_@(internalMsg(type))_from_java_converter_mid;
 @[      elif field.type.type == 'float64']@
         _dest_@(field.name)[i] = env->CallDoubleMethod(element, global_jdouble_value_mid);
 @[      elif field.type.type == 'string']@
-        // TODO(esteve): add support for strings
-        assert(false);
 @
+        jstring _jvalue_@(field.name) = static_cast<jstring>(element);
+        if (_jvalue_@(field.name) != nullptr) {
+          const char * _str_@(field.name) = env->GetStringUTFChars(_jvalue_@(field.name), 0);
+          rosidl_generator_c__String__assign(&_dest_@(field.name)[i], _str_@(field.name));
+          env->ReleaseStringUTFChars(_jvalue_@(field.name), _str_@(field.name));
+        }
 @[      end if]@
 @
 @[    else]@
@@ -361,6 +382,7 @@ static jmethodID global_@(internalMsg(type))_from_java_converter_mid;
 @[    elif field.type.type == 'float64']@
   ros_message->@(field.name) = env->GetDoubleField(_jmessage_obj, jmessage_field_@(field.name)_fid);
 @[    else]@
+@
   jobject _jfield_@(field.name)_obj = env->GetObjectField(_jmessage_obj, jmessage_field_@(field.name)_fid);
   if (_jfield_@(field.name)_obj != nullptr) {
 
@@ -454,6 +476,7 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
 @[      elif field.type.type == 'float64']@
     jobject _jlist_@(field.name)_element = env->NewObject(global_jdouble_class, global_jdouble_init_mid, _ros_message->@(field.name).data[i]);
 @[      else]@
+@
     jlong _jfield_@(field.name)_to_java_converter_ptr = env->CallStaticLongMethod(global_@(internalMsg(field.type))_class, global_@(internalMsg(field.type))_to_java_converter_mid);
     using _convert_to_java_signature_@(field.name) = jobject (*)(@(field.type.pkg_name)__msg__@(get_java_type(field.type)) *, jobject);
     _convert_to_java_signature_@(field.name) convert_to_java_@(field.name) = reinterpret_cast<_convert_to_java_signature_@(field.name)>(_jfield_@(field.name)_to_java_converter_ptr);
@@ -486,12 +509,15 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
 @[      elif field.type.type == 'float64']@
     jobject _jlist_@(field.name)_element = env->NewObject(global_jdouble_class, global_jdouble_init_mid, _ros_message->@(field.name)[i]);
 @[      else]@
+@
     jlong _jfield_@(field.name)_to_java_converter_ptr = env->CallStaticLongMethod(global_@(internalMsg(field.type))_class, global_@(internalMsg(field.type))_to_java_converter_mid);
     using _convert_to_java_signature_@(field.name) = jobject (*)(@(field.type.pkg_name)__msg__@(get_java_type(field.type)) *, jobject);
     _convert_to_java_signature_@(field.name) convert_to_java_@(field.name) = reinterpret_cast<_convert_to_java_signature_@(field.name)>(_jfield_@(field.name)_to_java_converter_ptr);
     jobject _jlist_@(field.name)_element = convert_to_java_@(field.name)(&(_ros_message->@(field.name)[i]), nullptr);
 @[      end if]@
 @[    end if]@
+@
+    // TODO (Theos) check why are not element...
     if (_jlist_@(field.name)_element != nullptr) {
       jboolean _jlist_@(field.name)_add_result = env->CallBooleanMethod(_jarray_list_@(field.name)_obj, global_jlist_add_mid, _jlist_@(field.name)_element);
       assert(_jlist_@(field.name)_add_result);
@@ -505,9 +531,11 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
 @
   // Convert @(field.name) field. (@(field.type))
 @[        if field.type.type == 'string']@
+@
   if (_ros_message->@(field.name).data != nullptr) {
       env->SetObjectField(_jmessage_obj, jmessage_field_@(field.name)_fid, env->NewStringUTF(_ros_message->@(field.name).data));
   }
+@
 @[        elif field.type.type == 'bool']@
   env->SetBooleanField(_jmessage_obj, jmessage_field_@(field.name)_fid, _ros_message->@(field.name));
 @[        elif field.type.type in ['byte', 'int8', 'uint8']]@
@@ -525,12 +553,14 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
 @[        elif field.type.type == 'float64']@
   env->SetDoubleField(_jmessage_obj, jmessage_field_@(field.name)_fid, _ros_message->@(field.name));
 @[        else]@
+@
   jlong _jfield_@(field.name)_to_java_converter_ptr = env->CallStaticLongMethod(global_@(internalMsg(field.type))_class, global_@(internalMsg(field.type))_to_java_converter_mid);
   using _convert_to_java_signature_@(field.name) = jobject (*)(@(field.type.pkg_name)__msg__@(get_java_type(field.type)) *, jobject);
   _convert_to_java_signature_@(field.name) convert_to_java_@(field.name) = reinterpret_cast<_convert_to_java_signature_@(field.name)>(_jfield_@(field.name)_to_java_converter_ptr);
   jobject _jfield_@(field.name)_obj = convert_to_java_@(field.name)(&(_ros_message->@(field.name)), nullptr);
 
   env->SetObjectField(_jmessage_obj, jmessage_field_@(field.name)_fid, _jfield_@(field.name)_obj);
+@
 @[        end if]@
 @
 @[  end if]@
@@ -698,6 +728,17 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       assert(global_jdouble_class != nullptr);
       global_jdouble_init_mid  = env->GetMethodID(global_jdouble_class, "<init>", "(D)V");
       global_jdouble_value_mid = env->GetMethodID(global_jdouble_class, "doubleValue", "()D");
+
+@[end if]@
+@
+@[if has_string]@
+//      // String Type
+//      jclass _jstring_class = env->FindClass("java/lang/String");
+//      global_jstring_class = (jclass) env->NewGlobalRef(_jstring_class);
+//      env->DeleteLocalRef(_jstring_class);
+//      assert(global_jstring_class != nullptr);
+//      global_jstring_init_mid  = env->GetMethodID(global_jstring_class, "<init>", "(L)V");
+//      global_jstring_value_mid = env->GetMethodID(global_jstring_class, "stringValue", "()Ljava/lang/String;");
 
 @[end if]@
 @

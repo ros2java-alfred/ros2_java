@@ -14,6 +14,10 @@
  */
 package org.ros2.rcljava.node.parameter;
 
+import rcl_interfaces.msg.Parameter;
+import rcl_interfaces.msg.ParameterType;
+import rcl_interfaces.msg.ParameterValue;
+
 /**
  * Parameter Variant.
  *
@@ -53,11 +57,87 @@ public class ParameterVariant<T> {
     }
 
     public String getTypeName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.value.getClass().getSimpleName();
     }
 
     public String valueToString() {
         return this.value.toString();
+    }
+
+    public ParameterValue toParameterValue() {
+        ParameterValue p = new ParameterValue();
+        p.setType(ParameterType.PARAMETER_NOT_SET);
+
+        if (Boolean.class.equals(this.value.getClass())) {
+            p.setBoolValue((Boolean) this.value);
+            p.setType(ParameterType.PARAMETER_BOOL);
+        } else
+
+//        if (List<Byte>).class.equals(this.value.getClass())) {
+//            p.setBytesValue((Byte) this.value);
+//            p.setType(ParameterType.PARAMETER_BYTES);
+//        } else
+
+        if (Double.class.equals(this.value.getClass())) {
+            p.setDoubleValue((Double) this.value);
+            p.setType(ParameterType.PARAMETER_DOUBLE);
+        } else
+
+        if (Long.class.equals(this.value.getClass())) {
+            p.setIntegerValue((Long) this.value);
+            p.setType(ParameterType.PARAMETER_INTEGER);
+        } else
+
+        if (String.class.equals(this.value.getClass())) {
+            p.setStringValue((String) this.value);
+            p.setType(ParameterType.PARAMETER_STRING);
+        }
+
+        return p;
+    }
+
+    public Parameter toParameter() {
+        Parameter result = new Parameter();
+        result.setName(this.name);
+        result.setValue(this.toParameterValue());
+
+        return result;
+    }
+
+    public static ParameterVariant<?> fromParameter(Parameter parameter) {
+
+        ParameterVariant<?> reuslt = null;
+
+        if (ParameterType.PARAMETER_BOOL == parameter.getValue().getType()) {
+            reuslt = new ParameterVariant<Boolean>(
+                parameter.getName(),
+                parameter.getValue().getBoolValue());
+        }
+
+//        if (ParameterType.PARAMETER_BYTES == parameter.getValue().getType()) {
+//            reuslt = new ParameterVariant<Byte[]>(
+//                parameter.getName(),
+//                parameter.getValue().getBytesValue());
+//        }
+
+        if (ParameterType.PARAMETER_DOUBLE == parameter.getValue().getType()) {
+            reuslt = new ParameterVariant<Double>(
+                parameter.getName(),
+                parameter.getValue().getDoubleValue());
+        }
+
+        if (ParameterType.PARAMETER_INTEGER == parameter.getValue().getType()) {
+            reuslt = new ParameterVariant<Long>(
+                parameter.getName(),
+                parameter.getValue().getIntegerValue());
+        }
+
+        if (ParameterType.PARAMETER_STRING == parameter.getValue().getType()) {
+            reuslt = new ParameterVariant<String>(
+                parameter.getName(),
+                parameter.getValue().getStringValue());
+        }
+
+        return reuslt;
     }
 }

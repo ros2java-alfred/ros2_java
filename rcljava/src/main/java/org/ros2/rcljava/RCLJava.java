@@ -193,7 +193,7 @@ public class RCLJava {
      *   be loaded and accessible, enabling the creating of ROS2 entities
      *   (@{link Node}s, @{link Publisher}s and @{link Subscription}s.
      */
-    public static void rclJavaInit(String args[]) {
+    public static void rclJavaInit(final String args[]) {
         synchronized (RCLJava.class) {
             if (!RCLJava.initialized) {
                 if (RCLJava.rmwImplementation == null) {
@@ -238,7 +238,7 @@ public class RCLJava {
      * @return A @{link Node} that represents the underlying ROS2 node
      *     structure.
      */
-    public static Node createNode(String nodeName) {
+    public static Node createNode(final String nodeName) {
         logger.fine("Create Node stack : " + nodeName);
 
         if (!RCLJava.initialized) {
@@ -394,7 +394,7 @@ public class RCLJava {
      * @param topic
      * @return
      */
-    public static Message waitForMessage(Node node, String topic) {
+    public static Message waitForMessage(final Node node, final String topic) {
         if (!RCLJava.initialized) {
             throw new NotInitializedException();
         }

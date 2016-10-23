@@ -16,6 +16,7 @@ package org.ros2.rcljava.node;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -29,6 +30,8 @@ import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.parameter.ParameterService;
+import org.ros2.rcljava.node.parameter.ParameterVariant;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.TriConsumer;
@@ -37,6 +40,7 @@ import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 
 import builtin_interfaces.msg.Time;
+import rcl_interfaces.msg.SetParametersResult;
 
 /**
  * This class serves as a bridge between ROS2's rcl_node_t and RCLJava.
@@ -84,7 +88,9 @@ public class Node implements INode {
     private final Queue<Client<?>> clients;
 
     /** List of parameters */
-    private final HashMap<String, Object> parameters;
+    private final HashMap<String, ParameterVariant<?>> parameters;
+
+    private final ParameterService parameter_service;
 
     // Native call.
     /**
@@ -151,7 +157,9 @@ public class Node implements INode {
         this.publishers     = new LinkedBlockingQueue<Publisher<?>>();
         this.clients        = new LinkedBlockingQueue<Client<?>>();
         this.services       = new LinkedBlockingQueue<Service<?>>();
-        this.parameters     = new HashMap<String, Object>();
+        this.parameters     = new HashMap<String, ParameterVariant<?>>();
+
+        this.parameter_service = new ParameterService(this, QoSProfile.PROFILE_PARAMETER);
     }
 
     /**
@@ -426,24 +434,43 @@ public class Node implements INode {
 
 
     @Override
-    public List<Object> setParameters(final List<Object> parameters) {
-        //TODO
-        throw new NotImplementedException();
-//        return parameters;
+    public List<SetParametersResult> setParameters(final List<ParameterVariant<?>> parameters) {
+        List<SetParametersResult> result = new ArrayList<SetParametersResult>();
+
+        for (ParameterVariant<?> parameterVariantRequest : parameters) {
+            this.parameters.put(parameterVariantRequest.getName(), parameterVariantRequest);
+            SetParametersResult subResult = new SetParametersResult();
+//            subResult.setReason(arg0);
+            subResult.setSuccessful(true);
+            result.add(subResult);
+        }
+
+        return result;
     }
 
     @Override
-    public List<Object> getParameters(final List<String> names) {
-        //TODO
-        throw new NotImplementedException();
-//        return new ArrayList<Object>();
+    public List<ParameterVariant<?>> getParameters(final List<String> names) {
+        List<ParameterVariant<?>>  result = new ArrayList<ParameterVariant<?>>();
+
+        for (String name : names) {
+            ParameterVariant<?> param = this.getParameter(name);
+            if (param != null) {
+                result.add(param);
+            }
+        }
+
+        return result;
     }
 
     @Override
-    public Object getParameter(final String name) {
-        //TODO
-        throw new NotImplementedException();
-//        return name;
+    public ParameterVariant<?> getParameter(final String name) {
+        ParameterVariant<?> result = null;
+
+        if (this.parameters.containsKey(name)) {
+            result = this.parameters.get(name);
+        }
+
+        return result;
     }
 
     @Override
