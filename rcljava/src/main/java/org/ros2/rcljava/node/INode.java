@@ -23,7 +23,6 @@ import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.parameter.ParameterVariant;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.Service;
-import org.ros2.rcljava.node.service.ServiceConsumer;
 import org.ros2.rcljava.node.service.TriConsumer;
 import org.ros2.rcljava.node.topic.Consumer;
 import org.ros2.rcljava.node.topic.Publisher;

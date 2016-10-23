@@ -59,31 +59,39 @@ set(JUNIT_JAR "/usr/share/java/junit4.jar")
 
 set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/Log.java"
-  "src/main/java/org/ros2/rcljava/QoSProfile.java"
   "src/main/java/org/ros2/rcljava/NativeUtils.java"
+  "src/main/java/org/ros2/rcljava/QoSProfile.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
+  "src/main/java/org/ros2/rcljava/RMWRequestId.java"
+
   "src/main/java/org/ros2/rcljava/namespace/GraphName.java"
+
   "src/main/java/org/ros2/rcljava/node/INode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
+
+
+  "src/main/java/org/ros2/rcljava/node/topic/Consumer.java"
   "src/main/java/org/ros2/rcljava/node/topic/Publisher.java"
   "src/main/java/org/ros2/rcljava/node/topic/Subscription.java"
-  "src/main/java/org/ros2/rcljava/node/topic/Consumer.java"
-  "src/main/java/org/ros2/rcljava/node/service/Client.java"
+  "src/main/java/org/ros2/rcljava/node/topic/Topics.java"
+
   "src/main/java/org/ros2/rcljava/node/service/BiConsumer.java"
+  "src/main/java/org/ros2/rcljava/node/service/Client.java"
   "src/main/java/org/ros2/rcljava/node/service/RCLFuture.java"
   "src/main/java/org/ros2/rcljava/node/service/Service.java"
   "src/main/java/org/ros2/rcljava/node/service/ServiceConsumer.java"
   "src/main/java/org/ros2/rcljava/node/service/TriConsumer.java"
+
   "src/main/java/org/ros2/rcljava/node/parameter/ParameterConsumer.java"
   "src/main/java/org/ros2/rcljava/node/parameter/ParameterService.java"
   "src/main/java/org/ros2/rcljava/node/parameter/ParameterVariant.java"
   "src/main/java/org/ros2/rcljava/node/parameter/SyncParametersClient.java"
+
   "src/main/java/org/ros2/rcljava/exception/ImplementationAlreadyImportedException.java"
   "src/main/java/org/ros2/rcljava/exception/InvalidRCLJAVAImplementation.java"
   "src/main/java/org/ros2/rcljava/exception/NoImplementationAvailableException.java"
   "src/main/java/org/ros2/rcljava/exception/NotImplementedException.java"
   "src/main/java/org/ros2/rcljava/exception/NotInitializedException.java"
-  "src/main/java/org/ros2/rcljava/RMWRequestId.java"
 )
 
 ### Macro ###

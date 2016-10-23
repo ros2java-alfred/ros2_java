@@ -87,10 +87,14 @@ public class Node implements INode {
      */
     private final Queue<Client<?>> clients;
 
-    /** List of parameters */
+    /**
+     *  List of parameters
+     */
     private final HashMap<String, ParameterVariant<?>> parameters;
 
-    private final ParameterService parameter_service;
+    private final ParameterService parameterService;
+
+    private final Log logRos;
 
     // Native call.
     /**
@@ -148,7 +152,7 @@ public class Node implements INode {
      * Constructor.
      *
      * @param nodeHandle A pointer to the underlying ROS2 node structure. Must not
-   *     be zero.
+     *     be zero.
      */
     public Node(final long nodeHandle, final String nodeName) {
         this.name           = nodeName;
@@ -159,7 +163,8 @@ public class Node implements INode {
         this.services       = new LinkedBlockingQueue<Service<?>>();
         this.parameters     = new HashMap<String, ParameterVariant<?>>();
 
-        this.parameter_service = new ParameterService(this, QoSProfile.PROFILE_PARAMETER);
+        this.parameterService = new ParameterService(this, QoSProfile.PROFILE_PARAMETER);
+        this.logRos = new Log(this);
     }
 
     /**
@@ -617,6 +622,6 @@ public class Node implements INode {
     }
 
     public Log getLog() {
-        return new Log(this);
+        return this.logRos;
     }
 }

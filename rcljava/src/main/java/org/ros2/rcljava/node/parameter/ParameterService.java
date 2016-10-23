@@ -15,6 +15,7 @@
 package org.ros2.rcljava.node.parameter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.ros2.rcljava.QoSProfile;
@@ -23,9 +24,11 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.TriConsumer;
+import org.ros2.rcljava.node.topic.Publisher;
 
 import rcl_interfaces.msg.Parameter;
 import rcl_interfaces.msg.ParameterValue;
+import rcl_interfaces.msg.ParameterEvent;
 import rcl_interfaces.srv.DescribeParameters;
 import rcl_interfaces.srv.DescribeParameters_Request;
 import rcl_interfaces.srv.DescribeParameters_Response;
@@ -56,6 +59,7 @@ public class ParameterService {
     private Service<SetParameters> setParametersService;
     private Service<ListParameters> listParametersService;
     private Service<DescribeParameters> describeParametersService;
+    private Publisher<ParameterEvent> eventparameterPublisher;
 
     public ParameterService(final Node node, final QoSProfile profileParameter) {
 
@@ -144,10 +148,17 @@ public class ParameterService {
                         }
                     });
 
+            this.eventparameterPublisher = node.createPublisher(ParameterEvent.class, "parameter_events", profileParameter);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    private void notifyAddEvent(Collection<Parameter> param) {
+        ParameterEvent eventMsg = new ParameterEvent();
+        eventMsg.setNewParameters(param);
+        this.eventparameterPublisher.publish(eventMsg);
     }
 
 }

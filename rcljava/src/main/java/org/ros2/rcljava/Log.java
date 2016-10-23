@@ -14,15 +14,17 @@
  */
 package org.ros2.rcljava;
 
+import java.util.logging.Level;
+
 //import java.io.PrintWriter;
 //import java.io.StringWriter;
 
 import java.util.logging.Logger;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.SimpleFormatter;
-
 import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Topics;
+
+import std_msgs.msg.String;
 
 /**
  * Not define in ROS2.
@@ -31,10 +33,10 @@ import org.ros2.rcljava.node.Node;
  */
 public class Log {
 
-    private final Node defaultNode;
-//    private final Publisher<rosgraph_msgs.msg.Log> publisher;
-    private Object publisher = null;
     private final Logger log;
+    private final Node defaultNode;
+    private final Publisher<std_msgs.msg.String> publisher;
+
     private boolean isDebugEnabled;
     private boolean isErrorEnabled;
     private boolean isFatalEnabled;
@@ -42,16 +44,12 @@ public class Log {
     private boolean isTraceEnabled;
     private boolean isWarnEnabled;
 
-    public Log(Node defaultNode) {
+    public Log(final Node defaultNode) {
         this.defaultNode = defaultNode;
-        this.publisher = null; //this.defaultNode.createPublisher(rosgraph_msgs.msg.Log.class, Topics.ROSOUT);
+        this.publisher = this.defaultNode.createPublisher(std_msgs.msg.String.class, Topics.ROSOUT);
         this.log = Logger.getLogger(this.defaultNode.getName());
 
         this.log.setLevel(Level.ALL);
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleFormatter());
-        this.log.addHandler(handler);
-        handler.setLevel(Level.ALL);
     }
 
 //    public Publisher<rosgraph_msgs.msg.Log> getPublisher() {
@@ -62,17 +60,19 @@ public class Log {
 //        StringWriter stringWriter = new StringWriter();
 //        PrintWriter printWriter = new PrintWriter(stringWriter);
 //        throwable.printStackTrace(printWriter);
-//        publish(level, message.toString() + '\n' + stringWriter.toString());
+//        this.publish(level, message.toString() + '\n' + stringWriter.toString());
 //    }
 
-//    private void publish(byte level, Object message) {
+    private void publish(byte level, Object message) {
 //        rosgraph_msgs.msg.Log logMessage = new rosgraph_msgs.msg.Log();
 //        logMessage.getHeader().setStamp(this.defaultNode.getCurrentTime());
 //        logMessage.setLevel(level);
 //        logMessage.setName(this.defaultNode.getName());
 //        logMessage.setMsg(message.toString());
-//        this.publisher.publish(logMessage);
-//    }
+        String logMessage = new String();
+        logMessage.setData(message.toString());
+        this.publisher.publish(logMessage);
+    }
 
     public boolean isDebugEnabled() {
         return this.isDebugEnabled;
@@ -101,6 +101,7 @@ public class Log {
     public void trace(Object message) {
         this.log.info(message.toString());
         if (this.isTraceEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.Log.DEBUG, message);
         }
     }
@@ -108,6 +109,7 @@ public class Log {
     public void trace(Object message, Throwable t) {
         this.log.info(message.toString());
         if (this.isTraceEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.Log.DEBUG, message, t);
         }
     }
@@ -115,6 +117,7 @@ public class Log {
     public void debug(Object message) {
         this.log.finest(message.toString());
         if (this.isDebugEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.Log.DEBUG, message);
         }
     }
@@ -122,6 +125,7 @@ public class Log {
     public void debug(Object message, Throwable t) {
         this.log.finest(message.toString());
         if (this.isDebugEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.Log.DEBUG, message, t);
         }
     }
@@ -129,6 +133,7 @@ public class Log {
     public void info(Object message) {
         this.log.info(message.toString());
         if (this.isInfoEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.Log.INFO, message);
         }
     }
@@ -136,6 +141,7 @@ public class Log {
     public void info(Object message, Throwable t) {
         this.log.info(message.toString());
         if (this.isInfoEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.Log.INFO, message, t);
         }
     }
@@ -143,6 +149,7 @@ public class Log {
     public void warn(Object message) {
         this.log.warning(message.toString());
         if (this.isWarnEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.Log.WARN, message);
         }
     }
@@ -150,6 +157,7 @@ public class Log {
     public void warn(Object message, Throwable t) {
         this.log.warning(message.toString());
         if (this.isWarnEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.msg.Log.WARN, message, t);
         }
     }
@@ -157,6 +165,7 @@ public class Log {
     public void error(Object message) {
         this.log.severe(message.toString());
         if (this.isErrorEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.Log.ERROR, message);
         }
     }
@@ -164,6 +173,7 @@ public class Log {
     public void error(Object message, Throwable t) {
         this.log.severe(message.toString());
         if (this.isErrorEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.Log.ERROR, message, t);
         }
     }
@@ -171,6 +181,7 @@ public class Log {
     public void fatal(Object message) {
         this.log.severe(message.toString());
         if (this.isFatalEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.Log.FATAL, message);
         }
     }
@@ -178,6 +189,7 @@ public class Log {
     public void fatal(Object message, Throwable t) {
         this.log.severe(message.toString());
         if (this.isFatalEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
 //            this.publish(rosgraph_msgs.Log.FATAL, message, t);
         }
     }
