@@ -17,6 +17,9 @@ package org.ros2.rcljava;
 
 import org.ros2.rcljava.qos.QoSProfile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -26,6 +29,9 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Entry point for the ROS2 Java API, similar to the rclcpp API.
  */
 public final class RCLJava {
+
+  private static final Logger logger = LoggerFactory.getLogger(RCLJava.class);
+
   /**
    * Private constructor so this cannot be instantiated.
    */
@@ -102,11 +108,11 @@ public final class RCLJava {
           }
         }
         if (RCLJava.rmwImplementation == null) {
-          System.err.println("No RMW implementation found");
+          logger.error("No RMW implementation found");
           System.exit(1);
         } else {
           nativeRCLJavaInit();
-          System.out.println("Using RMW implementation: " + getRMWIdentifier());
+          logger.info("Using RMW implementation: {}", getRMWIdentifier());
           initialized = true;
         }
       }

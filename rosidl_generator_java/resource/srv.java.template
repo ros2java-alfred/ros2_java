@@ -2,12 +2,18 @@ package @(package_name).@(subfolder);
 
 import org.ros2.rcljava.common.RCLJavaProxy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class @(type_name) {
+
+  private static final Logger logger = LoggerFactory.getLogger(@(type_name).class);
+
   static {
     try {
       System.loadLibrary("@(spec.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
     } catch (UnsatisfiedLinkError e) {
-      System.err.println("Native code library failed to load.\n" + e);
+      logger.error("Native code library failed to load.\n" + e);
       System.exit(1);
     }
   }

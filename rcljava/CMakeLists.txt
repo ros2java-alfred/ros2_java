@@ -103,6 +103,8 @@ add_jar("${PROJECT_NAME}_jar"
   "${${PROJECT_NAME}_sources}"
   OUTPUT_NAME
   "${PROJECT_NAME}"
+  INCLUDE_JARS
+  "${rcljava_common_JARS}"
 )
 
 call_for_each_rmw_implementation(target)

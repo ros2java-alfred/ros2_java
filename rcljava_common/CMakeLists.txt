@@ -38,6 +38,45 @@ add_jar("${PROJECT_NAME}_jar"
 install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
 ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
 
+find_jar(SFL4J_JAR NAMES slf4j-api)
+if(NOT ${SFL4J_JAR})
+  set(log4j_version "1.2.17")
+  set(slf4j_version "1.7.21")
+
+  set(log4j_sha256 "1d31696445697720527091754369082a6651bd49781b6005deb94e56753406f9")
+  set(slf4j_api_sha256 "1d5aeb6bd98b0fdd151269eae941c05f6468a791ea0f1e68d8e7fe518af3e7df")
+  set(slf4j_log4j_sha256 "9563e26fd7863cca0f5d468ef09f2927047f8b85a8c76d98766ed5863cb678b2")
+  set(slf4j_android_sha256 "3874b0975f9ad283328c0371ccde2de353754da33fda36e611702623ee1e5a95")
+
+  set(log4j_url "http://central.maven.org/maven2/log4j/log4j/${log4j_version}/log4j-${log4j_version}.jar")
+  set(slf4j_api_url "http://central.maven.org/maven2/org/slf4j/slf4j-api/${slf4j_version}/slf4j-api-${slf4j_version}.jar")
+  set(slf4j_log4j_url "http://central.maven.org/maven2/org/slf4j/slf4j-log4j12/${slf4j_version}/slf4j-log4j12-${slf4j_version}.jar")
+  set(slf4j_android_url "http://central.maven.org/maven2/org/slf4j/slf4j-android/${slf4j_version}/slf4j-android-${slf4j_version}.jar")
+
+  set(log4j_jar_path "${CMAKE_CURRENT_BINARY_DIR}/jars/log4j-${log4j_version}.jar")
+  set(slf4j_api_jar_path "${CMAKE_CURRENT_BINARY_DIR}/jars/slf4j-api-${slf4j_version}.jar")
+  set(slf4j_log4j_jar_path "${CMAKE_CURRENT_BINARY_DIR}/jars/slf4j-log4j12-${slf4j_version}.jar")
+  set(slf4j_android_jar_path "${CMAKE_CURRENT_BINARY_DIR}/jars/slf4j-android-${slf4j_version}.jar")
+
+  file(DOWNLOAD ${log4j_url} ${log4j_jar_path} EXPECTED_HASH SHA256=${log4j_sha256})
+  file(DOWNLOAD ${slf4j_api_url} ${slf4j_api_jar_path} EXPECTED_HASH SHA256=${slf4j_api_sha256})
+  file(DOWNLOAD ${slf4j_log4j_url} ${slf4j_log4j_jar_path} EXPECTED_HASH SHA256=${slf4j_log4j_sha256})
+  file(DOWNLOAD ${slf4j_android_url} ${slf4j_android_jar_path} EXPECTED_HASH SHA256=${slf4j_android_sha256})
+
+  install(FILES
+    ${log4j_jar_path} ${slf4j_api_jar_path}
+    ${slf4j_log4j_jar_path} ${slf4j_android_jar_path}
+    DESTINATION
+    "share/${PROJECT_NAME}/java")
+
+  ament_export_jars("share/${PROJECT_NAME}/java/log4j-${log4j_version}.jar")
+  ament_export_jars("share/${PROJECT_NAME}/java/slf4j-api-${slf4j_version}.jar")
+  ament_export_jars("share/${PROJECT_NAME}/java/slf4j-log4j12-${slf4j_version}.jar")
+  ament_export_jars("share/${PROJECT_NAME}/java/slf4j-android-${slf4j_version}.jar")
+endif()
+
+ament_export_jars(${SFL4J_JAR})
+
 include_directories(include)
 
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_cpp_sources})

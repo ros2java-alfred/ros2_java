@@ -15,6 +15,9 @@
 
 package org.ros2.rcljava;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class serves as a bridge between ROS2's rcl_publisher_t and RCLJava.
  * A Publisher must be created via
@@ -23,11 +26,14 @@ package org.ros2.rcljava;
  * @param <T> The type of the messages that this publisher will publish.
  */
 public class Publisher<T> {
+
+  private static final Logger logger = LoggerFactory.getLogger(Publisher.class);
+
   static {
     try {
       System.loadLibrary("rcljavaPublisher__" + RCLJava.getRMWIdentifier());
     } catch (UnsatisfiedLinkError ule) {
-      System.err.println("Native code library failed to load.\n" + ule);
+      logger.error("Native code library failed to load.\n" + ule);
       System.exit(1);
     }
   }

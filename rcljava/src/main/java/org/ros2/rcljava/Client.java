@@ -15,17 +15,22 @@
 
 package org.ros2.rcljava;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
 
 public class Client<T> {
+  private static final Logger logger = LoggerFactory.getLogger(Client.class);
+
   static {
     try {
       System.loadLibrary("rcljavaClient__" + RCLJava.getRMWIdentifier());
     } catch (UnsatisfiedLinkError ule) {
-      System.err.println("Native code library failed to load.\n" + ule);
+      logger.error("Native code library failed to load.\n" + ule);
       System.exit(1);
     }
   }

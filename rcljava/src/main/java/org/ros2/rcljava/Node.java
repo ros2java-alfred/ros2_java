@@ -17,6 +17,9 @@ package org.ros2.rcljava;
 
 import org.ros2.rcljava.qos.QoSProfile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,11 +31,14 @@ import java.util.concurrent.LinkedBlockingQueue;
  * A Node must be created via @{link RCLJava#createNode(String)}
  */
 public class Node {
+
+  private static final Logger logger = LoggerFactory.getLogger(Node.class);
+
   static {
     try {
       System.loadLibrary("rcljavaNode__" + RCLJava.getRMWIdentifier());
     } catch (UnsatisfiedLinkError ule) {
-      System.err.println("Native code library failed to load.\n" + ule);
+      logger.error("Native code library failed to load.\n" + ule);
       System.exit(1);
     }
   }
