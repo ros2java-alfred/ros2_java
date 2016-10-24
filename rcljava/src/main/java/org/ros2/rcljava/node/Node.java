@@ -1,0 +1,627 @@
+/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.ros2.rcljava.node;
+
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Logger;
+
+import org.ros2.rcljava.Log;
+import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.RMWRequestId;
+import org.ros2.rcljava.exception.NotImplementedException;
+import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.parameter.ParameterService;
+import org.ros2.rcljava.node.parameter.ParameterVariant;
+import org.ros2.rcljava.node.service.Client;
+import org.ros2.rcljava.node.service.Service;
+import org.ros2.rcljava.node.service.TriConsumer;
+import org.ros2.rcljava.node.topic.Consumer;
+import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Subscription;
+
+import builtin_interfaces.msg.Time;
+import rcl_interfaces.msg.SetParametersResult;
+
+/**
+ * This class serves as a bridge between ROS2's rcl_node_t and RCLJava.
+ * A Node must be created via @{link RCLJava#createNode(String)}
+ *
+ * @author Esteve Fernandez <esteve@apache.org>
+ * @author Mickael Gaillard <mick.gaillard@gmail.com>
+ */
+public class Node implements INode {
+
+    private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
+
+    // Loading JNI library.
+    static {
+        RCLJava.loadLibrary("rcljavanode_Node__" + RCLJava.getRMWIdentifier());
+    }
+
+    /** Name of the node */
+    private String name;
+
+    /**
+     * An integer that represents a pointer to the underlying ROS2 node
+     * structure (rcl_node_t).
+     */
+    private final long nodeHandle;
+
+    /**
+     * All the @{link Subscription}s that have been created through this instance.
+     */
+    private final Queue<Subscription<?>> subscriptions;
+
+    /**
+     * All the @{link Publisher}s that have been created through this instance.
+     */
+    private final Queue<Publisher<?>> publishers;
+
+    /**
+     * All the @{link Service}s that have been created through this instance.
+     */
+    private final Queue<Service<?>> services;
+
+    /**
+     * All the @{link Client}s that have been created through this instance.
+     */
+    private final Queue<Client<?>> clients;
+
+    /**
+     *  List of parameters
+     */
+    private final HashMap<String, ParameterVariant<?>> parameters;
+
+    private final ParameterService parameterService;
+
+    private final Log logRos;
+
+    // Native call.
+    /**
+     * Create a ROS2 publisher (rcl_publisher_t) and return a pointer to
+     *     it as an integer.
+     *
+     * @param <T> The type of the messages that will be published by the
+     *     created @{link Publisher}.
+     * @param nodeHandle A pointer to the underlying ROS2 node structure.
+     * @param messageType The class of the messages that will be published by the
+     *     created @{link Publisher}.
+     * @param topic The topic to which the created @{link Publisher} will
+     *     publish messages.
+     * @return A pointer to the underlying ROS2 publisher structure.
+     */
+    private static native <T extends Message> long nativeCreatePublisherHandle(
+            long nodeHandle, Class<T> messageType, String topic, QoSProfile qos);
+
+    /**
+     * Create a ROS2 subscription (rcl_subscription_t) and return a pointer to
+     *     it as an integer.
+     *
+     * @param <T> The type of the messages that will be received by the
+     *     created @{link Subscription}.
+     * @param nodeHandle A pointer to the underlying ROS2 node structure.
+     * @param messageType The class of the messages that will be received by the
+     *     created @{link Subscription}.
+     * @param topic The topic from which the created @{link Subscription} will
+     *     receive messages.
+     * @return A pointer to the underlying ROS2 subscription structure.
+     */
+    private static native <T> long nativeCreateSubscriptionHandle(
+            long nodeHandle, Class<T> messageType, String topic, QoSProfile qos);
+
+    private static native <T> long nativeCreateClientHandle(
+            long nodeHandle, Class<T> cls, String serviceName, QoSProfile qos);
+
+    private static native <T> long nativeCreateServiceHandle(
+            long nodeHandle, Class<T> cls, String serviceName, QoSProfile qos);
+
+    private static native void nativeDispose(long nodeHandle);
+
+    private static native String nativeGetName(long nodeHandle);
+
+    private static native int nativeCountPublishers(long nodeHandle, String topic);
+
+    private static native int nativeCountSubscribers(long nodeHandle, String topic);
+
+    private static native HashMap<String, String> getListTopics(long nodeHandle);
+
+
+//    private static native  ; //rcl_service_server_is_available
+
+    /**
+     * Constructor.
+     *
+     * @param nodeHandle A pointer to the underlying ROS2 node structure. Must not
+     *     be zero.
+     */
+    public Node(final long nodeHandle, final String nodeName) {
+        this.name           = nodeName;
+        this.nodeHandle     = nodeHandle;
+        this.subscriptions  = new LinkedBlockingQueue<Subscription<?>>();
+        this.publishers     = new LinkedBlockingQueue<Publisher<?>>();
+        this.clients        = new LinkedBlockingQueue<Client<?>>();
+        this.services       = new LinkedBlockingQueue<Service<?>>();
+        this.parameters     = new HashMap<String, ParameterVariant<?>>();
+
+        this.parameterService = new ParameterService(this, QoSProfile.PROFILE_PARAMETER);
+        this.logRos = new Log(this);
+    }
+
+    /**
+     * Safely destroy the underlying ROS2 node structure.
+     */
+    @Override
+    public void dispose() {
+        logger.fine("Destroy Node stack : " + this.name);
+
+        Node.nativeDispose(this.nodeHandle);
+        this.publishers.clear();
+        this.subscriptions.clear();
+    }
+
+    /**
+     * Get the name of the node.
+     *
+     * @return The name of the node.
+     */
+    @Override
+    public String getName() {
+        String name = Node.nativeGetName(this.nodeHandle);
+
+        if (!this.name.equals(name)) {
+            logger.fine("Node name has change ! from " + this.name + " to " + name);
+            this.name = name;
+        }
+
+        logger.fine("Get Node name stack : " + this.name);
+        return name;
+    }
+
+    /**
+     * Create a Publisher&lt;T&gt;.
+     *
+     * @param <T> The type of the messages that will be published by the
+     *     created @{link Publisher}.
+     * @param messageType The class of the messages that will be published by the
+     *     created @{link Publisher}.
+     * @param topic The topic to which the created @{link Publisher} will
+     *     publish messages.
+     * @param qos The quality of service profile to pass on to the rmw implementation.
+     * @return A @{link Publisher} that represents the underlying ROS2 publisher
+     *     structure.
+     */
+    @Override
+    public <T extends Message> Publisher<T> createPublisher(
+            final Class<T> messageType,
+            final String topic,
+            final QoSProfile qos) {
+
+        logger.fine("Create Publisher : " + topic);
+        long publisherHandle = Node.nativeCreatePublisherHandle(this.nodeHandle, messageType, topic, qos);
+
+        Publisher<T> publisher = new Publisher<T>(this.nodeHandle, publisherHandle, messageType, topic, qos);
+
+        this.publishers.add(publisher);
+        return publisher;
+    }
+
+    /**
+     * Create and return a Publisher. (Retro-compatibility)
+     *
+     * @param <T> Message definition.
+     * @param messageType Message class.
+     * @param topic The topic for this publisher to publish on.
+     * @return Publisher instance of the created publisher.
+     */
+    @Override
+    public <T extends Message> Publisher<T> createPublisher(
+            final Class<T> messageType,
+            final String topic) {
+        return this.createPublisher(messageType, topic, QoSProfile.PROFILE_DEFAULT);
+    }
+
+    /**
+     * Create a Subscription&lt;T&gt;.
+     *
+     * @param <T> The type of the messages that will be received by the
+     *     created @{link Subscription}.
+     * @param messageType The class of the messages that will be received by the
+     *     created @{link Subscription}.
+     * @param topic The topic from which the created @{link Subscription} will
+     *     receive messages.
+     * @param callback The callback function that will be triggered when a
+     *     message is received by the @{link Subscription}.
+     * @param qos The quality of service profile to pass on to the rmw implementation.
+     * @return A @{link Subscription} that represents the underlying ROS2
+     *     subscription structure.
+     */
+    @Override
+    public <T extends Message> Subscription<T> createSubscription(
+            final Class<T> messageType,
+            final String topic,
+            final Consumer<T> callback,
+            final QoSProfile qos) {
+
+        logger.fine("Create Subscription : " + topic);
+        long subscriptionHandle = Node.nativeCreateSubscriptionHandle(this.nodeHandle, messageType, topic, qos);
+
+        Subscription<T> subscription = new Subscription<T>(
+                this.nodeHandle,
+                subscriptionHandle,
+                messageType,
+                topic,
+                callback,
+                qos);
+        this.subscriptions.add(subscription);
+        return subscription;
+    }
+
+    /**
+     * Create and return a Subscription. (Retro-compatibility)
+     *
+     * @param <T> Message definition.
+     * @param messageType Message Class
+     * @param topic The topic to subscribe on.
+     * @param callback The user-defined callback function.
+     * @param qos The quality of service profile to pass on to the rmw implementation.
+     * @return Subscription instance of the created subscription.
+     */
+    @Override
+    public <T extends Message> Subscription<T> createSubscription(
+            final Class<T> messageType,
+            final String topic,
+            final Consumer<T> callback) {
+        return this.createSubscription(messageType, topic, callback, QoSProfile.PROFILE_DEFAULT);
+    }
+
+    /**
+     * Create and return a Client.
+     *
+     * @param <T> Message definition.
+     * @param serviceType Service Class
+     * @param serviceName The service to subscribe on.
+     * @param qos The quality of service profile to pass on to the rmw implementation.
+     * @return Client instance of the service.
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws NoSuchMethodException
+     */
+    @Override
+    public <T> Client<T> createClient(
+            final Class<T> serviceType,
+            final String serviceName,
+            final QoSProfile qos) throws Exception {
+
+        logger.fine("Create Client : " + serviceName);
+
+        Class<?> requestType = (Class<?>)serviceType.getField("RequestType").get(null);
+
+        Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+        long requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
+
+        Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+        long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
+
+        Class<?> responseType = (Class<?>)serviceType.getField("ResponseType").get(null);
+
+        Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+        long responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
+
+        Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+        long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
+
+        long clientHandle = Node.nativeCreateClientHandle(
+                this.nodeHandle,
+                serviceType,
+                serviceName,
+                QoSProfile.PROFILE_SERVICES_DEFAULT);
+
+        Client<T> client = new Client<T>(
+                new WeakReference<Node>(this),
+                this.nodeHandle,
+                clientHandle,
+                serviceType,
+                serviceName,
+                requestType,
+                responseType,
+                requestFromJavaConverterHandle,
+                requestToJavaConverterHandle,
+                responseFromJavaConverterHandle,
+                responseToJavaConverterHandle);
+
+        this.clients.add(client);
+        return client;
+    }
+
+    /**
+     * Create and return a Client. (Retro-compatibility)
+     *
+     * @param <T> Message definition.
+     * @param message Message Class
+     * @param service The service to subscribe on.
+     * @return Client instance of the service.
+     * @throws Exception
+     */
+    @Override
+    public <T> Client<T> createClient(
+            final Class<T> serviceType,
+            final String serviceName) throws Exception {
+        return this.createClient(serviceType, serviceName, QoSProfile.PROFILE_DEFAULT);
+    }
+
+    /**
+     * Create and return a Service.
+     *
+     * @param <T> Message definition.
+     * @param serviceType Service Class
+     * @param serviceName The service for this publisher to publish on.
+     * @param callback The user-defined callback function.
+     * @param qos The quality of service profile to pass on to the rmw implementation.
+     * @return Service instance of the service.
+     */
+    @Override
+    public <T> Service<T> createService(
+            final Class<T> serviceType,
+            final String serviceName,
+            final TriConsumer<RMWRequestId, ?, ?> callback,
+            final QoSProfile qos
+            ) throws Exception {
+
+        logger.fine("Create Service : " + serviceName);
+//        long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service, qos);
+//
+//        Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
+
+        Class<?> requestType = (Class<?>)serviceType.getField("RequestType").get(null);
+
+        Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+        long requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
+
+        Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+        long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
+
+        Class<?> responseType = (Class<?>)serviceType.getField("ResponseType").get(null);
+
+        Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+        long responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
+
+        Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+        long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
+
+        long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, serviceType, serviceName, qos);
+        Service<T> service = new Service<T>(this.nodeHandle, serviceHandle, serviceType, serviceName, callback, requestType, responseType,
+          requestFromJavaConverterHandle, requestToJavaConverterHandle, responseFromJavaConverterHandle,
+          responseToJavaConverterHandle);
+
+        this.services.add(service);
+        return service;
+    }
+
+    /**
+     * Create and return a Service. (Retro-compatibility)
+     *
+     * @param <T> Message definition.
+     * @param message Message Class
+     * @param service The service for this publisher to publish on.
+     * @param callback The user-defined callback function.
+     * @return Service instance of the service.
+     */
+    @Override
+    public <T> Service<T> createService(
+            final Class<T> serviceType,
+            final String serviceName,
+            final TriConsumer<RMWRequestId, ?, ?> callback) throws Exception {
+
+        return this.createService(serviceType, serviceName, callback, QoSProfile.PROFILE_DEFAULT);
+    }
+
+
+    @Override
+    public List<SetParametersResult> setParameters(final List<ParameterVariant<?>> parameters) {
+        List<SetParametersResult> result = new ArrayList<SetParametersResult>();
+
+        for (ParameterVariant<?> parameterVariantRequest : parameters) {
+            this.parameters.put(parameterVariantRequest.getName(), parameterVariantRequest);
+            SetParametersResult subResult = new SetParametersResult();
+//            subResult.setReason(arg0);
+            subResult.setSuccessful(true);
+            result.add(subResult);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ParameterVariant<?>> getParameters(final List<String> names) {
+        List<ParameterVariant<?>>  result = new ArrayList<ParameterVariant<?>>();
+
+        for (String name : names) {
+            ParameterVariant<?> param = this.getParameter(name);
+            if (param != null) {
+                result.add(param);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public ParameterVariant<?> getParameter(final String name) {
+        ParameterVariant<?> result = null;
+
+        if (this.parameters.containsKey(name)) {
+            result = this.parameters.get(name);
+        }
+
+        return result;
+    }
+
+    @Override
+    public HashMap<String, String> getTopicNamesAndTypes() {
+        HashMap<String, String> topics =  Node.getListTopics(this.nodeHandle);
+
+        for (Entry<String, String> entry : topics.entrySet()) {
+            logger.fine("\t - Topics: " + entry.getKey() + "\t Value: " + entry.getValue());
+        }
+
+        return topics;
+    }
+
+    @Override
+    public int countPublishers(final String topic) {
+        return Node.nativeCountPublishers(this.nodeHandle, topic);
+    }
+
+    @Override
+    public int countSubscribers(final String topic) {
+        return Node.nativeCountSubscribers(this.nodeHandle, topic);
+    }
+
+    /**
+     * Return the rcl_node_t node handle (non-const version).
+     * @return
+     */
+    @Override
+    public long getRclNodeHandle() {
+        return this.nodeHandle;
+    }
+
+    /**
+     * Notify threads waiting on graph changes.
+     *
+     * Affects threads waiting on the notify guard condition, see:
+     * get_notify_guard_condition(), as well as the threads waiting on graph
+     * changes using a graph Event, see: wait_for_graph_change().
+     *
+     * This is typically only used by the rclcpp::graph_listener::GraphListener.
+     *
+     * @throws RCLBaseError (a child of that exception) when an rcl error occurs
+     */
+    @Override
+    public void notifyGraphChange() {
+        //TODO
+        throw new NotImplementedException();
+    }
+
+    /** Notify any and all blocking node actions that shutdown has occurred. */
+    @Override
+    public void notifyShutdown() {
+        //TODO
+        throw new NotImplementedException();
+    }
+
+    /**
+     * Return a graph event, which will be set anytime a graph change occurs.
+     *
+     * The graph Event object is a loan which must be returned.
+     * The Event object is scoped and therefore to return the load just let it go
+     * out of scope.
+     */
+    @Override
+    public Object getGraphEvent() {
+        //TODO
+        throw new NotImplementedException();
+//        return null;
+    }
+
+    /**
+     * Wait for a graph event to occur by waiting on an Event to become set.
+     *
+     * The given Event must be acquire through the get_graph_event() method.
+     *
+     * @throws InvalidEventError if the given event is nullptr
+     * @throws EventNotRegisteredError if the given event was not acquired with get_graph_event().
+     */
+    @Override
+    public void waitForGraphChange(Object event, int timeout) {
+        //TODO
+        throw new NotImplementedException();
+    }
+
+    /**
+     * This is typically only used by the rclcpp::graph_listener::GraphListener.
+     * @return the number of on loan graph events, see get_graph_event().
+     */
+    @Override
+    public int countGraphUsers() {
+        //TODO
+        throw new NotImplementedException();
+//        return 0;
+    }
+
+    /**
+     * Register the callback for parameter changes.
+     * Repeated invocations of this function will overwrite previous callbacks
+     *
+     * @param User defined callback function, It is expected to atomically set parameters.
+     */
+    @Override
+    public <T extends Message> void registerParamChangeCallback(Consumer<T> callback) {
+        //TODO
+        throw new NotImplementedException();
+    }
+
+    public final long getNodeHandle() {
+        return this.nodeHandle;
+      }
+
+    /**
+     * @return All the @{link Subscription}s that were created by this instance.
+     */
+    public Queue<Subscription<? extends Message>> getSubscriptions() {
+        return this.subscriptions;
+    }
+
+    /**
+     * @return All the @{link Publisher}s that were created by this instance.
+     */
+    public final Queue<Publisher<? extends Message>> getPublishers() {
+      return this.publishers;
+    }
+
+    /**
+     * Get list of Clients.
+     * @return ArrayList of Clients
+     */
+    public final Queue<Client<?>> getClients() {
+        return this.clients;
+    }
+
+    /**
+     * Get list of Services.
+     * @return ArrayList of Services
+     */
+    public final Queue<Service<?>> getServices() {
+        return this.services;
+    }
+
+    public Time getCurrentTime() {
+        return null;
+    }
+
+    public Log getLog() {
+        return this.logRos;
+    }
+}

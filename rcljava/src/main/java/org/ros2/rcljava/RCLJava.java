@@ -12,26 +12,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava;
 
 import java.lang.ref.WeakReference;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
-import org.ros2.rcljava.exception.NoImplementationAvailableException;
 
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Logger;
+
+import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
+import org.ros2.rcljava.exception.NoImplementationAvailableException;
+import org.ros2.rcljava.exception.NotInitializedException;
+import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.service.Client;
+import org.ros2.rcljava.node.service.Service;
+import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Subscription;
+
+import java.util.List;
 
 /**
- * <h1>ROS2 java client wrapper.</h1>
+ * ROS2 java client wrapper.
+ *
  * <p>JNI call of ROS2 c client.</p>
  *
  * @author Esteve Fernandez <esteve@apache.org>
+ * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class RCLJava {
 
@@ -40,16 +50,29 @@ public class RCLJava {
     private static Logger logger = Logger.getLogger(LOG_NAME);
 
     /** Global List/Queue of publishers. */
-    public static Queue<WeakReference> publisherReferences = new LinkedBlockingQueue();
+    public static Queue<WeakReference<Publisher<?>>> publisherReferences =
+            new LinkedBlockingQueue<WeakReference<Publisher<?>>>();
 
-    /** Current ROS2 middleware implementation use. */
+    /**
+     * The identifier of the currently active RMW implementation.
+     */
     private static String rmwImplementation = null;
 
-    /** ROS2 client is initialized. */
+    /**
+     * Flag to indicate if RCLJava has been fully initialized, with a valid RMW
+     *   implementation.
+     */
     private static boolean initialized = false;
 
-    /** List of ROS2 middleware supported. */
-    private static final Map<String, String> rmwToTypesupport = new ConcurrentSkipListMap<String, String>() {
+    /**
+     * All the @{link Node}s that have been created.
+     */
+    private static Queue<Node> nodes = new LinkedBlockingQueue<Node>();
+
+    /**
+     * A mapping between RMW implementations and their typesupports.
+     */
+    private static final Map<String, String> RMW_TO_TYPESUPPORT = new ConcurrentSkipListMap<String, String>() {
         /** Serial Id */
         private static final long serialVersionUID = 1L;
 
@@ -62,191 +85,443 @@ public class RCLJava {
     };
 
     // Natives definitions
-    private static native void nativeRCLJavaInit();
-    private static native long nativeCreateNodeHandle(String nodeName);
-    private static native boolean nativeOk();
-    private static native String nativeGetRMWIdentifier();
+    //################################################################################################################//
+
+    // rcl.h
+    /**
+     * Initialize the underlying rcl layer.
+     */
+    private static native void nativeRCLJavaInit(String args[]);
+
     private static native void nativeShutdown();
+
+    /**
+     * Call the underlying ROS2 rcl mechanism to check if ROS2 has been shut
+     *   down.
+     *
+     * @return true if RCLJava hasn't been shut down, false otherwise.
+     */
+    private static native boolean nativeOk();
+
+    /**
+     * @return The identifier of the currently active RMW implementation via the
+     *     native ROS2 API.
+     */
+    private static native String nativeGetRMWIdentifier();
+
+    // Node.h
+    /**
+     * Create a ROS2 node (rcl_node_t) and return a pointer to it as an integer.
+     *
+     * @param nodeName The name that will identify this node in a ROS2 graph.
+     * @return A pointer to the underlying ROS2 node structure.
+     */
+    private static native long nativeCreateNodeHandle(String nodeName);
+
+    // Wait.h
     private static native long nativeGetZeroInitializedWaitSet();
-    private static native void nativeWaitSetInit(long waitSetHandle, int numberOfSubscriptions, int numberOfGuardConditions, int numberOfTimers);
+    private static native void nativeWaitSetInit(
+            long waitSetHandle,
+            int numberOfSubscriptions,
+            int numberOfGuardConditions,
+            int numberOfTimers,
+            int numberOfClients,
+            int numberOfServices);
     private static native void nativeWaitSetClearSubscriptions(long waitSetHandle);
     private static native void nativeWaitSetAddSubscription(long waitSetHandle, long subscriptionHandle);
+    private static native void nativeWaitSetClearServices(long waitSetHandle);
+    private static native void nativeWaitSetAddService(long waitSetHandle, long serviceHandle);
+    private static native void nativeWaitSetClearClients(long waitSetHandle);
+    private static native void nativeWaitSetAddClient(long waitSetHandle, long clientHandle);
     private static native void nativeWait(long waitSetHandle);
-    private static native Object nativeTake(long SubscriptionHandle, Class<?> msgType);
+    private static native Message nativeTake(long SubscriptionHandle, Class<?> msgType);
+    private static native void nativeWaitSetFini(long waitSetHandle);
+    private static native List<String> nativeGetNodeNames();
+    private static native Object nativeTakeRequest(
+            long serviceHandle,
+            long requestFromJavaConverterHandle,
+            long requestToJavaConverterHandle,
+            Object requestMessage);
+    private static native void nativeSendServiceResponse(
+            long serviceHandle,
+            Object header,
+            long responseFromJavaConverterHandle,
+            long responseToJavaConverterHandle,
+            Object responseMessage);
+    private static native Object nativeTakeResponse(
+            long clientHandle,
+            long responseFromJavaConverterHandle,
+            long responseToJavaConverterHandle,
+            Object responseMessage);
 
     /** Release all ressources at shutdown. */
     static {
-        logger.setLevel(Level.ALL);
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleFormatter());
-        logger.addHandler(handler);
-        handler.setLevel(Level.INFO);
-
-
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                logger.fine("Shutdown...");
+                if (RCLJava.initialized) {
+                    logger.fine("Final Shutdown...");
 
-                String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
-                StringBuilder msgLog = new StringBuilder();
-                for (String key : list) {
-                    msgLog.append(key);
-                    msgLog.append("\n");
-                }
-                logger.fine("Native libraries Loaded: \n" + msgLog.toString());
-
-                for(WeakReference<Publisher<?>> publisherReference : RCLJava.publisherReferences) {
-                    if(publisherReference.get() != null) {
-                        publisherReference.get().dispose();
+                    String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
+                    StringBuilder msgLog = new StringBuilder();
+                    for (String key : list) {
+                        msgLog.append(key);
+                        msgLog.append("\n");
                     }
+                    logger.fine("Native libraries Loaded: \n" + msgLog.toString());
+
+                    for(WeakReference<Publisher<?>> publisherReference : RCLJava.publisherReferences) {
+                        if(publisherReference.get() != null) {
+                            publisherReference.get().dispose();
+                        }
+                    }
+                }
+
+                for (Node node : nodes) {
+                    node.dispose();
                 }
             }
         });
     }
 
     /**
-     * <h1>Global initialization of rcl.</h1>
-     * <p>
-     * Unless otherwise noted, this must be called
-     * before using any rcl functions.
-     * </p><p>
-     * This function can only be run once after starting the program, and once
-     * after each call to rcl_shutdown. Repeated calls will fail with
-     * RCL_RET_ALREADY_INIT. This function is not thread safe.
-     * </p>
+     * Private constructor so this cannot be instantiated.
      */
-    public static void rclJavaInit() {
+    private RCLJava() { }
+
+    /**
+     * Initialize the RCLJava API. If successful, a valid RMW implementation will
+     *   be loaded and accessible, enabling the creating of ROS2 entities
+     *   (@{link Node}s, @{link Publisher}s and @{link Subscription}s.
+     */
+    public static void rclJavaInit(final String args[]) {
         synchronized (RCLJava.class) {
             if (!RCLJava.initialized) {
-                String libpath = System.getProperty("java.library.path");
-                logger.fine("Native Library path : \n" + libpath.replace(':', '\n'));
-
                 if (RCLJava.rmwImplementation == null) {
-                    for (Map.Entry<String, String> entry : rmwToTypesupport.entrySet()) {
-                        try {
-                            logger.config("Try to load native " + entry.getKey() + "...");
-                            RCLJava.setRMWImplementation(entry.getKey());
-                            logger.config(entry.getKey() + " loaded !");
-                            break;
-                        } catch (NoImplementationAvailableException e) {
-                            logger.config(entry.getKey() + " not available ! (" + e.getMessage() + ")");
-                        }
-                    }
+                    String libpath = System.getProperty("java.library.path");
+                    logger.fine("Native Library path : \n" + libpath.replace(':', '\n'));
+
+                    RCLJava.autoLoadRmw();
                 }
 
                 if (RCLJava.rmwImplementation == null) {
                     logger.severe("No RMW implementation found...");
                     System.exit(1);
                 } else {
-                    RCLJava.nativeRCLJavaInit();
+                    logger.fine("Initialize rclJava with " + RCLJava.rmwImplementation);
+                    RCLJava.nativeRCLJavaInit(args);
                     RCLJava.initialized = true;
                 }
+            } else {
+                NotInitializedException ex = new NotInitializedException("Cannot intialized twice !");
+                logger.severe(ex.getMessage());
+                throw ex;
             }
         }
     }
 
     /**
-     * Node Reference of native node.
-     *
-     * @param nodeName Name of the node.
-     * @return Instance of Node Reference.
+     * @return true if RCLJava has been fully initialized, false otherwise.
      */
-    public static Node createNode(String nodeName) {
-        logger.fine("Create Node stack : " + nodeName);
-        long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName);
+    public static boolean isInitialized() {
+        return RCLJava.initialized;
+    }
 
-        return new Node(nodeHandle);
+    public static void rclJavaInit() {
+        RCLJava.rclJavaInit(null);
     }
 
     /**
-     * <h1>Wait for once loop.</h1>
+     * Create a @{link Node}.
+     *
+     * @param nodeName Name of the node.
+     * @param nodeName The name that will identify this node in a ROS2 graph.
+     * @return A @{link Node} that represents the underlying ROS2 node
+     *     structure.
+     */
+    public static Node createNode(final String nodeName) {
+        logger.fine("Create Node stack : " + nodeName);
+
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
+        long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName);
+        Node node = new Node(nodeHandle, nodeName);
+        nodes.add(node);
+
+        return node;
+    }
+
+
+    /**
+     * Wait for once loop.
+     *
      * @param node
      */
-    public static void spinOnce(Node node) {
+    public static void spinOnce(final Node node) {
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
+        if (node.getClients().size() > 0 ||
+                node.getPublishers().size() > 0 ||
+                node.getServices().size() > 0 ||
+                node.getSubscriptions().size() > 0) {
+            long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
+
+            RCLJava.nativeWaitSetInit(
+                    waitSetHandle,
+                    node.getSubscriptions().size(),
+                    0,
+                    0,
+                    node.getClients().size(),
+                    node.getServices().size());
+
+            RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
+            RCLJava.nativeWaitSetClearServices(waitSetHandle);
+            RCLJava.nativeWaitSetClearClients(waitSetHandle);
+
+            for (Subscription<?> subscription : node.getSubscriptions()) {
+                RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
+            }
+
+            for (Service<?> service : node.getServices()) {
+                RCLJava.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
+            }
+
+            for (Client<?> client : node.getClients()) {
+                RCLJava.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
+            }
+
+            RCLJava.nativeWait(waitSetHandle);
+            RCLJava.nativeWaitSetFini(waitSetHandle);
+
+            for (Subscription subscription : node.getSubscriptions()) {
+                Message message = RCLJava.nativeTake(subscription.getSubscriptionHandle(), subscription.getMessageType());
+                if (message != null) {
+                    subscription.getCallback().accept(message);
+                }
+            }
+
+            for (Service service : node.getServices()) {
+                long requestFromJavaConverterHandle = service.getRequestFromJavaConverterHandle();
+                long requestToJavaConverterHandle = service.getRequestToJavaConverterHandle();
+                long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
+                long responseToJavaConverterHandle = service.getResponseToJavaConverterHandle();
+
+                Class<?> requestType = service.getRequestType();
+                Class<?> responseType = service.getResponseType();
+
+                Object requestMessage = null;
+                Object responseMessage = null;
+
+                try {
+                    requestMessage = requestType.newInstance();
+                    responseMessage = responseType.newInstance();
+                } catch (InstantiationException ie) {
+                    ie.printStackTrace();
+                    continue;
+                } catch (IllegalAccessException iae) {
+                    iae.printStackTrace();
+                    continue;
+                }
+
+                RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
+                        service.getServiceHandle(),
+                        requestFromJavaConverterHandle,
+                        requestToJavaConverterHandle,
+                        requestMessage);
+
+                if (rmwRequestId != null) {
+                    service.getCallback().accept(rmwRequestId, requestMessage, responseMessage);
+                    RCLJava.nativeSendServiceResponse(service.getServiceHandle(), rmwRequestId, responseFromJavaConverterHandle,
+                            responseToJavaConverterHandle, responseMessage);
+                }
+            }
+
+            for (Client<?> client : node.getClients()) {
+                long responseFromJavaConverterHandle = client.getResponseFromJavaConverterHandle();
+                long responseToJavaConverterHandle = client.getResponseToJavaConverterHandle();
+
+                Class<?> responseType = client.getResponseType();
+
+                Object responseMessage = null;
+
+                try {
+                    responseMessage = responseType.newInstance();
+                } catch (InstantiationException ie) {
+                    ie.printStackTrace();
+                    continue;
+                } catch (IllegalAccessException iae) {
+                    iae.printStackTrace();
+                    continue;
+                }
+
+                RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeResponse(
+                        client.getClientHandle(),
+                        responseFromJavaConverterHandle,
+                        responseToJavaConverterHandle,
+                        responseMessage);
+
+
+                if (rmwRequestId != null) {
+                    client.handleResponse(rmwRequestId, responseMessage);
+                }
+            }
+        } else {
+            // TODO fix to rate sleep.
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Helper Spin.
+     * @param node
+     */
+    public static void spin(final Node node) {
+        while(RCLJava.ok()) {
+            RCLJava.spinOnce(node);
+        }
+    }
+
+    /**
+     *
+     * @param node
+     * @param topic
+     * @return
+     */
+    public static Message waitForMessage(final Node node, final String topic) {
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
+        Message msg = null;
         long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
 
-        RCLJava.nativeWaitSetInit(waitSetHandle, node.getSubscriptions().size(), 0, 0);
-        RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
+        RCLJava.nativeWaitSetInit(waitSetHandle, 1, 0, 0, 0, 0);
 
+        RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
         for(Subscription<?> subscription : node.getSubscriptions()) {
-            RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
+            if (subscription.getTopic() == topic) {
+                RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
+            }
         }
 
         RCLJava.nativeWait(waitSetHandle);
 
-        for(Subscription subscription : node.getSubscriptions()) {
-            Object msg = RCLJava.nativeTake(subscription.getSubscriptionHandle(), subscription.getMsgType());
-            if (msg != null) {
-                subscription.getCallback().accept(msg);
+        for(Subscription<?> subscription : node.getSubscriptions()) {
+            if (subscription.getTopic() == topic) {
+                msg = RCLJava.nativeTake(subscription.getSubscriptionHandle(), subscription.getMessageType());
+                if (msg != null) {
+                    break;
+                }
             }
         }
+
+        RCLJava.nativeWaitSetFini(waitSetHandle);
+
+        return msg;
+
     }
 
     /**
-     * Check if native is ready.
+     * Return true if rcl is currently initialized, otherwise false.
      *
-     * @see rcl_node_is_valid(const rcl_node_t * node);
-     * @return true if the node is valid, else false.
+     * @see rcl_ok();
+     *
+     * @return true if RCLJava hasn't been shut down, false otherwise.
      */
     public static boolean ok() {
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
         return RCLJava.nativeOk();
     }
 
     /**
-     * <h1>Signal global shutdown of RCLJava.</h1>
-     * <p>
-     * This function does not have to be
-     * called on exit, but does have to be called making a repeat call to
-     * RCLJava.rclJavaInit.
-     * </p><p>
-     * This function can only be called once after each call to RCLJava.rclJavaInit.
-     * </p>
+     * Signal global shutdown of RCLJava.
+     *
+     * <p>This function does not have to be called on exit, but does have to be called making a
+     * repeat call to RCLJava.rclJavaInit.</p>
+     *
+     * <p>This function can only be called once after each call to RCLJava.rclJavaInit.</p>
      */
     public static void shutdown() {
         logger.fine("Shutdown...");
+
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
         RCLJava.nativeShutdown();
+        RCLJava.initialized = false;
     }
 
     /**
-     * Get ROS Midleware indentifier.
-     *
-     * @return indentifier.
+     * @return The identifier of the currently active RMW implementation.
      */
     public static String getRMWIdentifier() {
+        if (!RCLJava.initialized) {
+            throw new NotInitializedException();
+        }
+
         return RCLJava.nativeGetRMWIdentifier();
     }
 
+    public static List<String> getNodeNames() {
+        return RCLJava.nativeGetNodeNames();
+    }
+
     /**
-     * <h1>Get identifier of the ROS2 middleware use.</h1>
+     * Get identifier of the ROS2 middleware use.
+     *
      * <p>TODO rename to list of RMW available.</p>
+     *
      * @return Identifier string of ROS2 middleware.
      */
     public static String getTypesupportIdentifier() {
-        String typesupportIdentifier = rmwToTypesupport.get(RCLJava.getRMWIdentifier());
+        String typesupportIdentifier = RMW_TO_TYPESUPPORT.get(RCLJava.getRMWIdentifier());
 
         return typesupportIdentifier;
     }
 
     /**
-     * <h1>Switch of ROS2 middleware implementation</h1>
+     * Switch of ROS2 middleware implementation
+     *
      * <p>TODO need to check implementation available.</p>
+     *
      * @param rmwImplementation
      * @throws NoImplementationAvailableException
      */
     public static void setRMWImplementation(String rmwImplementation)
-            throws NoImplementationAvailableException {
+            throws NoImplementationAvailableException, ImplementationAlreadyImportedException {
 
         synchronized(RCLJava.class) {
-            String file = "rcljavaRCLJava__" + rmwImplementation;
-            logger.fine("Load native file : lib" + file + ".so");
+            if (rmwImplementation != null && !rmwImplementation.isEmpty()) {
+                if (!rmwImplementation.equals(RCLJava.rmwImplementation)) {
 
-            try {
-                System.loadLibrary(file);
-                RCLJava.rmwImplementation = rmwImplementation;
-            } catch (UnsatisfiedLinkError ule) {
-                throw new NoImplementationAvailableException(ule);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                    String file = "rcljavaRCLJava__" + rmwImplementation;
+                    logger.fine("Load native RMW file : lib" + file + ".so");
+
+                    try {
+                        System.loadLibrary(file);
+                        RCLJava.rmwImplementation = rmwImplementation;
+                    } catch (UnsatisfiedLinkError e) {
+                        throw new NoImplementationAvailableException(e);
+                    } catch (Exception e) {
+                        throw new NoImplementationAvailableException(e);
+                    }
+                } else {
+                    throw new ImplementationAlreadyImportedException();
+                }
+            } else {
+                logger.fine("Disable RMW !");
+                RCLJava.rmwImplementation = null;
             }
         }
     }
@@ -259,6 +534,11 @@ public class RCLJava {
     public static void loadLibrary(String name) {
         synchronized(RCLJava.class) {
             logger.fine("Load native file : lib" + name + ".so");
+
+            if (!RCLJava.initialized) {
+                throw new NotInitializedException();
+            }
+
             try {
                 System.loadLibrary(name);
             } catch (UnsatisfiedLinkError e) {
@@ -267,4 +547,23 @@ public class RCLJava {
             }
         }
     }
+
+    /**
+     * Load RMW.
+     */
+    private static void autoLoadRmw() {
+        for (Map.Entry<String, String> entry : RMW_TO_TYPESUPPORT.entrySet()) {
+            try {
+                logger.config("Try to load native " + entry.getKey() + "...");
+                RCLJava.setRMWImplementation(entry.getKey());
+                logger.config(entry.getKey() + " loaded !");
+                break;
+            } catch (NoImplementationAvailableException e) {
+                logger.config(entry.getKey() + " not available ! (" + e.getMessage() + ")");
+            } catch (ImplementationAlreadyImportedException e) {
+                logger.config(e.getMessage());
+            }
+        }
+    }
+
 }

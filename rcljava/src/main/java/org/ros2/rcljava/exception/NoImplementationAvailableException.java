@@ -20,7 +20,7 @@ package org.ros2.rcljava.exception;
  * @author Mickael Gaillard <mickael.gaillard@gmail.com>
  *
  */
-public class NoImplementationAvailableException extends RuntimeException {
+public class NoImplementationAvailableException extends Exception {
 
     /** Serial ID */
     private static final long serialVersionUID = -2351440132432398102L;

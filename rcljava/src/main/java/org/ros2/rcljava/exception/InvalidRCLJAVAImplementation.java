@@ -15,16 +15,19 @@
 package org.ros2.rcljava.exception;
 
 /**
- * Raised when an invalid RCLPYImplementation is requested.
- * 
- * @author Mickael Gaillard
+ * Raised when an invalid RCLJAVAImplementation is requested.
+ *
+ * @author Mickael Gaillard <mick.gaillard@gmail.com>
  *
  */
-public class InvalidRCLJAVAImplementation extends Exception {
+public class InvalidRCLJAVAImplementation extends RuntimeException {
+
+    /** Serial ID */
+    private static final long serialVersionUID = -7328914635553812875L;
 
     /**
      * Constructor.
-     * 
+     *
      * @param cause
      */
     public InvalidRCLJAVAImplementation(Throwable cause) {

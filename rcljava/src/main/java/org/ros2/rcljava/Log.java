@@ -14,23 +14,184 @@
  */
 package org.ros2.rcljava;
 
-import org.ros2.rcljava.exception.NoImplementationAvailableException;
+import java.util.logging.Level;
+
+//import java.io.PrintWriter;
+//import java.io.StringWriter;
+
+import java.util.logging.Logger;
+import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Topics;
+
+import std_msgs.msg.String;
 
 /**
  * Not define in ROS2.
  *
- * @author Mickael Gaillard
+ * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class Log {
 
-    public Log() { }
+    private final Logger log;
+    private final Node defaultNode;
+    private final Publisher<std_msgs.msg.String> publisher;
 
-    public void fatal(Exception e) {
-        throw new NoImplementationAvailableException(e);
+    private boolean isDebugEnabled;
+    private boolean isErrorEnabled;
+    private boolean isFatalEnabled;
+    private boolean isInfoEnabled;
+    private boolean isTraceEnabled;
+    private boolean isWarnEnabled;
+
+    public Log(final Node defaultNode) {
+        this.defaultNode = defaultNode;
+        this.publisher = this.defaultNode.createPublisher(std_msgs.msg.String.class, Topics.ROSOUT);
+        this.log = Logger.getLogger(this.defaultNode.getName());
+
+        this.log.setLevel(Level.ALL);
     }
 
-    public void info(String string) {
-        throw new NoImplementationAvailableException(new Exception(string));
+//    public Publisher<rosgraph_msgs.msg.Log> getPublisher() {
+//        return this.publisher;
+//    }
+
+//    private void publish(byte level, Object message, Throwable throwable) {
+//        StringWriter stringWriter = new StringWriter();
+//        PrintWriter printWriter = new PrintWriter(stringWriter);
+//        throwable.printStackTrace(printWriter);
+//        this.publish(level, message.toString() + '\n' + stringWriter.toString());
+//    }
+
+    private void publish(byte level, Object message) {
+//        rosgraph_msgs.msg.Log logMessage = new rosgraph_msgs.msg.Log();
+//        logMessage.getHeader().setStamp(this.defaultNode.getCurrentTime());
+//        logMessage.setLevel(level);
+//        logMessage.setName(this.defaultNode.getName());
+//        logMessage.setMsg(message.toString());
+        String logMessage = new String();
+        logMessage.setData(message.toString());
+        this.publisher.publish(logMessage);
+    }
+
+    public boolean isDebugEnabled() {
+        return this.isDebugEnabled;
+    }
+
+    public boolean isErrorEnabled() {
+        return this.isErrorEnabled;
+    }
+
+    public boolean isFatalEnabled() {
+        return this.isFatalEnabled;
+    }
+
+    public boolean isInfoEnabled() {
+        return this.isInfoEnabled;
+    }
+
+    public boolean isTraceEnabled() {
+        return this.isTraceEnabled;
+    }
+
+    public boolean isWarnEnabled() {
+        return this.isWarnEnabled;
+    }
+
+    public void trace(Object message) {
+        this.log.info(message.toString());
+        if (this.isTraceEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.Log.DEBUG, message);
+        }
+    }
+
+    public void trace(Object message, Throwable t) {
+        this.log.info(message.toString());
+        if (this.isTraceEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.Log.DEBUG, message, t);
+        }
+    }
+
+    public void debug(Object message) {
+        this.log.finest(message.toString());
+        if (this.isDebugEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.Log.DEBUG, message);
+        }
+    }
+
+    public void debug(Object message, Throwable t) {
+        this.log.finest(message.toString());
+        if (this.isDebugEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.Log.DEBUG, message, t);
+        }
+    }
+
+    public void info(Object message) {
+        this.log.info(message.toString());
+        if (this.isInfoEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.Log.INFO, message);
+        }
+    }
+
+    public void info(Object message, Throwable t) {
+        this.log.info(message.toString());
+        if (this.isInfoEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.Log.INFO, message, t);
+        }
+    }
+
+    public void warn(Object message) {
+        this.log.warning(message.toString());
+        if (this.isWarnEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.Log.WARN, message);
+        }
+    }
+
+    public void warn(Object message, Throwable t) {
+        this.log.warning(message.toString());
+        if (this.isWarnEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.msg.Log.WARN, message, t);
+        }
+    }
+
+    public void error(Object message) {
+        this.log.severe(message.toString());
+        if (this.isErrorEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.Log.ERROR, message);
+        }
+    }
+
+    public void error(Object message, Throwable t) {
+        this.log.severe(message.toString());
+        if (this.isErrorEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.Log.ERROR, message, t);
+        }
+    }
+
+    public void fatal(Object message) {
+        this.log.severe(message.toString());
+        if (this.isFatalEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.Log.FATAL, message);
+        }
+    }
+
+    public void fatal(Object message, Throwable t) {
+        this.log.severe(message.toString());
+        if (this.isFatalEnabled() && this.publisher != null) {
+            this.publish((byte)0, message);
+//            this.publish(rosgraph_msgs.Log.FATAL, message, t);
+        }
     }
 
 }

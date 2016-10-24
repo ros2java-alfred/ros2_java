@@ -39,6 +39,8 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
 
     mapping_srvs = {
         os.path.join(template_dir, 'srv.java.template'): ['%s.java'],
+        os.path.join(template_dir, 'srv_support.entry_point.cpp.template'):
+        type_support_impl_by_filename.keys(),
     }
 
     for template_file in mapping_msgs.keys():
@@ -72,15 +74,20 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
         modules[subfolder].append((module_name, type_name))
         package_name = args['package_name']
         jni_package_name = package_name.replace('_', '_1')
+        jni_type_name = type_name.replace('_', '_1')
         for template_file, generated_filenames in mapping.items():
             for generated_filename in generated_filenames:
                 data = {
                     'constant_value_to_java': constant_value_to_java,
-                     'convert_camel_case_to_lower_case_underscore': convert_camel_case_to_lower_case_underscore,
+                    'convert_camel_case_to_lower_case_underscore': convert_camel_case_to_lower_case_underscore,
+                    'convert_lower_case_underscore_to_camel_case' : convert_lower_case_underscore_to_camel_case,
                     'get_builtin_java_type': get_builtin_java_type,
-                    'module_name': module_name, 'package_name': package_name,
+                    'module_name': module_name,
+                    'package_name': package_name,
                     'jni_package_name': jni_package_name,
-                    'spec': spec, 'subfolder': subfolder,
+                    'spec': spec,
+                    'subfolder': subfolder,
+                    'jni_type_name': jni_type_name,
                     'typesupport_impl': type_support_impl_by_filename.get(generated_filename, ''),
                     'typesupport_impls': typesupport_impls,
                     'type_name': type_name,
@@ -166,3 +173,9 @@ def get_java_type(type_, use_primitives=True):
         return type_.type
 
     return get_builtin_java_type(type_.type, use_primitives=use_primitives)
+
+def convert_lower_case_underscore_to_camel_case(value):
+    components = value.split('_')
+    # We capitalize the first letter of each component except the first one
+    # with the 'title' method and join them together.
+    return components[0] + "".join(x.title() for x in components[1:])
