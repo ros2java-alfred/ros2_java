@@ -176,7 +176,7 @@ Mickael Gaillard (https://github.com/Theosakamg)
 TODO
 ----
 
-There's a bunch of features missing, efficient intraprocess communication, DDS domain separation and QoS profiles.
+There's a bunch of features missing, including efficient intraprocess communication and DDS domain separation.
 
 Large messages would benefit from Java's NIO.
 
