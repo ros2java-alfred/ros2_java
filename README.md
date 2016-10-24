@@ -23,6 +23,16 @@ Including Android?
 
 Yep! Make sure to use [this fork](https://github.com/eProsima/Fast-RTPS/pull/26) as your DDS vendor.
 
+Features
+--------
+
+The current set of features include:
+- Generation of all builtin and complex ROS types, including arrays, strings, nested types, constants, etc.
+- Support for publishers and subscriptions
+- Tunable Quality of Service (e.g. lossy networks, reliable delivery, etc.)
+- Clients and services
+- Support for Android
+
 Sounds great, how can I try this out?
 -------------------------------------
 
