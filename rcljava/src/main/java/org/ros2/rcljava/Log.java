@@ -14,8 +14,6 @@
  */
 package org.ros2.rcljava;
 
-import java.util.logging.Level;
-
 //import java.io.PrintWriter;
 //import java.io.StringWriter;
 

@@ -169,6 +169,8 @@ public class Node implements INode {
         this.services       = new LinkedBlockingQueue<Service<?>>();
         this.parameters     = new HashMap<String, ParameterVariant<?>>();
 
+        Node.logger.debug("Init Node stack : " + this.name);
+
         this.parameterService = new ParameterService(this, QoSProfile.PARAMETER);
         this.logRos = new Log(this);
     }
@@ -178,7 +180,7 @@ public class Node implements INode {
      */
     @Override
     public void dispose() {
-        logger.debug("Destroy Node stack : " + this.name);
+        Node.logger.debug("Destroy Node stack : " + this.name);
 
         Node.nativeDispose(this.nodeHandle);
         this.publishers.clear();
@@ -195,11 +197,10 @@ public class Node implements INode {
         String name = Node.nativeGetName(this.nodeHandle);
 
         if (!this.name.equals(name)) {
-            logger.debug("Node name has change ! from " + this.name + " to " + name);
+            Node.logger.debug("Node name has changed ! from " + this.name + " to " + name);
             this.name = name;
         }
 
-        logger.debug("Get Node name stack : " + this.name);
         return name;
     }
 
@@ -222,7 +223,7 @@ public class Node implements INode {
             final String topic,
             final QoSProfile qosProfile) {
 
-        logger.debug("Create Publisher : " + topic);
+        Node.logger.debug("Create Publisher : " + topic);
         long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
         long publisherHandle = Node.nativeCreatePublisherHandle(this.nodeHandle, messageType, topic, qosProfileHandle);
         RCLJava.disposeQoSProfile(qosProfileHandle);
@@ -270,7 +271,7 @@ public class Node implements INode {
             final Consumer<T> callback,
             final QoSProfile qosProfile) {
 
-        logger.debug("Create Subscription : " + topic);
+        Node.logger.debug("Create Subscription : " + topic);
         long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
         long subscriptionHandle = Node.nativeCreateSubscriptionHandle(this.nodeHandle, messageType, topic, qosProfileHandle);
         RCLJava.disposeQoSProfile(qosProfileHandle);
@@ -324,7 +325,7 @@ public class Node implements INode {
             final String serviceName,
             final QoSProfile qosProfile) throws Exception {
 
-        logger.debug("Create Client : " + serviceName);
+        Node.logger.debug("Create Client : " + serviceName);
 
         Class<?> requestType = (Class<?>)serviceType.getField("RequestType").get(null);
 
@@ -401,7 +402,7 @@ public class Node implements INode {
             final QoSProfile qosProfile
             ) throws Exception {
 
-        logger.debug("Create Service : " + serviceName);
+        Node.logger.debug("Create Service : " + serviceName);
 //        long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service, qos);
 //
 //        Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
@@ -498,7 +499,7 @@ public class Node implements INode {
         HashMap<String, String> topics =  Node.getListTopics(this.nodeHandle);
 
         for (Entry<String, String> entry : topics.entrySet()) {
-            logger.debug("\t - Topics: " + entry.getKey() + "\t Value: " + entry.getValue());
+            Node.logger.debug("\t - Topics: " + entry.getKey() + "\t Value: " + entry.getValue());
         }
 
         return topics;

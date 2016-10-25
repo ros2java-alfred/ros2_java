@@ -17,7 +17,6 @@ package org.ros2.rcljava.qos;
 
 import org.ros2.rcljava.qos.policies.Durability;
 import org.ros2.rcljava.qos.policies.History;
-import org.ros2.rcljava.qos.policies.QoSPolicy;
 import org.ros2.rcljava.qos.policies.Reliability;
 
 public class QoSProfile {

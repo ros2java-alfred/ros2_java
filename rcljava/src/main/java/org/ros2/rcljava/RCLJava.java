@@ -165,7 +165,7 @@ public class RCLJava {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 if (RCLJava.initialized) {
-                    logger.debug("Final Shutdown...");
+                    RCLJava.logger.debug("Final Shutdown...");
 
                     String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
                     StringBuilder msgLog = new StringBuilder();
@@ -173,7 +173,7 @@ public class RCLJava {
                         msgLog.append(key);
                         msgLog.append("\n");
                     }
-                    logger.debug("Native libraries Loaded: \n" + msgLog.toString());
+                    RCLJava.logger.debug("Native libraries Loaded: \n" + msgLog.toString());
 
                     for(WeakReference<Publisher<?>> publisherReference : RCLJava.publisherReferences) {
                         if(publisherReference.get() != null) {
@@ -204,16 +204,16 @@ public class RCLJava {
             if (!RCLJava.initialized) {
                 if (RCLJava.rmwImplementation == null) {
                     String libpath = System.getProperty("java.library.path");
-                    logger.debug("Native Library path : \n" + libpath.replace(':', '\n'));
+                    RCLJava.logger.debug("Native Library path : \n" + libpath.replace(':', '\n'));
 
                     RCLJava.autoLoadRmw();
                 }
 
                 if (RCLJava.rmwImplementation == null) {
-                    logger.error("No RMW implementation found...");
+                    RCLJava.logger.error("No RMW implementation found...");
                     System.exit(1);
                 } else {
-                    logger.debug("Initialize rclJava with " + RCLJava.rmwImplementation);
+                    RCLJava.logger.debug("Initialize rclJava with " + RCLJava.rmwImplementation);
                     RCLJava.nativeRCLJavaInit(args);
                     RCLJava.initialized = true;
                 }
@@ -245,7 +245,7 @@ public class RCLJava {
      *     structure.
      */
     public static Node createNode(final String nodeName) {
-        logger.debug("Create Node stack : " + nodeName);
+        RCLJava.logger.debug("Create Node stack : " + nodeName);
 
         if (!RCLJava.initialized) {
             throw new NotInitializedException();
@@ -458,7 +458,7 @@ public class RCLJava {
      * <p>This function can only be called once after each call to RCLJava.rclJavaInit.</p>
      */
     public static void shutdown() {
-        logger.debug("Shutdown...");
+        RCLJava.logger.debug("Shutdown...");
 
         if (!RCLJava.initialized) {
             throw new NotInitializedException();
@@ -512,7 +512,7 @@ public class RCLJava {
                 if (!rmwImplementation.equals(RCLJava.rmwImplementation)) {
 
                     String file = "rcljavaRCLJava__" + rmwImplementation;
-                    logger.debug("Load native RMW file : lib" + file + ".so");
+                    RCLJava.logger.debug("Load native RMW file : lib" + file + ".so");
 
                     try {
                         System.loadLibrary(file);
@@ -526,7 +526,7 @@ public class RCLJava {
                     throw new ImplementationAlreadyImportedException();
                 }
             } else {
-                logger.debug("Disable RMW !");
+                RCLJava.logger.debug("Disable RMW !");
                 RCLJava.rmwImplementation = null;
             }
         }
@@ -539,7 +539,7 @@ public class RCLJava {
      */
     public static void loadLibrary(String name) {
         synchronized(RCLJava.class) {
-            logger.debug("Load native file : lib" + name + ".so");
+            RCLJava.logger.info("Load native file : lib" + name + ".so");
 
             if (!RCLJava.initialized) {
                 throw new NotInitializedException();
@@ -548,7 +548,7 @@ public class RCLJava {
             try {
                 System.loadLibrary(name);
             } catch (UnsatisfiedLinkError e) {
-                System.err.println("Native code library failed to load.\n" + e);
+                RCLJava.logger.error("Native code library failed to load.", e);
                 System.exit(1);
             }
         }
@@ -560,14 +560,14 @@ public class RCLJava {
     private static void autoLoadRmw() {
         for (Map.Entry<String, String> entry : RMW_TO_TYPESUPPORT.entrySet()) {
             try {
-                logger.info("Try to load native " + entry.getKey() + "...");
+                RCLJava.logger.info("Try to load native " + entry.getKey() + "...");
                 RCLJava.setRMWImplementation(entry.getKey());
-                logger.info(entry.getKey() + " loaded !");
+                RCLJava.logger.info(entry.getKey() + " loaded !");
                 break;
             } catch (NoImplementationAvailableException e) {
-                logger.error(entry.getKey() + " not available ! (" + e.getMessage() + ")");
+                RCLJava.logger.error(entry.getKey() + " not available ! (" + e.getMessage() + ")");
             } catch (ImplementationAlreadyImportedException e) {
-                logger.error(e.getMessage());
+                RCLJava.logger.error(e.getMessage());
             }
         }
     }
@@ -578,6 +578,8 @@ public class RCLJava {
       int depth = qosProfile.getDepth();
       int reliability = qosProfile.getReliability().getValue();
       int durability = qosProfile.getDurability().getValue();
+
+      RCLJava.logger.debug("Convert QosProfile...");
 
       return nativeConvertQoSProfileToHandle(history, depth, reliability,
         durability);

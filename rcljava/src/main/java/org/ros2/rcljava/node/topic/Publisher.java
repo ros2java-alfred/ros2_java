@@ -137,7 +137,7 @@ public class Publisher<T extends Message> {
      * Safely destroy the underlying ROS2 publisher structure.
      */
     public void dispose() {
-        logger.debug("Destroy Publisher of topic : " + this.topic);
+        Publisher.logger.debug("Destroy Publisher of topic : " + this.topic);
 
         Publisher.nativeDispose(this.nodeHandle, this.publisherHandle);
     }

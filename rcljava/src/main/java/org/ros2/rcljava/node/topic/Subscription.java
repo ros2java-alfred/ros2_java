@@ -15,6 +15,8 @@
 package org.ros2.rcljava.node.topic;
 
 import org.ros2.rcljava.qos.QoSProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ros2.rcljava.internal.message.Message;
 
 /**
@@ -27,6 +29,8 @@ import org.ros2.rcljava.internal.message.Message;
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class Subscription<T extends Message> {
+
+    private static final Logger logger = LoggerFactory.getLogger(Subscription.class);
 
     /**
        * An integer that represents a pointer to the underlying ROS2 node
@@ -124,6 +128,7 @@ public class Subscription<T extends Message> {
      * Release all Publisher ressource.
      */
     public void dispose() {
+        Subscription.logger.debug("Destroy Publisher of topic : " + this.topic);
         // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
     }
 }

@@ -18,10 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.ros2.rcljava.qos.QoSProfile;
-import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.topic.Subscription;
@@ -49,7 +50,7 @@ import rcl_interfaces.msg.SetParametersResult;
  */
 public class SyncParametersClient {
 
-    private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
+    private static final Logger logger = LoggerFactory.getLogger(SyncParametersClient.class);
 
     private Client<GetParameters> getParametersClient;
     private Client<GetParameterTypes> getParameterTypesClient;
