@@ -1,0 +1,39 @@
+sudo: required
+
+language: generic
+
+services:
+  - docker
+
+before_install:
+- docker pull esteve/ros2-ubuntu-xenial-travisci:java
+- docker run -u "$UID" -it --rm esteve/ros2-ubuntu-xenial-travisci:java sh -c '/bin/echo $HOME'
+- docker ps -a
+- pwd
+- ls -l
+- cd ..
+- ls -l
+- cd ..
+- ls -l
+- pwd
+- mkdir -p ament_ws/src
+- cd ament_ws
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "/usr/bin/wget https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos"
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "/usr/bin/vcs import src < ament_java.repos"
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated"
+- cd ..
+- mkdir -p ros2_java_ws/src
+- cd ros2_java_ws
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "/usr/bin/wget https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_desktop.repos"
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "/usr/bin/vcs import src < ros2_java_desktop.repos"
+- rm -rfv src/ros2_java/ros2_java
+- ln -s /home/travis/build/esteve/ros2_java src/ros2_java/ros2_java
+- ls -l src/ros2_java/
+- ls -l src/ros2_java/ros2_java/
+- cd src/ros2/rosidl
+- patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_java.diff
+- cd /home/travis/build
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament build --symlink-install --isolated"
+
+script:
+- cd /home/travis/build && docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament test --isolated --only rcljava"
