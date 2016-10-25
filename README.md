@@ -1,4 +1,4 @@
-ROS2 for Java
+ROS2 for Java [![Build Status](https://travis-ci.org/esteve/ros2_java.svg?branch=master)](https://travis-ci.org/esteve/ros2_java)
 =============
 
 What is this?
