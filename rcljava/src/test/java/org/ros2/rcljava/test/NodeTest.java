@@ -18,7 +18,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.node.Node;
@@ -121,7 +121,7 @@ public class NodeTest {
             pub = node.<std_msgs.msg.String>createPublisher(
                     std_msgs.msg.String.class,
                     "testChannel",
-                    QoSProfile.PROFILE_DEFAULT);
+                    QoSProfile.DEFAULT);
 
             pub.dispose();
             node.dispose();
@@ -153,7 +153,7 @@ public class NodeTest {
                     std_msgs.msg.String.class,
                     "testChannel",
                     callback,
-                    QoSProfile.PROFILE_DEFAULT);
+                    QoSProfile.DEFAULT);
 
           //TODO sub.dispose();
             node.dispose();
@@ -179,7 +179,7 @@ public class NodeTest {
             clt = node.<std_msgs.msg.String>createClient(
                     std_msgs.msg.String.class,
                     "testChannel",
-                    QoSProfile.PROFILE_DEFAULT);
+                    QoSProfile.DEFAULT);
           //TODO clt.dispose();
             node.dispose();
         } catch (Exception e) {
@@ -211,7 +211,7 @@ public class NodeTest {
                     std_msgs.msg.String.class,
                     "testChannel",
                     callback,
-                    QoSProfile.PROFILE_DEFAULT);
+                    QoSProfile.DEFAULT);
           //TODO srv.dispose();
             node.dispose();
         } catch (Exception e) {

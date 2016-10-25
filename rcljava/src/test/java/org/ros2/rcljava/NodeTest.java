@@ -20,6 +20,10 @@ import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.service.RCLFuture;
+import org.ros2.rcljava.node.topic.Consumer;
+import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Subscription;
 
 import java.lang.ref.WeakReference;
 
