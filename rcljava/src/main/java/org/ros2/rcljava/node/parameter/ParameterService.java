@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;

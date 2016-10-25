@@ -33,4 +33,4 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_service_Client_nativeSendClien
 }
 #endif
 
-#endif  // ORG_ROS2_RCLJAVA_CLIENT_H_
+#endif  // ORG_ROS2_RCLJAVA_NODE_SERVICE_CLIENT_H_

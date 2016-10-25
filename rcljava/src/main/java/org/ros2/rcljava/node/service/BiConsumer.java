@@ -16,8 +16,8 @@
 package org.ros2.rcljava.node.service;
 
 /**
- * This is a copy of {@link java.util.funcion.BiConsumer} for platforms that don't
- * support Java 8's API (e.g. Android &lt; 7.0)
+ * This is a copy of {@link java.util.funcion.BiConsumer} for platforms that
+ * don't support Java 8's API (e.g. Android &lt; 7.0)
  *
  * @param <T> - the type of the first input to the operation
  * @param <U> - the type of the second input to the operation

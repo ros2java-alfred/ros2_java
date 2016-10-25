@@ -14,9 +14,10 @@
  */
 package org.ros2.rcljava.node.topic;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.internal.message.Message;
 
@@ -31,7 +32,7 @@ import org.ros2.rcljava.internal.message.Message;
  */
 public class Publisher<T extends Message> {
 
-    private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
+    private static final Logger logger = LoggerFactory.getLogger(Publisher.class);
 
     /**
      * An integer that represents a pointer to the underlying ROS2 node
@@ -91,7 +92,7 @@ public class Publisher<T extends Message> {
      * @param topic The topic to which this publisher will publish messages.
      * @param qos Quality of Service profile.
      */
-    public Publisher(long nodeHandle, long publisherHandle, Class<T> messageType, String topic, QoSProfile qosProfile) {
+    public Publisher(final long nodeHandle, final long publisherHandle, final Class<T> messageType, final String topic, final QoSProfile qosProfile) {
         this.nodeHandle = nodeHandle;
         this.publisherHandle = publisherHandle;
         this.messageType = messageType;
@@ -104,7 +105,7 @@ public class Publisher<T extends Message> {
      *
      * @param message An instance of the &lt;T&gt; parameter.
      */
-    public void publish(T msg) {
+    public void publish(final T msg) {
         Publisher.nativePublish(this.publisherHandle, msg);
     }
 
@@ -136,7 +137,7 @@ public class Publisher<T extends Message> {
      * Safely destroy the underlying ROS2 publisher structure.
      */
     public void dispose() {
-        logger.fine("Destroy Publisher of topic : " + this.topic);
+        logger.debug("Destroy Publisher of topic : " + this.topic);
 
         Publisher.nativeDispose(this.nodeHandle, this.publisherHandle);
     }

@@ -14,7 +14,7 @@
  */
 package org.ros2.rcljava.node.topic;
 
-import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.internal.message.Message;
 
 /**

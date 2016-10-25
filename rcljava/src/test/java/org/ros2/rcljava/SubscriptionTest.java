@@ -15,6 +15,7 @@
 
 package org.ros2.rcljava;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
@@ -25,17 +26,17 @@ import org.ros2.rcljava.node.topic.Subscription;
 public class SubscriptionTest {
 
   @Test
-  public void testCreate() {
+  public final void testCreate() {
     RCLJava.rclJavaInit();
     Node node = RCLJava.createNode("test_node");
-    Subscription<std_msgs.msg.String> subscription = node.
-      <std_msgs.msg.String>createSubscription(std_msgs.msg.String.class,
-      "test_topic", new Consumer<std_msgs.msg.String>() {
-        public void accept(std_msgs.msg.String msg) {
+    Subscription<std_msgs.msg.String> subscription = node
+        .<std_msgs.msg.String>createSubscription(std_msgs.msg.String.class,
+        "test_topic", new Consumer<std_msgs.msg.String>() {
+          public void accept(final std_msgs.msg.String msg) {
+          }
         }
-      }
     );
-    assertNotEquals(node.getNodeHandle(), subscription.getNodeHandle());
+    assertEquals(node.getNodeHandle(), subscription.getNodeHandle());
     assertNotEquals(0, subscription.getNodeHandle());
     assertNotEquals(0, subscription.getSubscriptionHandle());
   }

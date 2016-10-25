@@ -7,7 +7,11 @@ What is this?
 This is a set of projects (bindings, code generator, examples and more) that enables developers to write ROS2
 applications for the JVM and Android.
 
-Besides this repository itself, there's also https://github.com/esteve/ament_java, which adds support for Gradle to Ament. Additionally, examples for Java and Android can be found in https://github.com/esteve/ros2_java_examples and https://github.com/esteve/ros2_android_examples respectively.
+Besides this repository itself, there's also:
+- https://github.com/esteve/ament_java, which adds support for Gradle to Ament
+- https://github.com/esteve/ament_gradle_plugin, a Gradle plugin that makes it easier to use ROS2 in Java and Android project, and which can be found published at the Gradle Central at https://plugins.gradle.org/plugin/org.ros2.tools.gradle
+- https://github.com/esteve/ros2_java_examples, examples for the Java Runtime Environment
+- https://github.com/esteve/ros2_android_examples, examples for Android
 
 Is this Java only?
 ------------------
@@ -18,6 +22,16 @@ Including Android?
 ------------------
 
 Yep! Make sure to use [this fork](https://github.com/eProsima/Fast-RTPS/pull/26) as your DDS vendor.
+
+Features
+--------
+
+The current set of features include:
+- Generation of all builtin and complex ROS types, including arrays, strings, nested types, constants, etc.
+- Support for publishers and subscriptions
+- Tunable Quality of Service (e.g. lossy networks, reliable delivery, etc.)
+- Clients and services
+- Support for Android
 
 Sounds great, how can I try this out?
 -------------------------------------
@@ -64,7 +78,7 @@ Talker:
 . ~/ament_ws/install_isolated/local_setup.sh
 . ~/ros2_java_ws/install_isolated/local_setup.sh
 cd ~/ros2_java_ws
-java -cp install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.Talker
+java -cp install_isolated/rcljava_common/share/rcljava_common/java/slf4j-jdk14-1.7.21.jar:install_isolated/rcljava_common/share/rcljava_common/java/slf4j-api-1.7.21.jar:install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.Talker
 ```
 
 Listener:
@@ -73,7 +87,7 @@ Listener:
 . ~/ament_ws/install_isolated/local_setup.sh
 . ~/ros2_java_ws/install_isolated/local_setup.sh
 cd ~/ros2_java_ws
-java -cp install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.Listener
+java -cp install_isolated/rcljava_common/share/rcljava_common/java/slf4j-jdk14-1.7.21.jar:install_isolated/rcljava_common/share/rcljava_common/java/slf4j-api-1.7.21.jar:install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.Listener
 ```
 
 Client and Service
@@ -85,7 +99,7 @@ Client:
 . ~/ament_ws/install_isolated/local_setup.sh
 . ~/ros2_java_ws/install_isolated/local_setup.sh
 cd ~/ros2_java_ws
-java -cp install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.AddTwoIntsClient
+java -cp install_isolated/rcljava_common/share/rcljava_common/java/slf4j-jdk14-1.7.21.jar:install_isolated/rcljava_common/share/rcljava_common/java/slf4j-api-1.7.21.jar:install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.AddTwoIntsClient
 ```
 
 Service:
@@ -94,7 +108,7 @@ Service:
 . ~/ament_ws/install_isolated/local_setup.sh
 . ~/ros2_java_ws/install_isolated/local_setup.sh
 cd ~/ros2_java_ws
-java -cp install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.AddTwoIntsService
+java -cp install_isolated/rcljava_common/share/rcljava_common/java/slf4j-jdk14-1.7.21.jar:install_isolated/rcljava_common/share/rcljava_common/java/slf4j-api-1.7.21.jar:install_isolated/std_msgs/share/std_msgs/java/std_msgs.jar:install_isolated/rcljava/share/rcljava/java/rcljava.jar:install_isolated/rcljava_examples/share/rcljava_examples/java/rcljava_examples.jar:install_isolated/example_interfaces/share/example_interfaces/java/example_interfaces.jar:install_isolated/rcljava_common/share/rcljava_common/java/rcljava_common.jar org.ros2.rcljava.examples.AddTwoIntsService
 ```
 
 You can also combine any scenario where the talker/listener or client/service are written in Java, Python and C++ and they should talk to each other.
@@ -162,7 +176,7 @@ Mickael Gaillard (https://github.com/Theosakamg)
 TODO
 ----
 
-There's a bunch of features missing, such as services, efficient intraprocess communication, DDS domain separation and QoS profiles.
+There's a bunch of features missing, including efficient intraprocess communication and DDS domain separation.
 
 Large messages would benefit from Java's NIO.
 

@@ -40,7 +40,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreatePublisherHan
      jlong jnode_handle,
     jclass jmessage_class,
    jstring jtopic,
-   jobject jqos) {
+     jlong qos_profile_handle) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
   rosidl_message_type_support_t *msg_type = jclass2MessageType(env, jmessage_class);
@@ -50,7 +50,9 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreatePublisherHan
   publisher->impl = NULL;
 
   rcl_publisher_options_t publisher_ops = rcl_publisher_get_default_options();
-//  publisher_ops.qos =
+
+  rmw_qos_profile_t * qos_profile = handle2Instance<rmw_qos_profile_t>(qos_profile_handle);
+  publisher_ops.qos = *qos_profile;
 
   rcl_ret_t ret = rcl_publisher_init(
       publisher,
@@ -80,7 +82,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateSubscription
      jlong jnode_handle,
     jclass jmessage_class,
    jstring jtopic,
-   jobject jqos) {
+     jlong qos_profile_handle) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
   rosidl_message_type_support_t *msg_type = jclass2MessageType(env, jmessage_class);
@@ -89,8 +91,9 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateSubscription
   rcl_subscription_t * subscription = makeInstance<rcl_subscription_t>();
   subscription->impl = NULL;
 
-  rcl_subscription_options_t subscription_ops =
-      rcl_subscription_get_default_options();
+  rcl_subscription_options_t subscription_ops = rcl_subscription_get_default_options();
+  rmw_qos_profile_t * qos_profile = handle2Instance<rmw_qos_profile_t>(qos_profile_handle);
+  subscription_ops.qos = *qos_profile;
 
   rcl_ret_t ret = rcl_subscription_init(
       subscription,
@@ -120,7 +123,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateClientHandle
      jlong jnode_handle,
     jclass jservice_class,
    jstring jservice_topic,
-   jobject jqos) {
+     jlong qos_profile_handle) {
 
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
@@ -142,7 +145,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateClientHandle
 //  }
 
   rcl_client_options_t client_ops = rcl_client_get_default_options();
-  //  publisher_ops.qos =
+  rmw_qos_profile_t * qos_profile = reinterpret_cast<rmw_qos_profile_t *>(qos_profile_handle);
+  client_ops.qos = *qos_profile;
 
   rcl_ret_t ret = rcl_client_init(
       client,
@@ -172,7 +176,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateServiceHandl
      jlong jnode_handle,
     jclass jservice_class,
    jstring jservice_topic,
-   jobject jqos) {
+     jlong qos_profile_handle) {
 
   rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
   rosidl_service_type_support_t *msg_type = jclass2ServiceType(env, jservice_class);
@@ -183,7 +187,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateServiceHandl
   service->impl = NULL;
 
   rcl_service_options_t service_ops = rcl_service_get_default_options();
-  //  publisher_ops.qos =
+  rmw_qos_profile_t * qos_profile = handle2Instance<rmw_qos_profile_t>(qos_profile_handle);
+  service_ops.qos = *qos_profile;
 
   rcl_ret_t ret = rcl_service_init(
       service,

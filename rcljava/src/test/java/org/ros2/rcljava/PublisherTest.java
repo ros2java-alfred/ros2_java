@@ -15,6 +15,7 @@
 
 package org.ros2.rcljava;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
@@ -24,13 +25,13 @@ import org.ros2.rcljava.node.topic.Publisher;
 public class PublisherTest {
 
   @Test
-  public void testCreate() {
+  public final void testCreate() {
     RCLJava.rclJavaInit();
     Node node = RCLJava.createNode("test_node");
-    Publisher<std_msgs.msg.String> publisher = node.
-      <std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
-      "test_topic");
-    assertNotEquals(node.getNodeHandle(), publisher.getNodeHandle());
+    Publisher<std_msgs.msg.String> publisher = node
+        .<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
+        "test_topic");
+    assertEquals(node.getNodeHandle(), publisher.getNodeHandle());
     assertNotEquals(0, publisher.getNodeHandle());
     assertNotEquals(0, publisher.getPublisherHandle());
   }

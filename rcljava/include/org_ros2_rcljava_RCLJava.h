@@ -177,21 +177,27 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeSendServiceResponse
 
 /*
  * Class:     org_ros2_rcljava_RCLJava
- * Method:    nativeSendClientRequest
- * Signature: (JJLjava/lang/Object;JJ)V
- */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeSendClientRequest
-  (JNIEnv *, jclass, jlong, jlong, jlong, jlong, jobject);
-
-/*
- * Class:     org_ros2_rcljava_RCLJava
  * Method:    nativeTakeResponse
  * Signature: (JJJLjava/lang/Object;)Ljava/lang/Object;
  */
 JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeResponse
   (JNIEnv *, jclass, jlong, jlong, jlong, jobject);
 
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeConvertQoSProfileToHandle
+ * Signature: (IIII)J
+ */
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToHandle
+  (JNIEnv *, jclass, jint, jint, jint, jint);
 
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeDisposeQoSProfile
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile
+  (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
 }

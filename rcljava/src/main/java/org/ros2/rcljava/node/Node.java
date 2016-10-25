@@ -22,10 +22,12 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.ros2.rcljava.Log;
-import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.exception.NotImplementedException;
@@ -51,7 +53,7 @@ import rcl_interfaces.msg.SetParametersResult;
  */
 public class Node implements INode {
 
-    private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
+    private static final Logger logger = LoggerFactory.getLogger(Node.class);
 
     // Loading JNI library.
     static {
@@ -108,10 +110,12 @@ public class Node implements INode {
      *     created @{link Publisher}.
      * @param topic The topic to which the created @{link Publisher} will
      *     publish messages.
+     * @param qosProfileHandle A pointer to the underlying ROS2 QoS profile
+     *     structure.
      * @return A pointer to the underlying ROS2 publisher structure.
      */
     private static native <T extends Message> long nativeCreatePublisherHandle(
-            long nodeHandle, Class<T> messageType, String topic, QoSProfile qos);
+            long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
 
     /**
      * Create a ROS2 subscription (rcl_subscription_t) and return a pointer to
@@ -124,16 +128,18 @@ public class Node implements INode {
      *     created @{link Subscription}.
      * @param topic The topic from which the created @{link Subscription} will
      *     receive messages.
+     * @param qosProfileHandle A pointer to the underlying ROS2 QoS profile
+     *     structure.
      * @return A pointer to the underlying ROS2 subscription structure.
      */
     private static native <T> long nativeCreateSubscriptionHandle(
-            long nodeHandle, Class<T> messageType, String topic, QoSProfile qos);
+            long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
 
     private static native <T> long nativeCreateClientHandle(
-            long nodeHandle, Class<T> cls, String serviceName, QoSProfile qos);
+            long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
 
     private static native <T> long nativeCreateServiceHandle(
-            long nodeHandle, Class<T> cls, String serviceName, QoSProfile qos);
+            long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
 
     private static native void nativeDispose(long nodeHandle);
 
@@ -163,7 +169,7 @@ public class Node implements INode {
         this.services       = new LinkedBlockingQueue<Service<?>>();
         this.parameters     = new HashMap<String, ParameterVariant<?>>();
 
-        this.parameterService = new ParameterService(this, QoSProfile.PROFILE_PARAMETER);
+        this.parameterService = new ParameterService(this, QoSProfile.PARAMETER);
         this.logRos = new Log(this);
     }
 
@@ -172,7 +178,7 @@ public class Node implements INode {
      */
     @Override
     public void dispose() {
-        logger.fine("Destroy Node stack : " + this.name);
+        logger.debug("Destroy Node stack : " + this.name);
 
         Node.nativeDispose(this.nodeHandle);
         this.publishers.clear();
@@ -189,11 +195,11 @@ public class Node implements INode {
         String name = Node.nativeGetName(this.nodeHandle);
 
         if (!this.name.equals(name)) {
-            logger.fine("Node name has change ! from " + this.name + " to " + name);
+            logger.debug("Node name has change ! from " + this.name + " to " + name);
             this.name = name;
         }
 
-        logger.fine("Get Node name stack : " + this.name);
+        logger.debug("Get Node name stack : " + this.name);
         return name;
     }
 
@@ -206,7 +212,7 @@ public class Node implements INode {
      *     created @{link Publisher}.
      * @param topic The topic to which the created @{link Publisher} will
      *     publish messages.
-     * @param qos The quality of service profile to pass on to the rmw implementation.
+     *
      * @return A @{link Publisher} that represents the underlying ROS2 publisher
      *     structure.
      */
@@ -214,12 +220,14 @@ public class Node implements INode {
     public <T extends Message> Publisher<T> createPublisher(
             final Class<T> messageType,
             final String topic,
-            final QoSProfile qos) {
+            final QoSProfile qosProfile) {
 
-        logger.fine("Create Publisher : " + topic);
-        long publisherHandle = Node.nativeCreatePublisherHandle(this.nodeHandle, messageType, topic, qos);
+        logger.debug("Create Publisher : " + topic);
+        long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+        long publisherHandle = Node.nativeCreatePublisherHandle(this.nodeHandle, messageType, topic, qosProfileHandle);
+        RCLJava.disposeQoSProfile(qosProfileHandle);
 
-        Publisher<T> publisher = new Publisher<T>(this.nodeHandle, publisherHandle, messageType, topic, qos);
+        Publisher<T> publisher = new Publisher<T>(this.nodeHandle, publisherHandle, messageType, topic, qosProfile);
 
         this.publishers.add(publisher);
         return publisher;
@@ -237,7 +245,7 @@ public class Node implements INode {
     public <T extends Message> Publisher<T> createPublisher(
             final Class<T> messageType,
             final String topic) {
-        return this.createPublisher(messageType, topic, QoSProfile.PROFILE_DEFAULT);
+        return this.createPublisher(messageType, topic, QoSProfile.DEFAULT);
     }
 
     /**
@@ -260,10 +268,12 @@ public class Node implements INode {
             final Class<T> messageType,
             final String topic,
             final Consumer<T> callback,
-            final QoSProfile qos) {
+            final QoSProfile qosProfile) {
 
-        logger.fine("Create Subscription : " + topic);
-        long subscriptionHandle = Node.nativeCreateSubscriptionHandle(this.nodeHandle, messageType, topic, qos);
+        logger.debug("Create Subscription : " + topic);
+        long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+        long subscriptionHandle = Node.nativeCreateSubscriptionHandle(this.nodeHandle, messageType, topic, qosProfileHandle);
+        RCLJava.disposeQoSProfile(qosProfileHandle);
 
         Subscription<T> subscription = new Subscription<T>(
                 this.nodeHandle,
@@ -271,7 +281,7 @@ public class Node implements INode {
                 messageType,
                 topic,
                 callback,
-                qos);
+                qosProfile);
         this.subscriptions.add(subscription);
         return subscription;
     }
@@ -291,7 +301,7 @@ public class Node implements INode {
             final Class<T> messageType,
             final String topic,
             final Consumer<T> callback) {
-        return this.createSubscription(messageType, topic, callback, QoSProfile.PROFILE_DEFAULT);
+        return this.createSubscription(messageType, topic, callback, QoSProfile.DEFAULT);
     }
 
     /**
@@ -312,9 +322,9 @@ public class Node implements INode {
     public <T> Client<T> createClient(
             final Class<T> serviceType,
             final String serviceName,
-            final QoSProfile qos) throws Exception {
+            final QoSProfile qosProfile) throws Exception {
 
-        logger.fine("Create Client : " + serviceName);
+        logger.debug("Create Client : " + serviceName);
 
         Class<?> requestType = (Class<?>)serviceType.getField("RequestType").get(null);
 
@@ -332,11 +342,13 @@ public class Node implements INode {
         Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
         long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
 
+        long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
         long clientHandle = Node.nativeCreateClientHandle(
                 this.nodeHandle,
                 serviceType,
                 serviceName,
-                QoSProfile.PROFILE_SERVICES_DEFAULT);
+                qosProfileHandle);
+        RCLJava.disposeQoSProfile(qosProfileHandle);
 
         Client<T> client = new Client<T>(
                 new WeakReference<Node>(this),
@@ -368,7 +380,7 @@ public class Node implements INode {
     public <T> Client<T> createClient(
             final Class<T> serviceType,
             final String serviceName) throws Exception {
-        return this.createClient(serviceType, serviceName, QoSProfile.PROFILE_DEFAULT);
+        return this.createClient(serviceType, serviceName, QoSProfile.DEFAULT);
     }
 
     /**
@@ -386,10 +398,10 @@ public class Node implements INode {
             final Class<T> serviceType,
             final String serviceName,
             final TriConsumer<RMWRequestId, ?, ?> callback,
-            final QoSProfile qos
+            final QoSProfile qosProfile
             ) throws Exception {
 
-        logger.fine("Create Service : " + serviceName);
+        logger.debug("Create Service : " + serviceName);
 //        long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service, qos);
 //
 //        Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
@@ -410,7 +422,10 @@ public class Node implements INode {
         Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
         long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
 
-        long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, serviceType, serviceName, qos);
+        long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+        long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, serviceType, serviceName, qosProfileHandle);
+        RCLJava.disposeQoSProfile(qosProfileHandle);
+
         Service<T> service = new Service<T>(this.nodeHandle, serviceHandle, serviceType, serviceName, callback, requestType, responseType,
           requestFromJavaConverterHandle, requestToJavaConverterHandle, responseFromJavaConverterHandle,
           responseToJavaConverterHandle);
@@ -434,7 +449,7 @@ public class Node implements INode {
             final String serviceName,
             final TriConsumer<RMWRequestId, ?, ?> callback) throws Exception {
 
-        return this.createService(serviceType, serviceName, callback, QoSProfile.PROFILE_DEFAULT);
+        return this.createService(serviceType, serviceName, callback, QoSProfile.DEFAULT);
     }
 
 
@@ -483,7 +498,7 @@ public class Node implements INode {
         HashMap<String, String> topics =  Node.getListTopics(this.nodeHandle);
 
         for (Entry<String, String> entry : topics.entrySet()) {
-            logger.fine("\t - Topics: " + entry.getKey() + "\t Value: " + entry.getValue());
+            logger.debug("\t - Topics: " + entry.getKey() + "\t Value: " + entry.getValue());
         }
 
         return topics;

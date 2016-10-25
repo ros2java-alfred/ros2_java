@@ -16,6 +16,6 @@
 package org.ros2.rcljava;
 
 public class RMWRequestId {
-  public byte writerGUID[] = new byte[16];
+  public byte[] writerGUID = new byte[16];
   public long sequenceNumber;
 }

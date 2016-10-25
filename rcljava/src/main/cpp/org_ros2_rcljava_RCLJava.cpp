@@ -455,3 +455,23 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeResponse(
 
   return nullptr;
 }
+
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToHandle(
+  JNIEnv *, jclass, jint history, jint depth, jint reliability, jint durability)
+{
+  rmw_qos_profile_t * qos_profile =
+    static_cast<rmw_qos_profile_t *>(malloc(sizeof(rmw_qos_profile_t)));
+  qos_profile->history = static_cast<rmw_qos_history_policy_t>(history);
+  qos_profile->depth = depth;
+  qos_profile->reliability = static_cast<rmw_qos_reliability_policy_t>(reliability);
+  qos_profile->durability = static_cast<rmw_qos_durability_policy_t>(durability);
+  return reinterpret_cast<jlong>(qos_profile);
+}
+
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile(JNIEnv *, jclass,
+  jlong qos_profile_handle)
+{
+  rmw_qos_profile_t * qos_profile =
+    reinterpret_cast<rmw_qos_profile_t *>(qos_profile_handle);
+  free(qos_profile);
+}

@@ -13,22 +13,20 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava.node.service;
+package org.ros2.rcljava.qos.policies;
 
-/**
- * Based on {@link java.util.funcion.BiConsumer}.
- *
- * @param <T> - the type of the first input to the operation
- * @param <U> - the type of the second input to the operation
- * @param <V> - the type of the third input to the operation
- */
-public interface TriConsumer<T, U, V> {
-  /**
-   * Performs this operation on the given argument.
-   *
-   * @param input1 - the first input argument
-   * @param input2 - the second input argument
-   * @param input3 - the third input argument
-   */
-  void accept(T input1, U input2, V input3);
+public enum History implements QoSPolicy {
+  SYSTEM_DEFAULT(0),
+  KEEP_LAST(1),
+  KEEP_ALL(2);
+
+  private final int value;
+
+  History(final int value) {
+    this.value = value;
+  }
+
+  public int getValue() {
+    return value;
+  }
 }

@@ -17,7 +17,7 @@ package org.ros2.rcljava.node;
 import java.util.HashMap;
 import java.util.List;
 
-import org.ros2.rcljava.QoSProfile;
+import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.parameter.ParameterVariant;

@@ -40,4 +40,5 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_topic_Publisher_nativeDispose
 #ifdef __cplusplus
 }
 #endif
-#endif  // ORG_ROS2_RCLJAVA_PUBLISHER_H_
+
+#endif  // ORG_ROS2_RCLJAVA_NODE_TOPIC_PUBLISHER_H_

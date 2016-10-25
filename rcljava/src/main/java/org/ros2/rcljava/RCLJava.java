@@ -17,11 +17,14 @@ package org.ros2.rcljava;
 
 import java.lang.ref.WeakReference;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
@@ -32,8 +35,7 @@ import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
-
-import java.util.List;
+import org.ros2.rcljava.qos.QoSProfile;
 
 /**
  * ROS2 java client wrapper.
@@ -47,7 +49,7 @@ public class RCLJava {
 
     public static final String LOG_NAME = RCLJava.class.getName();
 
-    private static Logger logger = Logger.getLogger(LOG_NAME);
+    private static final Logger logger = LoggerFactory.getLogger(Node.class);
 
     /** Global List/Queue of publishers. */
     public static Queue<WeakReference<Publisher<?>>> publisherReferences =
@@ -153,13 +155,17 @@ public class RCLJava {
             long responseFromJavaConverterHandle,
             long responseToJavaConverterHandle,
             Object responseMessage);
+    private static native long nativeConvertQoSProfileToHandle(
+            int history, int depth, int reliability, int durability);
+    private static native void nativeDisposeQoSProfile(
+            long qosProfileHandle);
 
     /** Release all ressources at shutdown. */
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 if (RCLJava.initialized) {
-                    logger.fine("Final Shutdown...");
+                    logger.debug("Final Shutdown...");
 
                     String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
                     StringBuilder msgLog = new StringBuilder();
@@ -167,7 +173,7 @@ public class RCLJava {
                         msgLog.append(key);
                         msgLog.append("\n");
                     }
-                    logger.fine("Native libraries Loaded: \n" + msgLog.toString());
+                    logger.debug("Native libraries Loaded: \n" + msgLog.toString());
 
                     for(WeakReference<Publisher<?>> publisherReference : RCLJava.publisherReferences) {
                         if(publisherReference.get() != null) {
@@ -198,22 +204,22 @@ public class RCLJava {
             if (!RCLJava.initialized) {
                 if (RCLJava.rmwImplementation == null) {
                     String libpath = System.getProperty("java.library.path");
-                    logger.fine("Native Library path : \n" + libpath.replace(':', '\n'));
+                    logger.debug("Native Library path : \n" + libpath.replace(':', '\n'));
 
                     RCLJava.autoLoadRmw();
                 }
 
                 if (RCLJava.rmwImplementation == null) {
-                    logger.severe("No RMW implementation found...");
+                    logger.error("No RMW implementation found...");
                     System.exit(1);
                 } else {
-                    logger.fine("Initialize rclJava with " + RCLJava.rmwImplementation);
+                    logger.debug("Initialize rclJava with " + RCLJava.rmwImplementation);
                     RCLJava.nativeRCLJavaInit(args);
                     RCLJava.initialized = true;
                 }
             } else {
                 NotInitializedException ex = new NotInitializedException("Cannot intialized twice !");
-                logger.severe(ex.getMessage());
+                logger.error(ex.getMessage());
                 throw ex;
             }
         }
@@ -239,7 +245,7 @@ public class RCLJava {
      *     structure.
      */
     public static Node createNode(final String nodeName) {
-        logger.fine("Create Node stack : " + nodeName);
+        logger.debug("Create Node stack : " + nodeName);
 
         if (!RCLJava.initialized) {
             throw new NotInitializedException();
@@ -452,7 +458,7 @@ public class RCLJava {
      * <p>This function can only be called once after each call to RCLJava.rclJavaInit.</p>
      */
     public static void shutdown() {
-        logger.fine("Shutdown...");
+        logger.debug("Shutdown...");
 
         if (!RCLJava.initialized) {
             throw new NotInitializedException();
@@ -506,7 +512,7 @@ public class RCLJava {
                 if (!rmwImplementation.equals(RCLJava.rmwImplementation)) {
 
                     String file = "rcljavaRCLJava__" + rmwImplementation;
-                    logger.fine("Load native RMW file : lib" + file + ".so");
+                    logger.debug("Load native RMW file : lib" + file + ".so");
 
                     try {
                         System.loadLibrary(file);
@@ -520,7 +526,7 @@ public class RCLJava {
                     throw new ImplementationAlreadyImportedException();
                 }
             } else {
-                logger.fine("Disable RMW !");
+                logger.debug("Disable RMW !");
                 RCLJava.rmwImplementation = null;
             }
         }
@@ -533,7 +539,7 @@ public class RCLJava {
      */
     public static void loadLibrary(String name) {
         synchronized(RCLJava.class) {
-            logger.fine("Load native file : lib" + name + ".so");
+            logger.debug("Load native file : lib" + name + ".so");
 
             if (!RCLJava.initialized) {
                 throw new NotInitializedException();
@@ -554,16 +560,31 @@ public class RCLJava {
     private static void autoLoadRmw() {
         for (Map.Entry<String, String> entry : RMW_TO_TYPESUPPORT.entrySet()) {
             try {
-                logger.config("Try to load native " + entry.getKey() + "...");
+                logger.info("Try to load native " + entry.getKey() + "...");
                 RCLJava.setRMWImplementation(entry.getKey());
-                logger.config(entry.getKey() + " loaded !");
+                logger.info(entry.getKey() + " loaded !");
                 break;
             } catch (NoImplementationAvailableException e) {
-                logger.config(entry.getKey() + " not available ! (" + e.getMessage() + ")");
+                logger.error(entry.getKey() + " not available ! (" + e.getMessage() + ")");
             } catch (ImplementationAlreadyImportedException e) {
-                logger.config(e.getMessage());
+                logger.error(e.getMessage());
             }
         }
+    }
+
+
+    public static long convertQoSProfileToHandle(final QoSProfile qosProfile) {
+      int history = qosProfile.getHistory().getValue();
+      int depth = qosProfile.getDepth();
+      int reliability = qosProfile.getReliability().getValue();
+      int durability = qosProfile.getDurability().getValue();
+
+      return nativeConvertQoSProfileToHandle(history, depth, reliability,
+        durability);
+    }
+
+    public static void disposeQoSProfile(final long qosProfileHandle) {
+        nativeDisposeQoSProfile(qosProfileHandle);
     }
 
 }

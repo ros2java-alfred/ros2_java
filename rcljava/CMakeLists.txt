@@ -60,7 +60,6 @@ set(JUNIT_JAR "/usr/share/java/junit4.jar")
 set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/Log.java"
   "src/main/java/org/ros2/rcljava/NativeUtils.java"
-  "src/main/java/org/ros2/rcljava/QoSProfile.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
   "src/main/java/org/ros2/rcljava/RMWRequestId.java"
 
@@ -69,6 +68,11 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/node/INode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
 
+  "src/main/java/org/ros2/rcljava/qos/policies/Durability.java"
+  "src/main/java/org/ros2/rcljava/qos/policies/History.java"
+  "src/main/java/org/ros2/rcljava/qos/policies/QoSPolicy.java"
+  "src/main/java/org/ros2/rcljava/qos/policies/Reliability.java"
+  "src/main/java/org/ros2/rcljava/qos/QoSProfile.java"
 
   "src/main/java/org/ros2/rcljava/node/topic/Consumer.java"
   "src/main/java/org/ros2/rcljava/node/topic/Publisher.java"
@@ -159,14 +163,14 @@ endmacro()
 set(CMAKE_JAVA_INCLUDE_PATH "${BUILTIN_COMMON_JARS}:${BUILTIN_MSGS_JARS}:${LOG_JAR}")
 add_jar("${PROJECT_NAME}_jar"
   "${${PROJECT_NAME}_sources}"
+  OUTPUT_NAME
+  "${PROJECT_NAME}"
   INCLUDE_JARS
   "${std_msgs_JARS}"
   "${rcl_interfaces_JARS}"
   "${builtin_interfaces_JARS}"
   "${rcljava_common_JARS}"
   "${_jar_file}"
-  OUTPUT_NAME
-  "${PROJECT_NAME}"
 )
 
 call_for_each_rmw_implementation(target)
@@ -214,8 +218,8 @@ if(BUILD_TESTING)
     TESTS
     "${testsuite}"
     INCLUDE_JARS
-    "${std_msgs_JARS}"
     "${rcljava_common_JARS}"
+    "${std_msgs_JARS}"
     "${_jar_file}"
     LIBRARY_PATHS
     "${_deps_library_paths}"
