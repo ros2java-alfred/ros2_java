@@ -34,6 +34,7 @@ public class RCLFuture<V> implements Future<V> {
     this.nodeReference = nodeReference;
   }
 
+  @Override
   public final V get() throws InterruptedException, ExecutionException {
     while (RCLJava.ok() && !isDone()) {
       Node node = nodeReference.get();
@@ -46,6 +47,7 @@ public class RCLFuture<V> implements Future<V> {
     return value;
   }
 
+  @Override
   public final V get(final long timeout, final TimeUnit unit) throws
       InterruptedException, ExecutionException, TimeoutException {
     if (isDone()) {
@@ -80,14 +82,17 @@ public class RCLFuture<V> implements Future<V> {
     throw new InterruptedException();
   }
 
+  @Override
   public final boolean isDone() {
     return done;
   }
 
+  @Override
   public final boolean isCancelled() {
     return false;
   }
 
+  @Override
   public final boolean cancel(final boolean mayInterruptIfRunning) {
     return false;
   }
