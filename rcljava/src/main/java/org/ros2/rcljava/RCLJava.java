@@ -264,6 +264,7 @@ public class RCLJava {
      *
      * @param node
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static void spinOnce(final Node node) {
         if (!RCLJava.initialized) {
             throw new NotInitializedException();

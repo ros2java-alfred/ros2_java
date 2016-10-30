@@ -124,6 +124,10 @@ public class Subscription<T extends Message> {
         return this.topic;
     }
 
+    public QoSProfile getQosProfile() {
+        return qosProfile;
+    }
+
     /**
      * Release all Publisher ressource.
      */

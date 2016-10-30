@@ -116,6 +116,7 @@ public class Client<T> {
             }
     }
 
+    @SuppressWarnings("unchecked")
     public <V> void handleResponse(RMWRequestId header, V response) {
         synchronized(pendingRequests) {
             long sequenceNumber = header.sequenceNumber;
