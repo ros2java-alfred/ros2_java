@@ -18,38 +18,32 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.Service;
-import org.ros2.rcljava.node.service.ServiceConsumer;
 import org.ros2.rcljava.node.service.TriConsumer;
 import org.ros2.rcljava.node.topic.Consumer;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 
 import java.util.HashMap;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /**
  *
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class NodeTest {
-    private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
+    private static final Logger logger = LoggerFactory.getLogger(NodeTest.class);
 
     @BeforeClass
     public static void setUp() {
-        logger.setLevel(Level.ALL);
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleFormatter());
-        logger.addHandler(handler);
-        handler.setLevel(Level.ALL);
+
     }
 
     @Test

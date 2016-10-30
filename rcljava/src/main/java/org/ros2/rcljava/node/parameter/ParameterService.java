@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.node.Node;
@@ -26,9 +29,12 @@ import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.TriConsumer;
 import org.ros2.rcljava.node.topic.Publisher;
 
+import rcl_interfaces.msg.ListParametersResult;
 import rcl_interfaces.msg.Parameter;
+import rcl_interfaces.msg.ParameterDescriptor;
 import rcl_interfaces.msg.ParameterValue;
 import rcl_interfaces.msg.ParameterEvent;
+
 import rcl_interfaces.srv.DescribeParameters;
 import rcl_interfaces.srv.DescribeParameters_Request;
 import rcl_interfaces.srv.DescribeParameters_Response;
@@ -53,6 +59,7 @@ import rcl_interfaces.srv.SetParameters_Response;
  */
 @SuppressWarnings("unused")
 public class ParameterService {
+    private static final Logger logger = LoggerFactory.getLogger(ParameterService.class);
 
     private Service<GetParameters> getParametersService;
     private Service<GetParameterTypes> getParameterTypesService;
@@ -64,6 +71,8 @@ public class ParameterService {
     public ParameterService(final Node node, final QoSProfile profileParameter) {
 
         try {
+            logger.debug("Create Parameters stack " + node.getName());
+
             this.getParametersService = node.<GetParameters>createService(
                     GetParameters.class,
                     node.getName() + "__get_parameters",
@@ -74,7 +83,7 @@ public class ParameterService {
                                 final RMWRequestId header,
                                 final GetParameters_Request request,
                                 final GetParameters_Response response) {
-
+                            logger.debug("Replies to get Parameters.");
                             List<ParameterValue> paramsResult = new ArrayList<ParameterValue>();
 
                             List<ParameterVariant<?>> paramsCurrent = node.getParameters(request.getNames());
@@ -96,7 +105,8 @@ public class ParameterService {
                                 final RMWRequestId header,
                                 final GetParameterTypes_Request request,
                                 final GetParameterTypes_Response response) {
-                            //AddTwoIntsServer.handleAddTwoInts(request, response);
+
+                            logger.debug("Replies to get Parameter Types ! NOT IMPLEMENTED !");
                         }
                     });
 
@@ -111,6 +121,7 @@ public class ParameterService {
                                 final SetParameters_Request request,
                                 final SetParameters_Response response) {
 
+                            logger.debug("Replies to set Parameters.");
                             List<ParameterVariant<?>> parameterVariants = new ArrayList<ParameterVariant<?>>();
                             for (Parameter parameterVariant : request.getParameters()) {
                                 parameterVariants.add(ParameterVariant.fromParameter(parameterVariant));
@@ -130,6 +141,10 @@ public class ParameterService {
                                 final ListParameters_Request request,
                                 final ListParameters_Response response) {
 
+                            logger.debug("Replies to list of Parameters.");
+                            ListParametersResult listParamResult = new ListParametersResult();
+                            listParamResult.setNames(node.getParametersNames());
+                            response.setResult(listParamResult);
 
                         }
                     });
@@ -144,7 +159,18 @@ public class ParameterService {
                                 final RMWRequestId header,
                                 final DescribeParameters_Request request,
                                 final DescribeParameters_Response response) {
-                            //AddTwoIntsServer.handleAddTwoInts(request, response);
+
+                            logger.debug("Replies to describe Parameters. ! NOT IMPLEMENTED !");
+//                            request.getNames()
+//
+//
+//                            List<ParameterDescriptor> listDescritiorResult = null;
+//
+//                            ParameterDescriptor descriptor = new ParameterDescriptor();
+//                            descriptor.setName(arg0);
+//                            descriptor.setType(arg0);
+//
+//                            response.setDescriptors(listDescritiorResult);
                         }
                     });
 

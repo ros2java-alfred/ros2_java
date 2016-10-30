@@ -14,32 +14,28 @@
  */
 package org.ros2.rcljava.test;
 
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotInitializedException;
 import org.ros2.rcljava.node.Node;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class RCLJavaTest{
-    private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
+    private static final Logger logger = LoggerFactory.getLogger(RCLJavaTest.class);
 
     @BeforeClass
     public static void setUp() {
-        logger.setLevel(Level.ALL);
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleFormatter());
-        logger.addHandler(handler);
-        handler.setLevel(Level.ALL);
+
+
     }
 
     @Test

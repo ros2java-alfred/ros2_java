@@ -15,6 +15,7 @@
 package org.ros2.rcljava.node.parameter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -31,21 +32,26 @@ import rcl_interfaces.srv.GetParameters;
 import rcl_interfaces.srv.GetParameters_Request;
 import rcl_interfaces.srv.GetParameters_Response;
 import rcl_interfaces.srv.GetParameterTypes;
+import rcl_interfaces.srv.GetParameterTypes_Request;
+import rcl_interfaces.srv.GetParameterTypes_Response;
 import rcl_interfaces.srv.SetParameters;
 import rcl_interfaces.srv.SetParameters_Request;
 import rcl_interfaces.srv.SetParameters_Response;
 import rcl_interfaces.srv.ListParameters;
+import rcl_interfaces.srv.ListParameters_Request;
+import rcl_interfaces.srv.ListParameters_Response;
 import rcl_interfaces.srv.DescribeParameters;
+import rcl_interfaces.srv.DescribeParameters_Request;
+import rcl_interfaces.srv.DescribeParameters_Response;
 import rcl_interfaces.msg.ListParametersResult;
 import rcl_interfaces.msg.Parameter;
-import rcl_interfaces.msg.ParameterType;
+import rcl_interfaces.msg.ParameterDescriptor;
 import rcl_interfaces.msg.ParameterValue;
 import rcl_interfaces.msg.SetParametersResult;
 
 /**
- * Parameter Client.
+ * Sync Parameter Client.
  *
- * @param <T> Service Type.
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class SyncParametersClient {
@@ -66,6 +72,8 @@ public class SyncParametersClient {
         if (remoteNodeName == null || remoteNodeName.equals("")) {
             remoteNodeName = node.getName();
         }
+
+        logger.debug("Create parameter client for %s", remoteNodeName);
 
         try {
             this.getParametersClient = node.<GetParameters>createClient(
@@ -94,21 +102,18 @@ public class SyncParametersClient {
         }
     }
 
-    public boolean hasParameter(final String parameterName) {
-        return false;
-    }
-
     public List<ParameterVariant<?>> getParameters(final List<String> list) {
         List<ParameterVariant<?>> result = null;
 
         GetParameters_Request request = new GetParameters_Request();
         request.setNames(list);
 
-     // Call service...
+        // Call service...
         Future<GetParameters_Response> future = this.getParametersClient.sendRequest(request);
 
         if (future != null) {
             try {
+                logger.debug("Call get Parameter service.");
                 List<ParameterValue> values = future.get().getValues();
 
                 result = new ArrayList<ParameterVariant<?>>();
@@ -131,14 +136,73 @@ public class SyncParametersClient {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("add_two_ints_client was interrupted. Exiting.");
+            logger.error("getParameters was interrupted. Exiting.");
         }
 
         return result;
     }
 
-    public ArrayList<ParameterType> getParameterTypes(final List<String> parameterNames) {
-        return null;
+    public List<Byte> getParameterTypes(final List<String> parameterNames) {
+        List<Byte> result = null;
+
+        GetParameterTypes_Request request = new GetParameterTypes_Request();
+        request.setNames(parameterNames);
+
+        // Call service...
+        Future<GetParameterTypes_Response> future = this.getParameterTypesClient.sendRequest(request);
+
+        if (future != null) {
+            try {
+                logger.debug("Call get Type of Parameter service.");
+                result =  future.get().getTypes();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else {
+            logger.error("getParameterTypes was interrupted. Exiting.");
+        }
+
+        return result;
+    }
+
+    public boolean hasParameter(final String parameterName) {
+        List<String> finded = Arrays.asList(parameterName);
+        logger.debug("Has Parameter service.");
+        ListParametersResult result = this.listParameters(finded, 1);
+        return result.getNames().size() > 0;
+    }
+
+    public ListParametersResult listParameters(final List<String> prefixes, int depth) {
+        ListParametersResult result = null;
+
+        // Set request.
+        ListParameters_Request request = new ListParameters_Request();
+        request.setPrefixes(prefixes);
+        request.setDepth(depth);
+
+        // Call service...
+        Future<ListParameters_Response> future = this.listParametersClient.sendRequest(request);
+
+        if (future != null) {
+            try {
+                logger.debug("Call list of Parameter service.");
+                result = future.get().getResult();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else {
+            logger.error("listParameters was interrupted. Exiting.");
+        }
+
+        return result;
     }
 
     public List<SetParametersResult> setParameters(final List<ParameterVariant<?>> list) {
@@ -159,6 +223,7 @@ public class SyncParametersClient {
 
         if (future != null) {
             try {
+                logger.debug("Call set Parameter service.");
                 result = future.get().getResults();
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
@@ -168,14 +233,37 @@ public class SyncParametersClient {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("add_two_ints_client was interrupted. Exiting.");
+            logger.error("setParameters was interrupted. Exiting.");
         }
+
         return result;
     }
 
-    public ListParametersResult listParameters(final List<String> list, int i) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<ParameterDescriptor> describeParametersClient(final List<String> parameterNames) {
+        List<ParameterDescriptor> result = null;
+
+        DescribeParameters_Request request = new DescribeParameters_Request();
+        request.setNames(parameterNames);
+
+        // Call service...
+        Future<DescribeParameters_Response> future = this.describeParametersClient.sendRequest(request);
+
+        if (future != null) {
+            try {
+                logger.debug("Call describe Parameter service.");
+                result = future.get().getDescriptors();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else {
+            logger.error("setParameters was interrupted. Exiting.");
+        }
+
+        return result;
     }
 
     public Subscription<?> onParameterEvent(final ParameterConsumer parameterConsumer) { // rcl_interfaces.msg.ParameterEvent

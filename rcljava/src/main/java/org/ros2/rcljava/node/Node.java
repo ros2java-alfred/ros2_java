@@ -494,6 +494,12 @@ public class Node implements INode {
         return result;
     }
 
+    public List<String> getParametersNames() {
+
+        return new ArrayList<String>(this.parameters.keySet());
+
+    }
+
     @Override
     public HashMap<String, String> getTopicNamesAndTypes() {
         HashMap<String, String> topics =  Node.getListTopics(this.nodeHandle);

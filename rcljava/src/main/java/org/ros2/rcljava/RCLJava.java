@@ -47,9 +47,9 @@ import org.ros2.rcljava.qos.QoSProfile;
  */
 public class RCLJava {
 
-    public static final String LOG_NAME = RCLJava.class.getName();
+    private static final String LOG_NAME = RCLJava.class.getName();
 
-    private static final Logger logger = LoggerFactory.getLogger(Node.class);
+    private static final Logger logger = LoggerFactory.getLogger(RCLJava.class);
 
     /** Global List/Queue of publishers. */
     public static Queue<WeakReference<Publisher<?>>> publisherReferences =
