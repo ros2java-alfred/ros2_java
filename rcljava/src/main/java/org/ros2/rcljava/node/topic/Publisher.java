@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.Node;
 
 /**
  * This class serves as a bridge between ROS2's rcl_publisher_t and RCLJava.
@@ -35,10 +36,9 @@ public class Publisher<T extends Message> {
     private static final Logger logger = LoggerFactory.getLogger(Publisher.class);
 
     /**
-     * An integer that represents a pointer to the underlying ROS2 node
-     * structure (rcl_node_t).
+     *
      */
-    private final long nodeHandle;
+    private final Node node;
 
     /**
      * An integer that represents a pointer to the underlying ROS2 publisher
@@ -92,12 +92,18 @@ public class Publisher<T extends Message> {
      * @param topic The topic to which this publisher will publish messages.
      * @param qos Quality of Service profile.
      */
-    public Publisher(final long nodeHandle, final long publisherHandle, final Class<T> messageType, final String topic, final QoSProfile qosProfile) {
-        this.nodeHandle = nodeHandle;
+    public Publisher(final Node node, final long publisherHandle, final Class<T> messageType, final String topic, final QoSProfile qosProfile) {
+        if (node == null && publisherHandle == 0) {
+            throw new RuntimeException("Need to provide active node with handle object");
+        }
+
+        this.node = node;
         this.publisherHandle = publisherHandle;
         this.messageType = messageType;
         this.topic = topic;
         this.qosProfile = qosProfile;
+
+        this.node.getPublishers().add(this);
     }
 
     /**
@@ -126,7 +132,7 @@ public class Publisher<T extends Message> {
     }
 
     public final long getNodeHandle() {
-        return this.nodeHandle;
+        return this.node.getNodeHandle();
     }
 
     public final long getPublisherHandle() {
@@ -138,7 +144,7 @@ public class Publisher<T extends Message> {
      */
     public void dispose() {
         Publisher.logger.debug("Destroy Publisher of topic : " + this.topic);
-
-        Publisher.nativeDispose(this.nodeHandle, this.publisherHandle);
+        this.node.getPublishers().remove(this);
+        Publisher.nativeDispose(this.node.getNodeHandle(), this.publisherHandle);
     }
 }

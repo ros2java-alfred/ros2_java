@@ -47,7 +47,7 @@ public class Log {
     public Log(final Node defaultNode) {
         this.defaultNode = defaultNode;
         this.publisher = this.defaultNode.createPublisher(std_msgs.msg.String.class, Topics.ROSOUT);
-        this.log = LoggerFactory.getLogger(Log.class);
+        this.log = LoggerFactory.getLogger(defaultNode.getClass());
     }
 
 //    public Publisher<rosgraph_msgs.msg.Log> getPublisher() {

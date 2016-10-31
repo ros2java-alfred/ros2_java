@@ -15,6 +15,7 @@
 package org.ros2.rcljava.node.service;
 
 import org.ros2.rcljava.RMWRequestId;
+import org.ros2.rcljava.node.Node;
 
 /**
  * Service Server.
@@ -24,11 +25,11 @@ import org.ros2.rcljava.RMWRequestId;
  */
 public class Service<T> {
 
-    /** Name of the node */
+    /** Name of the service */
     private final String serviceName;
 
-    /** Node Handler. */
-//    private final long nodeHandle;
+    /** Node. */
+    private final Node node;
 
     /** Service Handler. */
     private final long serviceHandle;
@@ -53,7 +54,7 @@ public class Service<T> {
      * @param serviceName
      */
     public Service(
-            final long nodeHandle,
+            final Node node,
             final long serviceHandle,
             final Class<T> serviceType,
             final String serviceName,
@@ -64,8 +65,14 @@ public class Service<T> {
             final long requestToJavaConverterHandle,
             final long responseFromJavaConverterHandle,
             final long responseToJavaConverterHandle) {
-//        this.nodeHandle = nodeHandle;
+
+        if (node == null && serviceHandle == 0) {
+            throw new RuntimeException("Need to provide active node with handle object");
+        }
+
+        this.node = node;
         this.serviceHandle = serviceHandle;
+
         this.serviceType = serviceType;
         this.serviceName = serviceName;
         this.callback = callback;
@@ -75,10 +82,12 @@ public class Service<T> {
         this.requestToJavaConverterHandle = requestToJavaConverterHandle;
         this.responseFromJavaConverterHandle = responseFromJavaConverterHandle;
         this.responseToJavaConverterHandle = responseToJavaConverterHandle;
+
+        this.node.getServices().add(this);
     }
 
     public void dispose() {
-        //TODO
+        this.node.getServices().remove(this);
     }
 
     public void sendResponse() {

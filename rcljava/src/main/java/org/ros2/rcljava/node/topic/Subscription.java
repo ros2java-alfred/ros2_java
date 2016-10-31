@@ -18,6 +18,7 @@ import org.ros2.rcljava.qos.QoSProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.Node;
 
 /**
  * This class serves as a bridge between ROS2's rcl_subscription_t and RCLJava.
@@ -33,10 +34,9 @@ public class Subscription<T extends Message> {
     private static final Logger logger = LoggerFactory.getLogger(Subscription.class);
 
     /**
-       * An integer that represents a pointer to the underlying ROS2 node
-       * structure (rcl_node_t).
-       */
-    private final long nodeHandle;
+     *
+     */
+    private final Node node;
 
     /**
      * An integer that represents a pointer to the underlying ROS2 subscription
@@ -81,17 +81,23 @@ public class Subscription<T extends Message> {
      * @param callback The callback function that will be triggered when a new
      *     message is received.
      */
-    public Subscription(final long nodeHandle,final  long subscriptionHandle,final  Class<T> messageType,final  String topic,final  Consumer<T> callback,final  QoSProfile qosProfile) {
-        this.nodeHandle = nodeHandle;
+    public Subscription(final Node node,final  long subscriptionHandle,final  Class<T> messageType,final  String topic,final  Consumer<T> callback,final  QoSProfile qosProfile) {
+        if (node == null && subscriptionHandle == 0) {
+            throw new RuntimeException("Need to provide active node with handle object");
+        }
+
+        this.node = node;
         this.subscriptionHandle = subscriptionHandle;
         this.messageType = messageType;
         this.topic = topic;
         this.callback = callback;
         this.qosProfile = qosProfile;
+
+        this.node.getSubscriptions().add(this);
     }
 
     public final long getNodeHandle() {
-        return this.nodeHandle;
+        return this.node.getNodeHandle();
       }
 
     /**
@@ -129,10 +135,11 @@ public class Subscription<T extends Message> {
     }
 
     /**
-     * Release all Publisher ressource.
+     * Safely destroy the underlying ROS2 subscriber structure.
      */
     public void dispose() {
-        Subscription.logger.debug("Destroy Publisher of topic : " + this.topic);
+        Subscription.logger.debug("Destroy Subscription of topic : " + this.topic);
+        this.node.getSubscriptions().remove(this);
         // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
     }
 }

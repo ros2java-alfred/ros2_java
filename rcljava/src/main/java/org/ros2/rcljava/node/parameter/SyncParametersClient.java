@@ -58,48 +58,74 @@ public class SyncParametersClient {
 
     private static final Logger logger = LoggerFactory.getLogger(SyncParametersClient.class);
 
+    private final Node ownerNode;
+    private final String remoteNodeName;
     private Client<GetParameters> getParametersClient;
     private Client<GetParameterTypes> getParameterTypesClient;
     private Client<SetParameters> setParametersClient;
     private Client<ListParameters> listParametersClient;
     private Client<DescribeParameters> describeParametersClient;
 
+    public SyncParametersClient(final Node node) {
+        this(node, null, QoSProfile.PARAMETER);
+    }
+
+    public SyncParametersClient(final Node node, String remoteNodeName) {
+        this(node, remoteNodeName, QoSProfile.PARAMETER);
+    }
+
     public SyncParametersClient(final Node node, final QoSProfile profileParameter) {
         this(node, null, profileParameter);
     }
 
-    public SyncParametersClient(final Node node, String remoteNodeName, final QoSProfile profileParameter) {
+    public SyncParametersClient(final Node node, final String remoteNodeName, final QoSProfile profileParameter) {
+        this.ownerNode = node;
         if (remoteNodeName == null || remoteNodeName.equals("")) {
-            remoteNodeName = node.getName();
+            this.remoteNodeName = node.getName();
+        } else {
+            this.remoteNodeName = remoteNodeName;
         }
 
-        logger.debug("Create parameter client for %s", remoteNodeName);
+        logger.debug("Create parameter client for %s", this.remoteNodeName);
 
         try {
-            this.getParametersClient = node.<GetParameters>createClient(
+            this.getParametersClient = this.ownerNode.<GetParameters>createClient(
                     GetParameters.class,
-                    remoteNodeName + "__get_parameters",
+                    this.remoteNodeName + "__get_parameters",
                     profileParameter);
-            this.getParameterTypesClient = node.<GetParameterTypes>createClient(
+            this.getParameterTypesClient = this.ownerNode.<GetParameterTypes>createClient(
                     GetParameterTypes.class,
-                    remoteNodeName + "__get_parameter_types",
+                    this.remoteNodeName + "__get_parameter_types",
                     profileParameter);
-            this.setParametersClient = node.<SetParameters>createClient(
+            this.setParametersClient = this.ownerNode.<SetParameters>createClient(
                     SetParameters.class,
-                    remoteNodeName + "__set_parameters",
+                    this.remoteNodeName + "__set_parameters",
                     profileParameter);
-            this.listParametersClient = node.<ListParameters>createClient(
+            this.listParametersClient = this.ownerNode.<ListParameters>createClient(
                     ListParameters.class,
                     remoteNodeName + "__list_parameters",
                     profileParameter);
-            this.describeParametersClient = node.<DescribeParameters>createClient(
+            this.describeParametersClient = this.ownerNode.<DescribeParameters>createClient(
                     DescribeParameters.class,
-                    remoteNodeName + "__describe_parameters",
+                    this.remoteNodeName + "__describe_parameters",
                     profileParameter);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Safely destroy the underlying ROS2 subscriber structure.
+     */
+    public void dispose() {
+        logger.debug("Destroy parameter client : " + this.remoteNodeName);
+        this.getParametersClient.dispose();
+        this.getParametersClient.dispose();
+        this.getParameterTypesClient.dispose();
+        this.setParametersClient.dispose();
+        this.listParametersClient.dispose();
+        this.describeParametersClient.dispose();
     }
 
     public List<ParameterVariant<?>> getParameters(final List<String> list) {

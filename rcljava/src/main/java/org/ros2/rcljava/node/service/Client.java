@@ -47,9 +47,6 @@ public class Client<T> {
 
     private final WeakReference<Node> nodeReference;
 
-    /** Node Handler. */
-    private final long nodeHandle;
-
     /** Client Handler. */
     private final long clientHandle;
 
@@ -73,7 +70,6 @@ public class Client<T> {
      */
     public Client(
             final WeakReference<Node> nodeReference,
-            final long nodeHandle,
             final long clientHandle,
             final Class<T> serviceType,
             final String serviceName,
@@ -83,9 +79,14 @@ public class Client<T> {
             final long requestToJavaConverterHandle,
             final long responseFromJavaConverterHandle,
             final long responseToJavaConverterHandle) {
+
+        if (nodeReference == null && clientHandle == 0) {
+            throw new RuntimeException("Need to provide active node with handle object");
+        }
+
         this.nodeReference = nodeReference;
-        this.nodeHandle = nodeHandle;
         this.clientHandle = clientHandle;
+
         this.serviceType = serviceType;
         this.serviceName = serviceName;
         this.requestType = requestType;
@@ -95,10 +96,12 @@ public class Client<T> {
         this.responseFromJavaConverterHandle = responseFromJavaConverterHandle;
         this.responseToJavaConverterHandle = responseToJavaConverterHandle;
         this.pendingRequests = new HashMap<Long, RCLFuture<?>>();
+
+        this.nodeReference.get().getClients().add(this);
     }
 
     public void dispose() {
-        //TODO
+        this.nodeReference.get().getClients().remove(this);
     }
 
     public <U, V> Future<V> sendRequest(U request) {
@@ -117,7 +120,7 @@ public class Client<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public <V> void handleResponse(RMWRequestId header, V response) {
+    public <V> void handleResponse(final RMWRequestId header,final V response) {
         synchronized(pendingRequests) {
             long sequenceNumber = header.sequenceNumber;
             RCLFuture<V> future = (RCLFuture<V>) pendingRequests.remove(sequenceNumber);
@@ -138,11 +141,11 @@ public class Client<T> {
     }
 
     public final Class<T> getServiceType() {
-        return serviceType;
+        return this.serviceType;
     }
 
     public final long getClientHandle() {
-        return clientHandle;
+        return this.clientHandle;
     }
 
     public final long getRequestFromJavaConverterHandle() {
@@ -161,7 +164,7 @@ public class Client<T> {
         return this.responseToJavaConverterHandle;
     }
 
-    public boolean waitForService(int i) {
+    public boolean waitForService(final int i) {
       //TODO
         throw new NotImplementedException();
 //        return false;

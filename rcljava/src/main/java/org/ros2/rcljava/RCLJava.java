@@ -396,46 +396,6 @@ public class RCLJava {
     }
 
     /**
-     *
-     * @param node
-     * @param topic
-     * @return
-     */
-    public static Message waitForMessage(final Node node, final String topic) {
-        if (!RCLJava.initialized) {
-            throw new NotInitializedException();
-        }
-
-        Message msg = null;
-        long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
-
-        RCLJava.nativeWaitSetInit(waitSetHandle, 1, 0, 0, 0, 0);
-
-        RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
-        for(Subscription<?> subscription : node.getSubscriptions()) {
-            if (subscription.getTopic() == topic) {
-                RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
-            }
-        }
-
-        RCLJava.nativeWait(waitSetHandle);
-
-        for(Subscription<?> subscription : node.getSubscriptions()) {
-            if (subscription.getTopic() == topic) {
-                msg = RCLJava.nativeTake(subscription.getSubscriptionHandle(), subscription.getMessageType());
-                if (msg != null) {
-                    break;
-                }
-            }
-        }
-
-        RCLJava.nativeWaitSetFini(waitSetHandle);
-
-        return msg;
-
-    }
-
-    /**
      * Return true if rcl is currently initialized, otherwise false.
      *
      * @see rcl_ok();

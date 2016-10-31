@@ -61,6 +61,8 @@ import rcl_interfaces.srv.SetParameters_Response;
 public class ParameterService {
     private static final Logger logger = LoggerFactory.getLogger(ParameterService.class);
 
+    private final Node ownerNode;
+
     private Service<GetParameters> getParametersService;
     private Service<GetParameterTypes> getParameterTypesService;
     private Service<SetParameters> setParametersService;
@@ -68,7 +70,12 @@ public class ParameterService {
     private Service<DescribeParameters> describeParametersService;
     private Publisher<ParameterEvent> eventparameterPublisher;
 
+    public ParameterService(final Node node) {
+        this(node, QoSProfile.PARAMETER);
+    }
+
     public ParameterService(final Node node, final QoSProfile profileParameter) {
+        this.ownerNode = node;
 
         try {
             logger.debug("Create Parameters stack " + node.getName());
@@ -93,7 +100,8 @@ public class ParameterService {
 
                             response.setValues(paramsResult);
                         }
-                    });
+                    },
+                    profileParameter);
 
             this.getParameterTypesService = node.<GetParameterTypes>createService(
                     GetParameterTypes.class,
@@ -108,7 +116,8 @@ public class ParameterService {
 
                             logger.debug("Replies to get Parameter Types ! NOT IMPLEMENTED !");
                         }
-                    });
+                    },
+                    profileParameter);
 
             this.setParametersService = node.<SetParameters>createService(
                     SetParameters.class,
@@ -128,7 +137,8 @@ public class ParameterService {
                             }
                             response.setResults(node.setParameters(parameterVariants));
                         }
-                    });
+                    },
+                    profileParameter);
 
             this.listParametersService = node.<ListParameters>createService(
                     ListParameters.class,
@@ -147,7 +157,8 @@ public class ParameterService {
                             response.setResult(listParamResult);
 
                         }
-                    });
+                    },
+                    profileParameter);
 
             this.describeParametersService = node.<DescribeParameters>createService(
                     DescribeParameters.class,
@@ -172,7 +183,8 @@ public class ParameterService {
 //
 //                            response.setDescriptors(listDescritiorResult);
                         }
-                    });
+                    },
+                    profileParameter);
 
             this.eventparameterPublisher = node.createPublisher(ParameterEvent.class, "parameter_events", profileParameter);
 
@@ -181,10 +193,22 @@ public class ParameterService {
         }
     }
 
-    private void notifyAddEvent(Collection<Parameter> param) {
+    private void notifyAddEvent(final Collection<Parameter> param) {
         ParameterEvent eventMsg = new ParameterEvent();
         eventMsg.setNewParameters(param);
         this.eventparameterPublisher.publish(eventMsg);
     }
 
+    /**
+     * Safely destroy the underlying ROS2 subscriber structure.
+     */
+    public void dispose() {
+        logger.debug("Destroy parameter client : " + this.ownerNode.getName());
+        this.getParametersService.dispose();
+        this.getParameterTypesService.dispose();
+        this.setParametersService.dispose();
+        this.listParametersService.dispose();
+        this.describeParametersService.dispose();
+        this.eventparameterPublisher.dispose();
+    }
 }
