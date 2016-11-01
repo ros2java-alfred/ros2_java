@@ -61,7 +61,6 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/Log.java"
   "src/main/java/org/ros2/rcljava/NativeUtils.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
-  "src/main/java/org/ros2/rcljava/RMWRequestId.java"
 
   "src/main/java/org/ros2/rcljava/namespace/GraphName.java"
 
@@ -82,8 +81,8 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/node/service/BiConsumer.java"
   "src/main/java/org/ros2/rcljava/node/service/Client.java"
   "src/main/java/org/ros2/rcljava/node/service/RCLFuture.java"
+  "src/main/java/org/ros2/rcljava/node/service/RMWRequestId.java"
   "src/main/java/org/ros2/rcljava/node/service/Service.java"
-  "src/main/java/org/ros2/rcljava/node/service/ServiceConsumer.java"
   "src/main/java/org/ros2/rcljava/node/service/TriConsumer.java"
 
   "src/main/java/org/ros2/rcljava/node/parameter/ParameterConsumer.java"
