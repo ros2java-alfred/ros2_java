@@ -1,4 +1,5 @@
-/* Copyright 2016 Open Source Robotics Foundation, Inc.
+/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +28,8 @@ import org.ros2.rcljava.node.topic.Topics;
 import std_msgs.msg.String;
 
 /**
- * Not define in ROS2.
+ * <i>Not define in ROS2. Copy of ROS1</i>
  *
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class Log {
 

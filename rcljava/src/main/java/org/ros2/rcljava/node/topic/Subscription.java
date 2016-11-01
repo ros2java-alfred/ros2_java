@@ -1,4 +1,5 @@
 /* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,21 +27,18 @@ import org.ros2.rcljava.node.Node;
  * @{link Node#createSubscription(Class&lt;T&gt;, String, Consumer&lt;T&gt;)}
  *
  * @param <T> The type of the messages that this subscription will receive.
- * @author Esteve Fernandez <esteve@apache.org>
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class Subscription<T extends Message> {
 
     private static final Logger logger = LoggerFactory.getLogger(Subscription.class);
 
     /**
-     *
+     * Node owner.
      */
-    private final Node node;
+    private final Node ownerNode;
 
     /**
-     * An integer that represents a pointer to the underlying ROS2 subscription
-     * structure (rcl_subsription_t).
+     * An integer that represents a pointer to the underlying ROS2 subscription structure (rcl_subsription_t).
      */
     private final long subscriptionHandle;
 
@@ -60,7 +58,7 @@ public class Subscription<T extends Message> {
      */
     private final Consumer<T> callback;
 
-    /** Quality of Service profil. */
+    /** Quality of Service profile. */
     private final QoSProfile qosProfile;
 
     // Native call.
@@ -81,28 +79,34 @@ public class Subscription<T extends Message> {
      * @param callback The callback function that will be triggered when a new
      *     message is received.
      */
-    public Subscription(final Node node,final  long subscriptionHandle,final  Class<T> messageType,final  String topic,final  Consumer<T> callback,final  QoSProfile qosProfile) {
+    public Subscription(
+            final Node node,
+            final long subscriptionHandle,
+            final Class<T> messageType,
+            final String topic,
+            final Consumer<T> callback,
+            final QoSProfile qosProfile) {
+
         if (node == null && subscriptionHandle == 0) {
             throw new RuntimeException("Need to provide active node with handle object");
         }
 
-        this.node = node;
+        this.ownerNode = node;
         this.subscriptionHandle = subscriptionHandle;
         this.messageType = messageType;
         this.topic = topic;
         this.callback = callback;
         this.qosProfile = qosProfile;
 
-        this.node.getSubscriptions().add(this);
+        this.ownerNode.getSubscriptions().add(this);
     }
 
     public final long getNodeHandle() {
-        return this.node.getNodeHandle();
+        return this.ownerNode.getNodeHandle();
       }
 
     /**
-     * @return The callback function that this subscription will trigger when
-     *     a message is received.
+     * @return The callback function that this subscription will trigger when a message is received.
      */
     public final Consumer<T> getCallback() {
         return this.callback;
@@ -130,6 +134,10 @@ public class Subscription<T extends Message> {
         return this.topic;
     }
 
+    /**
+     * Get QOS Profile
+     * @return
+     */
     public QoSProfile getQosProfile() {
         return qosProfile;
     }
@@ -139,7 +147,7 @@ public class Subscription<T extends Message> {
      */
     public void dispose() {
         Subscription.logger.debug("Destroy Subscription of topic : " + this.topic);
-        this.node.getSubscriptions().remove(this);
+        this.ownerNode.getSubscriptions().remove(this);
         // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
     }
 }

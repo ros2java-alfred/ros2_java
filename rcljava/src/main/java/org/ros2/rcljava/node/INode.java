@@ -1,4 +1,5 @@
-/* Copyright 2016 Open Source Robotics Foundation, Inc.
+/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.ros2.rcljava.qos.QoSProfile;
-import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.parameter.ParameterVariant;
 import org.ros2.rcljava.node.service.Client;
+import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.TriConsumer;
 import org.ros2.rcljava.node.topic.Consumer;
@@ -33,7 +34,6 @@ import rcl_interfaces.msg.SetParametersResult;
 /**
  * ROS2 Client API.
  *
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public interface INode {
 

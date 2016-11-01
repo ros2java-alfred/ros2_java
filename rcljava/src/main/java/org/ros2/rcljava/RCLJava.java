@@ -1,4 +1,5 @@
 /* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.ros2.rcljava;
 
 import java.lang.ref.WeakReference;
@@ -32,6 +32,7 @@ import org.ros2.rcljava.exception.NotInitializedException;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
+import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
@@ -42,8 +43,6 @@ import org.ros2.rcljava.qos.QoSProfile;
  *
  * <p>JNI call of ROS2 c client.</p>
  *
- * @author Esteve Fernandez <esteve@apache.org>
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class RCLJava {
 
@@ -465,7 +464,7 @@ public class RCLJava {
      * @param rmwImplementation
      * @throws NoImplementationAvailableException
      */
-    public static void setRMWImplementation(String rmwImplementation)
+    public static void setRMWImplementation(final String rmwImplementation)
             throws NoImplementationAvailableException, ImplementationAlreadyImportedException {
 
         synchronized(RCLJava.class) {
@@ -494,11 +493,11 @@ public class RCLJava {
     }
 
     /**
-     * <h1>Load Native ROS library</h1>
-     * <p>load from java.library.path .</p>
+     * Load Native ROS library
+     * <i>load from java.library.path .</i>
      * @param name Name of the library.
      */
-    public static void loadLibrary(String name) {
+    public static void loadLibrary(final String name) {
         synchronized(RCLJava.class) {
             RCLJava.logger.info("Load native file : lib" + name + ".so");
 
@@ -534,6 +533,11 @@ public class RCLJava {
     }
 
 
+    /**
+     * Convert Java QOS to JNI.
+     * @param qosProfile
+     * @return
+     */
     public static long convertQoSProfileToHandle(final QoSProfile qosProfile) {
       int history = qosProfile.getHistory().getValue();
       int depth = qosProfile.getDepth();
@@ -542,12 +546,15 @@ public class RCLJava {
 
       RCLJava.logger.debug("Convert QosProfile...");
 
-      return nativeConvertQoSProfileToHandle(history, depth, reliability,
-        durability);
+      return RCLJava.nativeConvertQoSProfileToHandle(history, depth, reliability, durability);
     }
 
+    /**
+     * Dispose JNI QosProfile.
+     * @param qosProfileHandle identifier
+     */
     public static void disposeQoSProfile(final long qosProfileHandle) {
-        nativeDisposeQoSProfile(qosProfileHandle);
+        RCLJava.nativeDisposeQoSProfile(qosProfileHandle);
     }
 
 }

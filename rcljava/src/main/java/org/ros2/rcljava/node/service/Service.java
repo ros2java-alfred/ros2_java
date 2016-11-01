@@ -1,4 +1,5 @@
 /* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +15,20 @@
  */
 package org.ros2.rcljava.node.service;
 
-import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.node.Node;
 
 /**
  * Service Server.
  *
  * @param <T> Service Type.
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class Service<T> {
 
     /** Name of the service */
     private final String serviceName;
 
-    /** Node. */
-    private final Node node;
+    /** Node owner. */
+    private final Node ownerNode;
 
     /** Service Handler. */
     private final long serviceHandle;
@@ -70,7 +69,7 @@ public class Service<T> {
             throw new RuntimeException("Need to provide active node with handle object");
         }
 
-        this.node = node;
+        this.ownerNode = node;
         this.serviceHandle = serviceHandle;
 
         this.serviceType = serviceType;
@@ -83,11 +82,11 @@ public class Service<T> {
         this.responseFromJavaConverterHandle = responseFromJavaConverterHandle;
         this.responseToJavaConverterHandle = responseToJavaConverterHandle;
 
-        this.node.getServices().add(this);
+        this.ownerNode.getServices().add(this);
     }
 
     public void dispose() {
-        this.node.getServices().remove(this);
+        this.ownerNode.getServices().remove(this);
     }
 
     public void sendResponse() {

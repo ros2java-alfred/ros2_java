@@ -1,4 +1,5 @@
 /* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.ros2.rcljava.node.service;
 
 /**
@@ -23,6 +23,7 @@ package org.ros2.rcljava.node.service;
  * @param <V> - the type of the third input to the operation
  */
 public interface TriConsumer<T, U, V> {
+
   /**
    * Performs this operation on the given argument.
    *
@@ -31,4 +32,5 @@ public interface TriConsumer<T, U, V> {
    * @param input3 - the third input argument
    */
   void accept(T input1, U input2, V input3);
+
 }

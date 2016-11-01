@@ -1,4 +1,5 @@
 /* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,17 +29,19 @@ import org.ros2.rcljava.node.Node;
  * @{link Node#createPublisher(Class&lt;T&gt;, String)}
  *
  * @param <T> The type of the messages that this publisher will publish.
- * @author Esteve Fernandez <esteve@apache.org>
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class Publisher<T extends Message> {
 
     private static final Logger logger = LoggerFactory.getLogger(Publisher.class);
 
+    static {
+        RCLJava.loadLibrary("rcljavanode_topic_Publisher__" + RCLJava.getRMWIdentifier());
+    }
+
     /**
-     *
+     * Node owner.
      */
-    private final Node node;
+    private final Node ownerNode;
 
     /**
      * An integer that represents a pointer to the underlying ROS2 publisher
@@ -78,10 +81,6 @@ public class Publisher<T extends Message> {
      */
     private static native void nativeDispose(long nodeHandle, long publisherHandle);
 
-    static {
-        RCLJava.loadLibrary("rcljavanode_topic_Publisher__" + RCLJava.getRMWIdentifier());
-    }
-
     /**
      * Constructor.
      *
@@ -97,13 +96,13 @@ public class Publisher<T extends Message> {
             throw new RuntimeException("Need to provide active node with handle object");
         }
 
-        this.node = node;
+        this.ownerNode = node;
         this.publisherHandle = publisherHandle;
         this.messageType = messageType;
         this.topic = topic;
         this.qosProfile = qosProfile;
 
-        this.node.getPublishers().add(this);
+        this.ownerNode.getPublishers().add(this);
     }
 
     /**
@@ -132,7 +131,7 @@ public class Publisher<T extends Message> {
     }
 
     public final long getNodeHandle() {
-        return this.node.getNodeHandle();
+        return this.ownerNode.getNodeHandle();
     }
 
     public final long getPublisherHandle() {
@@ -144,7 +143,7 @@ public class Publisher<T extends Message> {
      */
     public void dispose() {
         Publisher.logger.debug("Destroy Publisher of topic : " + this.topic);
-        this.node.getPublishers().remove(this);
-        Publisher.nativeDispose(this.node.getNodeHandle(), this.publisherHandle);
+        this.ownerNode.getPublishers().remove(this);
+        Publisher.nativeDispose(this.ownerNode.getNodeHandle(), this.publisherHandle);
     }
 }

@@ -1,4 +1,5 @@
-/* Copyright 2016 Open Source Robotics Foundation, Inc.
+/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +23,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.ros2.rcljava.qos.QoSProfile;
-import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
+import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.TriConsumer;
 import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Topics;
 
 import rcl_interfaces.msg.ListParametersResult;
 import rcl_interfaces.msg.Parameter;
@@ -55,7 +57,6 @@ import rcl_interfaces.srv.SetParameters_Response;
 /**
  * Parameter Variant.
  *
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 @SuppressWarnings("unused")
 public class ParameterService {
@@ -186,7 +187,7 @@ public class ParameterService {
                     },
                     profileParameter);
 
-            this.eventparameterPublisher = node.createPublisher(ParameterEvent.class, "parameter_events", profileParameter);
+            this.eventparameterPublisher = node.createPublisher(ParameterEvent.class, Topics.PARAM_EVENT, profileParameter);
 
         } catch (Exception e) {
             e.printStackTrace();

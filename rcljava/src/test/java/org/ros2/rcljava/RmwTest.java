@@ -1,4 +1,5 @@
-/* Copyright 2016 Open Source Robotics Foundation, Inc.
+/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava.test;
+package org.ros2.rcljava;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -22,15 +23,11 @@ import org.junit.Test;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class RmwTest {
-    private static final Logger logger = LoggerFactory.getLogger(RCLJavaTest.class);
 
     @BeforeClass
     public static void setUp() {

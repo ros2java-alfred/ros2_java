@@ -1,4 +1,5 @@
 /* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +21,6 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.node.Node;
 
@@ -28,7 +28,6 @@ import org.ros2.rcljava.node.Node;
  * Service Client.
  *
  * @param <T> Service Type.
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class Client<T> {
 

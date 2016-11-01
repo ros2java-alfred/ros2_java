@@ -1,4 +1,5 @@
 /* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +30,12 @@ import org.slf4j.LoggerFactory;
 import org.ros2.rcljava.Log;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.RMWRequestId;
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.parameter.ParameterService;
 import org.ros2.rcljava.node.parameter.ParameterVariant;
 import org.ros2.rcljava.node.service.Client;
+import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.TriConsumer;
 import org.ros2.rcljava.node.topic.Consumer;
@@ -48,8 +49,6 @@ import rcl_interfaces.msg.SetParametersResult;
  * This class serves as a bridge between ROS2's rcl_node_t and RCLJava.
  * A Node must be created via @{link RCLJava#createNode(String)}
  *
- * @author Esteve Fernandez <esteve@apache.org>
- * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
 public class Node implements INode {
 
@@ -94,8 +93,14 @@ public class Node implements INode {
      */
     private final HashMap<String, ParameterVariant<?>> parameters;
 
+    /**
+     * Parameter service.
+     */
     private final ParameterService parameterService;
 
+    /**
+     * Log to ROS2.
+     */
     private final Log logRos;
 
     // Native call.
@@ -546,6 +551,14 @@ public class Node implements INode {
     }
 
     /**
+     * DUPLICATE !!
+     * @return
+     */
+    public final long getNodeHandle() {
+        return this.nodeHandle;
+    }
+
+    /**
      * Notify threads waiting on graph changes.
      *
      * Affects threads waiting on the notify guard condition, see:
@@ -620,10 +633,6 @@ public class Node implements INode {
         throw new NotImplementedException();
     }
 
-    public final long getNodeHandle() {
-        return this.nodeHandle;
-      }
-
     /**
      * @return All the @{link Subscription}s that were created by this instance.
      */
@@ -655,6 +664,7 @@ public class Node implements INode {
     }
 
     public Time getCurrentTime() {
+        //TODO (theos)
         return null;
     }
 

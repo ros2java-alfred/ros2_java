@@ -192,16 +192,11 @@ if(BUILD_TESTING)
     "src/test/java/org/ros2/rcljava/SubscriptionTest.java"
   )
 
-  set(${PROJECT_NAME}_tests
-    "src/test/java/org/ros2/rcljava/test/NodeTest.java"
-    "src/test/java/org/ros2/rcljava/test/RCLJavaTest.java"
-    "src/test/java/org/ros2/rcljava/test/RmwTest.java"
-  )
-
   set(${PROJECT_NAME}_testsuites
     "org.ros2.rcljava.NodeTest"
     "org.ros2.rcljava.PublisherTest"
     "org.ros2.rcljava.RCLJavaTest"
+    "org.ros2.rcljava.RmwTest"
     "org.ros2.rcljava.SubscriptionTest"
   )
 
