@@ -229,7 +229,7 @@ makeJNames(rmw_ros_meta_t * ros_meta)
 
 jobject convert_rmw_request_id_to_java(JNIEnv * env, rmw_request_id_t * request_id)
 {
-  jclass jrequest_id_class = env->FindClass("org/ros2/rcljava/RMWRequestId");
+  jclass jrequest_id_class = env->FindClass("org/ros2/rcljava/node/service/RMWRequestId");
   assert(jrequest_id_class != nullptr);
 
   jmethodID jconstructor = env->GetMethodID(jrequest_id_class, "<init>", "()V");
