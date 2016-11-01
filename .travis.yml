@@ -16,10 +16,10 @@ before_install:
 - cd /home/travis/build
 - mkdir -p ros2_java_ws/src
 - cd /home/travis/build/ros2_java_ws
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/d9259bbc708c5145255fbdeb25e65e19/raw/18908a464ad1011f55e7d8e7bca774c7b45b344c/ros2_java_desktop.repos"
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/d9259bbc708c5145255fbdeb25e65e19/raw/9ea8f8ae96efd79598a0004d7d06de505ee11ace/ros2_java_desktop.repos"
 - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "/usr/bin/vcs import src < ros2_java_desktop.repos"
 - rm -rf /home/travis/build/ros2_java_ws/src/ros2_java/ros2_java
-- ln -s /home/travis/build/esteve/ros2_java /home/travis/build/ros2_java_ws/src/ros2_java/ros2_java
+- ln -s /home/travis/build/Theosakamg/ros2_java /home/travis/build/ros2_java_ws/src/ros2_java/ros2_java
 - cd /home/travis/build/ros2_java_ws/src/ros2/rosidl
 - patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_java.diff
 - cd /home/travis/build
