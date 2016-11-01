@@ -1,4 +1,4 @@
-ROS2 for Java (Theos variation)
+ROS2 for Java (Theos variation) [![Build Status](https://travis-ci.org/Theosakamg/ros2_java.svg?branch=master)](https://travis-ci.org/Theosakamg/ros2_java)
 =============
 
 What is this?
