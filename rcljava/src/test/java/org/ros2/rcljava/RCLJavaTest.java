@@ -132,8 +132,12 @@ public class RCLJavaTest {
             test = false;
         }
 
-        RCLJava.shutdown();
-        assertEquals(false, RCLJava.ok());
+        try {
+            RCLJava.shutdown();
+            assertEquals(false, RCLJava.ok());
+            test = false;
+        } catch (Exception e) {  }
+
         Assert.assertTrue("Expected Runtime error.", test);
     }
 

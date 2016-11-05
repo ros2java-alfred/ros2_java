@@ -15,8 +15,6 @@
  */
 package org.ros2.rcljava;
 
-import java.lang.ref.WeakReference;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -34,7 +32,6 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
-import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.qos.QoSProfile;
 
@@ -49,10 +46,6 @@ public class RCLJava {
     private static final String LOG_NAME = RCLJava.class.getName();
 
     private static final Logger logger = LoggerFactory.getLogger(RCLJava.class);
-
-    /** Global List/Queue of publishers. */
-    public static Queue<WeakReference<Publisher<?>>> publisherReferences =
-            new LinkedBlockingQueue<WeakReference<Publisher<?>>>();
 
     /**
      * The identifier of the currently active RMW implementation.
@@ -166,6 +159,7 @@ public class RCLJava {
                 if (RCLJava.initialized) {
                     RCLJava.logger.debug("Final Shutdown...");
 
+                    // List loaded libraries.
                     String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
                     StringBuilder msgLog = new StringBuilder();
                     for (String key : list) {
@@ -173,12 +167,6 @@ public class RCLJava {
                         msgLog.append("\n");
                     }
                     RCLJava.logger.debug("Native libraries Loaded: \n" + msgLog.toString());
-
-                    for(WeakReference<Publisher<?>> publisherReference : RCLJava.publisherReferences) {
-                        if(publisherReference.get() != null) {
-                            publisherReference.get().dispose();
-                        }
-                    }
                 }
 
                 for (Node node : nodes) {
@@ -283,10 +271,12 @@ public class RCLJava {
                     node.getClients().size(),
                     node.getServices().size());
 
+            // Clean Waitset components.
             RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
             RCLJava.nativeWaitSetClearServices(waitSetHandle);
             RCLJava.nativeWaitSetClearClients(waitSetHandle);
 
+            // Subscribe waiset components.
             for (Subscription<?> subscription : node.getSubscriptions()) {
                 RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
             }
@@ -299,9 +289,11 @@ public class RCLJava {
                 RCLJava.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
             }
 
+            // Wait...
             RCLJava.nativeWait(waitSetHandle);
             RCLJava.nativeWaitSetFini(waitSetHandle);
 
+            // Take all components.
             for (Subscription subscription : node.getSubscriptions()) {
                 Message message = RCLJava.nativeTake(subscription.getSubscriptionHandle(), subscription.getMessageType());
                 if (message != null) {

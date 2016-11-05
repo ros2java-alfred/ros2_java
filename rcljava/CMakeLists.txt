@@ -14,7 +14,7 @@ find_package(builtin_interfaces REQUIRED)
 find_package(JavaExtra MODULE)
 
 
-if (ANDROID)
+if(ANDROID)
   # https://cmake.org/cmake/help/v3.0/module/FindJava.html?highlight=java
   find_host_package(Java 1.6 COMPONENTS Development)
 else()
@@ -26,7 +26,7 @@ else()
 endif()
 
 # https://cmake.org/cmake/help/v3.0/module/UseJava.html?highlight=java
-include (UseJava)
+include(UseJava)
 enable_testing()
 
 ### Definitions ###
@@ -39,7 +39,7 @@ endif()
 include_directories(include)
 
 find_jar(JUNIT_JAR NAMES junit PATHS /usr/share/java VERSIONS 4)
-find_jar(LOG_JAR NAMES commons-logging PATHS /usr/share/java )
+find_jar(LOG_JAR NAMES commons-logging PATHS /usr/share/java)
 find_jar(STD_MSGS_JARS NAMES std_msgs
   PATHS "${CMAKE_BINARY_DIR}/../std_msgs/")
 find_jar(RCLINTERFACE_MSGS_JARS NAMES rcl_interfaces
@@ -138,6 +138,7 @@ macro(target)
     ament_target_dependencies(${_target_name}
       "rcl${target_suffix}"
       "rcljava_common"
+      "rcl_interfaces"
     )
 
     target_include_directories(
@@ -188,6 +189,7 @@ if(BUILD_TESTING)
     "src/test/java/org/ros2/rcljava/NodeTest.java"
     "src/test/java/org/ros2/rcljava/PublisherTest.java"
     "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
+    "src/test/java/org/ros2/rcljava/RmwTest.java"
     "src/test/java/org/ros2/rcljava/SubscriptionTest.java"
   )
 
@@ -212,8 +214,10 @@ if(BUILD_TESTING)
     TESTS
     "${testsuite}"
     INCLUDE_JARS
-    "${rcljava_common_JARS}"
     "${std_msgs_JARS}"
+    "${rcl_interfaces_JARS}"
+    "${builtin_interfaces_JARS}"
+    "${rcljava_common_JARS}"
     "${_jar_file}"
     LIBRARY_PATHS
     "${_deps_library_paths}"

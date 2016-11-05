@@ -17,14 +17,14 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cassert>
-#include <jni.h>
 
-#include <rmw/rmw.h>
-#include <rcl/error_handling.h>
-#include <rcl/rcl.h>
-#include <rcl/node.h>
-#include <rcl/graph.h>
-#include <rosidl_generator_c/message_type_support_struct.h>
+#include "jni.h"
+#include "rmw/rmw.h"
+#include "rcl/error_handling.h"
+#include "rcl/rcl.h"
+#include "rcl/node.h"
+#include "rcl/graph.h"
+#include "rosidl_generator_c/message_type_support_struct.h"
 
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
@@ -36,15 +36,15 @@
  * nativeCreatePublisherHandle
  */
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreatePublisherHandle(
-    JNIEnv *env,
-    jclass ,
-     jlong jnode_handle,
-    jclass jmessage_class,
-   jstring jtopic,
-     jlong qos_profile_handle) {
-
-  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
-  rosidl_message_type_support_t *msg_type = jclass2MessageType(env, jmessage_class);
+  JNIEnv * env,
+  jclass,
+  jlong jnode_handle,
+  jclass jmessage_class,
+  jstring jtopic,
+  jlong qos_profile_handle)
+{
+  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
+  rosidl_message_type_support_t * msg_type = jclass2MessageType(env, jmessage_class);
   std::string topic = jstring2String(env, jtopic);
 
   rcl_publisher_t * publisher = makeInstance<rcl_publisher_t>();
@@ -56,15 +56,15 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreatePublisherHan
   publisher_ops.qos = *qos_profile;
 
   rcl_ret_t ret = rcl_publisher_init(
-      publisher,
-      node,
-      msg_type,
-      topic.c_str(),
-      &publisher_ops);
+    publisher,
+    node,
+    msg_type,
+    topic.c_str(),
+    &publisher_ops);
 
   if (ret != RCL_RET_OK) {
     std::string message("Failed to create publisher: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
 
     return -1;
@@ -78,15 +78,15 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreatePublisherHan
  * nativeCreateSubscriptionHandle
  */
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateSubscriptionHandle(
-    JNIEnv *env,
-    jclass ,
-     jlong jnode_handle,
-    jclass jmessage_class,
-   jstring jtopic,
-     jlong qos_profile_handle) {
-
-  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
-  rosidl_message_type_support_t *msg_type = jclass2MessageType(env, jmessage_class);
+  JNIEnv * env,
+  jclass,
+  jlong jnode_handle,
+  jclass jmessage_class,
+  jstring jtopic,
+  jlong qos_profile_handle)
+{
+  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
+  rosidl_message_type_support_t * msg_type = jclass2MessageType(env, jmessage_class);
   std::string topic = jstring2String(env, jtopic);
 
   rcl_subscription_t * subscription = makeInstance<rcl_subscription_t>();
@@ -97,15 +97,15 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateSubscription
   subscription_ops.qos = *qos_profile;
 
   rcl_ret_t ret = rcl_subscription_init(
-      subscription,
-      node,
-      msg_type,
-      topic.c_str(),
-      &subscription_ops);
+    subscription,
+    node,
+    msg_type,
+    topic.c_str(),
+    &subscription_ops);
 
   if (ret != RCL_RET_OK) {
     std::string message("Failed to create subscription: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
 
     return -1;
@@ -119,19 +119,18 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateSubscription
  * nativeCreateClientHandle
  */
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateClientHandle(
-    JNIEnv *env,
-    jclass ,
-     jlong jnode_handle,
-    jclass jservice_class,
-   jstring jservice_topic,
-     jlong qos_profile_handle) {
-
-
-  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
-  rosidl_service_type_support_t *msg_type = jclass2ServiceType(env, jservice_class);
+  JNIEnv * env,
+  jclass,
+  jlong jnode_handle,
+  jclass jservice_class,
+  jstring jservice_topic,
+  jlong qos_profile_handle)
+{
+  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
+  rosidl_service_type_support_t * msg_type = jclass2ServiceType(env, jservice_class);
   std::string service_topic = jstring2String(env, jservice_topic);
 
-  rcl_client_t *client = makeInstance<rcl_client_t>();
+  rcl_client_t * client = makeInstance<rcl_client_t>();
   client->impl = NULL;
 
 //  bool is_available = false;
@@ -150,15 +149,15 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateClientHandle
   client_ops.qos = *qos_profile;
 
   rcl_ret_t ret = rcl_client_init(
-      client,
-      node,
-      msg_type,
-      service_topic.c_str(),
-      &client_ops);
+    client,
+    node,
+    msg_type,
+    service_topic.c_str(),
+    &client_ops);
 
   if (ret != RCL_RET_OK) {
     std::string message("Failed to create client: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
 
     return -1;
@@ -172,19 +171,18 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateClientHandle
  * nativeCreateServiceHandle
  */
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateServiceHandle(
-    JNIEnv *env,
-    jclass ,
-     jlong jnode_handle,
-    jclass jservice_class,
-   jstring jservice_topic,
-     jlong qos_profile_handle) {
-
-  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
-  rosidl_service_type_support_t *msg_type = jclass2ServiceType(env, jservice_class);
+  JNIEnv * env,
+  jclass,
+  jlong jnode_handle,
+  jclass jservice_class,
+  jstring jservice_topic,
+  jlong qos_profile_handle)
+{
+  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
+  rosidl_service_type_support_t * msg_type = jclass2ServiceType(env, jservice_class);
   std::string service_topic = jstring2String(env, jservice_topic);
 
-
-  rcl_service_t *service = makeInstance<rcl_service_t>();
+  rcl_service_t * service = makeInstance<rcl_service_t>();
   service->impl = NULL;
 
   rcl_service_options_t service_ops = rcl_service_get_default_options();
@@ -192,15 +190,15 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateServiceHandl
   service_ops.qos = *qos_profile;
 
   rcl_ret_t ret = rcl_service_init(
-      service,
-      node,
-      msg_type,
-      service_topic.c_str(),
-      &service_ops);
+    service,
+    node,
+    msg_type,
+    service_topic.c_str(),
+    &service_ops);
 
   if (ret != RCL_RET_OK) {
     std::string message("Failed to create service: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
 
     return -1;
@@ -213,15 +211,17 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_Node_nativeCreateServiceHandl
 /*
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_Node_nativeDispose
-  (JNIEnv *env, jclass , jlong jnode_handle) {
-
-  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_Node_nativeDispose(
+  JNIEnv * env,
+  jclass,
+  jlong jnode_handle)
+{
+  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
 
   rcl_ret_t ret = rcl_node_fini(node);
   if (ret != RCL_RET_OK) {
     std::string message("Failed finish node: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
@@ -229,12 +229,14 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_Node_nativeDispose
 /*
  *
  */
-JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_node_Node_nativeGetName
-  (JNIEnv *env, jclass, jlong jnode_handle) {
+JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_node_Node_nativeGetName(
+  JNIEnv * env,
+  jclass,
+  jlong jnode_handle)
+{
+  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
 
-  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
-
-  const char *name_tmp = rcl_node_get_name(node);
+  const char * name_tmp = rcl_node_get_name(node);
   jstring name = env->NewStringUTF(name_tmp);
 
   return name;
@@ -243,17 +245,20 @@ JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_node_Node_nativeGetName
 /*
  *
  */
-JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_Node_nativeCountPublishers
-  (JNIEnv *env, jclass, jlong jnode_handle, jstring jtopic) {
-
-  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
+JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_Node_nativeCountPublishers(
+  JNIEnv * env,
+  jclass,
+  jlong jnode_handle,
+  jstring jtopic)
+{
+  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
   std::string topic = jstring2String(env, jtopic);
 
   size_t count = -1;
   rcl_ret_t ret = rcl_count_publishers(node, topic.c_str(), &count);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to count Publishers: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 
@@ -263,33 +268,38 @@ JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_Node_nativeCountPublishers
 /*
  *
  */
-JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_Node_nativeCountSubscribers
-  (JNIEnv *env, jclass, jlong jnode_handle, jstring jtopic) {
-
-  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
+JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_Node_nativeCountSubscribers(
+  JNIEnv * env,
+  jclass,
+  jlong jnode_handle,
+  jstring jtopic)
+{
+  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
   std::string topic = jstring2String(env, jtopic);
 
   size_t count = 0;
   rcl_ret_t ret = rcl_count_subscribers(node, topic.c_str(), &count);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to count Publishers: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 
   return count;
 }
 
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_Node_getListTopics
-  (JNIEnv *env, jclass, jlong jnode_handle) {
-
-  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_Node_getListTopics(
+  JNIEnv * env,
+  jclass,
+  jlong jnode_handle)
+{
+  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
   rcl_topic_names_and_types_t topic_names_and_types {};
 
   rcl_ret_t ret = rcl_get_topic_names_and_types(node, &topic_names_and_types);
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of topics: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 
@@ -298,10 +308,9 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_Node_getListTopics
   ret = rcl_destroy_topic_names_and_types(&topic_names_and_types);
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of topics: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 
   return topics;
-
 }

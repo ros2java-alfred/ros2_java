@@ -13,27 +13,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SRC_RCL_UTILS_H_
-#define SRC_RCL_UTILS_H_
-
 #include <string>
 #include <cstdlib>
 #include <cassert>
 #include <cstdio>
-#include <jni.h>
-#include <rcl/graph.h>
-#include <rmw/rmw.h>
 
-#include <rmw/types.h>
-#include <rosidl_generator_c/message_type_support.h>
+#include "jni.h"
+
+#include "rcl/graph.h"
+#include "rmw/rmw.h"
+#include "rmw/types.h"
+#include "rosidl_generator_c/message_type_support.h"
+
+#ifndef UTILS_H_
+#define UTILS_H_
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Convert jstring to std::string.
  */
 std::string
-jstring2String(JNIEnv *env, jstring jsubject)
+jstring2String(JNIEnv * env, jstring jsubject)
 {
-  const char *subject_tmp = env->GetStringUTFChars(jsubject, 0);
+  const char * subject_tmp = env->GetStringUTFChars(jsubject, 0);
   std::string result(subject_tmp);
   env->ReleaseStringUTFChars(jsubject, subject_tmp);
 
@@ -44,15 +48,15 @@ jstring2String(JNIEnv *env, jstring jsubject)
  * Convertion of Message type.
  */
 rosidl_message_type_support_t *
-jclass2MessageType(JNIEnv *env, jclass jmessage_class)
+jclass2MessageType(JNIEnv * env, jclass jmessage_class)
 {
   jmethodID mid =
-      env->GetStaticMethodID(jmessage_class, "getTypeSupport", "()J");
+    env->GetStaticMethodID(jmessage_class, "getTypeSupport", "()J");
 
   jlong jts = env->CallStaticLongMethod(jmessage_class, mid);
 
-  rosidl_message_type_support_t *ts =
-      reinterpret_cast<rosidl_message_type_support_t *>(jts);
+  rosidl_message_type_support_t * ts =
+    reinterpret_cast<rosidl_message_type_support_t *>(jts);
 
   return ts;
 }
@@ -61,31 +65,31 @@ jclass2MessageType(JNIEnv *env, jclass jmessage_class)
  *
  */
 void *
-jclass2Message(JNIEnv *env, jclass jmessage_class)
+jclass2Message(JNIEnv * env, jclass jmessage_class)
 {
   jmethodID jfrom_mid = env->GetStaticMethodID(jmessage_class, "getFromJavaConverter", "()J");
   jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, jfrom_mid);
 
   using convert_from_java_signature = void * (*)(jobject, void *);
   convert_from_java_signature convert_from_java =
-      reinterpret_cast<convert_from_java_signature>(jfrom_java_converter);
+    reinterpret_cast<convert_from_java_signature>(jfrom_java_converter);
 
   jmethodID jconstructor = env->GetMethodID(jmessage_class, "<init>", "()V");
   jobject jmsg = env->NewObject(jmessage_class, jconstructor);
 
-  void *taken_msg = convert_from_java(jmsg, nullptr);
+  void * taken_msg = convert_from_java(jmsg, nullptr);
   return taken_msg;
 }
 
 jobject
-jclass2JMessage(JNIEnv *env, jclass jmessage_class, void * taken_msg)
+jclass2JMessage(JNIEnv * env, jclass jmessage_class, void * taken_msg)
 {
   jmethodID jto_mid = env->GetStaticMethodID(jmessage_class, "getToJavaConverter", "()J");
   jlong jto_java_converter = env->CallStaticLongMethod(jmessage_class, jto_mid);
 
   using convert_to_java_signature = jobject (*)(void *, jobject);
   convert_to_java_signature convert_to_java =
-      reinterpret_cast<convert_to_java_signature>(jto_java_converter);
+    reinterpret_cast<convert_to_java_signature>(jto_java_converter);
 
   jobject jtaken_msg = convert_to_java(taken_msg, nullptr);
   return jtaken_msg;
@@ -95,7 +99,7 @@ jclass2JMessage(JNIEnv *env, jclass jmessage_class, void * taken_msg)
  *
  */
 void *
-jobject2Message(JNIEnv *env, jobject jmessage)
+jobject2Message(JNIEnv * env, jobject jmessage)
 {
   jclass jmessage_class = env->GetObjectClass(jmessage);
   jmethodID mid = env->GetStaticMethodID(jmessage_class, "getFromJavaConverter", "()J");
@@ -113,17 +117,17 @@ jobject2Message(JNIEnv *env, jobject jmessage)
  *
  */
 rosidl_service_type_support_t *
-jclass2ServiceType(JNIEnv *env, jclass jmessage_class)
+jclass2ServiceType(JNIEnv * env, jclass jmessage_class)
 {
   jmethodID mid =
-      env->GetStaticMethodID(jmessage_class, "getServiceTypeSupport", "()J");
+    env->GetStaticMethodID(jmessage_class, "getServiceTypeSupport", "()J");
   assert(mid != NULL);
 
   jlong jts = env->CallStaticLongMethod(jmessage_class, mid);
   assert(jts != 0);
 
-  rosidl_service_type_support_t *ts =
-      reinterpret_cast<rosidl_service_type_support_t *>(jts);
+  rosidl_service_type_support_t * ts =
+    reinterpret_cast<rosidl_service_type_support_t *>(jts);
 
   return ts;
 }
@@ -131,32 +135,8 @@ jclass2ServiceType(JNIEnv *env, jclass jmessage_class)
 /*
  *
  */
-template <typename T>
-T *
-makeInstance()
-{
-  return (T *)malloc(sizeof(T));
-}
-
-/*
- *
- */
-template <typename T>
-T*
-handle2Instance(jlong handle)
-{
-  T * obj = reinterpret_cast<T *>(handle);
-
-  assert(obj != NULL);
-
-  return obj;
-}
-
-/*
- *
- */
 jlong
-instance2Handle(void* obj)
+instance2Handle(void * obj)
 {
   jlong handler = reinterpret_cast<jlong>(obj);
 
@@ -169,12 +149,12 @@ instance2Handle(void* obj)
  *
  */
 void
-throwException(JNIEnv *env, std::string message)
+throwException(JNIEnv * env, std::string message)
 {
-  const char *class_name = "java/lang/IllegalStateException";
+  const char * class_name = "java/lang/IllegalStateException";
   jclass exception_class = env->FindClass(class_name);
 
-  assert(exception_class != NULL); // nullptr
+  assert(exception_class != NULL);
 
   env->ThrowNew(exception_class, message.c_str());
 }
@@ -183,21 +163,21 @@ throwException(JNIEnv *env, std::string message)
  *
  */
 jobject
-makeJTopics(JNIEnv *env, rcl_topic_names_and_types_t *topic_names_and_types)
+makeJTopics(JNIEnv * env, rcl_topic_names_and_types_t * topic_names_and_types)
 {
-  env->PushLocalFrame(256); // fix for local references
+  env->PushLocalFrame(256);  // fix for local references
 
-  jsize map_len   = topic_names_and_types->topic_count;
+  jsize map_len = topic_names_and_types->topic_count;
   jclass mapClass = env->FindClass("java/util/HashMap");
-  jmethodID init  = env->GetMethodID(mapClass, "<init>", "(I)V");
+  jmethodID init = env->GetMethodID(mapClass, "<init>", "(I)V");
   jobject hashMap = env->NewObject(mapClass, init, map_len);
-  jmethodID put   = env->GetMethodID(mapClass, "put",
+  jmethodID put = env->GetMethodID(mapClass, "put",
       "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 
   for (size_t i = 0; i < topic_names_and_types->topic_count; ++i) {
     env->CallObjectMethod(hashMap, put,
-        env->NewStringUTF(topic_names_and_types->topic_names[i]),
-        env->NewStringUTF(topic_names_and_types->type_names[i]));
+      env->NewStringUTF(topic_names_and_types->topic_names[i]),
+      env->NewStringUTF(topic_names_and_types->type_names[i]));
   }
 
   env->PopLocalFrame(hashMap);
@@ -283,4 +263,32 @@ rmw_request_id_t * convert_rmw_request_id_from_java(JNIEnv * env, jobject jreque
   return request_id;
 }
 
-#endif /* SRC_RCL_UTILS_H_ */
+#ifdef __cplusplus
+}
+#endif
+
+/*
+ *
+ */
+template<typename T>
+T *
+makeInstance()
+{
+  return (T *)malloc(sizeof(T));
+}
+
+/*
+ *
+ */
+template<typename T>
+T *
+handle2Instance(jlong handle)
+{
+  T * obj = reinterpret_cast<T *>(handle);
+
+  assert(obj != NULL);
+
+  return obj;
+}
+
+#endif  // UTILS_H_

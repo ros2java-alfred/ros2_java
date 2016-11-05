@@ -34,7 +34,14 @@ for field in spec.fields:
     if field.type.is_array: has_array = 1;
 
 # Remove duplicate Type
-use_types = list(set(use_types));
+seen = set()
+unique = []
+for item in use_types:
+    if item.type not in seen:
+        unique.append(item)
+        seen.add(item.type)
+
+use_types = list(set(unique));
 
 msg_typename = '%s__%s__%s' % (spec.base_type.pkg_name, subfolder, spec.base_type.type);
 

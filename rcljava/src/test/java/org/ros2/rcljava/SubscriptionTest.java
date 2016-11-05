@@ -37,8 +37,13 @@ public class SubscriptionTest {
           }
         }
     );
+
     assertEquals(node.getNodeHandle(), subscription.getNodeHandle());
     assertNotEquals(0, subscription.getNodeHandle());
     assertNotEquals(0, subscription.getSubscriptionHandle());
+
+    subscription.dispose();
+    node.dispose();
+    RCLJava.shutdown();
   }
 }

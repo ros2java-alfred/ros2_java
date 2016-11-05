@@ -16,6 +16,8 @@
 package org.ros2.rcljava.node.service;
 
 import org.ros2.rcljava.node.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service Server.
@@ -23,6 +25,8 @@ import org.ros2.rcljava.node.Node;
  * @param <T> Service Type.
  */
 public class Service<T> {
+
+    private static final Logger logger = LoggerFactory.getLogger(Service.class);
 
     /** Name of the service */
     private final String serviceName;
@@ -69,6 +73,8 @@ public class Service<T> {
             throw new RuntimeException("Need to provide active node with handle object");
         }
 
+        Service.logger.debug("Init Service stack : " + serviceName);
+
         this.ownerNode = node;
         this.serviceHandle = serviceHandle;
 
@@ -86,6 +92,7 @@ public class Service<T> {
     }
 
     public void dispose() {
+        Service.logger.debug("Destroy Service stack : " + this.serviceName);
         this.ownerNode.getServices().remove(this);
     }
 

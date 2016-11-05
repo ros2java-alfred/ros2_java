@@ -31,13 +31,13 @@
 #include "org_ros2_rcljava_node_service_Client.h"
 
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_service_Client_nativeSendClientRequest(
-    JNIEnv * env,
-    jclass,
-    jlong client_handle,
-    jlong sequence_number,
-    jlong jrequest_from_java_converter_handle,
-    jlong jrequest_to_java_converter_handle,
-    jobject jrequest_msg)
+  JNIEnv * env,
+  jclass,
+  jlong client_handle,
+  jlong sequence_number,
+  jlong jrequest_from_java_converter_handle,
+  jlong jrequest_to_java_converter_handle,
+  jobject jrequest_msg)
 {
   assert(client_handle != 0);
   assert(jrequest_from_java_converter_handle != 0);

@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <jni.h>
-
 #include <cassert>
 #include <cstdlib>
 #include <string>
+
+#include "jni.h"
 
 #include "rmw/rmw.h"
 #include "rcl/error_handling.h"
@@ -39,9 +39,11 @@ rmw_request_id_t * convert_rmw_request_id_from_java(JNIEnv *, jobject);
 /*
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit
-  (JNIEnv *env, jclass, jobjectArray arg) {
-
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit(
+  JNIEnv * env,
+  jclass,
+  jobjectArray arg)
+{
   // TODO(esteve): parse args
   int argc = arg != NULL ? env->GetArrayLength(arg) : 0;
   char ** argv = nullptr;
@@ -50,7 +52,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit
   rcl_ret_t ret = rcl_init(argc, argv, allocator);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to init: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
@@ -58,13 +60,14 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit
 /*
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown
-  (JNIEnv *env, jclass) {
-
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown(
+  JNIEnv * env,
+  jclass)
+{
   rcl_ret_t ret = rcl_shutdown();
   if (ret != RCL_RET_OK) {
     std::string message("Failed to shutdown: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
@@ -72,18 +75,20 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown
 /*
  *
  */
-JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_RCLJava_nativeOk
-  (JNIEnv *, jclass) {
-
+JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_RCLJava_nativeOk(
+  JNIEnv *,
+  jclass)
+{
   return rcl_ok();
 }
 
 /*
  *
  */
-JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier
-  (JNIEnv *env, jclass) {
-
+JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier(
+  JNIEnv * env,
+  jclass)
+{
   const char * rmw_implementation_identifier = rmw_get_implementation_identifier();
 
   return env->NewStringUTF(rmw_implementation_identifier);
@@ -92,12 +97,14 @@ JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier
 /*
  *
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle
-  (JNIEnv *env, jclass, jstring jnode_name) {
-
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(
+  JNIEnv * env,
+  jclass,
+  jstring jnode_name)
+{
   std::string node_name = jstring2String(env, jnode_name);
 
-  rcl_node_t *node = makeInstance<rcl_node_t>();
+  rcl_node_t * node = makeInstance<rcl_node_t>();
   node->impl = nullptr;
 
   rcl_node_options_t default_options = rcl_node_get_default_options();
@@ -105,7 +112,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle
   rcl_ret_t ret = rcl_node_init(node, node_name.c_str(), &default_options);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to create node: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
 
     return 0;
@@ -119,9 +126,10 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle
 /*
  *
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWaitSet
-  (JNIEnv *, jclass) {
-
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWaitSet(
+  JNIEnv *,
+  jclass)
+{
   // ~ rcl_get_zero_initialized_wait_set();
   rcl_wait_set_t * wait_set = makeInstance<rcl_wait_set_t>();
   wait_set->subscriptions = nullptr;
@@ -144,16 +152,16 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWa
  *
  */
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetInit(
-    JNIEnv *env,
-    jclass ,
-    jlong wait_set_handle,
-    jint number_of_subscriptions,
-    jint number_of_guard_conditions,
-    jint number_of_timers,
-    jint number_of_clients,
-    jint number_of_services
-) {
-
+  JNIEnv * env,
+  jclass,
+  jlong wait_set_handle,
+  jint number_of_subscriptions,
+  jint number_of_guard_conditions,
+  jint number_of_timers,
+  jint number_of_clients,
+  jint number_of_services
+)
+{
   rcl_wait_set_t * wait_set = handle2Instance<rcl_wait_set_t>(wait_set_handle);
 
   rcl_ret_t ret = rcl_wait_set_init(
@@ -167,7 +175,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetInit(
 
   if (ret != RCL_RET_OK) {
     std::string message("Failed to initialize wait set: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
@@ -175,15 +183,17 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetInit(
 /*
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearSubscriptions
-  (JNIEnv *env, jclass, jlong wait_set_handle) {
-
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearSubscriptions(
+  JNIEnv * env,
+  jclass,
+  jlong wait_set_handle)
+{
   rcl_wait_set_t * wait_set = handle2Instance<rcl_wait_set_t>(wait_set_handle);
 
   rcl_ret_t ret = rcl_wait_set_clear_subscriptions(wait_set);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to clear subscriptions from wait set: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
@@ -191,17 +201,20 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearSubscript
 /*
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddSubscription
-  (JNIEnv *env, jclass, jlong wait_set_handle, jlong subscription_handle) {
-
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddSubscription(
+  JNIEnv * env,
+  jclass,
+  jlong wait_set_handle,
+  jlong subscription_handle)
+{
   rcl_wait_set_t * wait_set = handle2Instance<rcl_wait_set_t>(wait_set_handle);
   rcl_subscription_t * subscription =
-      handle2Instance<rcl_subscription_t>(subscription_handle);
+    handle2Instance<rcl_subscription_t>(subscription_handle);
 
   rcl_ret_t ret = rcl_wait_set_add_subscription(wait_set, subscription);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to add subscription to wait set: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
@@ -209,15 +222,17 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddSubscriptio
 /*
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWait
-  (JNIEnv *env, jclass, jlong wait_set_handle) {
-
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWait(
+  JNIEnv * env,
+  jclass,
+  jlong wait_set_handle)
+{
   rcl_wait_set_t * wait_set = handle2Instance<rcl_wait_set_t>(wait_set_handle);
 
   rcl_ret_t ret = rcl_wait(wait_set, RCL_S_TO_NS(1));
   if (ret != RCL_RET_OK && ret != RCL_RET_TIMEOUT) {
     std::string message("Failed to wait on wait set: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
@@ -225,18 +240,21 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWait
 /*
  *
  */
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTake
-  (JNIEnv *env, jclass, jlong subscription_handle, jclass jmessage_class) {
-
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTake(
+  JNIEnv * env,
+  jclass,
+  jlong subscription_handle,
+  jclass jmessage_class)
+{
   rcl_subscription_t * subscription =
-      handle2Instance<rcl_subscription_t>(subscription_handle);
+    handle2Instance<rcl_subscription_t>(subscription_handle);
 
   void * taken_msg = jclass2Message(env, jmessage_class);
 
   rcl_ret_t ret = rcl_take(subscription, taken_msg, nullptr);
   if (ret != RCL_RET_OK && ret != RCL_RET_SUBSCRIPTION_TAKE_FAILED) {
     std::string message("Failed to take from a subscription: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 
@@ -252,47 +270,50 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTake
 /*
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetFini
-  (JNIEnv *env, jclass, jlong wait_set_handle) {
-
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetFini(
+  JNIEnv * env,
+  jclass,
+  jlong wait_set_handle)
+{
   rcl_wait_set_t * wait_set = handle2Instance<rcl_wait_set_t>(wait_set_handle);
 
   rcl_ret_t ret = rcl_wait_set_fini(wait_set);
   if (ret != RCL_RET_OK) {
-      std::string message("Failed to release wait set: " +
-          std::string(rcl_get_error_string_safe()));
-      throwException(env, message);
-    }
+    std::string message("Failed to release wait set: " +
+      std::string(rcl_get_error_string_safe()));
+    throwException(env, message);
+  }
 }
 
 
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetNodeNames
-  (JNIEnv *env, jclass) {
-
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetNodeNames(
+  JNIEnv * env,
+  jclass)
+{
   return NULL;
 }
 
 
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearServices(
-    JNIEnv * env,
-    jclass,
-    jlong wait_set_handle)
+  JNIEnv * env,
+  jclass,
+  jlong wait_set_handle)
 {
   rcl_wait_set_t * wait_set = handle2Instance<rcl_wait_set_t>(wait_set_handle);
 
   rcl_ret_t ret = rcl_wait_set_clear_services(wait_set);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to clear services from wait set: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
 
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddService(
-    JNIEnv * env,
-    jclass,
-    jlong wait_set_handle,
-    jlong service_handle)
+  JNIEnv * env,
+  jclass,
+  jlong wait_set_handle,
+  jlong service_handle)
 {
   rcl_wait_set_t * wait_set = handle2Instance<rcl_wait_set_t>(wait_set_handle);
   rcl_service_t * service = handle2Instance<rcl_service_t>(service_handle);
@@ -300,31 +321,31 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddService(
   rcl_ret_t ret = rcl_wait_set_add_service(wait_set, service);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to add service to wait set: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
 
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearClients(
-    JNIEnv * env,
-    jclass,
-    jlong wait_set_handle)
+  JNIEnv * env,
+  jclass,
+  jlong wait_set_handle)
 {
   rcl_wait_set_t * wait_set = handle2Instance<rcl_wait_set_t>(wait_set_handle);
 
   rcl_ret_t ret = rcl_wait_set_clear_clients(wait_set);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to clear clients from wait set: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
 
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddClient(
-    JNIEnv * env,
-    jclass,
-    jlong wait_set_handle,
-    jlong client_handle)
+  JNIEnv * env,
+  jclass,
+  jlong wait_set_handle,
+  jlong client_handle)
 {
   rcl_wait_set_t * wait_set = handle2Instance<rcl_wait_set_t>(wait_set_handle);
   rcl_client_t * client = handle2Instance<rcl_client_t>(client_handle);
@@ -332,18 +353,18 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddClient(
   rcl_ret_t ret = rcl_wait_set_add_client(wait_set, client);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to add client to wait set: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
 
 JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeRequest(
-    JNIEnv * env,
-    jclass,
-    jlong service_handle,
-    jlong jrequest_from_java_converter_handle,
-    jlong jrequest_to_java_converter_handle,
-    jobject jrequest_msg)
+  JNIEnv * env,
+  jclass,
+  jlong service_handle,
+  jlong jrequest_from_java_converter_handle,
+  jlong jrequest_to_java_converter_handle,
+  jobject jrequest_msg)
 {
   assert(service_handle != 0);
   assert(jrequest_from_java_converter_handle != 0);
@@ -365,7 +386,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeRequest(
   rcl_ret_t ret = rcl_take_request(service, &header, taken_msg);
   if (ret != RCL_RET_OK && ret != RCL_RET_SERVICE_TAKE_FAILED) {
     std::string message("Failed to take request from a service: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
     return nullptr;
   }
@@ -382,13 +403,13 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeRequest(
 }
 
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeSendServiceResponse(
-    JNIEnv * env,
-    jclass,
-    jlong service_handle,
-    jobject jrequest_id,
-    jlong jresponse_from_java_converter_handle,
-    jlong jresponse_to_java_converter_handle,
-    jobject jresponse_msg)
+  JNIEnv * env,
+  jclass,
+  jlong service_handle,
+  jobject jrequest_id,
+  jlong jresponse_from_java_converter_handle,
+  jlong jresponse_to_java_converter_handle,
+  jobject jresponse_msg)
 {
   assert(service_handle != 0);
   assert(jresponse_from_java_converter_handle != 0);
@@ -407,18 +428,18 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeSendServiceResponse(
   rcl_ret_t ret = rcl_send_response(service, request_id, response_msg);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to send response from a service: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
 
 JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeResponse(
-    JNIEnv * env,
-    jclass,
-    jlong client_handle,
-    jlong jresponse_from_java_converter_handle,
-    jlong jresponse_to_java_converter_handle,
-    jobject jresponse_msg)
+  JNIEnv * env,
+  jclass,
+  jlong client_handle,
+  jlong jresponse_from_java_converter_handle,
+  jlong jresponse_to_java_converter_handle,
+  jobject jresponse_msg)
 {
   assert(client_handle != 0);
   assert(jresponse_from_java_converter_handle != 0);
@@ -440,7 +461,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeResponse(
   rcl_ret_t ret = rcl_take_response(client, &header, taken_msg);
   if (ret != RCL_RET_OK && ret != RCL_RET_CLIENT_TAKE_FAILED) {
     std::string message("Failed to take request from a service: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
     return nullptr;
   }
@@ -458,7 +479,12 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeResponse(
 }
 
 JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToHandle(
-  JNIEnv *, jclass, jint history, jint depth, jint reliability, jint durability)
+  JNIEnv *,
+  jclass,
+  jint history,
+  jint depth,
+  jint reliability,
+  jint durability)
 {
   rmw_qos_profile_t * qos_profile =
     static_cast<rmw_qos_profile_t *>(malloc(sizeof(rmw_qos_profile_t)));
@@ -469,7 +495,9 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToH
   return reinterpret_cast<jlong>(qos_profile);
 }
 
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile(JNIEnv *, jclass,
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile(
+  JNIEnv *,
+  jclass,
   jlong qos_profile_handle)
 {
   rmw_qos_profile_t * qos_profile =

@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.ros2.rcljava.qos.QoSProfile;
-import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.parameter.ParameterVariant;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.RMWRequestId;
@@ -58,7 +57,7 @@ public interface INode {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Publisher instance of the created publisher.
      */
-    <T extends Message> Publisher<T> createPublisher(Class<T> message, String topic, QoSProfile qos);
+    <T extends org.ros2.rcljava.internal.message.Message> Publisher<T> createPublisher(Class<T> message, String topic, QoSProfile qos);
 
     /**
      * Create and return a Publisher. (Retro-compatibility)
@@ -68,7 +67,7 @@ public interface INode {
      * @param topic The topic for this publisher to publish on.
      * @return Publisher instance of the created publisher.
      */
-    <T extends Message> Publisher<T> createPublisher(Class<T> message, String topic);
+    <T extends org.ros2.rcljava.internal.message.Message> Publisher<T> createPublisher(Class<T> message, String topic);
 
     /**
      * Create and return a Subscription.
@@ -80,7 +79,7 @@ public interface INode {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Subscription instance of the created subscription.
      */
-    <T extends Message> Subscription<T> createSubscription(Class<T> message, String topic, Consumer<T> callback, QoSProfile qos);
+    <T extends org.ros2.rcljava.internal.message.Message> Subscription<T> createSubscription(Class<T> message, String topic, Consumer<T> callback, QoSProfile qos);
 
     /**
      * Create and return a Subscription. (Retro-compatibility)
@@ -91,7 +90,7 @@ public interface INode {
      * @param callback The user-defined callback function.
      * @return Subscription instance of the created subscription.
      */
-    <T extends Message> Subscription<T> createSubscription(Class<T> message, String topic, Consumer<T> callback);
+    <T extends org.ros2.rcljava.internal.message.Message> Subscription<T> createSubscription(Class<T> message, String topic, Consumer<T> callback);
 
     /**
      * Create and return a Client.
@@ -102,7 +101,7 @@ public interface INode {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Client instance of the service.
      */
-    <T> Client<T> createClient(Class<T> message, String service, QoSProfile qos) throws Exception;
+    <T extends org.ros2.rcljava.internal.service.Service> Client<T> createClient(Class<T> message, String service, QoSProfile qos) throws Exception;
 
     /**
      * Create and return a Client. (Retro-compatibility)
@@ -112,7 +111,7 @@ public interface INode {
      * @param service The service to subscribe on.
      * @return Client instance of the service.
      */
-    <T> Client<T> createClient(Class<T> message, String service) throws Exception ;
+    <T extends org.ros2.rcljava.internal.service.Service> Client<T> createClient(Class<T> message, String service) throws Exception ;
 
     /**
      * Create and return a Service.
@@ -124,7 +123,7 @@ public interface INode {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Service instance of the service.
      */
-    <T> Service<T> createService(final Class<T> serviceType,
+    <T extends org.ros2.rcljava.internal.service.Service> Service<T> createService(final Class<T> serviceType,
             final String serviceName,
             final TriConsumer<RMWRequestId, ?, ?> callback,
             final QoSProfile qos) throws Exception;
@@ -138,7 +137,7 @@ public interface INode {
      * @param callback The user-defined callback function.
      * @return Service instance of the service.
      */
-    <T> Service<T> createService(final Class<T> serviceType,
+    <T extends org.ros2.rcljava.internal.service.Service> Service<T> createService(final Class<T> serviceType,
             final String serviceName,
             final TriConsumer<RMWRequestId, ?, ?> callback) throws Exception;
 
@@ -208,6 +207,6 @@ public interface INode {
      *
      * @param User defined callback function, It is expected to atomically set parameters.
      */
-    <T extends Message> void registerParamChangeCallback(Consumer<T> callback);
+    <T extends org.ros2.rcljava.internal.message.Message> void registerParamChangeCallback(Consumer<T> callback);
 
 }

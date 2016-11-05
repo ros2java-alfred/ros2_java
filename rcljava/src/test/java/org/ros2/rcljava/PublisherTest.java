@@ -32,8 +32,13 @@ public class PublisherTest {
     Publisher<std_msgs.msg.String> publisher = node
         .<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
         "test_topic");
+
     assertEquals(node.getNodeHandle(), publisher.getNodeHandle());
     assertNotEquals(0, publisher.getNodeHandle());
     assertNotEquals(0, publisher.getPublisherHandle());
+
+    publisher.dispose();
+    node.dispose();
+    RCLJava.shutdown();
   }
 }

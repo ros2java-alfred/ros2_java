@@ -19,8 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
+
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.RCLFuture;
@@ -118,8 +118,7 @@ public class NodeTest {
 
         RCLFuture<std_msgs.msg.String> future = new RCLFuture<std_msgs.msg.String>(new WeakReference<Node>(node));
 
-//        Subscription<std_msgs.msg.String> subscription =
-        node.<std_msgs.msg.String>createSubscription(
+        Subscription<std_msgs.msg.String> subscription = node.<std_msgs.msg.String>createSubscription(
                 std_msgs.msg.String.class, "test_topic", new TestConsumer(future));
 
         std_msgs.msg.String msg = new std_msgs.msg.String();
@@ -132,9 +131,12 @@ public class NodeTest {
 
         std_msgs.msg.String value = future.get();
         assertEquals("Hello", value.getData());
+
+        subscription.dispose();
+        node.dispose();
+        RCLJava.shutdown();
     }
 
-    @Ignore
     @Test
     public void testPublisher() {
         boolean test = true;
@@ -144,10 +146,19 @@ public class NodeTest {
         RCLJava.rclJavaInit();
         try {
             node = RCLJava.createNode("testPublisher");
+//            RCLFuture<std_msgs.msg.String> future = new RCLFuture<std_msgs.msg.String>(new WeakReference<Node>(node));
             pub = node.<std_msgs.msg.String>createPublisher(
                     std_msgs.msg.String.class,
                     "testChannel",
                     QoSProfile.DEFAULT);
+
+//            std_msgs.msg.String msg = new std_msgs.msg.String();
+//            msg.setData("Hello");
+//
+//            while (RCLJava.ok() && !future.isDone()) {
+//                pub.publish(msg);
+//                RCLJava.spinOnce(node);
+//            }
 
             pub.dispose();
             node.dispose();
@@ -160,7 +171,6 @@ public class NodeTest {
         Assert.assertNotNull("Bad result", pub);
     }
 
-    @Ignore
     @Test
     public void testSubscription() {
         boolean test = true;
@@ -181,7 +191,7 @@ public class NodeTest {
                     callback,
                     QoSProfile.DEFAULT);
 
-          //TODO sub.dispose();
+            sub.dispose();
             node.dispose();
         } catch (Exception e) {
             test = false;
@@ -192,21 +202,21 @@ public class NodeTest {
         Assert.assertNotNull("Bad result", sub);
     }
 
-    @Ignore
     @Test
     public void testClient() {
         boolean test = true;
         Node node = null;
-        Client<std_msgs.msg.String> clt = null;
+        Client<rcl_interfaces.srv.GetParameters> clt = null;
 
         RCLJava.rclJavaInit();
         try {
             node = RCLJava.createNode("testClient");
-            clt = node.<std_msgs.msg.String>createClient(
-                    std_msgs.msg.String.class,
+            clt = node.<rcl_interfaces.srv.GetParameters>createClient(
+                    rcl_interfaces.srv.GetParameters.class,
                     "testChannel",
                     QoSProfile.DEFAULT);
-          //TODO clt.dispose();
+
+            clt.dispose();
             node.dispose();
         } catch (Exception e) {
             test = false;
@@ -217,28 +227,28 @@ public class NodeTest {
         Assert.assertNotNull("Bad result", clt);
     }
 
-    @Ignore
     @Test
     public void testService() {
         boolean test = true;
         Node node = null;
-        Service<std_msgs.msg.String> srv = null;
+        Service<rcl_interfaces.srv.GetParameters> srv = null;
 
-        TriConsumer<RMWRequestId, std_msgs.msg.String, std_msgs.msg.String> callback =
-                new TriConsumer<RMWRequestId, std_msgs.msg.String, std_msgs.msg.String>() {
+        TriConsumer<RMWRequestId, rcl_interfaces.srv.GetParameters_Request, rcl_interfaces.srv.GetParameters_Response> callback =
+                new TriConsumer<RMWRequestId, rcl_interfaces.srv.GetParameters_Request, rcl_interfaces.srv.GetParameters_Response>() {
             @Override
-            public void accept(RMWRequestId header, std_msgs.msg.String request, std_msgs.msg.String response) { }
+            public void accept(RMWRequestId header, rcl_interfaces.srv.GetParameters_Request request, rcl_interfaces.srv.GetParameters_Response response) { }
         };
 
         RCLJava.rclJavaInit();
         try {
             node = RCLJava.createNode("testSubscription");
-            srv = node.<std_msgs.msg.String>createService(
-                    std_msgs.msg.String.class,
+            srv = node.<rcl_interfaces.srv.GetParameters>createService(
+                    rcl_interfaces.srv.GetParameters.class,
                     "testChannel",
                     callback,
                     QoSProfile.DEFAULT);
-          //TODO srv.dispose();
+
+            srv.dispose();
             node.dispose();
         } catch (Exception e) {
             test = false;
@@ -336,7 +346,7 @@ public class NodeTest {
         RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", 0, topics.size());
+        Assert.assertEquals("Bad result", 12, topics.size());
     }
 
     //TODO Test Parameters

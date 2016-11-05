@@ -31,7 +31,6 @@ import org.ros2.rcljava.Log;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
-import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.parameter.ParameterService;
 import org.ros2.rcljava.node.parameter.ParameterVariant;
 import org.ros2.rcljava.node.service.Client;
@@ -119,7 +118,7 @@ public class Node implements INode {
      *     structure.
      * @return A pointer to the underlying ROS2 publisher structure.
      */
-    private static native <T extends Message> long nativeCreatePublisherHandle(
+    private static native <T extends org.ros2.rcljava.internal.message.Message> long nativeCreatePublisherHandle(
             long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
 
     /**
@@ -156,7 +155,6 @@ public class Node implements INode {
 
     private static native HashMap<String, String> getListTopics(long nodeHandle);
 
-
 //    private static native  ; //rcl_service_server_is_available
 
     /**
@@ -186,6 +184,7 @@ public class Node implements INode {
     @Override
     public void dispose() {
         Node.logger.debug("Destroy Node stack : " + this.name);
+        this.parameterService.dispose();
 
         Queue<Client<?>> tmpClients = new LinkedBlockingQueue<Client<?>>(this.clients);
         for (Client<?> client : tmpClients) {
@@ -241,7 +240,7 @@ public class Node implements INode {
      *     structure.
      */
     @Override
-    public <T extends Message> Publisher<T> createPublisher(
+    public <T extends org.ros2.rcljava.internal.message.Message> Publisher<T> createPublisher(
             final Class<T> messageType,
             final String topic,
             final QoSProfile qosProfile) {
@@ -265,7 +264,7 @@ public class Node implements INode {
      * @return Publisher instance of the created publisher.
      */
     @Override
-    public <T extends Message> Publisher<T> createPublisher(
+    public <T extends org.ros2.rcljava.internal.message.Message> Publisher<T> createPublisher(
             final Class<T> messageType,
             final String topic) {
         return this.createPublisher(messageType, topic, QoSProfile.DEFAULT);
@@ -287,7 +286,7 @@ public class Node implements INode {
      *     subscription structure.
      */
     @Override
-    public <T extends Message> Subscription<T> createSubscription(
+    public <T extends org.ros2.rcljava.internal.message.Message> Subscription<T> createSubscription(
             final Class<T> messageType,
             final String topic,
             final Consumer<T> callback,
@@ -321,7 +320,7 @@ public class Node implements INode {
      * @return Subscription instance of the created subscription.
      */
     @Override
-    public <T extends Message> Subscription<T> createSubscription(
+    public <T extends org.ros2.rcljava.internal.message.Message> Subscription<T> createSubscription(
             final Class<T> messageType,
             final String topic,
             final Consumer<T> callback) {
@@ -343,7 +342,7 @@ public class Node implements INode {
      * @throws NoSuchMethodException
      */
     @Override
-    public <T> Client<T> createClient(
+    public <T extends org.ros2.rcljava.internal.service.Service> Client<T> createClient(
             final Class<T> serviceType,
             final String serviceName,
             final QoSProfile qosProfile) throws Exception {
@@ -399,7 +398,7 @@ public class Node implements INode {
      * @throws Exception
      */
     @Override
-    public <T> Client<T> createClient(
+    public <T extends org.ros2.rcljava.internal.service.Service> Client<T> createClient(
             final Class<T> serviceType,
             final String serviceName) throws Exception {
         return this.createClient(serviceType, serviceName, QoSProfile.SERVICES_DEFAULT);
@@ -416,7 +415,7 @@ public class Node implements INode {
      * @return Service instance of the service.
      */
     @Override
-    public <T> Service<T> createService(
+    public <T extends org.ros2.rcljava.internal.service.Service> Service<T> createService(
             final Class<T> serviceType,
             final String serviceName,
             final TriConsumer<RMWRequestId, ?, ?> callback,
@@ -465,7 +464,7 @@ public class Node implements INode {
      * @return Service instance of the service.
      */
     @Override
-    public <T> Service<T> createService(
+    public <T extends org.ros2.rcljava.internal.service.Service> Service<T> createService(
             final Class<T> serviceType,
             final String serviceName,
             final TriConsumer<RMWRequestId, ?, ?> callback) throws Exception {
@@ -628,7 +627,7 @@ public class Node implements INode {
      * @param User defined callback function, It is expected to atomically set parameters.
      */
     @Override
-    public <T extends Message> void registerParamChangeCallback(Consumer<T> callback) {
+    public <T extends org.ros2.rcljava.internal.message.Message> void registerParamChangeCallback(Consumer<T> callback) {
         //TODO
         throw new NotImplementedException();
     }
@@ -636,14 +635,14 @@ public class Node implements INode {
     /**
      * @return All the @{link Subscription}s that were created by this instance.
      */
-    public Queue<Subscription<? extends Message>> getSubscriptions() {
+    public Queue<Subscription<? extends org.ros2.rcljava.internal.message.Message>> getSubscriptions() {
         return this.subscriptions;
     }
 
     /**
      * @return All the @{link Publisher}s that were created by this instance.
      */
-    public final Queue<Publisher<? extends Message>> getPublishers() {
+    public final Queue<Publisher<? extends org.ros2.rcljava.internal.message.Message>> getPublishers() {
       return this.publishers;
     }
 

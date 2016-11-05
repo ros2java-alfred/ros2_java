@@ -17,12 +17,12 @@
 #include <cstdlib>
 #include <cassert>
 #include <cstdio>
-#include <jni.h>
 
-#include <rmw/rmw.h>
-#include <rcl/error_handling.h>
-#include <rcl/rcl.h>
-#include <rcl/node.h>
+#include "jni.h"
+#include "rmw/rmw.h"
+#include "rcl/error_handling.h"
+#include "rcl/rcl.h"
+#include "rcl/node.h"
 
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
@@ -33,21 +33,20 @@
 /*
  * nativePublish
  */
-JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_node_topic_Publisher_nativePublish(
-    JNIEnv *env,
-    jclass ,
-     jlong jpublisher_handle,
-   jobject jmsg) {
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_topic_Publisher_nativePublish(
+  JNIEnv * env,
+  jclass,
+  jlong jpublisher_handle,
+  jobject jmsg)
+{
+  rcl_publisher_t * publisher = handle2Instance<rcl_publisher_t>(jpublisher_handle);
 
-  rcl_publisher_t *publisher = handle2Instance<rcl_publisher_t>(jpublisher_handle);
-
-  void *raw_ros_message = jobject2Message(env, jmsg);
+  void * raw_ros_message = jobject2Message(env, jmsg);
 
   rcl_ret_t ret = rcl_publish(publisher, raw_ros_message);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to publish: " +
-            std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
@@ -55,20 +54,19 @@ JNICALL Java_org_ros2_rcljava_node_topic_Publisher_nativePublish(
 /*
  * nativeDispose
  */
-JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_node_topic_Publisher_nativeDispose(
-    JNIEnv *env,
-    jclass ,
-     jlong jnode_handle,
-     jlong jpublisher_handle) {
-
-  rcl_node_t *node = handle2Instance<rcl_node_t>(jnode_handle);
-  rcl_publisher_t *publisher = handle2Instance<rcl_publisher_t>(jpublisher_handle);
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_topic_Publisher_nativeDispose(
+  JNIEnv * env,
+  jclass,
+  jlong jnode_handle,
+  jlong jpublisher_handle)
+{
+  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
+  rcl_publisher_t * publisher = handle2Instance<rcl_publisher_t>(jpublisher_handle);
 
   rcl_ret_t ret = rcl_publisher_fini(publisher, node);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to destroy publisher: " +
-        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     throwException(env, message);
   }
 }
