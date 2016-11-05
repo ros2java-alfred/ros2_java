@@ -174,6 +174,7 @@ public class Node implements INode {
 
         Node.logger.debug("Init Node stack : " + this.name);
 
+        RCLJava.addNode(this);
         this.parameterService = new ParameterService(this);
         this.logRos = new Log(this);
     }
@@ -207,6 +208,7 @@ public class Node implements INode {
         }
 
         Node.nativeDispose(this.nodeHandle);
+        RCLJava.removeNode(this);
     }
 
     /**

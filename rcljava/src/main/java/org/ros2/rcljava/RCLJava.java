@@ -240,7 +240,6 @@ public class RCLJava {
 
         long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName);
         Node node = new Node(nodeHandle, nodeName);
-        nodes.add(node);
 
         return node;
     }
@@ -547,6 +546,18 @@ public class RCLJava {
      */
     public static void disposeQoSProfile(final long qosProfileHandle) {
         RCLJava.nativeDisposeQoSProfile(qosProfileHandle);
+    }
+
+    public static void addNode(Node node) {
+        if (initialized) {
+            RCLJava.nodes.add(node);
+        }
+    }
+
+    public static void removeNode(Node node) {
+        if (initialized) {
+            RCLJava.nodes.remove(node);
+        }
     }
 
 }
