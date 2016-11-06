@@ -18,7 +18,7 @@ package org.ros2.rcljava.node.topic;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.internal.ISubscription;
 import org.ros2.rcljava.node.Node;
 
 /**
@@ -28,7 +28,7 @@ import org.ros2.rcljava.node.Node;
  *
  * @param <T> The type of the messages that this subscription will receive.
  */
-public class Subscription<T extends Message> {
+public class Subscription<T extends org.ros2.rcljava.internal.message.Message> implements ISubscription {
 
     private static final Logger logger = LoggerFactory.getLogger(Subscription.class);
 
@@ -101,8 +101,8 @@ public class Subscription<T extends Message> {
         this.ownerNode.getSubscriptions().add(this);
     }
 
-    public final long getNodeHandle() {
-        return this.ownerNode.getNodeHandle();
+    public final Node getNode() {
+        return this.ownerNode;
       }
 
     /**
@@ -138,13 +138,11 @@ public class Subscription<T extends Message> {
      * Get QOS Profile
      * @return
      */
-    public QoSProfile getQosProfile() {
+    public final QoSProfile getQosProfile() {
         return qosProfile;
     }
 
-    /**
-     * Safely destroy the underlying ROS2 subscriber structure.
-     */
+    @Override
     public void dispose() {
         Subscription.logger.debug("Destroy Subscription of topic : " + this.topic);
         this.ownerNode.getSubscriptions().remove(this);

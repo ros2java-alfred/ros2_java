@@ -38,8 +38,8 @@ public class SubscriptionTest {
         }
     );
 
-    assertEquals(node.getNodeHandle(), subscription.getNodeHandle());
-    assertNotEquals(0, subscription.getNodeHandle());
+    assertEquals(node.getNodeHandle(), subscription.getNode().getNodeHandle());
+    assertNotEquals(0, subscription.getNode().getNodeHandle());
     assertNotEquals(0, subscription.getSubscriptionHandle());
 
     subscription.dispose();

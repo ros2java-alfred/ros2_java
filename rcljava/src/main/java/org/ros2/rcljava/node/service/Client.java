@@ -22,6 +22,7 @@ import java.util.concurrent.Future;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
+import org.ros2.rcljava.internal.IClient;
 import org.ros2.rcljava.node.Node;
 
 /**
@@ -29,7 +30,7 @@ import org.ros2.rcljava.node.Node;
  *
  * @param <T> Service Type.
  */
-public class Client<T> {
+public class Client<T extends org.ros2.rcljava.internal.service.Service> implements IClient {
 
     // Loading JNI library.
     static {
@@ -99,11 +100,13 @@ public class Client<T> {
         this.nodeReference.get().getClients().add(this);
     }
 
+    @Override
     public void dispose() {
         this.nodeReference.get().getClients().remove(this);
     }
 
-    public <U, V> Future<V> sendRequest(U request) {
+    @Override
+    public final <U extends org.ros2.rcljava.internal.message.Message, V extends org.ros2.rcljava.internal.message.Message> Future<V> sendRequest(final U request) {
         synchronized(this.pendingRequests) {
               this.sequenceNumber++;
               Client.nativeSendClientRequest(
@@ -119,7 +122,7 @@ public class Client<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public <V> void handleResponse(final RMWRequestId header,final V response) {
+    public final <V extends org.ros2.rcljava.internal.message.Message> void handleResponse(final RMWRequestId header,final V response) {
         synchronized(pendingRequests) {
             long sequenceNumber = header.sequenceNumber;
             RCLFuture<V> future = (RCLFuture<V>) pendingRequests.remove(sequenceNumber);
@@ -135,7 +138,7 @@ public class Client<T> {
         return this.responseType;
     }
 
-    public String getServiceName() {
+    public final String getServiceName() {
         return this.serviceName;
     }
 
@@ -163,7 +166,7 @@ public class Client<T> {
         return this.responseToJavaConverterHandle;
     }
 
-    public boolean waitForService(final int i) {
+    public final boolean waitForService(final int i) {
       //TODO
         throw new NotImplementedException();
 //        return false;

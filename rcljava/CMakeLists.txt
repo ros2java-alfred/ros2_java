@@ -62,9 +62,15 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/NativeUtils.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
 
+  "src/main/java/org/ros2/rcljava/internal/IClient.java"
+  "src/main/java/org/ros2/rcljava/internal/IGraph.java"
+  "src/main/java/org/ros2/rcljava/internal/INode.java"
+  "src/main/java/org/ros2/rcljava/internal/IPublisher.java"
+  "src/main/java/org/ros2/rcljava/internal/IService.java"
+  "src/main/java/org/ros2/rcljava/internal/ISubscription.java"
+
   "src/main/java/org/ros2/rcljava/namespace/GraphName.java"
 
-  "src/main/java/org/ros2/rcljava/node/INode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
 
   "src/main/java/org/ros2/rcljava/qos/policies/Durability.java"

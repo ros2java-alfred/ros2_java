@@ -287,7 +287,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetFini(
 
 
 JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetNodeNames(
-  JNIEnv * env,
+  JNIEnv *,
   jclass)
 {
   return NULL;

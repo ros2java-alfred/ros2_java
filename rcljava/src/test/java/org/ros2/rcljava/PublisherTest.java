@@ -33,8 +33,8 @@ public class PublisherTest {
         .<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
         "test_topic");
 
-    assertEquals(node.getNodeHandle(), publisher.getNodeHandle());
-    assertNotEquals(0, publisher.getNodeHandle());
+    assertEquals(node.getNodeHandle(), publisher.getNode().getNodeHandle());
+    assertNotEquals(0, publisher.getNode().getNodeHandle());
     assertNotEquals(0, publisher.getPublisherHandle());
 
     publisher.dispose();

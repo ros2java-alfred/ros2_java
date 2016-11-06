@@ -41,7 +41,7 @@ for item in use_types:
         unique.append(item)
         seen.add(item.type)
 
-use_types = list(set(unique));
+use_types = unique;
 
 msg_typename = '%s__%s__%s' % (spec.base_type.pkg_name, subfolder, spec.base_type.type);
 

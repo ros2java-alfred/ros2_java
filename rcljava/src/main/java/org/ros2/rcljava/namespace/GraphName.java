@@ -15,6 +15,34 @@
  */
 package org.ros2.rcljava.namespace;
 
-public class GraphName {
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
+import org.ros2.rcljava.internal.IGraph;
+import org.ros2.rcljava.node.Node;
+
+public class GraphName implements IGraph {
+
+    /**
+     * All the @{link Node}s that have been created.
+     */
+    private static Queue<Node> nodes = new LinkedBlockingQueue<Node>();
+
+    public static void addNode(Node node) {
+//        if (initialized) {
+        GraphName.nodes.add(node);
+//        }
+    }
+
+    public static void removeNode(Node node) {
+//        if (initialized) {
+        GraphName.nodes.remove(node);
+//        }
+    }
+
+    public static void dispose() {
+        for (Node node : GraphName.nodes) {
+            node.dispose();
+        }
+    }
 }

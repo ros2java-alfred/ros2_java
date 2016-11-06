@@ -31,6 +31,8 @@ import org.ros2.rcljava.Log;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
+import org.ros2.rcljava.internal.INode;
+import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.parameter.ParameterService;
 import org.ros2.rcljava.node.parameter.ParameterVariant;
 import org.ros2.rcljava.node.service.Client;
@@ -174,7 +176,7 @@ public class Node implements INode {
 
         Node.logger.debug("Init Node stack : " + this.name);
 
-        RCLJava.addNode(this);
+        GraphName.addNode(this);
         this.parameterService = new ParameterService(this);
         this.logRos = new Log(this);
     }
@@ -208,7 +210,7 @@ public class Node implements INode {
         }
 
         Node.nativeDispose(this.nodeHandle);
-        RCLJava.removeNode(this);
+        GraphName.removeNode(this);
     }
 
     /**
@@ -547,14 +549,6 @@ public class Node implements INode {
      * @return
      */
     @Override
-    public long getRclNodeHandle() {
-        return this.nodeHandle;
-    }
-
-    /**
-     * DUPLICATE !!
-     * @return
-     */
     public final long getNodeHandle() {
         return this.nodeHandle;
     }

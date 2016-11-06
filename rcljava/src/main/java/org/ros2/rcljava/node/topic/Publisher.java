@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.internal.IPublisher;
 import org.ros2.rcljava.node.Node;
 
 /**
@@ -30,7 +30,7 @@ import org.ros2.rcljava.node.Node;
  *
  * @param <T> The type of the messages that this publisher will publish.
  */
-public class Publisher<T extends Message> {
+public class Publisher<T extends org.ros2.rcljava.internal.message.Message> implements IPublisher<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(Publisher.class);
 
@@ -69,7 +69,7 @@ public class Publisher<T extends Message> {
      *     structure, as an integer. Must not be zero.
      * @param message An instance of the &lt;T&gt; parameter.
      */
-    private static native <T extends Message> void nativePublish(long publisherHandle, T message);
+    private static native <T extends org.ros2.rcljava.internal.message.Message> void nativePublish(long publisherHandle, T message);
 
     /**
      * Destroy a ROS2 publisher (rcl_publisher_t).
@@ -110,8 +110,9 @@ public class Publisher<T extends Message> {
      *
      * @param message An instance of the &lt;T&gt; parameter.
      */
-    public void publish(final T msg) {
-        Publisher.nativePublish(this.publisherHandle, msg);
+    @Override
+    public void publish(final T message) {
+        Publisher.nativePublish(this.publisherHandle, message);
     }
 
     /**
@@ -130,8 +131,8 @@ public class Publisher<T extends Message> {
         return this.topic;
     }
 
-    public final long getNodeHandle() {
-        return this.ownerNode.getNodeHandle();
+    public final Node getNode() {
+        return this.ownerNode;
     }
 
     public final long getPublisherHandle() {
@@ -141,6 +142,7 @@ public class Publisher<T extends Message> {
     /**
      * Safely destroy the underlying ROS2 publisher structure.
      */
+    @Override
     public void dispose() {
         Publisher.logger.debug("Destroy Publisher of topic : " + this.topic);
         this.ownerNode.getPublishers().remove(this);

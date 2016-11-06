@@ -15,6 +15,7 @@
  */
 package org.ros2.rcljava.node.service;
 
+import org.ros2.rcljava.internal.IService;
 import org.ros2.rcljava.node.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> Service Type.
  */
-public class Service<T> {
+public class Service<T> implements IService {
 
     private static final Logger logger = LoggerFactory.getLogger(Service.class);
 
@@ -91,6 +92,7 @@ public class Service<T> {
         this.ownerNode.getServices().add(this);
     }
 
+    @Override
     public void dispose() {
         Service.logger.debug("Destroy Service stack : " + this.serviceName);
         this.ownerNode.getServices().remove(this);

@@ -17,9 +17,7 @@ package org.ros2.rcljava;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +26,7 @@ import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
 import org.ros2.rcljava.exception.NotInitializedException;
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.RMWRequestId;
@@ -57,11 +56,6 @@ public class RCLJava {
      *   implementation.
      */
     private static boolean initialized = false;
-
-    /**
-     * All the @{link Node}s that have been created.
-     */
-    private static Queue<Node> nodes = new LinkedBlockingQueue<Node>();
 
     /**
      * A mapping between RMW implementations and their typesupports.
@@ -169,9 +163,7 @@ public class RCLJava {
                     RCLJava.logger.debug("Native libraries Loaded: \n" + msgLog.toString());
                 }
 
-                for (Node node : nodes) {
-                    node.dispose();
-                }
+                GraphName.dispose();
             }
         });
     }
@@ -342,10 +334,10 @@ public class RCLJava {
 
                 Class<?> responseType = client.getResponseType();
 
-                Object responseMessage = null;
+                Message responseMessage = null;
 
                 try {
-                    responseMessage = responseType.newInstance();
+                    responseMessage = (Message)responseType.newInstance();
                 } catch (InstantiationException ie) {
                     ie.printStackTrace();
                     continue;
@@ -546,18 +538,6 @@ public class RCLJava {
      */
     public static void disposeQoSProfile(final long qosProfileHandle) {
         RCLJava.nativeDisposeQoSProfile(qosProfileHandle);
-    }
-
-    public static void addNode(Node node) {
-        if (initialized) {
-            RCLJava.nodes.add(node);
-        }
-    }
-
-    public static void removeNode(Node node) {
-        if (initialized) {
-            RCLJava.nodes.remove(node);
-        }
     }
 
 }
