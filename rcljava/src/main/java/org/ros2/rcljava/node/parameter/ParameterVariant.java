@@ -116,30 +116,36 @@ public class ParameterVariant<T> {
             reuslt = new ParameterVariant<Boolean>(
                 parameter.getName(),
                 parameter.getValue().getBoolValue());
-        }
+        } else
 
         if (ParameterType.PARAMETER_BYTES == parameter.getValue().getType()) {
             reuslt = new ParameterVariant<List<Byte>>(
                 parameter.getName(),
                 parameter.getValue().getBytesValue());
-        }
+        } else
 
         if (ParameterType.PARAMETER_DOUBLE == parameter.getValue().getType()) {
             reuslt = new ParameterVariant<Double>(
                 parameter.getName(),
                 parameter.getValue().getDoubleValue());
-        }
+        } else
 
         if (ParameterType.PARAMETER_INTEGER == parameter.getValue().getType()) {
             reuslt = new ParameterVariant<Long>(
                 parameter.getName(),
                 parameter.getValue().getIntegerValue());
-        }
+        } else
 
         if (ParameterType.PARAMETER_STRING == parameter.getValue().getType()) {
             reuslt = new ParameterVariant<String>(
                 parameter.getName(),
                 parameter.getValue().getStringValue());
+        } else
+
+        {
+            reuslt = new ParameterVariant<Object>(
+                parameter.getName(),
+                null);
         }
 
         return reuslt;
