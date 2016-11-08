@@ -77,10 +77,7 @@ public final class @(type_name) implements Message {
      * @@return @(get_java_type(field.type, use_primitives=False))
      */
     public final java.util.List<@(get_java_type(field.type, use_primitives=False))> get@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))() {
-        if (this.@(field.name) == null) {
-            return null;
-        }
-        return new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>(this.@(field.name));
+        return this.@(field.name);
     }
 @
 @[    else]@

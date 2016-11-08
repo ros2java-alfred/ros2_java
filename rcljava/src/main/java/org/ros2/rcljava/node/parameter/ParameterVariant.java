@@ -15,6 +15,8 @@
  */
 package org.ros2.rcljava.node.parameter;
 
+import java.util.List;
+
 import rcl_interfaces.msg.Parameter;
 import rcl_interfaces.msg.ParameterType;
 import rcl_interfaces.msg.ParameterValue;
@@ -27,7 +29,6 @@ import rcl_interfaces.msg.ParameterValue;
 public class ParameterVariant<T> {
 
     private final String name;
-
     private T value;
 
     public ParameterVariant(String name, T value) {
@@ -66,31 +67,34 @@ public class ParameterVariant<T> {
 
     public ParameterValue toParameterValue() {
         ParameterValue p = new ParameterValue();
-        p.setType(ParameterType.PARAMETER_NOT_SET);
 
-        if (Boolean.class.equals(this.value.getClass())) {
-            p.setBoolValue((Boolean) this.value);
-            p.setType(ParameterType.PARAMETER_BOOL);
-        } else
+        if (this.value == null) {
+            p.setType(ParameterType.PARAMETER_NOT_SET);
+        } else {
+            if (Boolean.class.equals(this.value.getClass())) {
+                p.setBoolValue((Boolean) this.value);
+                p.setType(ParameterType.PARAMETER_BOOL);
+            } else
 
-//        if (List<Byte>).class.equals(this.value.getClass())) {
-//            p.setBytesValue((Byte) this.value);
-//            p.setType(ParameterType.PARAMETER_BYTES);
-//        } else
+            if (List.class.equals(this.value.getClass())) {
+                p.setBytesValue((List<Byte>) this.value);
+                p.setType(ParameterType.PARAMETER_BYTES);
+            } else
 
-        if (Double.class.equals(this.value.getClass())) {
-            p.setDoubleValue((Double) this.value);
-            p.setType(ParameterType.PARAMETER_DOUBLE);
-        } else
+            if (Double.class.equals(this.value.getClass())) {
+                p.setDoubleValue((Double) this.value);
+                p.setType(ParameterType.PARAMETER_DOUBLE);
+            } else
 
-        if (Long.class.equals(this.value.getClass())) {
-            p.setIntegerValue((Long) this.value);
-            p.setType(ParameterType.PARAMETER_INTEGER);
-        } else
+            if (Long.class.equals(this.value.getClass())) {
+                p.setIntegerValue((Long) this.value);
+                p.setType(ParameterType.PARAMETER_INTEGER);
+            } else
 
-        if (String.class.equals(this.value.getClass())) {
-            p.setStringValue((String) this.value);
-            p.setType(ParameterType.PARAMETER_STRING);
+            if (String.class.equals(this.value.getClass())) {
+                p.setStringValue((String) this.value);
+                p.setType(ParameterType.PARAMETER_STRING);
+            }
         }
 
         return p;
@@ -114,11 +118,11 @@ public class ParameterVariant<T> {
                 parameter.getValue().getBoolValue());
         }
 
-//        if (ParameterType.PARAMETER_BYTES == parameter.getValue().getType()) {
-//            reuslt = new ParameterVariant<Byte[]>(
-//                parameter.getName(),
-//                parameter.getValue().getBytesValue());
-//        }
+        if (ParameterType.PARAMETER_BYTES == parameter.getValue().getType()) {
+            reuslt = new ParameterVariant<List<Byte>>(
+                parameter.getName(),
+                parameter.getValue().getBytesValue());
+        }
 
         if (ParameterType.PARAMETER_DOUBLE == parameter.getValue().getType()) {
             reuslt = new ParameterVariant<Double>(

@@ -18,6 +18,7 @@ package org.ros2.rcljava.node;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -44,6 +45,9 @@ import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 
 import builtin_interfaces.msg.Time;
+import rcl_interfaces.msg.Parameter;
+import rcl_interfaces.msg.ParameterEvent;
+import rcl_interfaces.msg.ParameterType;
 import rcl_interfaces.msg.SetParametersResult;
 
 /**
@@ -476,18 +480,47 @@ public class Node implements INode {
         return this.createService(serviceType, serviceName, callback, QoSProfile.SERVICES_DEFAULT);
     }
 
-
     @Override
     public List<SetParametersResult> setParameters(final List<ParameterVariant<?>> parameters) {
-        List<SetParametersResult> result = new ArrayList<SetParametersResult>();
+        List<SetParametersResult> results = new ArrayList<SetParametersResult>();
 
         for (ParameterVariant<?> parameterVariantRequest : parameters) {
-            this.parameters.put(parameterVariantRequest.getName(), parameterVariantRequest);
-            SetParametersResult subResult = new SetParametersResult();
-//            subResult.setReason(arg0);
-            subResult.setSuccessful(true);
-            result.add(subResult);
+            SetParametersResult result = this.setParametersAtomically(new ArrayList<ParameterVariant<?>>(Arrays.asList(parameterVariantRequest)));
+            results.add(result);
         }
+
+        return results;
+    }
+
+    @Override
+    public SetParametersResult setParametersAtomically(final List<ParameterVariant<?>> parameters) {
+        ParameterEvent parameter_event = new ParameterEvent();
+
+        // TODO (jacquelinekay) Check handle parameter constraints
+        SetParametersResult result = new SetParametersResult();
+//      result.setReason(arg0);
+        result.setSuccessful(true);
+
+        if (result.getSuccessful()){
+            for (ParameterVariant<?> paramVarReq : parameters) {
+                Parameter parameter = paramVarReq.toParameter();
+
+                if (!this.parameters.containsKey(paramVarReq.getName())) {
+                    if (parameter.getValue().getType() != ParameterType.PARAMETER_NOT_SET) {
+                        parameter_event.getNewParameters().add(parameter);
+                    }
+                } else {
+                    if (parameter.getValue().getType() != ParameterType.PARAMETER_NOT_SET) {
+                        parameter_event.getChangedParameters().add(parameter);
+                    } else {
+                        parameter_event.getDeletedParameters().add(parameter);
+                    }
+                }
+                this.parameters.put(paramVarReq.getName(), paramVarReq);
+            }
+        }
+
+        this.parameterService.notifyAddEvent(parameter_event);
 
         return result;
     }
@@ -518,9 +551,19 @@ public class Node implements INode {
     }
 
     public List<String> getParametersNames() {
-
         return new ArrayList<String>(this.parameters.keySet());
+    }
 
+    public List<Byte> getParametersTypes(List<String> names) {
+        List<Byte> result = new ArrayList<Byte>();
+
+        for (String name : names) {
+            if (this.parameters.containsKey(name)) {
+                result.add(this.parameters.get(name).toParameterValue().getType());
+            }
+        }
+
+        return result;
     }
 
     @Override

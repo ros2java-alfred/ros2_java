@@ -142,6 +142,8 @@ public interface INode {
 
     List<SetParametersResult> setParameters(final List<ParameterVariant<?>> parameters);
 
+    SetParametersResult setParametersAtomically(final List<ParameterVariant<?>> parameters);
+
     List<ParameterVariant<?>> getParameters(final List<String> names);
 
     ParameterVariant<?> getParameter(final String name);

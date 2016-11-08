@@ -27,7 +27,9 @@ import org.slf4j.LoggerFactory;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
+import org.ros2.rcljava.node.topic.Consumer;
 import org.ros2.rcljava.node.topic.Subscription;
+import org.ros2.rcljava.node.topic.Topics;
 
 import rcl_interfaces.srv.GetParameters;
 import rcl_interfaces.srv.GetParameters_Request;
@@ -47,6 +49,7 @@ import rcl_interfaces.srv.DescribeParameters_Response;
 import rcl_interfaces.msg.ListParametersResult;
 import rcl_interfaces.msg.Parameter;
 import rcl_interfaces.msg.ParameterDescriptor;
+import rcl_interfaces.msg.ParameterEvent;
 import rcl_interfaces.msg.ParameterValue;
 import rcl_interfaces.msg.SetParametersResult;
 
@@ -86,28 +89,28 @@ public class SyncParametersClient {
             this.remoteNodeName = remoteNodeName;
         }
 
-        logger.debug("Create parameter client for %s", this.remoteNodeName);
+        logger.debug(String.format("Create parameter client for %s", this.remoteNodeName));
 
         try {
             this.getParametersClient = this.ownerNode.<GetParameters>createClient(
                     GetParameters.class,
-                    this.remoteNodeName + "__get_parameters",
+                    String.format(ParameterService.TOPIC_GETPARAMETERS, this.remoteNodeName),
                     profileParameter);
             this.getParameterTypesClient = this.ownerNode.<GetParameterTypes>createClient(
                     GetParameterTypes.class,
-                    this.remoteNodeName + "__get_parameter_types",
+                    String.format(ParameterService.TOPIC_GETPARAMETERTYPES, this.remoteNodeName),
                     profileParameter);
             this.setParametersClient = this.ownerNode.<SetParameters>createClient(
                     SetParameters.class,
-                    this.remoteNodeName + "__set_parameters",
+                    String.format(ParameterService.TOPIC_SETPARAMETERS, this.remoteNodeName),
                     profileParameter);
             this.listParametersClient = this.ownerNode.<ListParameters>createClient(
                     ListParameters.class,
-                    remoteNodeName + "__list_parameters",
+                    String.format(ParameterService.TOPIC_LISTPARAMETERS, this.remoteNodeName),
                     profileParameter);
             this.describeParametersClient = this.ownerNode.<DescribeParameters>createClient(
                     DescribeParameters.class,
-                    this.remoteNodeName + "__describe_parameters",
+                    String.format(ParameterService.TOPIC_DESCRIBEPARAMETERS, this.remoteNodeName),
                     profileParameter);
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -120,7 +123,7 @@ public class SyncParametersClient {
      */
     public void dispose() {
         logger.debug("Destroy parameter client : " + this.remoteNodeName);
-        this.getParametersClient.dispose();
+
         this.getParametersClient.dispose();
         this.getParameterTypesClient.dispose();
         this.setParametersClient.dispose();
@@ -292,9 +295,19 @@ public class SyncParametersClient {
         return result;
     }
 
-    public Subscription<?> onParameterEvent(final ParameterConsumer parameterConsumer) { // rcl_interfaces.msg.ParameterEvent
-        // TODO Auto-generated method stub
-        return null;
+    public Subscription<ParameterEvent> onParameterEvent(final ParameterConsumer parameterConsumer) {
+        Subscription<ParameterEvent> sub_event = this.ownerNode.<ParameterEvent>createSubscription(
+                ParameterEvent.class,
+                Topics.PARAM_EVENT,
+                new Consumer<ParameterEvent>() {
+                    @Override
+                    public void accept(ParameterEvent msg) {
+                        parameterConsumer.onEvent(msg);
+                    }
+                },
+                QoSProfile.PARAMETER_EVENTS);
+
+        return sub_event;
     }
 
 }
