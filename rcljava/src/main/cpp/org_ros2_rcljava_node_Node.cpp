@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <jni.h>
+
 #include <string>
 #include <cstdlib>
 #include <cstdio>
 #include <cassert>
 
-#include "jni.h"
 #include "rmw/rmw.h"
 #include "rcl/error_handling.h"
 #include "rcl/rcl.h"
@@ -29,8 +30,8 @@
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
 
-#include "org_ros2_rcljava_node_Node.h"
-#include "utils.h"
+#include "rcljava/org_ros2_rcljava_node_Node.h"
+#include "rcljava/utils.h"
 
 /*
  * nativeCreatePublisherHandle

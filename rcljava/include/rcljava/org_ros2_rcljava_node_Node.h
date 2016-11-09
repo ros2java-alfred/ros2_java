@@ -17,8 +17,8 @@
 #include <jni.h>
 /* Header for class org_ros2_rcljava_node_Node */
 
-#ifndef ORG_ROS2_RCLJAVA_NODE_NODE_H_
-#define ORG_ROS2_RCLJAVA_NODE_NODE_H_
+#ifndef RCLJAVA__ORG_ROS2_RCLJAVA_NODE_NODE_H_
+#define RCLJAVA__ORG_ROS2_RCLJAVA_NODE_NODE_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -97,4 +97,4 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_Node_getListTopics
 #ifdef __cplusplus
 }
 #endif
-#endif  // ORG_ROS2_RCLJAVA_NODE_NODE_H_
+#endif  // RCLJAVA__ORG_ROS2_RCLJAVA_NODE_NODE_H_

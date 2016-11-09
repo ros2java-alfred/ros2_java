@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <jni.h>
+
 #include <cassert>
 #include <cstdlib>
 #include <string>
-
-#include "jni.h"
 
 #include "rmw/rmw.h"
 #include "rcl/error_handling.h"
@@ -29,8 +29,8 @@
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
 
-#include "org_ros2_rcljava_RCLJava.h"
-#include "utils.h"
+#include "rcljava/org_ros2_rcljava_RCLJava.h"
+#include "rcljava/utils.h"
 
 jobject convert_rmw_request_id_to_java(JNIEnv *, rmw_request_id_t *);
 

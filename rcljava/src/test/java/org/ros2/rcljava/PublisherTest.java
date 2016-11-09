@@ -19,26 +19,33 @@ package org.ros2.rcljava;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import org.apache.log4j.BasicConfigurator;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.Publisher;
 
 public class PublisherTest {
 
-  @Test
-  public final void testCreate() {
-    RCLJava.rclJavaInit();
-    Node node = RCLJava.createNode("test_node");
-    Publisher<std_msgs.msg.String> publisher = node
-        .<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
-        "test_topic");
+    @BeforeClass
+    public static void beforeClass() {
+        BasicConfigurator.resetConfiguration();
+        BasicConfigurator.configure();
+    }
 
-    assertEquals(node.getNodeHandle(), publisher.getNode().getNodeHandle());
-    assertNotEquals(0, publisher.getNode().getNodeHandle());
-    assertNotEquals(0, publisher.getPublisherHandle());
+    @Test
+    public final void testCreate() {
+        RCLJava.rclJavaInit();
+        Node node = RCLJava.createNode("test_node");
+        Publisher<std_msgs.msg.String> publisher = node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
+                "test_topic");
 
-    publisher.dispose();
-    node.dispose();
-    RCLJava.shutdown();
-  }
+        assertEquals(node.getNodeHandle(), publisher.getNode().getNodeHandle());
+        assertNotEquals(0, publisher.getNode().getNodeHandle());
+        assertNotEquals(0, publisher.getPublisherHandle());
+
+        publisher.dispose();
+        node.dispose();
+        RCLJava.shutdown();
+    }
 }

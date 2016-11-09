@@ -13,20 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <jni.h>
+
 #include <string>
 #include <cstdlib>
 #include <cassert>
 #include <cstdio>
-
-#include "jni.h"
 
 #include "rcl/graph.h"
 #include "rmw/rmw.h"
 #include "rmw/types.h"
 #include "rosidl_generator_c/message_type_support.h"
 
-#ifndef UTILS_H_
-#define UTILS_H_
+#ifndef RCLJAVA__UTILS_H_
+#define RCLJAVA__UTILS_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -291,4 +291,4 @@ handle2Instance(jlong handle)
   return obj;
 }
 
-#endif  // UTILS_H_
+#endif  // RCLJAVA__UTILS_H_

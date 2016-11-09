@@ -28,7 +28,7 @@
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
 
-#include "org_ros2_rcljava_node_service_Client.h"
+#include "rcljava/org_ros2_rcljava_node_service_Client.h"
 
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_service_Client_nativeSendClientRequest(
   JNIEnv * env,

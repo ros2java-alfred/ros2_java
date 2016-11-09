@@ -185,16 +185,15 @@ public class ParameterService {
                                 final DescribeParameters_Response response) {
 
                             logger.debug("Replies to describe Parameters. ! NOT IMPLEMENTED !");
-//                            request.getNames()
-//
-//
-//                            List<ParameterDescriptor> listDescritiorResult = null;
-//
-//                            ParameterDescriptor descriptor = new ParameterDescriptor();
+
+                            List<ParameterDescriptor> listDescritiorResult = new ArrayList<ParameterDescriptor>();
+
+                            ParameterDescriptor descriptor = new ParameterDescriptor();
 //                            descriptor.setName(arg0);
 //                            descriptor.setType(arg0);
-//
-//                            response.setDescriptors(listDescritiorResult);
+                            listDescritiorResult.add(descriptor);
+
+                            response.setDescriptors(listDescritiorResult);
                         }
                     },
                     profileParameter);

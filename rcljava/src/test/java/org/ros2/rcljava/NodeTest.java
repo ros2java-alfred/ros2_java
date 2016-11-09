@@ -18,7 +18,9 @@ package org.ros2.rcljava;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.ros2.rcljava.node.Node;
@@ -49,6 +51,12 @@ public class NodeTest {
                 this.future.set(msg);
             }
         }
+    }
+
+    @BeforeClass
+    public static void beforeClass() {
+        BasicConfigurator.resetConfiguration();
+        BasicConfigurator.configure();
     }
 
     @Test
@@ -346,7 +354,7 @@ public class NodeTest {
         RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", 12, topics.size());
+        Assert.assertEquals("Bad result", 14, topics.size());
     }
 
     //TODO Test Parameters

@@ -492,6 +492,7 @@ public class RCLJava {
                 System.loadLibrary(name);
             } catch (UnsatisfiedLinkError e) {
                 RCLJava.logger.error("Native code library failed to load.", e);
+
                 System.exit(1);
             }
         }

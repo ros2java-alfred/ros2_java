@@ -65,6 +65,7 @@ public class ParameterVariant<T> {
         return this.value.toString();
     }
 
+    @SuppressWarnings("unchecked")
     public ParameterValue toParameterValue() {
         ParameterValue p = new ParameterValue();
 

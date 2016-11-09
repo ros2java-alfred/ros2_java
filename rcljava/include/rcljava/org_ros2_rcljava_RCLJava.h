@@ -17,8 +17,8 @@
 #include <jni.h>
 /* Header for class org_ros2_rcljava_RCLJava */
 
-#ifndef ORG_ROS2_RCLJAVA_RCLJAVA_H_
-#define ORG_ROS2_RCLJAVA_RCLJAVA_H_
+#ifndef RCLJAVA__ORG_ROS2_RCLJAVA_RCLJAVA_H_
+#define RCLJAVA__ORG_ROS2_RCLJAVA_RCLJAVA_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -203,4 +203,4 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile
 #ifdef __cplusplus
 }
 #endif
-#endif  // ORG_ROS2_RCLJAVA_RCLJAVA_H_
+#endif  // RCLJAVA__ORG_ROS2_RCLJAVA_RCLJAVA_H_

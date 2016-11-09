@@ -520,7 +520,9 @@ public class Node implements INode {
             }
         }
 
-        this.parameterService.notifyAddEvent(parameter_event);
+        if (this.parameterService != null) {
+            this.parameterService.notifyAddEvent(parameter_event);
+        }
 
         return result;
     }

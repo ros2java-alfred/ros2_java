@@ -15,6 +15,7 @@
  */
 package org.ros2.rcljava;
 
+import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -30,8 +31,9 @@ import org.ros2.rcljava.exception.NoImplementationAvailableException;
 public class RmwTest {
 
     @BeforeClass
-    public static void setUp() {
-
+    public static void beforeClass() {
+        BasicConfigurator.resetConfiguration();
+        BasicConfigurator.configure();
     }
 
     @Test

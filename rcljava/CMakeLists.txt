@@ -212,22 +212,28 @@ if(BUILD_TESTING)
     get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
     list(APPEND _deps_library_paths ${_dep_dir})
   endforeach()
+  foreach(_dep_lib ${rcl_interfaces_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list(APPEND _deps_library_paths ${_dep_dir})
+  endforeach()
   list(APPEND _deps_library_paths ${CMAKE_CURRENT_BINARY_DIR})
+  list(REMOVE_DUPLICATES _deps_library_paths)
+  list(SORT _deps_library_paths)
 
   foreach(testsuite ${${PROJECT_NAME}_testsuites})
-  add_junit_tests("${PROJECT_NAME}_tests_${testsuite}"
-    "${${PROJECT_NAME}_test_sources}"
-    TESTS
-    "${testsuite}"
-    INCLUDE_JARS
-    "${std_msgs_JARS}"
-    "${rcl_interfaces_JARS}"
-    "${builtin_interfaces_JARS}"
-    "${rcljava_common_JARS}"
-    "${_jar_file}"
-    LIBRARY_PATHS
-    "${_deps_library_paths}"
-  )
+    add_junit_tests("${PROJECT_NAME}_tests_${testsuite}"
+      "${${PROJECT_NAME}_test_sources}"
+      TESTS
+      "${testsuite}"
+      INCLUDE_JARS
+      "${std_msgs_JARS}"
+      "${rcl_interfaces_JARS}"
+      "${builtin_interfaces_JARS}"
+      "${rcljava_common_JARS}"
+      "${_jar_file}"
+      LIBRARY_PATHS
+      "${_deps_library_paths}"
+    )
   endforeach()
 
 endif()

@@ -17,12 +17,20 @@ package org.ros2.rcljava;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ros2.rcljava.exception.NotInitializedException;
 import org.ros2.rcljava.node.Node;
 
 public class RCLJavaTest {
+
+    @BeforeClass
+    public static void beforeClass() {
+        BasicConfigurator.resetConfiguration();
+        BasicConfigurator.configure();
+    }
 
     @Test
     public void testInit() {
