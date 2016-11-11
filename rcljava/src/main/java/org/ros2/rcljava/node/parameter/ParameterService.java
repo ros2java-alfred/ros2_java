@@ -234,13 +234,27 @@ public class ParameterService {
      */
     public void dispose() {
         logger.debug("Destroy parameter client : " + this.ownerNode.getName());
-        this.getParametersService.dispose();
-        this.getParameterTypesService.dispose();
-        this.setParametersService.dispose();
-        this.setParametersAtomicallyService.dispose();
-        this.describeParametersService.dispose();
-        this.listParametersService.dispose();
 
-        this.eventparameterPublisher.dispose();
+        if (this.getParametersService != null) {
+            this.getParametersService.dispose();
+        }
+        if (this.getParameterTypesService != null) {
+            this.getParameterTypesService.dispose();
+        }
+        if (this.setParametersService != null) {
+            this.setParametersService.dispose();
+        }
+        if (this.setParametersAtomicallyService != null) {
+            this.setParametersAtomicallyService.dispose();
+        }
+        if (this.describeParametersService != null) {
+            this.describeParametersService.dispose();
+        }
+        if (this.listParametersService != null) {
+            this.listParametersService.dispose();
+        }
+        if (this.eventparameterPublisher != null) {
+            this.eventparameterPublisher.dispose();
+        }
     }
 }

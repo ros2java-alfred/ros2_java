@@ -15,18 +15,14 @@
  */
 package org.ros2.rcljava.node.parameter;
 
-import java.util.List;
-
-import rcl_interfaces.msg.SetParametersResult;
-
 /**
  * Parameter Consumer.
  *
  */
-public interface ParameterConsumer {
+public interface ParameterEventConsumer {
     /**
      *
      * @param event
      */
-    SetParametersResult onParamChange(final List<ParameterVariant<?>>  config);
+    void onEvent(final rcl_interfaces.msg.ParameterEvent event);
 }

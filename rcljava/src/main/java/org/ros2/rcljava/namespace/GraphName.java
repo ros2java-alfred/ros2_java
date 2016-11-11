@@ -20,6 +20,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.ros2.rcljava.internal.IGraph;
 import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.service.Service;
+import org.ros2.rcljava.node.topic.Topics;
 
 public class GraphName implements IGraph {
 
@@ -44,5 +46,78 @@ public class GraphName implements IGraph {
         for (Node node : GraphName.nodes) {
             node.dispose();
         }
+    }
+
+    private static String removeSheme(final String url) {
+        String topicName = url;
+        boolean result = topicName != null;
+
+        if (result) {
+            topicName = topicName.replaceAll(Topics.SCHEME, "");
+            topicName = topicName.replaceAll(Service.SCHEME, "");
+        }
+
+        return topicName;
+    }
+
+    /**
+     * Check if name is valid.
+     *
+     * For testing : https://regex101.com/r/b3R65h/1
+     * @param topicName
+     * @return
+     */
+    public static boolean isValidTopic(final String name) {
+        // Delete sample Regex : https://regex101.com/delete/7qMZiThwlEla6eAKIIee3251
+        boolean result = name != null;
+
+        if (result) {
+            String topicName = removeSheme(name);
+
+            result =
+                    topicName != null &&
+                    topicName.length() > 0 &&
+                    topicName.matches("^(?!.*(//|__|_/))[~A-Za-z/_{}][_A-Za-z0-9/{}]*$") &&
+                    !topicName.endsWith("_") &&
+                    !topicName.endsWith("/")
+            ;
+
+            if (result && topicName.startsWith("~") && topicName.length() > 2) {
+                result = topicName.startsWith("~/");
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     * @param substitution
+     * @return
+     */
+    public static boolean isValidSubstitution(final String substitution) {
+        boolean result =
+                substitution != null &&
+                substitution.length() > 0 &&
+                substitution.matches("^[_A-Za-z_/][_A-Za-z0-9/]*$") &&
+                !substitution.endsWith("_");
+
+        return result;
+    }
+
+    public static boolean isValideFQDN(final String fqn) {
+        boolean result = fqn != null;
+
+        if (result) {
+            String topicName = removeSheme(fqn);
+
+            result =
+                    GraphName.isValidTopic(topicName) &&
+                    topicName.startsWith("/") &&
+                    !topicName.contains("~") &&
+                    !topicName.contains("{}");
+        }
+
+        return result;
     }
 }

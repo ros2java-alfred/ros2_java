@@ -34,6 +34,7 @@ import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.INode;
 import org.ros2.rcljava.namespace.GraphName;
+import org.ros2.rcljava.node.parameter.ParameterConsumer;
 import org.ros2.rcljava.node.parameter.ParameterService;
 import org.ros2.rcljava.node.parameter.ParameterVariant;
 import org.ros2.rcljava.node.service.Client;
@@ -102,6 +103,11 @@ public class Node implements INode {
      * Parameter service.
      */
     private final ParameterService parameterService;
+    private ParameterConsumer parameterCallback ;
+
+    public void onParamChange(ParameterConsumer parameterCallback) {
+        this.parameterCallback = parameterCallback;
+    }
 
     /**
      * Log to ROS2.
@@ -170,6 +176,10 @@ public class Node implements INode {
      *     be zero.
      */
     public Node(final long nodeHandle, final String nodeName) {
+
+        if (nodeHandle==0) throw new NullPointerException("Node Handle is not define !");
+        if (nodeName==null || nodeName.length() == 0) throw new NullPointerException("Node name is needed !");
+
         this.name           = nodeName;
         this.nodeHandle     = nodeHandle;
         this.subscriptions  = new LinkedBlockingQueue<Subscription<?>>();
@@ -254,11 +264,20 @@ public class Node implements INode {
             final QoSProfile qosProfile) {
 
         Node.logger.debug("Create Publisher : " + topic);
-        long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-        long publisherHandle = Node.nativeCreatePublisherHandle(this.nodeHandle, messageType, topic, qosProfileHandle);
-        RCLJava.disposeQoSProfile(qosProfileHandle);
 
-        Publisher<T> publisher = new Publisher<T>(this, publisherHandle, messageType, topic, qosProfile);
+        if (messageType==null) throw new NullPointerException("Message Type can't be null.");
+        if (topic==null) throw new NullPointerException("Topic can't be null.");
+        if (qosProfile==null) throw new NullPointerException("QOS can't be null;");
+
+        Publisher<T> publisher = null;
+
+        if (GraphName.isValidTopic(topic)) {
+            long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+            long publisherHandle = Node.nativeCreatePublisherHandle(this.nodeHandle, messageType, topic, qosProfileHandle);
+            RCLJava.disposeQoSProfile(qosProfileHandle);
+
+            publisher = new Publisher<T>(this, publisherHandle, messageType, topic, qosProfile);
+        }
 
         return publisher;
     }
@@ -302,17 +321,26 @@ public class Node implements INode {
 
         Node.logger.debug("Create Subscription : " + topic);
 
-        long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-        long subscriptionHandle = Node.nativeCreateSubscriptionHandle(this.nodeHandle, messageType, topic, qosProfileHandle);
-        RCLJava.disposeQoSProfile(qosProfileHandle);
+        if (messageType==null) throw new NullPointerException("Message Type can't be null.");
+        if (topic==null) throw new NullPointerException("Topic can't be null.");
+        if (callback==null) throw new NullPointerException("Callback can't be null;");
+        if (qosProfile==null) throw new NullPointerException("QOS can't be null;");
 
-        Subscription<T> subscription = new Subscription<T>(
-                this,
-                subscriptionHandle,
-                messageType,
-                topic,
-                callback,
-                qosProfile);
+        Subscription<T> subscription = null;
+
+        if (GraphName.isValidTopic(topic)) {
+            long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+            long subscriptionHandle = Node.nativeCreateSubscriptionHandle(this.nodeHandle, messageType, topic, qosProfileHandle);
+            RCLJava.disposeQoSProfile(qosProfileHandle);
+
+            subscription = new Subscription<T>(
+                    this,
+                    subscriptionHandle,
+                    messageType,
+                    topic,
+                    callback,
+                    qosProfile);
+        }
 
         return subscription;
     }
@@ -357,41 +385,49 @@ public class Node implements INode {
 
         Node.logger.debug("Create Client : " + serviceName);
 
-        Class<?> requestType = (Class<?>)serviceType.getField("RequestType").get(null);
+        if (serviceType==null) throw new NullPointerException("Service Type can't be null.");
+        if (serviceName==null) throw new NullPointerException("Service name can't be null.");
+        if (qosProfile==null) throw new NullPointerException("QOS can't be null;");
 
-        Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-        long requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
+        Client<T> client = null;
 
-        Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-        long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
+//        if (GraphName.isValidTopic(serviceName)) {
+            Class<?> requestType = (Class<?>)serviceType.getField("RequestType").get(null);
 
-        Class<?> responseType = (Class<?>)serviceType.getField("ResponseType").get(null);
+            Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+            long requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
 
-        Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-        long responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
+            Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+            long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
 
-        Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-        long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
+            Class<?> responseType = (Class<?>)serviceType.getField("ResponseType").get(null);
 
-        long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-        long clientHandle = Node.nativeCreateClientHandle(
-                this.nodeHandle,
-                serviceType,
-                serviceName,
-                qosProfileHandle);
-        RCLJava.disposeQoSProfile(qosProfileHandle);
+            Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+            long responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
 
-        Client<T> client = new Client<T>(
-                new WeakReference<Node>(this),
-                clientHandle,
-                serviceType,
-                serviceName,
-                requestType,
-                responseType,
-                requestFromJavaConverterHandle,
-                requestToJavaConverterHandle,
-                responseFromJavaConverterHandle,
-                responseToJavaConverterHandle);
+            Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+            long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
+
+            long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+            long clientHandle = Node.nativeCreateClientHandle(
+                    this.nodeHandle,
+                    serviceType,
+                    serviceName,
+                    qosProfileHandle);
+            RCLJava.disposeQoSProfile(qosProfileHandle);
+
+            client = new Client<T>(
+                    new WeakReference<Node>(this),
+                    clientHandle,
+                    serviceType,
+                    serviceName,
+                    requestType,
+                    responseType,
+                    requestFromJavaConverterHandle,
+                    requestToJavaConverterHandle,
+                    responseFromJavaConverterHandle,
+                    responseToJavaConverterHandle);
+//        }
 
         return client;
     }
@@ -431,33 +467,43 @@ public class Node implements INode {
             ) throws Exception {
 
         Node.logger.debug("Create Service : " + serviceName);
-//        long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service, qos);
+
+        if (serviceType==null) throw new NullPointerException("Service Type can't be null.");
+        if (serviceName==null) throw new NullPointerException("Service name can't be null.");
+        if (callback==null) throw new NullPointerException("Callback can't be null;");
+        if (qosProfile==null) throw new NullPointerException("QOS can't be null;");
+
+        Service<T> service = null;
+
+//        if (GraphName.isValidTopic(serviceName)) {
+//            long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service, qos);
 //
-//        Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
+//            Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
 
-        Class<?> requestType = (Class<?>)serviceType.getField("RequestType").get(null);
+            Class<?> requestType = (Class<?>)serviceType.getField("RequestType").get(null);
 
-        Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-        long requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
+            Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+            long requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
 
-        Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-        long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
+            Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+            long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
 
-        Class<?> responseType = (Class<?>)serviceType.getField("ResponseType").get(null);
+            Class<?> responseType = (Class<?>)serviceType.getField("ResponseType").get(null);
 
-        Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-        long responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
+            Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+            long responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
 
-        Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-        long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
+            Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+            long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
 
-        long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-        long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, serviceType, serviceName, qosProfileHandle);
-        RCLJava.disposeQoSProfile(qosProfileHandle);
+            long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+            long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, serviceType, serviceName, qosProfileHandle);
+            RCLJava.disposeQoSProfile(qosProfileHandle);
 
-        Service<T> service = new Service<T>(this, serviceHandle, serviceType, serviceName, callback, requestType, responseType,
-          requestFromJavaConverterHandle, requestToJavaConverterHandle, responseFromJavaConverterHandle,
-          responseToJavaConverterHandle);
+            service = new Service<T>(this, serviceHandle, serviceType, serviceName, callback, requestType, responseType,
+              requestFromJavaConverterHandle, requestToJavaConverterHandle, responseFromJavaConverterHandle,
+              responseToJavaConverterHandle);
+//        }
 
         return service;
     }
@@ -498,8 +544,12 @@ public class Node implements INode {
 
         // TODO (jacquelinekay) Check handle parameter constraints
         SetParametersResult result = new SetParametersResult();
-//      result.setReason(arg0);
-        result.setSuccessful(true);
+
+        if (this.parameterCallback != null) {
+            result = this.parameterCallback.onParamChange(parameters);
+        } else {
+            result.setSuccessful(true);
+        }
 
         if (result.getSuccessful()){
             for (ParameterVariant<?> paramVarReq : parameters) {

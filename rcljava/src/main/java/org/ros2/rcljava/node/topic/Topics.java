@@ -26,4 +26,6 @@ public class Topics {
     /** Parameter events topic. */
     public static final String PARAM_EVENT = "parameter_events";
 
+    public static final String SCHEME = "rostopic://";
+
 }

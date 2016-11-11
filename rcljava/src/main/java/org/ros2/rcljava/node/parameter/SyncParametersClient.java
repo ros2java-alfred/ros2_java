@@ -295,7 +295,7 @@ public class SyncParametersClient {
         return result;
     }
 
-    public Subscription<ParameterEvent> onParameterEvent(final ParameterConsumer parameterConsumer) {
+    public Subscription<ParameterEvent> onParameterEvent(final ParameterEventConsumer parameterConsumer) {
         Subscription<ParameterEvent> sub_event = this.ownerNode.<ParameterEvent>createSubscription(
                 ParameterEvent.class,
                 Topics.PARAM_EVENT,

@@ -29,6 +29,8 @@ public class Service<T> implements IService {
 
     private static final Logger logger = LoggerFactory.getLogger(Service.class);
 
+    public static final String SCHEME = "rostopic://";
+
     /** Name of the service */
     private final String serviceName;
 

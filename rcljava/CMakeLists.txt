@@ -92,6 +92,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/node/service/TriConsumer.java"
 
   "src/main/java/org/ros2/rcljava/node/parameter/ParameterConsumer.java"
+  "src/main/java/org/ros2/rcljava/node/parameter/ParameterEventConsumer.java"
   "src/main/java/org/ros2/rcljava/node/parameter/ParameterService.java"
   "src/main/java/org/ros2/rcljava/node/parameter/ParameterVariant.java"
   "src/main/java/org/ros2/rcljava/node/parameter/SyncParametersClient.java"
@@ -192,6 +193,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 
   set(${PROJECT_NAME}_test_sources
+    "src/test/java/org/ros2/rcljava/GraphNameTest.java"
     "src/test/java/org/ros2/rcljava/NodeTest.java"
     "src/test/java/org/ros2/rcljava/PublisherTest.java"
     "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
@@ -200,6 +202,7 @@ if(BUILD_TESTING)
   )
 
   set(${PROJECT_NAME}_testsuites
+    "org.ros2.rcljava.GraphNameTest"
     "org.ros2.rcljava.NodeTest"
     "org.ros2.rcljava.PublisherTest"
     "org.ros2.rcljava.RCLJavaTest"
