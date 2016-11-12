@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ros2.rcljava.namespace.GraphName;
+import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.Topics;
 
 public class GraphNameTest {
@@ -31,7 +32,7 @@ public class GraphNameTest {
     }
 
     @Test
-    public final void testTopicName() {
+    public final void testIsTopicName() {
         // @see http://design.ros2.org/articles/topic_and_service_names.html
 
         // must not be empty
@@ -113,7 +114,7 @@ public class GraphNameTest {
     }
 
     @Test
-    public final void testSubstitution() {
+    public final void testIsSubstitution() {
         // must not be empty
         Assert.assertFalse("Substitution must not be null.", GraphName.isValidSubstitution(null));
         Assert.assertFalse("Substitution must not be empty.", GraphName.isValidSubstitution(""));
@@ -135,7 +136,7 @@ public class GraphNameTest {
     }
 
     @Test
-    public final void testTopicFQN() {
+    public final void testIsTopicFQN() {
         // must start with a forward slash (/), i.e. they must be absolute
         Assert.assertTrue("FQN must start with a forward slash.", GraphName.isValideFQDN("/foo"));
         Assert.assertFalse("FQN must start with a forward slash.", GraphName.isValideFQDN("foo"));
@@ -149,5 +150,33 @@ public class GraphNameTest {
         Assert.assertTrue(GraphName.isValideFQDN(Topics.SCHEME + "/ping"));
         Assert.assertTrue(GraphName.isValideFQDN("/_private/thing"));
         Assert.assertTrue(GraphName.isValideFQDN("/public_namespace/_private/thing"));
+    }
+
+    @Test
+    public final void testGetFullName() {
+        RCLJava.rclJavaInit();
+
+        Node node = RCLJava.createNode("my_node");
+        Assert.assertEquals("/ping",            GraphName.getFullName(node, "ping",     null));
+        Assert.assertEquals("/ping",            GraphName.getFullName(node, "/ping",    null));
+        Assert.assertEquals("/my_node",         GraphName.getFullName(node, "~",        null));
+        Assert.assertEquals("/my_node/ping",    GraphName.getFullName(node, "~/ping",   null));
+        node.dispose();
+
+        node = RCLJava.createNode("my_ns", "my_node");
+        Assert.assertEquals("/my_ns/ping",          GraphName.getFullName(node, "ping",     null));
+        Assert.assertEquals("/ping",                GraphName.getFullName(node, "/ping",    null));
+        Assert.assertEquals("/my_ns/my_node",       GraphName.getFullName(node, "~",        null));
+        Assert.assertEquals("/my_ns/my_node/ping",  GraphName.getFullName(node, "~/ping",   null));
+        node.dispose();
+
+        node = RCLJava.createNode("/my_ns/my_subns", "my_node");
+        Assert.assertEquals("/my_ns/my_subns/ping",         GraphName.getFullName(node, "ping",     null));
+        Assert.assertEquals("/ping",                        GraphName.getFullName(node, "/ping",    null));
+        Assert.assertEquals("/my_ns/my_subns/my_node",      GraphName.getFullName(node, "~",        null));
+        Assert.assertEquals("/my_ns/my_subns/my_node/ping", GraphName.getFullName(node, "~/ping",   null));
+        node.dispose();
+
+        RCLJava.shutdown();
     }
 }

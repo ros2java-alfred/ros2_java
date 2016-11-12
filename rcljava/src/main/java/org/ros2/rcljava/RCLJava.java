@@ -219,11 +219,25 @@ public class RCLJava {
      * Create a @{link Node}.
      *
      * @param nodeName Name of the node.
+     * @param ns Name Space.
      * @param nodeName The name that will identify this node in a ROS2 graph.
      * @return A @{link Node} that represents the underlying ROS2 node
      *     structure.
      */
     public static Node createNode(final String nodeName) {
+        return RCLJava.createNode(null, nodeName);
+    }
+
+    /**
+     * Create a @{link Node}.
+     *
+     * @param nodeName Name of the node.
+     * @param ns Name Space.
+     * @param nodeName The name that will identify this node in a ROS2 graph.
+     * @return A @{link Node} that represents the underlying ROS2 node
+     *     structure.
+     */
+    public static Node createNode(final String ns, final String nodeName) {
         RCLJava.logger.debug("Create Node stack : " + nodeName);
 
         if (!RCLJava.initialized) {
@@ -231,7 +245,7 @@ public class RCLJava {
         }
 
         long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName);
-        Node node = new Node(nodeHandle, nodeName);
+        Node node = new Node(nodeHandle, ns, nodeName);
 
         return node;
     }

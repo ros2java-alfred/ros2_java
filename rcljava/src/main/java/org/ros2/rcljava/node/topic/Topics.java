@@ -24,7 +24,7 @@ public class Topics {
     public static final String ROSOUT = "/rosout";
 
     /** Parameter events topic. */
-    public static final String PARAM_EVENT = "parameter_events";
+    public static final String PARAM_EVENT = "~/parameter_events";
 
     public static final String SCHEME = "rostopic://";
 

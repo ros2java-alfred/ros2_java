@@ -15,6 +15,7 @@
  */
 package org.ros2.rcljava.namespace;
 
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -61,6 +62,57 @@ public class GraphName implements IGraph {
     }
 
     /**
+     *
+     *
+     * <table>
+     * <tr><td>Input Name	</td><td>Node: my_node NS: none	</td><td>Node: my_node NS: /my_ns</td></tr>
+     * <tr><td>ping			</td><td>/ping					</td><td>/my_ns/ping</td></tr>
+     * <tr><td>/ping		</td><td>/ping					</td><td>/ping</td></tr>
+     * <tr><td>~			</td><td>/my_node				</td><td>/my_ns/my_node</td></tr>
+     * <tr><td>~/ping		</td><td>/my_node/ping			</td><td>/my_ns/my_node/ping</td></tr></table>
+     *
+     * @param node
+     * @param name
+     * @param options
+     * @return
+     */
+    public static String getFullName(final Node node, final String name, List<String> options) {
+        String result = name;
+        String nodeName = node.getName();
+        String ns = node.getNameSpace();
+
+        // Manage Name Space.
+        if (ns == null || ns.length() == 0) {
+            ns = "";
+        } else if (!ns.startsWith("/")){
+            ns = String.format("/%s", ns);
+        }
+
+        // Absolute case
+        if (name.startsWith("/")) {
+            result = name;
+        } else
+
+        // Relative case
+        if (name.startsWith("~/")) {
+            String relPath = name.replaceFirst("~/", "");
+            result = String.format("%s/%s/%s", ns, nodeName, relPath);
+        } else
+
+        // Node case
+        if (name.startsWith("~")) {
+            result = String.format("%s/%s", ns, nodeName);
+        } else
+
+        // Name space path
+        {
+            result = String.format("%s/%s", ns, name);
+        }
+
+        return result;
+    }
+
+    /**
      * Check if name is valid.
      *
      * For testing : https://regex101.com/r/b3R65h/1
@@ -72,7 +124,7 @@ public class GraphName implements IGraph {
         boolean result = name != null;
 
         if (result) {
-            String topicName = removeSheme(name);
+            String topicName = GraphName.removeSheme(name);
 
             result =
                     topicName != null &&
@@ -91,6 +143,7 @@ public class GraphName implements IGraph {
     }
 
     /**
+     * Check if substitution is valid.
      *
      * @param substitution
      * @return
@@ -105,11 +158,17 @@ public class GraphName implements IGraph {
         return result;
     }
 
+    /**
+     * Chack if Full Qualify Name is valid.
+     *
+     * @param fqn
+     * @return
+     */
     public static boolean isValideFQDN(final String fqn) {
         boolean result = fqn != null;
 
         if (result) {
-            String topicName = removeSheme(fqn);
+            String topicName = GraphName.removeSheme(fqn);
 
             result =
                     GraphName.isValidTopic(topicName) &&

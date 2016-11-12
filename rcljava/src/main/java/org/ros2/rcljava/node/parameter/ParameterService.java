@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
@@ -62,12 +63,12 @@ import rcl_interfaces.srv.SetParametersAtomically_Response;
 public class ParameterService {
     private static final Logger logger = LoggerFactory.getLogger(ParameterService.class);
 
-    protected static final String TOPIC_GETPARAMETERS = "%s__get_parameters";
-    protected static final String TOPIC_GETPARAMETERTYPES = "%s__get_parameter_types";
-    protected static final String TOPIC_SETPARAMETERS = "%s__set_parameters";
-    protected static final String TOPIC_SETPARAMETERSATOMICALLY = "%s__set_parameters_atomically";
-    protected static final String TOPIC_DESCRIBEPARAMETERS = "%s__describe_parameters";
-    protected static final String TOPIC_LISTPARAMETERS = "%s__list_parameters";
+    protected static final String TOPIC_GETPARAMETERS = "~/_get_parameters";
+    protected static final String TOPIC_GETPARAMETERTYPES = "~/_get_parameter_types";
+    protected static final String TOPIC_SETPARAMETERS = "~/_set_parameters";
+    protected static final String TOPIC_SETPARAMETERSATOMICALLY = "~/_set_parameters_atomically";
+    protected static final String TOPIC_DESCRIBEPARAMETERS = "~/_describe_parameters";
+    protected static final String TOPIC_LISTPARAMETERS = "~/_list_parameters";
 
 
     private final Node ownerNode;
@@ -90,117 +91,134 @@ public class ParameterService {
         try {
             logger.debug("Create Parameters stack " + node.getName());
 
-            this.getParametersService = node.<GetParameters>createService(
-                    GetParameters.class,
-                    String.format(TOPIC_GETPARAMETERS, node.getName()),
-                    new TriConsumer<RMWRequestId, GetParameters_Request, GetParameters_Response>() {
+            final String fqnGetParameter =  GraphName.getFullName(node, TOPIC_GETPARAMETERS, null);
+            if (GraphName.isValidTopic(fqnGetParameter)) {
+                this.getParametersService = node.<GetParameters>createService(
+                        GetParameters.class,
+                        fqnGetParameter,
+                        new TriConsumer<RMWRequestId, GetParameters_Request, GetParameters_Response>() {
 
-                        @Override
-                        public void accept(
-                                final RMWRequestId header,
-                                final GetParameters_Request request,
-                                final GetParameters_Response response) {
-                            logger.debug("Replies to get Parameters.");
-                            List<ParameterValue> paramsResult = new ArrayList<ParameterValue>();
+                            @Override
+                            public void accept(
+                                    final RMWRequestId header,
+                                    final GetParameters_Request request,
+                                    final GetParameters_Response response) {
+                                logger.debug("Replies to get Parameters.");
+                                List<ParameterValue> paramsResult = new ArrayList<ParameterValue>();
 
-                            List<ParameterVariant<?>> paramsCurrent = node.getParameters(request.getNames());
-                            for (ParameterVariant<?> parameterVariant : paramsCurrent) {
-                                paramsResult.add(parameterVariant.toParameterValue());
+                                List<ParameterVariant<?>> paramsCurrent = node.getParameters(request.getNames());
+                                for (ParameterVariant<?> parameterVariant : paramsCurrent) {
+                                    paramsResult.add(parameterVariant.toParameterValue());
+                                }
+
+                                response.setValues(paramsResult);
                             }
+                        },
+                        profileParameter);
+            }
 
-                            response.setValues(paramsResult);
-                        }
-                    },
-                    profileParameter);
+            final String fqnGetParametertypes = GraphName.getFullName(node, TOPIC_GETPARAMETERTYPES, null);
+            if (GraphName.isValidTopic(fqnGetParametertypes)) {
+                this.getParameterTypesService = node.<GetParameterTypes>createService(
+                        GetParameterTypes.class,
+                        fqnGetParametertypes,
+                        new TriConsumer<RMWRequestId, GetParameterTypes_Request, GetParameterTypes_Response>() {
 
-            this.getParameterTypesService = node.<GetParameterTypes>createService(
-                    GetParameterTypes.class,
-                    String.format(TOPIC_GETPARAMETERTYPES, node.getName()),
-                    new TriConsumer<RMWRequestId, GetParameterTypes_Request, GetParameterTypes_Response>() {
+                            @Override
+                            public void accept(
+                                    final RMWRequestId header,
+                                    final GetParameterTypes_Request request,
+                                    final GetParameterTypes_Response response) {
+                                logger.debug("Replies to get Parameter Types !");
 
-                        @Override
-                        public void accept(
-                                final RMWRequestId header,
-                                final GetParameterTypes_Request request,
-                                final GetParameterTypes_Response response) {
-                            logger.debug("Replies to get Parameter Types !");
-
-                            response.setTypes(node.getParametersTypes(request.getNames()));
-                        }
-                    },
-                    profileParameter);
-
-            this.setParametersService = node.<SetParameters>createService(
-                    SetParameters.class,
-                    String.format(TOPIC_SETPARAMETERS, node.getName()),
-                    new TriConsumer<RMWRequestId, SetParameters_Request, SetParameters_Response>() {
-
-                        @Override
-                        public void accept(
-                                final RMWRequestId header,
-                                final SetParameters_Request request,
-                                final SetParameters_Response response) {
-
-                            logger.debug("Replies to set Parameters.");
-                            List<ParameterVariant<?>> parameterVariants = new ArrayList<ParameterVariant<?>>();
-                            for (Parameter parameterVariant : request.getParameters()) {
-                                parameterVariants.add(ParameterVariant.fromParameter(parameterVariant));
+                                response.setTypes(node.getParametersTypes(request.getNames()));
                             }
-                            List<SetParametersResult> result = node.setParameters(parameterVariants);
-                            response.setResults(result);
-                        }
-                    },
-                    profileParameter);
+                        },
+                        profileParameter);
+            }
 
-            this.setParametersAtomicallyService = node.<SetParametersAtomically>createService(
-                    SetParametersAtomically.class,
-                    String.format(TOPIC_SETPARAMETERSATOMICALLY, node.getName()),
-                    new TriConsumer<RMWRequestId, SetParametersAtomically_Request, SetParametersAtomically_Response>() {
+            final String fqnSetParameters =  GraphName.getFullName(node, TOPIC_SETPARAMETERS, null);
+            if (GraphName.isValidTopic(fqnSetParameters)) {
+                this.setParametersService = node.<SetParameters>createService(
+                        SetParameters.class,
+                        fqnSetParameters,
+                        new TriConsumer<RMWRequestId, SetParameters_Request, SetParameters_Response>() {
 
-                        @Override
-                        public void accept(
-                                final RMWRequestId header,
-                                final SetParametersAtomically_Request request,
-                                final SetParametersAtomically_Response response) {
+                            @Override
+                            public void accept(
+                                    final RMWRequestId header,
+                                    final SetParameters_Request request,
+                                    final SetParameters_Response response) {
 
-                            logger.debug("Replies to set Parameters Atomically.");
-                            List<ParameterVariant<?>> parameterVariants = new ArrayList<ParameterVariant<?>>();
-                            for (Parameter parameterVariant : request.getParameters()) {
-                                parameterVariants.add(ParameterVariant.fromParameter(parameterVariant));
+                                logger.debug("Replies to set Parameters.");
+                                List<ParameterVariant<?>> parameterVariants = new ArrayList<ParameterVariant<?>>();
+                                for (Parameter parameterVariant : request.getParameters()) {
+                                    parameterVariants.add(ParameterVariant.fromParameter(parameterVariant));
+                                }
+                                List<SetParametersResult> result = node.setParameters(parameterVariants);
+                                response.setResults(result);
                             }
-                            response.setResult(node.setParametersAtomically(parameterVariants));
-                        }
-                    },
-                    profileParameter);
+                        },
+                        profileParameter);
+            }
 
-            this.describeParametersService = node.<DescribeParameters>createService(
-                    DescribeParameters.class,
-                    String.format(TOPIC_DESCRIBEPARAMETERS, node.getName()),
-                    new TriConsumer<RMWRequestId, DescribeParameters_Request, DescribeParameters_Response>() {
+            final String fqnSetParametersAtomically =  GraphName.getFullName(node, TOPIC_SETPARAMETERSATOMICALLY, null);
+            if (GraphName.isValidTopic(fqnSetParametersAtomically)) {
+                this.setParametersAtomicallyService = node.<SetParametersAtomically>createService(
+                        SetParametersAtomically.class,
+                        fqnSetParametersAtomically,
+                        new TriConsumer<RMWRequestId, SetParametersAtomically_Request, SetParametersAtomically_Response>() {
 
-                        @Override
-                        public void accept(
-                                final RMWRequestId header,
-                                final DescribeParameters_Request request,
-                                final DescribeParameters_Response response) {
+                            @Override
+                            public void accept(
+                                    final RMWRequestId header,
+                                    final SetParametersAtomically_Request request,
+                                    final SetParametersAtomically_Response response) {
 
-                            logger.debug("Replies to describe Parameters. ! NOT IMPLEMENTED !");
+                                logger.debug("Replies to set Parameters Atomically.");
+                                List<ParameterVariant<?>> parameterVariants = new ArrayList<ParameterVariant<?>>();
+                                for (Parameter parameterVariant : request.getParameters()) {
+                                    parameterVariants.add(ParameterVariant.fromParameter(parameterVariant));
+                                }
+                                response.setResult(node.setParametersAtomically(parameterVariants));
+                            }
+                        },
+                        profileParameter);
+            }
 
-                            List<ParameterDescriptor> listDescritiorResult = new ArrayList<ParameterDescriptor>();
+            final String fqnDescribeParameters =  GraphName.getFullName(node, TOPIC_DESCRIBEPARAMETERS, null);
+            if (GraphName.isValidTopic(fqnDescribeParameters)) {
+                this.describeParametersService = node.<DescribeParameters>createService(
+                        DescribeParameters.class,
+                        fqnDescribeParameters,
+                        new TriConsumer<RMWRequestId, DescribeParameters_Request, DescribeParameters_Response>() {
 
-                            ParameterDescriptor descriptor = new ParameterDescriptor();
-//                            descriptor.setName(arg0);
-//                            descriptor.setType(arg0);
-                            listDescritiorResult.add(descriptor);
+                            @Override
+                            public void accept(
+                                    final RMWRequestId header,
+                                    final DescribeParameters_Request request,
+                                    final DescribeParameters_Response response) {
 
-                            response.setDescriptors(listDescritiorResult);
-                        }
-                    },
-                    profileParameter);
+                                logger.debug("Replies to describe Parameters. ! NOT IMPLEMENTED !");
 
+                                List<ParameterDescriptor> listDescritiorResult = new ArrayList<ParameterDescriptor>();
+
+                                ParameterDescriptor descriptor = new ParameterDescriptor();
+    //                            descriptor.setName(arg0);
+    //                            descriptor.setType(arg0);
+                                listDescritiorResult.add(descriptor);
+
+                                response.setDescriptors(listDescritiorResult);
+                            }
+                        },
+                        profileParameter);
+            }
+
+            final String fqnListParameters =  GraphName.getFullName(node, TOPIC_LISTPARAMETERS, null);
+            if (GraphName.isValidTopic(fqnListParameters)) {
             this.listParametersService = node.<ListParameters>createService(
                     ListParameters.class,
-                    String.format(TOPIC_LISTPARAMETERS, node.getName()),
+                    fqnListParameters,
                     new TriConsumer<RMWRequestId, ListParameters_Request, ListParameters_Response>() {
 
                         @Override
@@ -217,8 +235,12 @@ public class ParameterService {
                         }
                     },
                     profileParameter);
+            }
 
-            this.eventparameterPublisher = node.createPublisher(ParameterEvent.class, Topics.PARAM_EVENT, QoSProfile.PARAMETER_EVENTS);
+            final String fqnParametersEvent =  GraphName.getFullName(node, Topics.PARAM_EVENT, null);
+            if (GraphName.isValidTopic(fqnListParameters)) {
+                this.eventparameterPublisher = node.createPublisher(ParameterEvent.class, fqnParametersEvent, QoSProfile.PARAMETER_EVENTS);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -226,7 +248,9 @@ public class ParameterService {
     }
 
     public void notifyAddEvent(final ParameterEvent param) {
-        this.eventparameterPublisher.publish(param);
+        if (this.eventparameterPublisher != null) {
+            this.eventparameterPublisher.publish(param);
+        }
     }
 
     /**
