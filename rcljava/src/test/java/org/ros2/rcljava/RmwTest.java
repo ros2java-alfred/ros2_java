@@ -55,6 +55,7 @@ public class RmwTest {
         Assert.assertTrue("failed to initialize rclJava with Fastrtps", test);
     }
 
+    @Ignore
     @Test
     public void testRmwOpensplice() {
         boolean test = true;

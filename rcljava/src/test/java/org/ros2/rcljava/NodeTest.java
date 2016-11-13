@@ -36,6 +36,7 @@ import org.ros2.rcljava.qos.QoSProfile;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class NodeTest {
 
@@ -341,11 +342,13 @@ public class NodeTest {
         boolean test = true;
         Node node = null;
         HashMap<String, String> topics = null;
+        String fqnNode = null;
 
         RCLJava.rclJavaInit();
         try {
             node = RCLJava.createNode("testSubscription");
             topics = node.getTopicNamesAndTypes();
+            fqnNode = "/" + node.getName();
 
             node.dispose();
         } catch (Exception e) {
@@ -353,8 +356,15 @@ public class NodeTest {
         }
         RCLJava.shutdown();
 
+        int i = 0;
+        for (Entry<String, String> topic : topics.entrySet()) {
+            if (topic.getKey().startsWith(fqnNode)) {
+                ++i;
+            }
+        }
+
         Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", 14, topics.size());
+        Assert.assertEquals("Bad result", 13, i);
     }
 
     //TODO Test Parameters

@@ -86,7 +86,6 @@ public class GraphNameTest {
         Assert.assertTrue(GraphName.isValidTopic("~/foo"));
         Assert.assertTrue(GraphName.isValidTopic("{foo}_bar"));
         Assert.assertTrue(GraphName.isValidTopic("foo/{ping}/bar"));
-//        Assert.assertTrue(GraphName.isValidTopic("foo/_/bar	")); //TODO (theos) For me not valid !!
         Assert.assertTrue(GraphName.isValidTopic(Topics.SCHEME + "/foo"));
         Assert.assertTrue(GraphName.isValidTopic(Topics.SCHEME + "foo/bar"));
 

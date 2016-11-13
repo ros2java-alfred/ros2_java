@@ -219,8 +219,6 @@ public class RCLJava {
      * Create a @{link Node}.
      *
      * @param nodeName Name of the node.
-     * @param ns Name Space.
-     * @param nodeName The name that will identify this node in a ROS2 graph.
      * @return A @{link Node} that represents the underlying ROS2 node
      *     structure.
      */
@@ -231,7 +229,6 @@ public class RCLJava {
     /**
      * Create a @{link Node}.
      *
-     * @param nodeName Name of the node.
      * @param ns Name Space.
      * @param nodeName The name that will identify this node in a ROS2 graph.
      * @return A @{link Node} that represents the underlying ROS2 node

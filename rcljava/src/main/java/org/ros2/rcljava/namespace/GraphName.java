@@ -104,7 +104,7 @@ public class GraphName implements IGraph {
             result = String.format("%s/%s", ns, nodeName);
         } else
 
-        // Name space path
+        // Name space path cas
         {
             result = String.format("%s/%s", ns, name);
         }
@@ -134,7 +134,7 @@ public class GraphName implements IGraph {
                     !topicName.endsWith("/")
             ;
 
-            if (result && topicName.startsWith("~") && topicName.length() > 2) {
+            if (result && topicName.startsWith("~") && topicName.length() > 1) {
                 result = topicName.startsWith("~/");
             }
         }
