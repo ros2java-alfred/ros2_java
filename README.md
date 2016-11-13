@@ -1,4 +1,4 @@
-ROS2 for Java (Alfred variation) [![Build Status](https://travis-ci.org/ros2java/ros2_java.svg?branch=master)](https://travis-ci.org/ros2java/ros2_java)
+ROS2 for Java (Alfred variation) [![Build Status](https://travis-ci.org/ros2java-alfred/ros2_java.svg?branch=master)](https://travis-ci.org/ros2java-alfred/ros2_java)
 =============
 
 What is this?
