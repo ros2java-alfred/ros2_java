@@ -6,7 +6,7 @@ services:
   - docker
 
 before_install:
-- docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"-
+- docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 - docker pull esteve/ros2-ubuntu-xenial-travisci:java
 - cd /home/travis/build
 - mkdir -p ament_ws/src
