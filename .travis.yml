@@ -19,7 +19,8 @@ before_install:
 - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/d9259bbc708c5145255fbdeb25e65e19/raw/af7893d2f6793b782046fd5a11f98053ac45035b/ros2_java_desktop.repos"
 - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c "/usr/bin/vcs import src < ros2_java_desktop.repos"
 - rm -rf /home/travis/build/ros2_java_ws/src/ros2_java/ros2_java
-- ln -s /home/travis/build/ros2java/ros2_java /home/travis/build/ros2_java_ws/src/ros2_java/ros2_java
+- ln -s /home/travis/build/ros2java-alfred/ros2_java
+ /home/travis/build/ros2_java_ws/src/ros2_java/ros2_java
 - cd /home/travis/build/ros2_java_ws/src/ros2/rosidl_typesupport
 - patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_java.diff
 - cd /home/travis/build
