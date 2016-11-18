@@ -29,6 +29,9 @@ before_install:
 script:
 - cd /home/travis/build && docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament test --isolated --only rcljava"
 
+after_success:
+  - coveralls
+
 notifications:
   webhooks:
     urls:
