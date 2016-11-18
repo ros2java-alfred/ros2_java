@@ -39,10 +39,6 @@ repositories:
     type: git
     url: https://github.com/ros2/rosidl_dds.git
     version: master
-  ros2/rosidl_typesupport:
-    type: git
-    url: https://github.com/esteve/rosidl_typesupport.git
-    version: android
   ros2_java/ros2_java:
     type: git
     url: https://github.com/esteve/ros2_java.git
@@ -51,6 +47,10 @@ repositories:
     type: git
     url: https://github.com/esteve/ros2_android_examples.git
     version: master
+  ros2_java/rosidl_typesupport:
+    type: git
+    url: https://github.com/esteve/rosidl_typesupport.git
+    version: android
   android-cmake/android-cmake:
     type: git
     url: https://github.com/chenxiaolong/android-cmake.git
