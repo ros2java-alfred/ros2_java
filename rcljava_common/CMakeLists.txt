@@ -41,7 +41,9 @@ install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
 ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
 
 find_jar(SFL4J_JAR NAMES slf4j-api)
-if(NOT ${SFL4J_JAR})
+if(${SFL4J_JAR})
+  ament_export_jars(${SFL4J_JAR})
+else()
   set(log4j_version "1.2.17")
   set(slf4j_version "1.7.21")
 
@@ -82,8 +84,6 @@ if(NOT ${SFL4J_JAR})
   ament_export_jars("share/${PROJECT_NAME}/java/slf4j-android-${slf4j_version}.jar")
   ament_export_jars("share/${PROJECT_NAME}/java/slf4j-jdk14-${slf4j_version}.jar")
 endif()
-
-ament_export_jars(${SFL4J_JAR})
 
 include_directories(include)
 
