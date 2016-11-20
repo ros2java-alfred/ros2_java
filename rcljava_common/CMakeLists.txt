@@ -7,6 +7,10 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_export_jars REQUIRED)
 find_package(ament_cmake_export_libraries REQUIRED)
 
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
+include(CrossCompilingExtra)
+
 if(ANDROID)
   find_host_package(Java COMPONENTS Development REQUIRED)
 else()
