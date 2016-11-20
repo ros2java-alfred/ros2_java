@@ -47,6 +47,16 @@ public final class @(type_name) {
 @[        end if]@
 
   public final void set@(convert_lower_case_underscore_to_camel_case(field.name))(final java.util.Collection<@(get_java_type(field.type, use_primitives=False))> @(field.name)) {
+@[        if field.type.array_size]@
+@[            if field.type.is_upper_bound]@
+    if(@(field.name).size() > @(field.type.array_size)) {
+        throw new IllegalArgumentException("List too big, maximum size allowed: @(field.type.array_size)");
+@[            else]@
+    if(@(field.name).size() != @(field.type.array_size)) {
+        throw new IllegalArgumentException("Invalid size for fixed array, must be exactly: @(field.type.array_size)");
+@[            end if]@
+    }
+@[        end if]@
     if (@(field.name) != null) {
       this.@(field.name) = new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>(@(field.name));
     }
@@ -70,6 +80,12 @@ public final class @(type_name) {
 @[        end if]@
 
   public void set@(convert_lower_case_underscore_to_camel_case(field.name))(final @(get_java_type(field.type)) @(field.name)) {
+@[        if field.type.string_upper_bound]@
+    if(@(field.name).length() > @(field.type.string_upper_bound)) {
+        throw new IllegalArgumentException("String too long, maximum size allowed: @(field.type.string_upper_bound)");
+    }
+@[        end if]@
+
     this.@(field.name) = @(field.name);
   }
 
