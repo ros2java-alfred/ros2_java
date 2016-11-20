@@ -23,6 +23,11 @@ from rosidl_parser import parse_message_file
 from rosidl_parser import parse_service_file
 
 
+# Taken from http://stackoverflow.com/a/6425628
+def convert_lower_case_underscore_to_camel_case(word):
+    return ''.join(x.capitalize() or '_' for x in word.split('_'))
+
+
 def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls):
     args = read_generator_arguments(generator_arguments_file)
     typesupport_impls = typesupport_impls.split(';')
@@ -82,6 +87,8 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
                     'value_to_java': value_to_java,
                     'convert_camel_case_to_lower_case_underscore':
                     convert_camel_case_to_lower_case_underscore,
+                    'convert_lower_case_underscore_to_camel_case':
+                    convert_lower_case_underscore_to_camel_case,
                     'get_builtin_java_type': get_builtin_java_type,
                     'module_name': module_name, 'package_name': package_name,
                     'jni_package_name': jni_package_name,
