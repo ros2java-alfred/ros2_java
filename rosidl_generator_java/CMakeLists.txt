@@ -23,6 +23,7 @@ else()
   find_package(JNI REQUIRED)
 endif()
 include(UseJava)
+include(JavaExtra)
 
 set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
@@ -67,7 +68,26 @@ if(BUILD_TESTING)
     SKIP_INSTALL
   )
 
-# TODO(esteve): add support for JUnit tests
+  set(${PROJECT_NAME}_test_sources
+    "src/test/java/org/ros2/generator/InterfacesTest.java"
+  )
+
+  set(${PROJECT_NAME}_testsuites
+    "org.ros2.generator.InterfacesTest"
+  )
+
+  foreach(testsuite ${${PROJECT_NAME}_testsuites})
+    add_junit_tests("${PROJECT_NAME}_tests_${testsuite}"
+      "${${PROJECT_NAME}_test_sources}"
+      TESTS
+      "${testsuite}"
+      INCLUDE_JARS
+      "${rcljava_common_JARS}"
+      "${rosidl_generator_java_JARS}"
+      "${_jar_file}"
+    )
+  endforeach()
+
 endif()
 
 install(
