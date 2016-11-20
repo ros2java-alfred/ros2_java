@@ -16,11 +16,16 @@ public final class @(type_name) {
   private static final Logger logger = LoggerFactory.getLogger(@(type_name).class);
 
   static {
-    try {
-      System.loadLibrary("@(spec.base_type.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
-    } catch (UnsatisfiedLinkError ule) {
-      logger.error("Native code library failed to load.\n" + ule);
-      System.exit(1);
+    java.lang.String typesupportIdentifier = RCLJavaProxy.getTypesupportIdentifier();
+    if (typesupportIdentifier == null) {
+      logger.debug("Typesupport identifier can't be found");
+    } else {
+      try {
+        System.loadLibrary("@(spec.base_type.pkg_name)_@(type_name)_s__" + typesupportIdentifier);
+      } catch (UnsatisfiedLinkError ule) {
+        logger.error("Native code library failed to load.\n" + ule);
+        System.exit(1);
+      }
     }
   }
 
