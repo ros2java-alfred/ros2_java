@@ -79,6 +79,7 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
             for generated_filename in generated_filenames:
                 data = {
                     'constant_value_to_java': constant_value_to_java,
+                    'value_to_java': value_to_java,
                     'convert_camel_case_to_lower_case_underscore':
                     convert_camel_case_to_lower_case_underscore,
                     'get_builtin_java_type': get_builtin_java_type,
@@ -104,6 +105,47 @@ def escape_string(s):
     s = s.replace('\\', '\\\\')
     s = s.replace("'", "\\'")
     return s
+
+
+def value_to_java(type_, value):
+    assert type_.is_primitive_type()
+    assert value is not None
+
+    if not type_.is_array:
+        return primitive_value_to_java(type_, value)
+
+    java_values = []
+    for single_value in value:
+        java_value = primitive_value_to_java(type_, single_value)
+        java_values.append(java_value)
+    return '{%s}' % ', '.join(java_values)
+
+
+def primitive_value_to_java(type_, value):
+    assert type_.is_primitive_type()
+    assert value is not None
+
+    if type_.type == 'bool':
+        return 'true' if value else 'false'
+
+    if type_.type in [
+        'byte',
+        'char',
+        'int8', 'uint8',
+        'int16', 'uint16',
+        'int32', 'uint32',
+        'int64', 'uint64',
+        'float64',
+    ]:
+        return str(value)
+
+    if type_.type == 'float32':
+        return '%sf' % value
+
+    if type_.type == 'string':
+        return '"%s"' % escape_string(value)
+
+    assert False, "unknown primitive type '%s'" % type_
 
 
 def constant_value_to_java(type_, value):
