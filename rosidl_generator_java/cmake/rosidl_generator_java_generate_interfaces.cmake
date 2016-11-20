@@ -299,6 +299,7 @@ if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
     get_filename_component(_msg_package_dir "${_msg_file}" DIRECTORY)
     get_filename_component(_msg_package_dir "${_msg_package_dir}" DIRECTORY)
 
+    ament_java_install_package(${PROJECT_NAME})
     install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
     ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
   endif()
