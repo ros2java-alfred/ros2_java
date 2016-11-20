@@ -8,7 +8,6 @@ find_package(rcl REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(rcljava_common REQUIRED)
-find_package(JavaExtra MODULE)
 
 include(CrossCompilingExtra)
 
@@ -20,6 +19,7 @@ else()
 endif()
 
 include(UseJava)
+include(JavaExtra)
 
 set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 

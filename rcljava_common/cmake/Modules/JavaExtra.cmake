@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include(CrossCompilingExtra)
+
 if(ANDROID)
   find_host_package(Java COMPONENTS Development)
 else()
