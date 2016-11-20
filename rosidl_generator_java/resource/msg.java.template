@@ -39,7 +39,11 @@ def upperfirst(s):
 @[for field in spec.fields]@
 
 @[    if field.type.is_array]@
+@[        if field.default_value is not None]@
+  private java.util.List<@(get_java_type(field.type, use_primitives=False))> @(field.name) = java.util.Arrays.asList(new @(get_java_type(field.type, use_primitives=False))[] @(value_to_java(field.type, field.default_value)));
+@[        else]@
   private java.util.List<@(get_java_type(field.type, use_primitives=False))> @(field.name);
+@[        end if]@
 
   public final void set@(upperfirst(field.name))(final java.util.Collection<@(get_java_type(field.type, use_primitives=False))> @(field.name)) {
     if (@(field.name) != null) {
@@ -54,7 +58,15 @@ def upperfirst(s):
     return new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>(this.@(field.name));
   }
 @[    else]@
+@[        if field.default_value is not None]@
+  private @(get_java_type(field.type)) @(field.name) = @(value_to_java(field.type, field.default_value));
+@[        else]@
+@[            if field.type.type == 'string']@
+  private @(get_java_type(field.type)) @(field.name) = "";
+@[            else]@
   private @(get_java_type(field.type)) @(field.name);
+@[            end if]@
+@[        end if]@
 
   public void set@(upperfirst(field.name))(final @(get_java_type(field.type)) @(field.name)) {
     this.@(field.name) = @(field.name);
