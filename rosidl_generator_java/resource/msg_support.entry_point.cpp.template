@@ -125,7 +125,7 @@ static JavaVM* g_vm = nullptr;
         jbyte _jfield_@(field.name)_value = env->CallByteMethod(element, _jfield_@(field.name)_mid);
         _dest_@(field.name)[i] = _jfield_@(field.name)_value;
 @[            elif field.type.type == 'char']@
-        jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Char");
+        jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Character");
         jmethodID _jfield_@(field.name)_mid = env->GetMethodID(
           _jfield_@(field.name)_class, "charValue", "()C");
         jchar _jfield_@(field.name)_value = env->CallCharMethod(element, _jfield_@(field.name)_mid);
@@ -287,7 +287,7 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
     jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(B)V");
     jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, static_cast<jbyte>(_ros_message->@(field.name).data[i]));
 @[                    elif field.type.type == 'char']@
-    jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Char");
+    jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Character");
     jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(C)V");
     jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_message->@(field.name).data[i]);
 @[                    elif field.type.type in ['int16', 'uint16']]@
