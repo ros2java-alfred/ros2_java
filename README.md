@@ -1,5 +1,12 @@
-ROS2 for Java [![Build Status](https://travis-ci.org/esteve/ros2_java.svg?branch=master)](https://travis-ci.org/esteve/ros2_java)
+ROS2 for Java
 =============
+
+Build status
+------------
+
+**JRE** [![Build Status](https://travis-ci.org/esteve/ros2_java.svg?branch=master)](https://travis-ci.org/esteve/ros2_java)
+
+**Android** [![Build Status](https://travis-ci.org/esteve/ros2_android.svg?branch=master)](https://travis-ci.org/esteve/ros2_android)
 
 What is this?
 -------------
