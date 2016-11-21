@@ -51,7 +51,3 @@ repositories:
     type: git
     url: https://github.com/esteve/rosidl_typesupport.git
     version: android
-  android-cmake/android-cmake:
-    type: git
-    url: https://github.com/chenxiaolong/android-cmake.git
-    version: mbp

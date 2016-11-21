@@ -10,6 +10,8 @@ find_package(rosidl_generator_c REQUIRED)
 
 find_package(rcljava_common REQUIRED)
 
+include(CrossCompilingExtra)
+
 ament_export_dependencies(rosidl_cmake)
 
 ament_python_install_package(${PROJECT_NAME})
