@@ -270,53 +270,58 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
 @[for field in spec.fields]@
 @[    if field.type.is_array]@
 @[        if field.type.is_primitive_type()]@
-@[            if field.type.array_size is None or field.type.is_upper_bound]@
   auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Ljava/util/List;");
   jclass _jarray_list_@(field.name)_class = env->FindClass("java/util/ArrayList");
   jmethodID _jarray_list_@(field.name)_init_mid = env->GetMethodID(_jarray_list_@(field.name)_class, "<init>", "()V");
   jobject _jarray_list_@(field.name)_obj = env->NewObject(_jarray_list_@(field.name)_class, _jarray_list_@(field.name)_init_mid);
+@[            if field.type.array_size and not field.type.is_upper_bound]@
+  for(size_t i = 0; i < @(field.type.array_size); ++i) {
+    auto _ros_@(field.name)_element = _ros_message->@(field.name)[i];
+@[            else]@
   for(size_t i = 0; i < _ros_message->@(field.name).size; ++i) {
-
+    auto _ros_@(field.name)_element = _ros_message->@(field.name).data[i];
+@[            end if]@
 @[                if field.type.type == 'string']@
     jobject _jlist_@(field.name)_element = nullptr;
-    if (_ros_message->@(field.name).data[i].data != nullptr) {
-      _jlist_@(field.name)_element = env->NewStringUTF(_ros_message->@(field.name).data[i].data);
+    if (_ros_@(field.name)_element.data != nullptr) {
+      _jlist_@(field.name)_element = env->NewStringUTF(_ros_@(field.name)_element.data);
     }
 @[                else]@
 @[                    if field.type.type == 'bool']@
     jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Boolean");
     jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(Z)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_message->@(field.name).data[i]);
+    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
 @[                    elif field.type.type in ['byte', 'int8', 'uint8']]@
     jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Byte");
     jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(B)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, static_cast<jbyte>(_ros_message->@(field.name).data[i]));
+    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, static_cast<jbyte>(_ros_@(field.name)_element));
 @[                    elif field.type.type == 'char']@
     jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Character");
     jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(C)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_message->@(field.name).data[i]);
+    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
 @[                    elif field.type.type in ['int16', 'uint16']]@
     jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Short");
     jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(S)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_message->@(field.name).data[i]);
+    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
 @[                    elif field.type.type in ['int32', 'uint32']]@
     jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Integer");
     jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(I)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_message->@(field.name).data[i]);
+    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
 @[                    elif field.type.type in ['int64', 'uint64']]@
     jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Long");
     jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(J)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_message->@(field.name).data[i]);
+    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
 @[                    elif field.type.type == 'float32']@
     jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Float");
     jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(F)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_message->@(field.name).data[i]);
+    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
 @[                    elif field.type.type == 'float64']@
     jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Double");
     jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(D)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_message->@(field.name).data[i]);
+    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
 @[                    end if]@
 @[                end if]@
+    // TODO(esteve): replace ArrayList with a jobjectArray to initialize the array beforehand
     jmethodID _jlist_@(field.name)_add_mid = env->GetMethodID(_jarray_list_@(field.name)_class, "add", "(Ljava/lang/Object;)Z");
     if (_jlist_@(field.name)_element != nullptr) {
       jboolean _jlist_@(field.name)_add_result = env->CallBooleanMethod(_jarray_list_@(field.name)_obj, _jlist_@(field.name)_add_mid, _jlist_@(field.name)_element);
@@ -325,7 +330,6 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
   }
 
   env->SetObjectField(_jmessage_obj, _jfield_@(field.name)_fid, _jarray_list_@(field.name)_obj);
-@[            end if]@
 @[        else]@
 
   auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Ljava/util/List;");
@@ -348,15 +352,12 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
 
 @[          if field.type.array_size and not field.type.is_upper_bound]@
   for(size_t i = 0; i < @(field.type.array_size); ++i) {
-@[          else]@
-  for(size_t i = 0; i < _ros_message->@(field.name).size; ++i) {
-@[          end if]@
-@[          if field.type.array_size and not field.type.is_upper_bound]@
   jobject _jlist_@(field.name)_element = convert_to_java_@(field.name)(&(_ros_message->@(field.name)[i]), nullptr);
 @[          else]@
+  for(size_t i = 0; i < _ros_message->@(field.name).size; ++i) {
   jobject _jlist_@(field.name)_element = convert_to_java_@(field.name)(&(_ros_message->@(field.name).data[i]), nullptr);
 @[          end if]@
-
+    // TODO(esteve): replace ArrayList with a jobjectArray to initialize the array beforehand
     jmethodID _jlist_@(field.name)_add_mid = env->GetMethodID(_jarray_list_@(field.name)_class, "add", "(Ljava/lang/Object;)Z");
     if (_jlist_@(field.name)_element != nullptr) {
       jboolean _jlist_@(field.name)_add_result = env->CallBooleanMethod(_jarray_list_@(field.name)_obj, _jlist_@(field.name)_add_mid, _jlist_@(field.name)_element);
