@@ -28,6 +28,9 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 
+import org.ros2.rcljava.Node;
+import org.ros2.rcljava.RCLJava;
+
 
 public class NodeTest {
 
