@@ -39,7 +39,7 @@ public final class RCLJavaProxy {
       Object obj = meth.invoke(null, (Class<?>[]) null);
       return (String) obj;
     } catch (Exception exc) {
-      // TODO(esteve): handle exception
+      // Just return null if we can't find the typesupport identifier
       return null;
     }
   }
@@ -55,7 +55,7 @@ public final class RCLJavaProxy {
       Object obj = meth.invoke(null, (Class<?>[]) null);
       return (String) obj;
     } catch (Exception exc) {
-      // TODO(esteve): handle exception
+      // Just return null if we can't find the RMW identifier
       return null;
     }
   }

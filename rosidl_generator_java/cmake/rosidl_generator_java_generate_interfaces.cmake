@@ -281,18 +281,16 @@ foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
   endforeach()
 endforeach()
 
-add_jar("${PROJECT_NAME}_jar"
+add_jar("${PROJECT_NAME}_messages_jar"
   "${_generated_msg_java_files}"
   "${_generated_srv_java_files}"
   OUTPUT_NAME
-  "${PROJECT_NAME}"
+  "${PROJECT_NAME}_messages"
   INCLUDE_JARS
   "${_jar_deps}"
 )
 
-add_dependencies("${PROJECT_NAME}_jar" "${rosidl_generate_interfaces_TARGET}${_target_suffix}")
-
-get_property(_jar_file TARGET "${PROJECT_NAME}_jar" PROPERTY "JAR_FILE")
+add_dependencies("${PROJECT_NAME}_messages_jar" "${rosidl_generate_interfaces_TARGET}${_target_suffix}")
 
 if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
   set(_install_jar_dir "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}")
@@ -301,7 +299,7 @@ if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
     get_filename_component(_msg_package_dir "${_msg_file}" DIRECTORY)
     get_filename_component(_msg_package_dir "${_msg_package_dir}" DIRECTORY)
 
-    install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
-    ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
+    install_jar("${PROJECT_NAME}_messages_jar" "share/${PROJECT_NAME}/java")
+    ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}_messages.jar")
   endif()
 endif()
