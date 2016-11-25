@@ -141,15 +141,17 @@ git submodule update
 cd ~/ros2_android_ws
 . ~/ament_ws/install_isolated/local_setup.sh
 ament build --isolated --cmake-args \
-  -DPYTHON_EXECUTABLE=/usr/bin/python3 -DCMAKE_TOOLCHAIN_FILE=$HOME/ros2_android_ws/src/android-cmake/android-cmake/android.toolchain.cmake \
+  -DPYTHON_EXECUTABLE=/usr/bin/python3 -DCMAKE_TOOLCHAIN_FILE=$HOME/android_ndk/android-ndk-r13b/build/cmake/android.toolchain.cmake \
   -DANDROID_FUNCTION_LEVEL_LINKING=OFF -DANDROID_NATIVE_API_LEVEL=android-21 \ -DANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang -DANDROID_STL=gnustl_shared \
-  -DANDROID_ABI=armeabi-v7a -DANDROID_NDK=$HOME/android_ndk/android-ndk-r12b -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF -- \
+  -DANDROID_ABI=armeabi-v7a -DANDROID_NDK=$HOME/android_ndk/android-ndk-r13b -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="$HOME/ament_ws/install_isolated;$HOME/ros2_android_ws/install_isolated" \
+  -DANDROID_CPP_FEATURES="exceptions rtti" -- \
   --ament-cmake-args \
-  -DPYTHON_EXECUTABLE=/usr/bin/python3 -DCMAKE_TOOLCHAIN_FILE=$HOME/ros2_android_ws/src/android-cmake/android-cmake/android.toolchain.cmake \
+  -DPYTHON_EXECUTABLE=/usr/bin/python3 -DCMAKE_TOOLCHAIN_FILE=$HOME/android_ndk/android-ndk-r13b/build/cmake/android.toolchain.cmake \
   -DANDROID_FUNCTION_LEVEL_LINKING=OFF -DANDROID_NATIVE_API_LEVEL=android-21 \ -DANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang -DANDROID_STL=gnustl_shared \
-  -DANDROID_ABI=armeabi-v7a -DANDROID_NDK=$HOME/android_ndk/android-ndk-r12b -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF -- \
+  -DANDROID_ABI=armeabi-v7a -DANDROID_NDK=$HOME/android_ndk/android-ndk-r13b -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="$HOME/ament_ws/install_isolated;$HOME/ros2_android_ws/install_isolated" \
+  -DANDROID_CPP_FEATURES="exceptions rtti" -- \
   --ament-gradle-args \
-  -Pament.android_stl=gnustl_shared -Pament.android_abi=armeabi-v7a -Pament.android_ndk=$HOME/android_ndk/android-ndk-r12b --
+  -Pament.android_stl=gnustl_shared -Pament.android_abi=armeabi-v7a -Pament.android_ndk=$HOME/android_ndk/android-ndk-r13b --
 ```
 
 The talker and listener example Android apps can be installed via adb, plug your Android device to your computer with a USB cable and type the following:
