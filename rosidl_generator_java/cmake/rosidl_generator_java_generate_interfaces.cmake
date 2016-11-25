@@ -292,8 +292,6 @@ add_jar("${PROJECT_NAME}_messages_jar"
 
 add_dependencies("${PROJECT_NAME}_messages_jar" "${rosidl_generate_interfaces_TARGET}${_target_suffix}")
 
-get_property(_jar_file TARGET "${PROJECT_NAME}_messages_jar" PROPERTY "JAR_FILE")
-
 if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
   set(_install_jar_dir "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}")
   if(NOT "${_generated_msg_java_files} " STREQUAL " ")

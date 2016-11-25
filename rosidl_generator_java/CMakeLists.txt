@@ -76,6 +76,10 @@ if(BUILD_TESTING)
     "org.ros2.generator.InterfacesTest"
   )
 
+  get_property(_${PROJECT_NAME}_messages_jar_file
+    TARGET "${PROJECT_NAME}_messages_jar"
+    PROPERTY "JAR_FILE")
+
   foreach(testsuite ${${PROJECT_NAME}_testsuites})
     add_junit_tests("${PROJECT_NAME}_tests_${testsuite}"
       "${${PROJECT_NAME}_test_sources}"
@@ -84,7 +88,7 @@ if(BUILD_TESTING)
       INCLUDE_JARS
       "${rcljava_common_JARS}"
       "${rosidl_generator_java_JARS}"
-      "${_jar_file}"
+      "${_${PROJECT_NAME}_messages_jar_file}"
     )
   endforeach()
 

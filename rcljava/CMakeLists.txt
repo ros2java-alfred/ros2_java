@@ -111,9 +111,6 @@ add_jar("${PROJECT_NAME}_jar"
 
 call_for_each_rmw_implementation(target)
 
-set(_install_jar_dir "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}")
-get_property(_jar_file TARGET "${PROJECT_NAME}_jar" PROPERTY "JAR_FILE")
-
 install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
 ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
 
@@ -142,7 +139,13 @@ if(BUILD_TESTING)
     SKIP_INSTALL
   )
 
-  get_property(_messages_jar_file TARGET "${PROJECT_NAME}_messages_jar" PROPERTY "JAR_FILE")
+  get_property(_${PROJECT_NAME}_jar_file
+    TARGET "${PROJECT_NAME}_jar"
+    PROPERTY "JAR_FILE")
+
+  get_property(_${PROJECT_NAME}_messages_jar_file
+    TARGET "${PROJECT_NAME}_messages_jar"
+    PROPERTY "JAR_FILE")
 
   set(${PROJECT_NAME}_test_sources
     "src/test/java/org/ros2/rcljava/NodeTest.java"
@@ -184,8 +187,8 @@ if(BUILD_TESTING)
       "${rcljava_test_msgs_JARS}"
       "${std_msgs_JARS}"
       "${builtin_interfaces_JARS}"
-      "${_jar_file}"
-      "${_messages_jar_file}"
+      "${_${PROJECT_NAME}_jar_file}"
+      "${_${PROJECT_NAME}_messages_jar_file}"
       LIBRARY_PATHS
       "${_deps_library_paths}"
     )
