@@ -10,6 +10,8 @@ find_package(rosidl_generator_c REQUIRED)
 
 find_package(rcljava_common REQUIRED)
 
+include(CrossCompilingExtra)
+
 ament_export_dependencies(rosidl_cmake)
 
 ament_python_install_package(${PROJECT_NAME})
@@ -21,6 +23,7 @@ else()
   find_package(JNI REQUIRED)
 endif()
 include(UseJava)
+include(JavaExtra)
 
 set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
@@ -65,7 +68,30 @@ if(BUILD_TESTING)
     SKIP_INSTALL
   )
 
-# TODO(esteve): add support for JUnit tests
+  set(${PROJECT_NAME}_test_sources
+    "src/test/java/org/ros2/generator/InterfacesTest.java"
+  )
+
+  set(${PROJECT_NAME}_testsuites
+    "org.ros2.generator.InterfacesTest"
+  )
+
+  get_property(_${PROJECT_NAME}_messages_jar_file
+    TARGET "${PROJECT_NAME}_messages_jar"
+    PROPERTY "JAR_FILE")
+
+  foreach(testsuite ${${PROJECT_NAME}_testsuites})
+    add_junit_tests("${PROJECT_NAME}_tests_${testsuite}"
+      "${${PROJECT_NAME}_test_sources}"
+      TESTS
+      "${testsuite}"
+      INCLUDE_JARS
+      "${rcljava_common_JARS}"
+      "${rosidl_generator_java_JARS}"
+      "${_${PROJECT_NAME}_messages_jar_file}"
+    )
+  endforeach()
+
 endif()
 
 install(

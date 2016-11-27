@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import org.apache.log4j.BasicConfigurator;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,6 +38,9 @@ import org.ros2.rcljava.qos.QoSProfile;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import org.ros2.rcljava.RCLJava;
+
 
 public class NodeTest {
 

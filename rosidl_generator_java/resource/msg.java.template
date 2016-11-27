@@ -61,12 +61,29 @@ public final class @(type_name) implements Message {
 @
     /** List of @(field.name). */
     private java.util.List<@(get_java_type(field.type, use_primitives=False))> @(field.name) = new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>();
+@[        if field.default_value is not None]@
+  //private java.util.List<@(get_java_type(field.type, use_primitives=False))> @(field.name) = java.util.Arrays.asList(new @(get_java_type(field.type, use_primitives=False))[] @(value_to_java(field.type, field.default_value)));
+@[        else]@
+  //private java.util.List<@(get_java_type(field.type, use_primitives=False))> @(field.name);
+@[        end if]@
 
     /**
      * @(upperfirst(field.name)) setter.
      * @@param @(field.name)
      */
     public final void set@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))(final java.util.Collection<@(get_java_type(field.type, use_primitives=False))> @(field.name)) {
+@[        if field.type.array_size]@
+@[            if field.type.is_upper_bound]@
+        if(@(field.name).size() > @(field.type.array_size)) {
+            throw new IllegalArgumentException("List too big, maximum size allowed: @(field.type.array_size)");
+        }
+@[            else]@
+        if(@(field.name).size() != @(field.type.array_size)) {
+            throw new IllegalArgumentException("Invalid size for fixed array, must be exactly: @(field.type.array_size)");
+        }
+@[            end if]@
+@[        end if]@
+
         if (@(field.name) != null) {
             this.@(field.name) = new java.util.ArrayList<@(get_java_type(field.type, use_primitives=False))>(@(field.name));
         }
@@ -87,6 +104,9 @@ public final class @(type_name) implements Message {
 @[        if (not field.type.is_primitive_type()) or (field.type.type == "string") ]@
 @
     private @(get_java_type(field.type)) @(field.name) = new @(get_java_type(field.type))();
+@[            if field.default_value is not None]@
+    // private @(get_java_type(field.type)) @(field.name) = @(value_to_java(field.type, field.default_value));
+@[            end if]@
 @
 @[        else]@
 @
@@ -100,6 +120,11 @@ public final class @(type_name) implements Message {
      * @@param @(field.name)
      */
     public final void set@(upperfirst(convert_lower_case_underscore_to_camel_case(field.name)))(final @(get_java_type(field.type)) @(field.name)) {
+@[        if field.type.string_upper_bound]@
+        if(@(field.name).length() > @(field.type.string_upper_bound)) {
+            throw new IllegalArgumentException("String too long, maximum size allowed: @(field.type.string_upper_bound)");
+        }
+@[        end if]@
         this.@(field.name) = @(field.name);
     }
 

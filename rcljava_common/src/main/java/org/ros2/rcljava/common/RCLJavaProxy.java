@@ -32,12 +32,12 @@ public final class RCLJavaProxy {
        */
     public static synchronized String getTypesupportIdentifier() {
         try {
-            Class c = Class.forName("org.ros2.rcljava.RCLJava");
-            Method m = c.getDeclaredMethod("getTypesupportIdentifier", (Class<?> []) null);
-            Object o = m.invoke(null); //, (Class<?> []) null);
-            return (String)o;
+            Class cls = Class.forName("org.ros2.rcljava.RCLJava");
+            Method meth = cls.getDeclaredMethod("getTypesupportIdentifier", (Class<?> []) null);
+            Object obj = meth.invoke(null);
+            return (String) obj;
         } catch(Exception e) {
-            // TODO(esteve): handle exception
+            // Just return null if we can't find the typesupport identifier
             return null;
         }
     }
@@ -47,12 +47,12 @@ public final class RCLJavaProxy {
      */
     public static synchronized String getRMWIdentifier() {
         try {
-            Class c = Class.forName("org.ros2.rcljava.RCLJava");
-            Method m = c.getDeclaredMethod("getRMWIdentifier", (Class<?> []) null);
-            Object o = m.invoke(null); //, (Class<?> []) null);
-            return (String)o;
+            Class cls = Class.forName("org.ros2.rcljava.RCLJava");
+            Method meth = cls.getDeclaredMethod("getRMWIdentifier", (Class<?> []) null);
+            Object obj = meth.invoke(null);
+            return (String) obj;
         } catch(Exception e) {
-            // TODO(esteve): handle exception
+            // Just return null if we can't find the RMW identifier
             return null;
         }
     }
@@ -62,9 +62,9 @@ public final class RCLJavaProxy {
      */
     public static synchronized void loadLibrary(String name) {
         try {
-            Class c = Class.forName("org.ros2.rcljava.RCLJava");
-            Method m = c.getDeclaredMethod("loadLibrary", String.class);
-            Object o = m.invoke(null, name);
+            Class cls = Class.forName("org.ros2.rcljava.RCLJava");
+            Method meth = cls.getDeclaredMethod("loadLibrary", String.class);
+            Object obj = meth.invoke(null, name);
         } catch(Exception e) {
             // TODO(esteve): handle exception
         }

@@ -30,8 +30,11 @@
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+  <test_depend>builtin_interfaces</test_depend>
   <test_depend>rcljava_common</test_depend>
   <test_depend>std_msgs</test_depend>
+  <test_depend>rosidl_default_generators</test_depend>
+  <test_depend>rosidl_default_runtime</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
