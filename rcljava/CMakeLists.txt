@@ -12,7 +12,6 @@ find_package(rcljava_common REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rcl_interfaces REQUIRED)
 find_package(builtin_interfaces REQUIRED)
-find_package(JavaExtra MODULE)
 
 include(CrossCompilingExtra)
 

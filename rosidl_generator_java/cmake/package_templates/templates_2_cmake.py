@@ -29,6 +29,7 @@ import pkg_resources
 
 IS_WINDOWS = os.name == 'nt'
 
+
 def main(argv=sys.argv[1:]):
     """
     Extract the information about templates provided by ament_package.
@@ -61,13 +62,14 @@ def main(argv=sys.argv[1:]):
         for line in lines:
             print(line)
 
+
 def get_environment_hook_template_path(name):
     return pkg_resources.resource_filename('ament_build_type_gradle', 'template/environment_hook/' + name)
+
 
 def generate_cmake_code():
     """
     Return a list of CMake set() commands containing the template information.
-
     :returns: list of str
     """
     variables = []

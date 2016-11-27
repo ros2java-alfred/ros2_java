@@ -34,7 +34,7 @@ macro(_ament_cmake_java_register_environment_hook)
     set(JAVAPATH "$AMENT_CURRENT_PREFIX/share/${PROJECT_NAME}/java/*")
 
     find_package(ament_cmake_core QUIET REQUIRED)
-    
+
     message("INFO _ament_cmake_java_register_environment_hook")
 
     # backup variable
@@ -50,9 +50,10 @@ endmacro()
 
 macro(_ament_cmake_java_get_java_install_dir)
   if(NOT DEFINED JAVA_INSTALL_DIR)
-  
+
     message("INFO _ament_cmake_java_get_java_install_dir")
-    # avoid storing backslash in cached variable since CMake will interpret it as escape character
+    # avoid storing backslash in cached variable since CMake will interpret it
+    # as escape character
     set(_java_code
       "from distutils.sysconfig import get_python_lib"
       "import os"

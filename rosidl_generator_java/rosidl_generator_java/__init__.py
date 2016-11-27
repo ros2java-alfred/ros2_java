@@ -22,9 +22,11 @@ from rosidl_cmake import read_generator_arguments
 from rosidl_parser import parse_message_file
 from rosidl_parser import parse_service_file
 
+
 # Taken from http://stackoverflow.com/a/6425628
 def convert_lower_case_underscore_to_camel_case(word):
     return ''.join(x.capitalize() or '_' for x in word.split('_'))
+
 
 def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls):
     args = read_generator_arguments(generator_arguments_file)
@@ -106,6 +108,7 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
                     minimum_timestamp=latest_target_timestamp)
 
     return 0
+
 
 def escape_string(s):
     s = s.replace('\\', '\\\\')
@@ -213,11 +216,13 @@ def get_builtin_java_type(type_, use_primitives=True):
 
     assert False, "unknown type '%s'" % type_
 
+
 def get_java_type(type_, use_primitives=True):
     if not type_.is_primitive_type():
         return type_.type
 
     return get_builtin_java_type(type_.type, use_primitives=use_primitives)
+
 
 def convert_lower_case_underscore_to_camel_case(value):
     components = value.split('_')
