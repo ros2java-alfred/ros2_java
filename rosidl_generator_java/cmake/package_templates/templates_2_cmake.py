@@ -29,7 +29,6 @@ import pkg_resources
 
 IS_WINDOWS = os.name == 'nt'
 
-
 def main(argv=sys.argv[1:]):
     """
     Extract the information about templates provided by ament_package.
@@ -63,7 +62,7 @@ def main(argv=sys.argv[1:]):
             print(line)
 
 def get_environment_hook_template_path(name):
-	    return pkg_resources.resource_filename('ament_build_type_gradle', 'template/environment_hook/' + name)
+    return pkg_resources.resource_filename('ament_build_type_gradle', 'template/environment_hook/' + name)
 
 def generate_cmake_code():
     """
@@ -73,7 +72,7 @@ def generate_cmake_code():
     """
     variables = []
 
-    ext = '.bat.in' if IS_WINDOWS else '.sh.in'        
+    ext = '.bat.in' if IS_WINDOWS else '.sh.in'
     variables.append((
         'ENVIRONMENT_HOOK_JAVAPATH',
         '"%s"' % get_environment_hook_template_path('javapath' + ext)))

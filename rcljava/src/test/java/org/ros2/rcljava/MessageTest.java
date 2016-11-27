@@ -34,6 +34,7 @@ import org.ros2.rcljava.node.topic.Consumer;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.internal.message.Message;
 
 
 public class MessageTest {
@@ -88,7 +89,7 @@ public class MessageTest {
     org.apache.log4j.BasicConfigurator.configure();
   }
 
-  public class TestConsumer<T> implements Consumer<T> {
+  public class TestConsumer<T extends Message> implements Consumer<T> {
     private final RCLFuture<T> future;
 
     TestConsumer(final RCLFuture<T> future) {
