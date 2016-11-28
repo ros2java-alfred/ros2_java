@@ -1,17 +1,14 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 
 project(rosidl_generator_java)
 
 find_package(ament_cmake REQUIRED)
-find_package(ament_cmake_export_jars REQUIRED)
-find_package(ament_cmake_python REQUIRED)
-find_package(rosidl_cmake REQUIRED)
-find_package(rosidl_generator_c REQUIRED)
 
 find_package(rcljava_common REQUIRED)
 
 include(CrossCompilingExtra)
 
+ament_export_dependencies(ament_cmake)
 ament_export_dependencies(rosidl_cmake)
 
 ament_python_install_package(${PROJECT_NAME})
@@ -30,6 +27,9 @@ set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 set(rosidl_generator_java_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 if(BUILD_TESTING)
+  find_package(rosidl_cmake REQUIRED)
+  find_package(rosidl_generator_c REQUIRED)
+  find_package(ament_lint_auto REQUIRED)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
@@ -90,6 +90,8 @@ if(BUILD_TESTING)
       "${rosidl_generator_java_JARS}"
       "${_${PROJECT_NAME}_messages_jar_file}"
     )
+
+    add_dependencies("${PROJECT_NAME}_tests_${testsuite}" "${PROJECT_NAME}_messages_jar")
   endforeach()
 
 endif()
