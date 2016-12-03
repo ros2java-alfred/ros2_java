@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 
 project(rcljava)
 
@@ -283,6 +283,8 @@ if(BUILD_TESTING)
       LIBRARY_PATHS
       "${_deps_library_paths}"
     )
+
+    add_dependencies("${PROJECT_NAME}_tests_${testsuite}" "${PROJECT_NAME}_messages_jar")
   endforeach()
 
 endif()

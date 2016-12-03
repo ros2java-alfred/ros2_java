@@ -249,6 +249,7 @@ static jmethodID global_@(internalMsg(type))_from_java_converter_mid;
   // TODO(esteve): check return status
   assert(g_vm != nullptr);
   g_vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+
   assert(env != nullptr);
 
   // Initialize ROS Native message.
@@ -609,7 +610,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       // @(field.name) field. (@(field.type))
 @[  if field.type.is_array]@
       jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "Ljava/util/List;");
-      assert(jmessage_field_@(field.name)_fid != nullptr);
 @[  elif field.type.type == 'bool']@
       jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "Z");
 @[  elif field.type.type in ['byte', 'int8', 'uint8']]@
@@ -628,11 +628,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
       jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "D");
 @[  elif field.type.type == 'string']@
       jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "Ljava/lang/String;");
-      assert(jmessage_field_@(field.name)_fid != nullptr);
 @[  else]@
       jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "L@(field.type.pkg_name)/msg/@(get_java_type(field.type));");
-      assert(jmessage_field_@(field.name)_fid != nullptr);
 @[  end if]@
+      assert(jmessage_field_@(field.name)_fid != nullptr);
 
 @[end for]@
 @
@@ -674,7 +673,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
 @
 @[if has_char]@
       // Char Type
-      jclass _jchar_class = env->FindClass("java/lang/Char");
+      jclass _jchar_class = env->FindClass("java/lang/Character");
       global_jchar_class = (jclass) env->NewGlobalRef(_jchar_class);
       env->DeleteLocalRef(_jchar_class);
       assert(global_jchar_class != nullptr);
@@ -744,7 +743,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
 //      global_jstring_class = (jclass) env->NewGlobalRef(_jstring_class);
 //      env->DeleteLocalRef(_jstring_class);
 //      assert(global_jstring_class != nullptr);
-//      global_jstring_init_mid  = env->GetMethodID(global_jstring_class, "<init>", "(L)V");
+//      global_jstring_init_mid  = env->GetMethodID(global_jstring_class, "<init>", "(Ljava/lang/String)V");
 //      global_jstring_value_mid = env->GetMethodID(global_jstring_class, "stringValue", "()Ljava/lang/String;");
 
 @[end if]@
