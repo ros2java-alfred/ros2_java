@@ -64,7 +64,7 @@ def main(argv=sys.argv[1:]):
 
 
 def get_environment_hook_template_path(name):
-    return pkg_resources.resource_filename('ament_build_type_gradle', 'template/environment_hook/' + name)
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'template/environment_hook/' + name)
 
 
 def generate_cmake_code():

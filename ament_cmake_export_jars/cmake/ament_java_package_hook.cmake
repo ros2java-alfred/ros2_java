@@ -21,7 +21,7 @@
 #   <package_name> folder relative to the CMAKE_CURRENT_LIST_DIR)
 # :type PACKAGE_DIR: string
 #
-macro(ament_java_install_package)
+macro(ament_java_package_hook)
   _ament_cmake_java_register_environment_hook()
 endmacro()
 

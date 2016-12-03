@@ -107,7 +107,5 @@ install(
 ament_package(
   CONFIG_EXTRAS "cmake/rosidl_generator_java_get_typesupports.cmake"
     "cmake/register_java.cmake"
-    "cmake/ament_java_install_package.cmake"
     "rosidl_generator_java-extras.cmake.in"
-    "ament_cmake_package_templates-extras.cmake"
 )

@@ -43,6 +43,7 @@ add_jar("${PROJECT_NAME}_jar"
 
 install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
 ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
+ament_java_package_hook(${PROJECT_NAME})
 
 find_jar(SFL4J_JAR NAMES slf4j-api)
 if(${SFL4J_JAR})

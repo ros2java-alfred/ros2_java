@@ -22,7 +22,7 @@ endif()
 message("INFO ament_cmake_package_templates JAVA")
 # stamp script to generate CMake code
 set(_generator
-  "${rosidl_generator_java_DIR}/package_templates/templates_2_cmake.py")
+  "${ament_cmake_export_jars_DIR}/package_templates/templates_2_cmake.py")
 stamp("${_generator}")
 
 # invoke generator script
