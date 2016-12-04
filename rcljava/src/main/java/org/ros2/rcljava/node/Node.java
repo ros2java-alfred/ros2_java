@@ -65,6 +65,9 @@ public class Node implements INode {
         RCLJava.loadLibrary("rcljavanode_Node__" + RCLJava.getRMWIdentifier());
     }
 
+    /** Domain ID */
+    private int domainId;
+
     /** Name of the node */
     private String name;
 
