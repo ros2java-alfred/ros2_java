@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
 import org.ros2.rcljava.exception.NotInitializedException;
+import org.ros2.rcljava.internal.NativeUtils;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.Node;
