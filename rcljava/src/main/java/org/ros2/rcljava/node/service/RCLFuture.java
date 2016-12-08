@@ -24,7 +24,6 @@ import java.util.concurrent.TimeoutException;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
 
-
 public class RCLFuture<V> implements Future<V> {
   private WeakReference<Node> nodeReference;
   private boolean done = false;

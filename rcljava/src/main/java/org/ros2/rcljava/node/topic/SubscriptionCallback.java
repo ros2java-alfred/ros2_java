@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava.node.service;
+package org.ros2.rcljava.node.topic;
+
+import org.ros2.rcljava.internal.message.Message;
 
 /**
- * Based on {@link java.util.funcion.BiConsumer}.
+ * This is a copy of {@link java.util.funcion.SubscriptionCallback} for platforms that don't
+ * support Java 8's API (e.g. Android &lt; 7.0)
  *
- * @param <T> - the type of the first input to the operation
- * @param <U> - the type of the second input to the operation
- * @param <V> - the type of the third input to the operation
+ * @param <T> - the type of the input to the operation
  */
-public interface TriConsumer<T, U, V> {
+public interface SubscriptionCallback<T extends Message> {
 
-  /**
-   * Performs this operation on the given argument.
-   *
-   * @param input1 - the first input argument
-   * @param input2 - the second input argument
-   * @param input3 - the third input argument
-   */
-  void accept(T input1, U input2, V input3);
-
+    /**
+       * Performs this operation on the given argument.
+       *
+       * @param message - the input argument
+       */
+    void dispatch(T message);
 }

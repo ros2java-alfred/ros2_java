@@ -15,7 +15,6 @@
  */
 package org.ros2.rcljava.node.service;
 
-import org.ros2.rcljava.internal.IService;
 import org.ros2.rcljava.node.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> Service Type.
  */
-public class Service<T> implements IService {
+public class Service<T extends org.ros2.rcljava.internal.service.Service> {
 
     private static final Logger logger = LoggerFactory.getLogger(Service.class);
 
@@ -42,7 +41,7 @@ public class Service<T> implements IService {
 
     private final Class<T> serviceType;
 
-    private final TriConsumer<RMWRequestId, ?, ?> callback;
+    private final ServiceCallback<?, ?> callback;
 
     private final long requestFromJavaConverterHandle;
     private final long requestToJavaConverterHandle;
@@ -64,7 +63,7 @@ public class Service<T> implements IService {
             final long serviceHandle,
             final Class<T> serviceType,
             final String serviceName,
-            final TriConsumer<RMWRequestId, ?, ?> callback,
+            final ServiceCallback<?, ?> callback,
             final Class<?> requestType,
             final Class<?> responseType,
             final long requestFromJavaConverterHandle,
@@ -94,7 +93,6 @@ public class Service<T> implements IService {
         this.ownerNode.getServices().add(this);
     }
 
-    @Override
     public void dispose() {
         Service.logger.debug("Destroy Service stack : " + this.serviceName);
         this.ownerNode.getServices().remove(this);
@@ -108,7 +106,7 @@ public class Service<T> implements IService {
         return this.serviceName;
     }
 
-    public final TriConsumer<RMWRequestId, ?, ?> getCallback() {
+    public final ServiceCallback<?, ?> getCallback() {
         return callback;
     }
 

@@ -65,16 +65,11 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/Log.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
 
-  "src/main/java/org/ros2/rcljava/internal/IClient.java"
-  "src/main/java/org/ros2/rcljava/internal/IGraph.java"
-  "src/main/java/org/ros2/rcljava/internal/INode.java"
-  "src/main/java/org/ros2/rcljava/internal/IPublisher.java"
-  "src/main/java/org/ros2/rcljava/internal/IService.java"
-  "src/main/java/org/ros2/rcljava/internal/ISubscription.java"
   "src/main/java/org/ros2/rcljava/internal/NativeUtils.java"
 
   "src/main/java/org/ros2/rcljava/namespace/GraphName.java"
 
+  "src/main/java/org/ros2/rcljava/node/NativeNode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
 
   "src/main/java/org/ros2/rcljava/qos/policies/Durability.java"
@@ -83,20 +78,22 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/qos/policies/Reliability.java"
   "src/main/java/org/ros2/rcljava/qos/QoSProfile.java"
 
-  "src/main/java/org/ros2/rcljava/node/topic/Consumer.java"
+  "src/main/java/org/ros2/rcljava/node/topic/NativePublisher.java"
+  "src/main/java/org/ros2/rcljava/node/topic/NativeSubscription.java"
   "src/main/java/org/ros2/rcljava/node/topic/Publisher.java"
   "src/main/java/org/ros2/rcljava/node/topic/Subscription.java"
+  "src/main/java/org/ros2/rcljava/node/topic/SubscriptionCallback.java"
   "src/main/java/org/ros2/rcljava/node/topic/Topics.java"
 
-  "src/main/java/org/ros2/rcljava/node/service/BiConsumer.java"
+  "src/main/java/org/ros2/rcljava/node/service/NativeClient.java"
   "src/main/java/org/ros2/rcljava/node/service/Client.java"
   "src/main/java/org/ros2/rcljava/node/service/RCLFuture.java"
   "src/main/java/org/ros2/rcljava/node/service/RMWRequestId.java"
   "src/main/java/org/ros2/rcljava/node/service/Service.java"
-  "src/main/java/org/ros2/rcljava/node/service/TriConsumer.java"
+  "src/main/java/org/ros2/rcljava/node/service/ServiceCallback.java"
 
-  "src/main/java/org/ros2/rcljava/node/parameter/ParameterConsumer.java"
-  "src/main/java/org/ros2/rcljava/node/parameter/ParameterEventConsumer.java"
+  "src/main/java/org/ros2/rcljava/node/parameter/ParameterCallback.java"
+  "src/main/java/org/ros2/rcljava/node/parameter/ParameterEventCallback.java"
   "src/main/java/org/ros2/rcljava/node/parameter/ParameterService.java"
   "src/main/java/org/ros2/rcljava/node/parameter/ParameterVariant.java"
   "src/main/java/org/ros2/rcljava/node/parameter/SyncParametersClient.java"
@@ -114,7 +111,7 @@ macro(target)
     get_rcl_information("${rmw_implementation}" "rcl${target_suffix}")
   endif()
 
-  set(_jni_classes "RCLJava;node_Node;node_topic_Publisher;node_service_Client")
+  set(_jni_classes "RCLJava;node_NativeNode;node_topic_NativePublisher;node_service_NativeClient")
 
   foreach(_jni_class ${_jni_classes})
     set(_target_name "${PROJECT_NAME}${_jni_class}${target_suffix}")

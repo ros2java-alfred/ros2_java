@@ -19,10 +19,10 @@ import java.util.List;
 import rcl_interfaces.msg.SetParametersResult;
 
 /**
- * Parameter Consumer.
+ * Parameter Callback.
  *
  */
-public interface ParameterConsumer {
+public interface ParameterCallback {
     /**
      *
      * @param event

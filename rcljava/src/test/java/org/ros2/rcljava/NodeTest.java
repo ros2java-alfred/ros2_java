@@ -29,8 +29,8 @@ import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
-import org.ros2.rcljava.node.service.TriConsumer;
-import org.ros2.rcljava.node.topic.Consumer;
+import org.ros2.rcljava.node.service.ServiceCallback;
+import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.qos.QoSProfile;
@@ -44,14 +44,14 @@ import org.ros2.rcljava.RCLJava;
 
 public class NodeTest {
 
-    public class TestConsumer implements Consumer<std_msgs.msg.String> {
+    public class TestConsumer implements SubscriptionCallback<std_msgs.msg.String> {
         private final RCLFuture<std_msgs.msg.String> future;
 
         TestConsumer(final RCLFuture<std_msgs.msg.String> future) {
             this.future = future;
         }
 
-        public final void accept(final std_msgs.msg.String msg) {
+        public final void dispatch(final std_msgs.msg.String msg) {
             if (!this.future.isDone()) {
                 this.future.set(msg);
             }
@@ -190,9 +190,9 @@ public class NodeTest {
         Node node = null;
         Subscription<std_msgs.msg.String> sub = null;
 
-        Consumer<std_msgs.msg.String> callback = new Consumer<std_msgs.msg.String>() {
+        SubscriptionCallback<std_msgs.msg.String> callback = new SubscriptionCallback<std_msgs.msg.String>() {
             @Override
-            public void accept(std_msgs.msg.String msg) { }
+            public void dispatch(std_msgs.msg.String msg) { }
         };
 
         RCLJava.rclJavaInit();
@@ -246,10 +246,10 @@ public class NodeTest {
         Node node = null;
         Service<rcl_interfaces.srv.GetParameters> srv = null;
 
-        TriConsumer<RMWRequestId, rcl_interfaces.srv.GetParameters_Request, rcl_interfaces.srv.GetParameters_Response> callback =
-                new TriConsumer<RMWRequestId, rcl_interfaces.srv.GetParameters_Request, rcl_interfaces.srv.GetParameters_Response>() {
+        ServiceCallback<rcl_interfaces.srv.GetParameters_Request, rcl_interfaces.srv.GetParameters_Response> callback =
+                new ServiceCallback<rcl_interfaces.srv.GetParameters_Request, rcl_interfaces.srv.GetParameters_Response>() {
             @Override
-            public void accept(RMWRequestId header, rcl_interfaces.srv.GetParameters_Request request, rcl_interfaces.srv.GetParameters_Response response) { }
+            public void dispatch(RMWRequestId header, rcl_interfaces.srv.GetParameters_Request request, rcl_interfaces.srv.GetParameters_Response response) { }
         };
 
         RCLJava.rclJavaInit();

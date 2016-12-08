@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava.node.topic;
+package org.ros2.rcljava.node.service;
 
 import org.ros2.rcljava.internal.message.Message;
 
 /**
- * This is a copy of {@link java.util.funcion.Consumer} for platforms that don't
- * support Java 8's API (e.g. Android &lt; 7.0)
+ * Callback of Service.
  *
- * @param <T> - the type of the input to the operation
+ * @param <U> - the type of Request Message to the operation
+ * @param <V> - the type of Response Message to the operation
  */
-public interface Consumer<T extends Message> {
+public interface ServiceCallback<U extends Message, V extends Message> {
 
-    /**
-       * Performs this operation on the given argument.
-       *
-       * @param message - the input argument
-       */
-    void accept(T message);
+  /**
+   * Performs this operation on the given argument.
+   *
+   * @param requestId - Request Header.
+   * @param request - Request Message.
+   * @param response - Response Message.
+   */
+  void dispatch(RMWRequestId requestId, U request, V response);
+
 }

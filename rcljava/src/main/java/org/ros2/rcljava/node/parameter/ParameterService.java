@@ -25,7 +25,7 @@ import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
-import org.ros2.rcljava.node.service.TriConsumer;
+import org.ros2.rcljava.node.service.ServiceCallback;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Topics;
 
@@ -95,10 +95,10 @@ public class ParameterService {
                 this.getParametersService = node.<GetParameters>createService(
                         GetParameters.class,
                         fqnGetParameter,
-                        new TriConsumer<RMWRequestId, GetParameters_Request, GetParameters_Response>() {
+                        new ServiceCallback<GetParameters_Request, GetParameters_Response>() {
 
                             @Override
-                            public void accept(
+                            public void dispatch(
                                     final RMWRequestId header,
                                     final GetParameters_Request request,
                                     final GetParameters_Response response) {
@@ -121,10 +121,10 @@ public class ParameterService {
                 this.getParameterTypesService = node.<GetParameterTypes>createService(
                         GetParameterTypes.class,
                         fqnGetParametertypes,
-                        new TriConsumer<RMWRequestId, GetParameterTypes_Request, GetParameterTypes_Response>() {
+                        new ServiceCallback<GetParameterTypes_Request, GetParameterTypes_Response>() {
 
                             @Override
-                            public void accept(
+                            public void dispatch(
                                     final RMWRequestId header,
                                     final GetParameterTypes_Request request,
                                     final GetParameterTypes_Response response) {
@@ -141,10 +141,10 @@ public class ParameterService {
                 this.setParametersService = node.<SetParameters>createService(
                         SetParameters.class,
                         fqnSetParameters,
-                        new TriConsumer<RMWRequestId, SetParameters_Request, SetParameters_Response>() {
+                        new ServiceCallback<SetParameters_Request, SetParameters_Response>() {
 
                             @Override
-                            public void accept(
+                            public void dispatch(
                                     final RMWRequestId header,
                                     final SetParameters_Request request,
                                     final SetParameters_Response response) {
@@ -166,10 +166,10 @@ public class ParameterService {
                 this.setParametersAtomicallyService = node.<SetParametersAtomically>createService(
                         SetParametersAtomically.class,
                         fqnSetParametersAtomically,
-                        new TriConsumer<RMWRequestId, SetParametersAtomically_Request, SetParametersAtomically_Response>() {
+                        new ServiceCallback<SetParametersAtomically_Request, SetParametersAtomically_Response>() {
 
                             @Override
-                            public void accept(
+                            public void dispatch(
                                     final RMWRequestId header,
                                     final SetParametersAtomically_Request request,
                                     final SetParametersAtomically_Response response) {
@@ -190,10 +190,10 @@ public class ParameterService {
                 this.describeParametersService = node.<DescribeParameters>createService(
                         DescribeParameters.class,
                         fqnDescribeParameters,
-                        new TriConsumer<RMWRequestId, DescribeParameters_Request, DescribeParameters_Response>() {
+                        new ServiceCallback<DescribeParameters_Request, DescribeParameters_Response>() {
 
                             @Override
-                            public void accept(
+                            public void dispatch(
                                     final RMWRequestId header,
                                     final DescribeParameters_Request request,
                                     final DescribeParameters_Response response) {
@@ -218,10 +218,10 @@ public class ParameterService {
             this.listParametersService = node.<ListParameters>createService(
                     ListParameters.class,
                     fqnListParameters,
-                    new TriConsumer<RMWRequestId, ListParameters_Request, ListParameters_Response>() {
+                    new ServiceCallback<ListParameters_Request, ListParameters_Response>() {
 
                         @Override
-                        public void accept(
+                        public void dispatch(
                                 final RMWRequestId header,
                                 final ListParameters_Request request,
                                 final ListParameters_Response response) {

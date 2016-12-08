@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
-import org.ros2.rcljava.node.topic.Consumer;
+import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.node.topic.Topics;
 
@@ -294,13 +294,13 @@ public class SyncParametersClient {
         return result;
     }
 
-    public Subscription<ParameterEvent> onParameterEvent(final ParameterEventConsumer parameterConsumer) {
+    public Subscription<ParameterEvent> onParameterEvent(final ParameterEventCallback parameterConsumer) {
         Subscription<ParameterEvent> sub_event = this.ownerNode.<ParameterEvent>createSubscription(
                 ParameterEvent.class,
                 Topics.PARAM_EVENT,
-                new Consumer<ParameterEvent>() {
+                new SubscriptionCallback<ParameterEvent>() {
                     @Override
-                    public void accept(ParameterEvent msg) {
+                    public void dispatch(ParameterEvent msg) {
                         parameterConsumer.onEvent(msg);
                     }
                 },

@@ -18,12 +18,15 @@ package org.ros2.rcljava;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.apache.log4j.BasicConfigurator;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.ros2.rcljava.node.Node;
-import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.NativeNode;
+import org.ros2.rcljava.node.topic.NativePublisher;
+
+import std_msgs.msg.String;
 
 public class PublisherTest {
 
@@ -36,12 +39,12 @@ public class PublisherTest {
     @Test
     public final void testCreate() {
         RCLJava.rclJavaInit();
-        Node node = RCLJava.createNode("test_node");
-        Publisher<std_msgs.msg.String> publisher = node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
+        NativeNode node = (NativeNode) RCLJava.createNode("test_node");
+        NativePublisher<std_msgs.msg.String> publisher = (NativePublisher<String>) node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
                 "test_topic");
 
-        assertEquals(node.getNodeHandle(), publisher.getNode().getNodeHandle());
-        assertNotEquals(0, publisher.getNode().getNodeHandle());
+        assertEquals(node, publisher.getNode());
+        assertNotNull(publisher.getNode());
         assertNotEquals(0, publisher.getPublisherHandle());
 
         publisher.dispose();

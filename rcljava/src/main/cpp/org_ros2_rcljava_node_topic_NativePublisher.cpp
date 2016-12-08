@@ -28,13 +28,13 @@
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
 
-#include "rcljava/org_ros2_rcljava_node_topic_Publisher.h"
+#include "rcljava/org_ros2_rcljava_node_topic_NativePublisher.h"
 #include "rcljava/utils.h"
 
 /*
  * nativePublish
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_topic_Publisher_nativePublish(
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_topic_NativePublisher_nativePublish(
   JNIEnv * env,
   jclass,
   jlong jpublisher_handle,
@@ -55,7 +55,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_topic_Publisher_nativePublish(
 /*
  * nativeDispose
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_topic_Publisher_nativeDispose(
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_topic_NativePublisher_nativeDispose(
   JNIEnv * env,
   jclass,
   jlong jnode_handle,

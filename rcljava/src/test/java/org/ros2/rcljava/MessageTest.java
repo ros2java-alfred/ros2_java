@@ -31,7 +31,7 @@ import java.util.List;
 
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RCLFuture;
-import org.ros2.rcljava.node.topic.Consumer;
+import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.RCLJava;
@@ -90,14 +90,14 @@ public class MessageTest {
     org.apache.log4j.BasicConfigurator.configure();
   }
 
-  public class TestConsumer<T extends Message> implements Consumer<T> {
+  public class TestConsumer<T extends Message> implements SubscriptionCallback<T> {
     private final RCLFuture<T> future;
 
     TestConsumer(final RCLFuture<T> future) {
       this.future = future;
     }
 
-    public final void accept(final T msg) {
+    public final void dispatch(final T msg) {
       if(!this.future.isDone()) {
         this.future.set(msg);
       }

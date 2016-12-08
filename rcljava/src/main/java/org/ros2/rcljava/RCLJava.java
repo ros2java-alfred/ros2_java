@@ -19,21 +19,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
 import org.ros2.rcljava.exception.NotInitializedException;
 import org.ros2.rcljava.internal.NativeUtils;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.namespace.GraphName;
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
+import org.ros2.rcljava.node.service.NativeClient;
 import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
+import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.qos.QoSProfile;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ROS2 java client wrapper.
@@ -243,7 +246,7 @@ public class RCLJava {
         }
 
         long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName);
-        Node node = new Node(nodeHandle, ns, nodeName);
+        Node node = new NativeNode(nodeHandle, ns, nodeName);
 
         return node;
     }
@@ -281,7 +284,8 @@ public class RCLJava {
 
             // Subscribe waiset components.
             for (Subscription<?> subscription : node.getSubscriptions()) {
-                RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
+                NativeSubscription<?> nativeSubscription = (NativeSubscription<?>) subscription;
+                RCLJava.nativeWaitSetAddSubscription(waitSetHandle, nativeSubscription.getSubscriptionHandle());
             }
 
             for (Service<?> service : node.getServices()) {
@@ -289,7 +293,8 @@ public class RCLJava {
             }
 
             for (Client<?> client : node.getClients()) {
-                RCLJava.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
+                NativeClient nativeClient = (NativeClient) client;
+                RCLJava.nativeWaitSetAddClient(waitSetHandle, nativeClient.getClientHandle());
             }
 
             // Wait...
@@ -298,9 +303,12 @@ public class RCLJava {
 
             // Take all components.
             for (Subscription subscription : node.getSubscriptions()) {
-                Message message = RCLJava.nativeTake(subscription.getSubscriptionHandle(), subscription.getMessageType());
+                NativeSubscription<?> nativeSubscription = (NativeSubscription<?>) subscription;
+                Message message = RCLJava.nativeTake(
+                        nativeSubscription.getSubscriptionHandle(),
+                        nativeSubscription.getMessageType());
                 if (message != null) {
-                    subscription.getCallback().accept(message);
+                    subscription.getCallback().dispatch(message);
                 }
             }
 
@@ -313,12 +321,12 @@ public class RCLJava {
                 Class<?> requestType = service.getRequestType();
                 Class<?> responseType = service.getResponseType();
 
-                Object requestMessage = null;
-                Object responseMessage = null;
+                Message requestMessage = null;
+                Message responseMessage = null;
 
                 try {
-                    requestMessage = requestType.newInstance();
-                    responseMessage = responseType.newInstance();
+                    requestMessage = (Message) requestType.newInstance();
+                    responseMessage = (Message) responseType.newInstance();
                 } catch (InstantiationException ie) {
                     ie.printStackTrace();
                     continue;
@@ -334,15 +342,16 @@ public class RCLJava {
                         requestMessage);
 
                 if (rmwRequestId != null) {
-                    service.getCallback().accept(rmwRequestId, requestMessage, responseMessage);
+                    service.getCallback().dispatch(rmwRequestId, requestMessage, responseMessage);
                     RCLJava.nativeSendServiceResponse(service.getServiceHandle(), rmwRequestId, responseFromJavaConverterHandle,
                             responseToJavaConverterHandle, responseMessage);
                 }
             }
 
             for (Client<?> client : node.getClients()) {
-                long responseFromJavaConverterHandle = client.getResponseFromJavaConverterHandle();
-                long responseToJavaConverterHandle = client.getResponseToJavaConverterHandle();
+                NativeClient nativeClient = (NativeClient) client;
+                long responseFromJavaConverterHandle = nativeClient.getResponseFromJavaConverterHandle();
+                long responseToJavaConverterHandle = nativeClient.getResponseToJavaConverterHandle();
 
                 Class<?> responseType = client.getResponseType();
 
@@ -359,7 +368,7 @@ public class RCLJava {
                 }
 
                 RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeResponse(
-                        client.getClientHandle(),
+                        nativeClient.getClientHandle(),
                         responseFromJavaConverterHandle,
                         responseToJavaConverterHandle,
                         responseMessage);

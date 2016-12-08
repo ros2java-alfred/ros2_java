@@ -18,12 +18,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.ros2.rcljava.internal.IGraph;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.topic.Topics;
 
-public class GraphName implements IGraph {
+public class GraphName {
 
     /**
      * All the @{link Node}s that have been created.
