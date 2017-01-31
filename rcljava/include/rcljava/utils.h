@@ -23,7 +23,7 @@
 #include "rcl/graph.h"
 #include "rmw/rmw.h"
 #include "rmw/types.h"
-#include "rosidl_generator_c/message_type_support.h"
+#include "rosidl_generator_c/message_type_support_struct.h"
 
 #ifndef RCLJAVA__UTILS_H_
 #define RCLJAVA__UTILS_H_

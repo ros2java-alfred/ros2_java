@@ -35,7 +35,7 @@ public class NativePublisher<T extends Message> implements Publisher<T> {
     private static final Logger logger = LoggerFactory.getLogger(NativePublisher.class);
 
     static {
-        RCLJava.loadLibrary("rcljavanode_topic_NativePublisher__" + RCLJava.getRMWIdentifier());
+        RCLJava.loadLibrary("rcljava_node_topic_NativePublisher"); //__" + RCLJava.getRMWIdentifier());
     }
 
     /**

@@ -24,7 +24,7 @@
 #include "rcl/rcl.h"
 #include "rcl/node.h"
 
-#include "rosidl_generator_c/message_type_support.h"
+#include "rosidl_generator_c/message_type_support_struct.h"
 
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"

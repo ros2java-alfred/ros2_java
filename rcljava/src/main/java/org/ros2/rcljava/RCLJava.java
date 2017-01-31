@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import org.apache.log4j.Level;
 import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
 import org.ros2.rcljava.exception.NotInitializedException;
@@ -475,7 +476,8 @@ public class RCLJava {
             if (rmwImplementation != null && !rmwImplementation.isEmpty()) {
                 if (!rmwImplementation.equals(RCLJava.rmwImplementation)) {
 
-                    String file = "rcljavaRCLJava__" + rmwImplementation;
+//                    String file = "rcljavaRCLJava__" + rmwImplementation;
+                    String file = "rcljava_RCLJava";
                     RCLJava.logger.debug("Load native RMW file : lib" + file + ".so");
 
                     try {

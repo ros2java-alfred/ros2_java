@@ -105,68 +105,70 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/exception/NotInitializedException.java"
 )
 
-### Macro ###
-macro(target)
-  if(NOT "${target_suffix} " STREQUAL " ")
-    get_rcl_information("${rmw_implementation}" "rcl${target_suffix}")
+get_rmw_typesupport(typesupport_impls "rmw_implementation" LANGUAGE "c")
+if(typesupport_impls STREQUAL "")
+  message(STATUS "Skipping rcljava because no C typesupport library was found.")
+  return()
+endif()
+
+set(_jni_classes "RCLJava;node_NativeNode;node_topic_NativePublisher;node_service_NativeClient")
+#set(target_suffix "__rmw_fastrtps_cpp")
+message(WARNING "===>${target_suffix}")
+
+foreach(_jni_class ${_jni_classes})
+  set(_target_name "${PROJECT_NAME}_${_jni_class}${target_suffix}")
+
+  add_library(
+    ${_target_name}
+    SHARED
+      src/main/cpp/org_ros2_rcljava_${_jni_class}.cpp
+  )
+
+  target_compile_definitions(
+    ${_target_name}
+    PRIVATE
+      "RMW_IMPLEMENTATION_SUFFIX=${target_suffix}"
+  )
+
+  if(WIN32)
+    set(_build_types ";_DEBUG;_MINSIZEREL;_RELEASE;_RELWITHDEBINFO")
+  else()
+    set(_build_types "")
   endif()
 
-  set(_jni_classes "RCLJava;node_NativeNode;node_topic_NativePublisher;node_service_NativeClient")
-
-  foreach(_jni_class ${_jni_classes})
-    set(_target_name "${PROJECT_NAME}${_jni_class}${target_suffix}")
-
-    add_library(
+  foreach(_build_type ${_build_types})
+    set_target_properties(
       ${_target_name}
-      SHARED
-        src/main/cpp/org_ros2_rcljava_${_jni_class}.cpp
+      PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY${_build_type} "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}"
+        RUNTIME_OUTPUT_DIRECTORY${_build_type} "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}"
     )
-
-    target_compile_definitions(
-      ${_target_name}
-      PRIVATE
-        "RMW_IMPLEMENTATION_SUFFIX=${target_suffix}"
-    )
-
-    if(WIN32)
-      set(_build_types ";_DEBUG;_MINSIZEREL;_RELEASE;_RELWITHDEBINFO")
-    else()
-      set(_build_types "")
-    endif()
-
-    foreach(_build_type ${_build_types})
-      set_target_properties(
-        ${_target_name}
-        PROPERTIES
-          LIBRARY_OUTPUT_DIRECTORY${_build_type} "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}"
-          RUNTIME_OUTPUT_DIRECTORY${_build_type} "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}"
-      )
-    endforeach()
-
-    ament_target_dependencies(${_target_name}
-      "rcl${target_suffix}"
-      "rcljava_common"
-      "rcl_interfaces"
-    )
-
-    target_include_directories(
-      ${_target_name}
-      PUBLIC
-        ${JNI_INCLUDE_DIRS}
-    )
-
-    if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
-      ament_export_libraries(${_target_name})
-    endif()
-
-    install(TARGETS ${_target_name}
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-    )
-
   endforeach()
 
-endmacro()
+  ament_target_dependencies(${_target_name}
+    "rcl${target_suffix}"
+    "rcljava_common"
+    "rcl_interfaces"
+  )
+
+  target_include_directories(
+    ${_target_name}
+    PUBLIC
+      ${JNI_INCLUDE_DIRS}
+  )
+
+#  if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
+    ament_export_libraries(${_target_name})
+#  endif()
+
+  install(TARGETS ${_target_name}
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+  )
+
+endforeach()
+
+#endmacro()
 
 set(CMAKE_JAVA_INCLUDE_PATH "${BUILTIN_COMMON_JARS}:${BUILTIN_MSGS_JARS}:${LOG_JAR}")
 add_jar("${PROJECT_NAME}_jar"
@@ -181,7 +183,7 @@ add_jar("${PROJECT_NAME}_jar"
   "${_jar_file}"
 )
 
-call_for_each_rmw_implementation(target)
+#call_for_each_rmw_implementation(target)
 
 install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
 ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")

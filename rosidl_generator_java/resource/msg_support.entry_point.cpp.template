@@ -76,7 +76,7 @@ msg_typename = '%s__%s__%s' % (spec.base_type.pkg_name, subfolder, spec.base_typ
 #include <rcljava_common/signatures.h>
 
 #include <@(spec.base_type.pkg_name)/@(subfolder)/@(module_name).h>
-#include <rosidl_generator_c/message_type_support.h>
+#include <rosidl_generator_c/message_type_support_struct.h>
 
 @[if has_string]@
 @
@@ -873,6 +873,6 @@ JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_g
 JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_getTypeSupport
   (JNIEnv *, jclass)
 {
-  jlong ptr = reinterpret_cast<jlong>(ROSIDL_GET_TYPE_SUPPORT(@(spec.base_type.pkg_name), @(subfolder), @(spec.msg_name)));
+  jlong ptr = reinterpret_cast<jlong>(ROSIDL_GET_MSG_TYPE_SUPPORT(@(spec.base_type.pkg_name), @(subfolder), @(spec.msg_name)));
   return ptr;
 }

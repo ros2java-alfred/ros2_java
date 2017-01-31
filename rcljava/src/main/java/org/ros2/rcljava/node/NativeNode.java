@@ -64,7 +64,7 @@ public class NativeNode implements Node {
 
     // Loading JNI library.
     static {
-        RCLJava.loadLibrary("rcljavanode_NativeNode__" + RCLJava.getRMWIdentifier());
+        RCLJava.loadLibrary("rcljava_node_NativeNode"); //__" + RCLJava.getRMWIdentifier());
     }
 
     /** Domain ID */

@@ -34,7 +34,7 @@ public class NativeClient<T extends org.ros2.rcljava.internal.service.Service> i
 
     // Loading JNI library.
     static {
-        RCLJava.loadLibrary("rcljavanode_service_NativeClient__" + RCLJava.getRMWIdentifier());
+        RCLJava.loadLibrary("rcljava_node_service_NativeClient"); //__" + RCLJava.getRMWIdentifier());
     }
 
     private static native void nativeSendClientRequest(

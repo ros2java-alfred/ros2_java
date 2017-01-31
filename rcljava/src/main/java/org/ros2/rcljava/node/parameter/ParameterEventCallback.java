@@ -15,7 +15,7 @@
 package org.ros2.rcljava.node.parameter;
 
 /**
- * Parameter Consumer.
+ * Parameter Event Consumer.
  *
  */
 public interface ParameterEventCallback {
