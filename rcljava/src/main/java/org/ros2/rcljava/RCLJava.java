@@ -1,5 +1,5 @@
 /* Copyright 2016 Esteve Fernandez <esteve@apache.org>
- * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
+ * Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import org.apache.log4j.Level;
 import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
 import org.ros2.rcljava.exception.NotInitializedException;
@@ -474,15 +473,19 @@ public class RCLJava {
 
         synchronized(RCLJava.class) {
             if (rmwImplementation != null && !rmwImplementation.isEmpty()) {
-                if (!rmwImplementation.equals(RCLJava.rmwImplementation)) {
+                String rmwImplementationSuffix = "__" + rmwImplementation;
 
-//                    String file = "rcljavaRCLJava__" + rmwImplementation;
-                    String file = "rcljava_RCLJava";
+                if (rmwImplementationSuffix.equals("__rmw_fastrtps_cpp")) {
+                    rmwImplementationSuffix = "";
+                }
+
+                if (!rmwImplementationSuffix.equals(RCLJava.rmwImplementation)) {
+                    String file = "rcljava_RCLJava"+ rmwImplementationSuffix;
                     RCLJava.logger.debug("Load native RMW file : lib" + file + ".so");
 
                     try {
                         System.loadLibrary(file);
-                        RCLJava.rmwImplementation = rmwImplementation;
+                        RCLJava.rmwImplementation = rmwImplementationSuffix;
                     } catch (UnsatisfiedLinkError e) {
                         throw new NoImplementationAvailableException(e);
                     } catch (Exception e) {
