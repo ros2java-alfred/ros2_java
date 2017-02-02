@@ -185,6 +185,28 @@ makeJTopics(JNIEnv * env, rcl_topic_names_and_types_t * topic_names_and_types)
   return hashMap;
 }
 
+jobject
+makeJNodes(JNIEnv * env, rcl_string_array_t * nodes)
+{
+  env->PushLocalFrame(256);  // fix for local references
+
+  jsize list_len = nodes->size;
+  jclass listClass = env->FindClass("java/util/ArrayList");
+  jmethodID init = env->GetMethodID(listClass, "<init>", "(I)V");
+  jobject arrayList = env->NewObject(listClass, init, list_len);
+  jmethodID add = env->GetMethodID(listClass, "add",
+      "(Ljava/lang/Object;)Z");
+
+  for (size_t i = 0; i < nodes->size; ++i) {
+    env->CallObjectMethod(arrayList, add,
+      env->NewStringUTF(nodes->data[i]));
+  }
+
+  env->PopLocalFrame(arrayList);
+
+  return arrayList;
+}
+
 /*
 jobject
 makeJNames(rmw_ros_meta_t * ros_meta)

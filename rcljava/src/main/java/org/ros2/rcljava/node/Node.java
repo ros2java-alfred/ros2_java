@@ -155,6 +155,8 @@ public interface Node {
 
     HashMap<String, String> getTopicNamesAndTypes();
 
+    List<String> getNodeNames();
+
     int countPublishers(final String topic);
 
     int countSubscribers(final String topic);

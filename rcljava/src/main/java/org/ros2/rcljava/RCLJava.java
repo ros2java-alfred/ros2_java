@@ -15,7 +15,6 @@
  */
 package org.ros2.rcljava;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -69,10 +68,10 @@ public class RCLJava {
         private static final long serialVersionUID = 1L;
 
         {
-            put("rmw_fastrtps_cpp",         "rosidl_typesupport_introspection_c");
             put("rmw_opensplice_cpp",       "rosidl_typesupport_opensplice_c");
             put("rmw_connext_cpp",          "rosidl_typesupport_connext_c");
             put("rmw_connext_dynamic_cpp",  "rosidl_typesupport_introspection_c");
+            put("rmw_fastrtps_cpp",         "rosidl_typesupport_introspection_c");
         }
     };
 
@@ -128,7 +127,6 @@ public class RCLJava {
     private static native void nativeWait(long waitSetHandle);
     private static native Message nativeTake(long SubscriptionHandle, Class<?> msgType);
     private static native void nativeWaitSetFini(long waitSetHandle);
-    private static native List<String> nativeGetNodeNames();
     private static native Object nativeTakeRequest(
             long serviceHandle,
             long requestFromJavaConverterHandle,
@@ -441,10 +439,6 @@ public class RCLJava {
         }
 
         return RCLJava.nativeGetRMWIdentifier();
-    }
-
-    public static List<String> getNodeNames() {
-        return RCLJava.nativeGetNodeNames();
     }
 
     /**

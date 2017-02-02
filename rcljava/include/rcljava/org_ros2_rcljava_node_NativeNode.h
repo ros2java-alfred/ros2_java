@@ -88,10 +88,18 @@ JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountSubscrib
 
 /*
  * Class:     org_ros2_rcljava_node_NativeNode
- * Method:    getListTopics
+ * Method:    nativeGetListTopics
  * Signature: (J)Ljava/util/HashMap;
  */
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_getListTopics
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTopics
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_node_NativeNode
+ * Method:    nativeGetNodeNames
+ * Signature: (J)Ljava/util/List;
+ */
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNames
   (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus

@@ -285,15 +285,6 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetFini(
   }
 }
 
-
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetNodeNames(
-  JNIEnv *,
-  jclass)
-{
-  return NULL;
-}
-
-
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearServices(
   JNIEnv * env,
   jclass,

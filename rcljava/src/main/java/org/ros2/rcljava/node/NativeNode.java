@@ -173,7 +173,9 @@ public class NativeNode implements Node {
 
     private static native int nativeCountSubscribers(long nodeHandle, String topic);
 
-    private static native HashMap<String, String> getListTopics(long nodeHandle);
+    private static native HashMap<String, String> nativeGetListTopics(long nodeHandle);
+
+    private static native List<String> nativeGetNodeNames(long nodeHandle);
 
 //    private static native  ; //rcl_service_server_is_available
 
@@ -639,13 +641,18 @@ public class NativeNode implements Node {
 
     @Override
     public HashMap<String, String> getTopicNamesAndTypes() {
-        HashMap<String, String> topics =  NativeNode.getListTopics(this.nodeHandle);
+        HashMap<String, String> topics =  NativeNode.nativeGetListTopics(this.nodeHandle);
 
         for (Entry<String, String> entry : topics.entrySet()) {
             NativeNode.logger.debug("\t - Topics: " + entry.getKey() + "\t Value: " + entry.getValue());
         }
 
         return topics;
+    }
+
+    @Override
+    public List<String> getNodeNames() {
+        return NativeNode.nativeGetNodeNames(this.nodeHandle);
     }
 
     @Override
