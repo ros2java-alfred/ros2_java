@@ -225,7 +225,7 @@ if(BUILD_TESTING)
   set(${PROJECT_NAME}_test_sources
     "src/test/java/org/ros2/rcljava/GraphNameTest.java"
     "src/test/java/org/ros2/rcljava/NodeTest.java"
-    "src/test/java/org/ros2/rcljava/MessageTest.java"
+#    "src/test/java/org/ros2/rcljava/MessageTest.java"
     "src/test/java/org/ros2/rcljava/PublisherTest.java"
     "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
     "src/test/java/org/ros2/rcljava/RmwTest.java"
@@ -235,7 +235,7 @@ if(BUILD_TESTING)
   set(${PROJECT_NAME}_testsuites
     "org.ros2.rcljava.GraphNameTest"
     "org.ros2.rcljava.NodeTest"
-    "org.ros2.rcljava.MessageTest"
+#    "org.ros2.rcljava.MessageTest"
     "org.ros2.rcljava.PublisherTest"
     "org.ros2.rcljava.RCLJavaTest"
     "org.ros2.rcljava.RmwTest"
