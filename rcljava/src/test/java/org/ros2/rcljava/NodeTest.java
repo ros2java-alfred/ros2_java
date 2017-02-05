@@ -118,7 +118,7 @@ public class NodeTest {
         RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", "/testNodeName", nodeName);
+        Assert.assertEquals("Bad result", "testNodeName", nodeName);
     }
 
     @Test

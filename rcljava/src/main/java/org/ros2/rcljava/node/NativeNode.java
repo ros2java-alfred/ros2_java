@@ -251,7 +251,7 @@ public class NativeNode implements Node {
             if (this.nameSpace != null) {
                 name = name.replace(this.nameSpace+"/", "");
             } else {
-                name.replace("/", "");
+                name = name.replace("/", "");
             }
         }
 
