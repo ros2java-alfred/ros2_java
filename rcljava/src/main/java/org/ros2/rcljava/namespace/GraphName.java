@@ -59,6 +59,28 @@ public class GraphName {
         return topicName;
     }
 
+    public static String getFullName(final String nameSpace, final String nodeName) {
+        String result = nodeName;
+        String ns = nameSpace;
+
+        // Manage Name Space.
+        if (ns == null || ns.length() == 0) {
+            ns = "";
+        } else if (!ns.startsWith("/")){
+            ns = String.format("/%s", ns);
+        }
+
+        // Absolute case
+        if (nodeName.startsWith("/")) {
+            result = nodeName;
+        } else
+
+        {
+            result = String.format("%s/%s", ns, nodeName);
+        }
+
+        return result;
+    }
     /**
      *
      *
@@ -84,6 +106,10 @@ public class GraphName {
             ns = "";
         } else if (!ns.startsWith("/")){
             ns = String.format("/%s", ns);
+        }
+
+        if (nodeName.startsWith("/")) {
+            nodeName = nodeName.replaceFirst("/", "");
         }
 
         // Absolute case

@@ -199,7 +199,7 @@ public class NativeNode implements Node {
         this.services       = new LinkedBlockingQueue<Service<? extends org.ros2.rcljava.internal.service.Service>>();
         this.parameters     = new HashMap<String, ParameterVariant<?>>();
 
-        NativeNode.logger.debug("Init Node stack : " + this.name);
+        NativeNode.logger.debug("Init Node stack : " + GraphName.getFullName(this.nameSpace, this.name));
 
         GraphName.addNode(this);
         this.parameterService = new ParameterService(this);
@@ -246,6 +246,14 @@ public class NativeNode implements Node {
     @Override
     public String getName() {
         String name = NativeNode.nativeGetName(this.nodeHandle);
+
+        if (name.contains("/")) {
+            if (this.nameSpace != null) {
+                name = name.replace(this.nameSpace+"/", "");
+            } else {
+                name.replace("/", "");
+            }
+        }
 
         if (!this.name.equals(name)) {
             NativeNode.logger.debug("Node name has changed ! from " + this.name + " to " + name);

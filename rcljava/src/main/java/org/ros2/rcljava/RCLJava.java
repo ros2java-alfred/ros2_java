@@ -68,10 +68,10 @@ public class RCLJava {
         private static final long serialVersionUID = 1L;
 
         {
-            put("rmw_opensplice_cpp",       "rosidl_typesupport_opensplice_c");
-            put("rmw_connext_cpp",          "rosidl_typesupport_connext_c");
-            put("rmw_connext_dynamic_cpp",  "rosidl_typesupport_introspection_c");
             put("rmw_fastrtps_cpp",         "rosidl_typesupport_introspection_c");
+//            put("rmw_opensplice_cpp",       "rosidl_typesupport_opensplice_c");
+//            put("rmw_connext_cpp",          "rosidl_typesupport_connext_c");
+//            put("rmw_connext_dynamic_cpp",  "rosidl_typesupport_introspection_c");
         }
     };
 
@@ -194,7 +194,10 @@ public class RCLJava {
                     RCLJava.logger.error("No RMW implementation found...");
                     System.exit(1);
                 } else {
-                    RCLJava.logger.debug("Initialize rclJava with " + RCLJava.rmwImplementation);
+                    String rmw_engine = "fastrtps";
+                    if (!RCLJava.rmwImplementation.equals(""))
+                        rmw_engine = RCLJava.rmwImplementation;
+                    RCLJava.logger.debug("Initialize rclJava with " + rmw_engine);
                     RCLJava.nativeRCLJavaInit(args);
                     RCLJava.initialized = true;
                 }
@@ -243,7 +246,8 @@ public class RCLJava {
             throw new NotInitializedException();
         }
 
-        long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName);
+        String fullName = GraphName.getFullName(ns, nodeName);
+        long nodeHandle = RCLJava.nativeCreateNodeHandle(fullName);
         Node node = new NativeNode(nodeHandle, ns, nodeName);
 
         return node;

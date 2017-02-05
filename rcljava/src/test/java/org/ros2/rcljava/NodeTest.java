@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.namespace.GraphName;
 
 
 public class NodeTest {
@@ -117,7 +118,7 @@ public class NodeTest {
         RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", "testNodeName", nodeName);
+        Assert.assertEquals("Bad result", "/testNodeName", nodeName);
     }
 
     @Test
@@ -352,7 +353,7 @@ public class NodeTest {
         try {
             node = RCLJava.createNode("testSubscription");
             topics = node.getTopicNamesAndTypes();
-            fqnNode = "/" + node.getName();
+            fqnNode = GraphName.getFullName(node.getNameSpace(), node.getName());
 
             node.dispose();
         } catch (Exception e) {
