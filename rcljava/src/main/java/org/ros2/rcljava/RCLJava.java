@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * <p>JNI call of ROS2 c client.</p>
  *
  */
-public class RCLJava {
+public abstract class RCLJava {
 
     private static final String LOG_NAME = RCLJava.class.getName();
 
@@ -69,6 +69,8 @@ public class RCLJava {
 
         {
             put("rmw_fastrtps_cpp",         "rosidl_typesupport_introspection_c");
+
+            // DISABLE multi-rmw.
 //            put("rmw_opensplice_cpp",       "rosidl_typesupport_opensplice_c");
 //            put("rmw_connext_cpp",          "rosidl_typesupport_connext_c");
 //            put("rmw_connext_dynamic_cpp",  "rosidl_typesupport_introspection_c");
@@ -175,6 +177,21 @@ public class RCLJava {
      */
     private RCLJava() { }
 
+    private static String getRmwImplementationSuffix(String rmwImplementation) {
+        String result = "__" + rmwImplementation;
+
+        if (result.equals("__rmw_fastrtps_cpp")) {
+            result = "";
+        }
+
+        return result;
+    }
+
+    private static void displayContext() {
+        String libpath = System.getProperty("java.library.path");
+        RCLJava.logger.debug("Native Library path : \n" + libpath.replace(':', '\n'));
+    }
+
     /**
      * Initialize the RCLJava API. If successful, a valid RMW implementation will
      *   be loaded and accessible, enabling the creating of ROS2 entities
@@ -183,21 +200,22 @@ public class RCLJava {
     public static void rclJavaInit(final String args[]) {
         synchronized (RCLJava.class) {
             if (!RCLJava.initialized) {
-                if (RCLJava.rmwImplementation == null) {
-                    String libpath = System.getProperty("java.library.path");
-                    RCLJava.logger.debug("Native Library path : \n" + libpath.replace(':', '\n'));
 
+                // Auto-detect RMW implementation.
+                if (RCLJava.rmwImplementation == null) {
+                    RCLJava.displayContext();
                     RCLJava.autoLoadRmw();
                 }
 
+                // No RMW implementation founded !
                 if (RCLJava.rmwImplementation == null) {
                     RCLJava.logger.error("No RMW implementation found...");
                     System.exit(1);
-                } else {
-                    String rmw_engine = "fastrtps";
-                    if (!RCLJava.rmwImplementation.equals(""))
-                        rmw_engine = RCLJava.rmwImplementation;
-                    RCLJava.logger.debug("Initialize rclJava with " + rmw_engine);
+                } else
+
+                // RMW implementation founded.
+                {
+                    RCLJava.logger.debug("Initialize rclJava with " + RCLJava.rmwImplementation);
                     RCLJava.nativeRCLJavaInit(args);
                     RCLJava.initialized = true;
                 }
@@ -471,19 +489,13 @@ public class RCLJava {
 
         synchronized(RCLJava.class) {
             if (rmwImplementation != null && !rmwImplementation.isEmpty()) {
-                String rmwImplementationSuffix = "__" + rmwImplementation;
-
-                if (rmwImplementationSuffix.equals("__rmw_fastrtps_cpp")) {
-                    rmwImplementationSuffix = "";
-                }
-
-                if (!rmwImplementationSuffix.equals(RCLJava.rmwImplementation)) {
-                    String file = "rcljava_RCLJava"+ rmwImplementationSuffix;
+                if (!rmwImplementation.equals(RCLJava.rmwImplementation)) {
+                    String file = "rcljava_RCLJava"+ RCLJava.getRmwImplementationSuffix(rmwImplementation);
                     RCLJava.logger.debug("Load native RMW file : lib" + file + ".so");
 
                     try {
                         System.loadLibrary(file);
-                        RCLJava.rmwImplementation = rmwImplementationSuffix;
+                        RCLJava.rmwImplementation = rmwImplementation;
                     } catch (UnsatisfiedLinkError e) {
                         throw new NoImplementationAvailableException(e);
                     } catch (Exception e) {
@@ -506,7 +518,7 @@ public class RCLJava {
      */
     public static void loadLibrary(final String name) {
         synchronized(RCLJava.class) {
-            RCLJava.logger.info("Load native file : lib" + name + ".so");
+            RCLJava.logger.debug("Load native file : lib" + name + ".so");
 
             if (!RCLJava.initialized) {
                 throw new NotInitializedException();
@@ -528,9 +540,9 @@ public class RCLJava {
     private static void autoLoadRmw() {
         for (Map.Entry<String, String> entry : RMW_TO_TYPESUPPORT.entrySet()) {
             try {
-                RCLJava.logger.info("Try to load native " + entry.getKey() + "...");
+                RCLJava.logger.debug("Try to load native " + entry.getKey() + "...");
                 RCLJava.setRMWImplementation(entry.getKey());
-                RCLJava.logger.info(entry.getKey() + " loaded !");
+                RCLJava.logger.debug(entry.getKey() + " loaded !");
                 break;
             } catch (NoImplementationAvailableException e) {
                 RCLJava.logger.error(entry.getKey() + " not available ! (" + e.getMessage() + ")");
