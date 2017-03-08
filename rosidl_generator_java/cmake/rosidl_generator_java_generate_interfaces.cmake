@@ -296,11 +296,20 @@ add_dependencies("${PROJECT_NAME}_messages_jar" "${rosidl_generate_interfaces_TA
 
 if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
   set(_install_jar_dir "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}")
-  if(NOT "${_generated_msg_java_files} " STREQUAL " ")
-    list(GET _generated_msg_java_files 0 _msg_file)
-    get_filename_component(_msg_package_dir "${_msg_file}" DIRECTORY)
-    get_filename_component(_msg_package_dir "${_msg_package_dir}" DIRECTORY)
-
+  if(NOT "${_generated_msg_java_files} " STREQUAL " " OR NOT "${_generated_srv_java_files} " STREQUAL " ")
+  
+    if(NOT "${_generated_msg_java_files} " STREQUAL " ")
+      list(GET _generated_msg_java_files 0 _msg_file)
+      get_filename_component(_msg_package_dir "${_msg_file}" DIRECTORY)
+      get_filename_component(_msg_package_dir "${_msg_package_dir}" DIRECTORY)
+    endif()
+    
+    if(NOT "${_generated_srv_java_files} " STREQUAL " ")
+      list(GET _generated_srv_java_files 0 _srv_file)
+      get_filename_component(_srv_package_dir "${_srv_file}" DIRECTORY)
+      get_filename_component(_srv_package_dir "${_srv_package_dir}" DIRECTORY)
+    endif()
+    
     install_jar("${PROJECT_NAME}_messages_jar" "share/${PROJECT_NAME}/java")
     ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}_messages.jar")
     ament_java_package_hook(${PROJECT_NAME})
