@@ -1,0 +1,23 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    - "~/docker"
+  override:
+    - docker info
+    - if [[ -e ~/docker/image.tar ]]; then docker load -i ~/docker/image.tar; fi
+    - docker build -t theosakamg7/ros2java .
+    - mkdir -p ~/docker; docker save theosakamg7/ros2java > ~/docker/image.tar
+
+test:
+  override:
+    - docker run -d -p 9200:9200 theosakamg7/ros2java; sleep 10
+
+#deployment:
+#  hub:
+#    branch: circle
+#    commands:
+#      - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASS"
+#      - docker push theosakamg7/ros2java:latest
