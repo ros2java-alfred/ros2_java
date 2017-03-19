@@ -12,10 +12,19 @@ env:
     - ROS2JAVA_PATH=$ROS2WS/src/android-cmake/android-cmake/android.toolchain.cmake
     - PYTHON_PATH=/usr/bin/python3
 
+cache:
+  directories:
+  - .autoconf
+  - $HOME/.m2
+  - $HOME/.gradle
 
 before_install:
 - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 - docker pull theosakamg7/ros2java:latest
+- cd $HOME_BUILD && env | grep -E '^TRAVIS_' > .env
+- env | grep -E '^COVERALLS_' >> .env
+- env | grep -E '^CI_' >> .env
+- echo -e "CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER\nCI_PULL_REQUEST=$TRAVIS_PULL_REQUEST\nCI_BRANCH=$TRAVIS_BRANCH\nCI_BUILD_URL=$" >> .env
 - echo "INSTALL/BUILD ROS2 AMENT..."
 - cd $HOME_BUILD && mkdir -p ament_ws/src && cd $HOME_BUILD/ament_ws
 - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos"
@@ -25,18 +34,15 @@ before_install:
 - cd $HOME_BUILD && mkdir -p $ROS2WS/src && cd $ROS2WS
 - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/d9259bbc708c5145255fbdeb25e65e19/raw/ros2_java_desktop.repos"
 - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c "/usr/bin/vcs import src < ros2_java_desktop.repos"
-- rm -rf $ROS2WS/src/ros2_java/ros2_java && ln -s $HOME_BUILD/ros2java-alfred/ros2_java  $ROS2WS/src/ros2_java/ros2_java
 - cd $ROS2WS/src/ros2/rosidl_typesupport && patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_java.diff
 - cd $ROS2WS/src/eProsima/Fast-RTPS && git submodule init && git submodule update
+- rm -rf $ROS2WS/src/ros2_java/ros2_java && ln -s $HOME_BUILD/ros2java-alfred/ros2_java  $ROS2WS/src/ros2_java/ros2_java
 - echo "BUILD ROS2 WS..."
-- cd $HOME_BUILD && ls -lFa ./ && find . -maxdepth 3 -type d -not \( -path "./.git" -prune \)
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament build --symlink-install --isolated --skip-packages $PKG_EXCLUDE"
+- cd $HOME_BUILD
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file .env -w `pwd` theosakamg7/ros2java:latest sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament build --symlink-install --isolated --skip-packages $PKG_EXCLUDE --ament-gradle-args --parallel --daemon --configure-on-demand"
 
 script:
-- cd /home/travis/build && docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament test --isolated --only-packages ament_cmake_export_jars rcljava rcljava_common rosidl_generator_java"
-
-after_success:
-  - coveralls
+- cd $HOME_BUILD && docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file .env -w `pwd` theosakamg7/ros2java:latest sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && . ./install_isolated/local_setup.sh && ament test --symlink-install --isolated --only-packages ament_cmake_export_jars rcljava rcljava_common"
 
 notifications:
   webhooks:

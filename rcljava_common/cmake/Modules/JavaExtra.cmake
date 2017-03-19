@@ -125,7 +125,7 @@ function(add_junit_tests TARGET_NAME)
     ${JVMARGS} -classpath ${${TARGET_NAME}_jar_dependencies} -Djava.library.path=${_library_paths}
     org.junit.runner.JUnitCore ${_add_junit_tests_TESTS}
   )
-  
+
   add_custom_target(${TARGET_NAME} DEPENDS ${_jar_test_file})
 
   add_dependencies(${TARGET_NAME} "${TARGET_NAME}_jar")
