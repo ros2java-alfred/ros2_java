@@ -109,7 +109,7 @@ public abstract class RCLJava {
      * @param nodeName The name that will identify this node in a ROS2 graph.
      * @return A pointer to the underlying ROS2 node structure.
      */
-    private static native long nativeCreateNodeHandle(String nodeName);
+    private static native long nativeCreateNodeHandle(String nodeName, String spaceName);
 
     // Wait.h
     private static native long nativeGetZeroInitializedWaitSet();
@@ -264,8 +264,8 @@ public abstract class RCLJava {
             throw new NotInitializedException();
         }
 
-        String fullName = GraphName.getFullName(ns, nodeName);
-        long nodeHandle = RCLJava.nativeCreateNodeHandle(fullName);
+//        String fullName = GraphName.getFullName(ns, nodeName);
+        long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName, ns);
         Node node = new NativeNode(nodeHandle, ns, nodeName);
 
         return node;
