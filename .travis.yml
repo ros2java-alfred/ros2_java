@@ -46,8 +46,12 @@ script:
 - cd $HOME_BUILD && docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file .env -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && . ./install_isolated/local_setup.sh && ament test --symlink-install --isolated --only-packages ament_cmake_export_jars rcljava rcljava_common"
 
 after_success:
- - docker tag $DOCKER_REPO:latest $DOCKER_REPO:build_$TRAVIS_BUILD_NUMBER
- - docker push $DOCKER_REPO:build_$TRAVIS_BUILD_NUMBER
+ - docker ps -a
+ - docker images
+ - docker cp `pwd` $DOCKER_REPO:`pwd`
+ - DOCKER_ID=$(docker ps --filter="name=$DOCKER_DIST" -q | xargs)
+ - docker commit -m "Build $TRAVIS_BUILD_NUMBER" $DOCKER_ID $DOCKER_REPO:$DOCKER_DIST-ros2java
+ - docker push $DOCKER_REPO:$DOCKER_DIST-ros2java
 
 notifications:
   webhooks:
