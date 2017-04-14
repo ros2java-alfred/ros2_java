@@ -48,7 +48,7 @@ script:
 after_success:
  - docker ps -a
  - docker images
- - docker cp -L $HOME_BUILD/ artefact:$HOME_BUILD/
+ - docker cp -L $HOME_BUILD/. artefact:$HOME_BUILD/
  - docker tag $DOCKER_REPO:$DOCKER_DIST $DOCKER_REPO:$DOCKER_DIST-ros2java
  - docker commit -m "Build $TRAVIS_BUILD_NUMBER" artefact $DOCKER_REPO:$DOCKER_DIST-ros2java
  - docker push $DOCKER_REPO:$DOCKER_DIST-ros2java
