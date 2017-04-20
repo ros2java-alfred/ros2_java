@@ -44,11 +44,11 @@ script:
 
 after_success:
  - docker run -u "$UID" -it --env-file .env -w `pwd` --name="artefact" $DOCKER_REPO:$DOCKER_DIST sh -c "echo ok"
- - docker -D cp $HOME_BUILD artefact:$HOME_BUILD
- - docker -D commit -m "Build $TRAVIS_BUILD_NUMBER" artefact $DOCKER_REPO:$DOCKER_DIST-ros2java
- - docker -D push $DOCKER_REPO:$DOCKER_DIST-ros2java
- - docker -D tag $DOCKER_REPO:$DOCKER_DIST-ros2java $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER
- - docker -D push $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER
+ - docker cp $HOME_BUILD artefact:$HOME_BUILD
+ - docker commit -m "Build $TRAVIS_BUILD_NUMBER" artefact $DOCKER_REPO:$DOCKER_DIST-ros2java
+ - docker push $DOCKER_REPO:$DOCKER_DIST-ros2java
+ - docker tag $DOCKER_REPO:$DOCKER_DIST-ros2java $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER
+ - docker push $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER
 
 notifications:
   webhooks:
