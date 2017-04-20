@@ -47,6 +47,8 @@ after_success:
  - docker -D cp $HOME_BUILD artefact:$HOME_BUILD
  - docker -D commit -m "Build $TRAVIS_BUILD_NUMBER" artefact $DOCKER_REPO:$DOCKER_DIST-ros2java
  - docker -D push $DOCKER_REPO:$DOCKER_DIST-ros2java
+ - docker -D tag $DOCKER_REPO:$DOCKER_DIST-ros2java $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER
+ - docker -D push $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER
 
 notifications:
   webhooks:
