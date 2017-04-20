@@ -6,7 +6,7 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_export_jars REQUIRED)
 find_package(rcl REQUIRED)
 find_package(rmw REQUIRED)
-find_package(c_utilities REQUIRED)
+find_package(rcutils REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(rcljava_common REQUIRED)
 
