@@ -299,7 +299,8 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTop
   rcl_topic_names_and_types_t topic_names_and_types =
     rcl_get_zero_initialized_topic_names_and_types();
 
-  rcl_ret_t ret = rcl_get_topic_names_and_types(node, &topic_names_and_types);
+  rcl_ret_t ret = rcl_get_topic_names_and_types(node, rcl_get_default_allocator(),
+      &topic_names_and_types);
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of topics: " +
       std::string(rcl_get_error_string_safe()));
@@ -326,7 +327,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNam
   rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
   utilities_string_array_t node_names = utilities_get_zero_initialized_string_array();
 
-  rcl_ret_t ret = rcl_get_node_names(node, &node_names);
+  rcl_ret_t ret = rcl_get_node_names(node, rcl_get_default_allocator(), &node_names);
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of nodes: " +
       std::string(rcl_get_error_string_safe()));
