@@ -186,7 +186,7 @@ makeJTopics(JNIEnv * env, rcl_topic_names_and_types_t * topic_names_and_types)
 }
 
 jobject
-makeJNodes(JNIEnv * env, utilities_string_array_t * nodes)
+makeJNodes(JNIEnv * env, rcutils_string_array_t * nodes)
 {
   env->PushLocalFrame(256);  // fix for local references
 

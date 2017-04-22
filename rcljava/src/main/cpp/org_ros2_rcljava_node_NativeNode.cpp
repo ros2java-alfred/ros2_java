@@ -21,7 +21,7 @@
 #include <cassert>
 
 #include "rmw/rmw.h"
-#include "c_utilities/types.h"
+#include "rcutils/types.h"
 #include "rcl/error_handling.h"
 #include "rcl/rcl.h"
 #include "rcl/node.h"
@@ -325,7 +325,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNam
   jlong jnode_handle)
 {
   rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
-  utilities_string_array_t node_names = utilities_get_zero_initialized_string_array();
+  rcutils_string_array_t node_names = rcutils_get_zero_initialized_string_array();
 
   rcl_ret_t ret = rcl_get_node_names(node, rcl_get_default_allocator(), &node_names);
   if (ret != RCL_RET_OK) {
@@ -336,7 +336,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNam
 
   jobject nodes = makeJNodes(env, &node_names);
 
-  ret = utilities_string_array_fini(&node_names);
+  ret = rcutils_string_array_fini(&node_names);
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of nodes: " +
       std::string(rcl_get_error_string_safe()));
