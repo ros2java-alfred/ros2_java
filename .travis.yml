@@ -15,6 +15,7 @@ env:
     - ROS2JAVA_PATH=${ROS2WS}/src/android-cmake/android-cmake/android.toolchain.cmake
     - PYTHON_PATH=/usr/bin/python3
     - COMMIT=${TRAVIS_COMMIT::8}
+    - ENV_PATH=${HOME_BUILD}/.env.txt
 
 cache:
   directories:
@@ -25,7 +26,8 @@ cache:
 before_install:
 - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 - docker pull $DOCKER_REPO:$DOCKER_DIST
-- cd $HOME_BUILD && env | grep -E '^TRAVIS_' > .env && env | grep -E '^COVERALLS_' >> .env && env | grep -E '^CI_' >> .env && echo -e "CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER\nCI_PULL_REQUEST=$TRAVIS_PULL_REQUEST\nCI_BRANCH=$TRAVIS_BRANCH\nCI_BUILD_URL=$" >> .env
+- cd $HOME_BUILD && env | grep -E '^TRAVIS_' > $ENV_PATH && env | grep -E '^COVERALLS_' >> $ENV_PATH && env | grep -E '^CI_' >> $ENV_PATH && echo -e "CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER\nCI_PULL_REQUEST=$TRAVIS_PULL_REQUEST\nCI_BRANCH=$TRAVIS_BRANCH\nCI_BUILD_URL=$" >> $ENV_PATH
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "locale"
 - echo "INSTALL/BUILD ROS2 AMENT..."
 - cd $HOME_BUILD && mkdir -p ament_ws/src && cd $HOME_BUILD/ament_ws
 - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos"
@@ -40,18 +42,18 @@ before_install:
 - rm -rf $ROS2WS/src/ros2_java/ros2_java && ln -s $HOME_BUILD/ros2java-alfred/ros2_java  $ROS2WS/src/ros2_java/ros2_java
 - echo "BUILD ROS2 WS..."
 - cd $HOME_BUILD
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file .env -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament build --symlink-install --isolated --skip-packages $PKG_EXCLUDE --ament-gradle-args --parallel --daemon --configure-on-demand"
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file $ENV_PATH -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament build --symlink-install --isolated --skip-packages $PKG_EXCLUDE --ament-gradle-args --parallel --daemon --configure-on-demand"
 
 script:
-- cd $HOME_BUILD && docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file .env -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && . ./install_isolated/local_setup.sh && ament test --symlink-install --isolated --only-packages ament_cmake_export_jars rcljava rcljava_common"
+- cd $HOME_BUILD && docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file $ENV_PATH -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && . ./install_isolated/local_setup.sh && ament test --symlink-install --isolated --only-packages ament_cmake_export_jars rcljava rcljava_common"
 
 after_success:
- - docker run -u "$UID" -it --env-file .env -w `pwd` --name="artefact" $DOCKER_REPO:$DOCKER_DIST sh -c "echo ok"
+ - docker run -u "$UID" -it --env-file $ENV_PATH -w `pwd` --name="artefact" $DOCKER_REPO:$DOCKER_DIST sh -c "echo ok"
  - docker cp -L $HOME_BUILD/. artefact:$HOME_BUILD
  - docker commit -m "Build $TRAVIS_BUILD_NUMBER" artefact $DOCKER_REPO:$DOCKER_DIST-ros2java
  - docker push $DOCKER_REPO:$DOCKER_DIST-ros2java
- - docker tag $DOCKER_REPO:$DOCKER_DIST-ros2java $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER
- - docker push $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER
+ - if ("$TRAVIS_EVENT_TYPE" != "cron"); then docker tag $DOCKER_REPO:$DOCKER_DIST-ros2java $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER ; fi
+ - if ("$TRAVIS_EVENT_TYPE" != "cron"); then docker push $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER ; fi
 
 notifications:
   webhooks:
