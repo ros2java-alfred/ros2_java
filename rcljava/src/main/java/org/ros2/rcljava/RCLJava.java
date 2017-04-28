@@ -107,6 +107,7 @@ public abstract class RCLJava {
      * Create a ROS2 node (rcl_node_t) and return a pointer to it as an integer.
      *
      * @param nodeName The name that will identify this node in a ROS2 graph.
+     * @param spaceName The name-space that will identify this node in a ROS2 graph.
      * @return A pointer to the underlying ROS2 node structure.
      */
     private static native long nativeCreateNodeHandle(String nodeName, String spaceName);

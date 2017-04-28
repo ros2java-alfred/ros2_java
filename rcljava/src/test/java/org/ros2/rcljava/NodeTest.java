@@ -72,7 +72,7 @@ public class NodeTest {
 
         RCLJava.rclJavaInit();
         try {
-            node = RCLJava.createNode("test_node");
+            node = RCLJava.createNode("_test_node");
             node.dispose();
         } catch (Exception e) {
             test = false;
