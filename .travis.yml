@@ -28,7 +28,7 @@ before_install:
   - 'if [ ${TRAVIS_BRANCH} != "master" ]; then
         array=("debian-stable ubuntu ubuntu-rolling");
         if [[ " ${array[@]} " =~ " ${TRAVIS_BRANCH} " ]]; then
-            DOCKER_DIST = ${TRAVIS_BRANCH} ;
+            DOCKER_DIST=${TRAVIS_BRANCH};
         fi
      fi'
   - docker pull $DOCKER_REPO:$DOCKER_DIST
