@@ -5,6 +5,13 @@ sudo: required
 
 language: generic
 
+matrix:
+  include:
+    - env DOCKER_DIST="debian"
+    - env DOCKER_DIST="ubuntu"
+    - env DOCKER_DIST="debian-stable"
+    - env DOCKER_DIST="ubuntu-rolling"
+
 services:
   - docker
 
@@ -19,18 +26,12 @@ env:
 
 cache:
   directories:
-  - .autoconf
-  - $HOME/.m2
-  - $HOME/.gradle
+    - .autoconf
+    - $HOME/.m2
+    - $HOME/.gradle
 
 before_install:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - 'if [ ${TRAVIS_BRANCH} != "master" ]; then
-        array=("debian-stable ubuntu ubuntu-rolling");
-        if [[ " ${array[@]} " =~ " ${TRAVIS_BRANCH} " ]]; then
-            DOCKER_DIST=${TRAVIS_BRANCH};
-        fi
-     fi'
   - docker pull $DOCKER_REPO:$DOCKER_DIST
   - cd $HOME_BUILD && env | grep -E '^TRAVIS_' > $ENV_PATH && env | grep -E '^COVERALLS_' >> $ENV_PATH && env | grep -E '^CI_' >> $ENV_PATH && echo -e "CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER\nCI_PULL_REQUEST=$TRAVIS_PULL_REQUEST\nCI_BRANCH=$TRAVIS_BRANCH\nCI_BUILD_URL=$" >> $ENV_PATH
   - docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file $ENV_PATH -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "locale && env | grep -E '^TRAVIS_' && env | grep -E '^CI_' && env | grep -E '^JAVA_'"
