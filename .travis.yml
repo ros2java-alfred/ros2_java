@@ -24,36 +24,46 @@ cache:
   - $HOME/.gradle
 
 before_install:
-- docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-- docker pull $DOCKER_REPO:$DOCKER_DIST
-- cd $HOME_BUILD && env | grep -E '^TRAVIS_' > $ENV_PATH && env | grep -E '^COVERALLS_' >> $ENV_PATH && env | grep -E '^CI_' >> $ENV_PATH && echo -e "CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER\nCI_PULL_REQUEST=$TRAVIS_PULL_REQUEST\nCI_BRANCH=$TRAVIS_BRANCH\nCI_BUILD_URL=$" >> $ENV_PATH
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "locale"
-- echo "INSTALL/BUILD ROS2 AMENT..."
-- cd $HOME_BUILD && mkdir -p ament_ws/src && cd $HOME_BUILD/ament_ws
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos"
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "/usr/bin/vcs import src < ament_java.repos"
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated"
-- echo "INSTALL ROS2 WS..."
-- cd $HOME_BUILD && mkdir -p $ROS2WS/src && cd $ROS2WS
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/d9259bbc708c5145255fbdeb25e65e19/raw/ros2_java_desktop.repos"
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "/usr/bin/vcs import src < ros2_java_desktop.repos"
-- cd $ROS2WS/src/ros2/rosidl_typesupport && patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_java.diff
-- cd $ROS2WS/src/eProsima/Fast-RTPS && git submodule init && git submodule update
-- rm -rf $ROS2WS/src/ros2_java/ros2_java && ln -s $HOME_BUILD/ros2java-alfred/ros2_java  $ROS2WS/src/ros2_java/ros2_java
-- echo "BUILD ROS2 WS..."
-- cd $HOME_BUILD
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file $ENV_PATH -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament build --symlink-install --isolated --skip-packages $PKG_EXCLUDE --ament-gradle-args --parallel --daemon --configure-on-demand"
+  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - 'if [ ${TRAVIS_BRANCH} != "master" ]; then
+        array=("debian-stable ubuntu ubuntu-rolling");
+        if [[ " ${array[@]} " =~ " ${TRAVIS_BRANCH} " ]]; then
+            DOCKER_DIST = ${TRAVIS_BRANCH} ;
+        fi
+     fi'
+  - docker pull $DOCKER_REPO:$DOCKER_DIST
+  - cd $HOME_BUILD && env | grep -E '^TRAVIS_' > $ENV_PATH && env | grep -E '^COVERALLS_' >> $ENV_PATH && env | grep -E '^CI_' >> $ENV_PATH && echo -e "CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER\nCI_PULL_REQUEST=$TRAVIS_PULL_REQUEST\nCI_BRANCH=$TRAVIS_BRANCH\nCI_BUILD_URL=$" >> $ENV_PATH
+  - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "locale"
+  - echo "INSTALL/BUILD ROS2 AMENT..."
+  - cd $HOME_BUILD && mkdir -p ament_ws/src && cd $HOME_BUILD/ament_ws
+  - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos"
+  - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "/usr/bin/vcs import src < ament_java.repos"
+  - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated"
+  - echo "INSTALL ROS2 WS..."
+  - cd $HOME_BUILD && mkdir -p $ROS2WS/src && cd $ROS2WS
+  - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/d9259bbc708c5145255fbdeb25e65e19/raw/ros2_java_desktop.repos"
+  - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c "/usr/bin/vcs import src < ros2_java_desktop.repos"
+  - cd $ROS2WS/src/ros2/rosidl_typesupport && patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_java.diff
+  - cd $ROS2WS/src/eProsima/Fast-RTPS && git submodule init && git submodule update
+  - rm -rf $ROS2WS/src/ros2_java/ros2_java && ln -s $HOME_BUILD/ros2java-alfred/ros2_java  $ROS2WS/src/ros2_java/ros2_java
+  - echo "BUILD ROS2 WS..."
+  - cd $HOME_BUILD
+  - docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file $ENV_PATH -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament build --symlink-install --isolated --skip-packages $PKG_EXCLUDE --ament-gradle-args --parallel --daemon --configure-on-demand"
 
 script:
-- cd $HOME_BUILD && docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file $ENV_PATH -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && . ./install_isolated/local_setup.sh && ament test --symlink-install --isolated --only-packages ament_cmake_export_jars rcljava rcljava_common"
+  - cd $HOME_BUILD && docker run -u "$UID" -it --rm -v `pwd`:`pwd` --env-file $ENV_PATH -w `pwd` $DOCKER_REPO:$DOCKER_DIST sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && . ./install_isolated/local_setup.sh && ament test --symlink-install --isolated --only-packages ament_cmake_export_jars rcljava rcljava_common"
 
 after_success:
- - docker run -u "$UID" -it --env-file $ENV_PATH -w `pwd` --name="artefact" $DOCKER_REPO:$DOCKER_DIST sh -c "echo ok"
- - docker cp -L $HOME_BUILD/. artefact:$HOME_BUILD
- - docker commit -m "Build $TRAVIS_BUILD_NUMBER" artefact $DOCKER_REPO:$DOCKER_DIST-ros2java
- - docker push $DOCKER_REPO:$DOCKER_DIST-ros2java
- - if ("$TRAVIS_EVENT_TYPE" != "cron"); then docker tag $DOCKER_REPO:$DOCKER_DIST-ros2java $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER ; fi
- - if ("$TRAVIS_EVENT_TYPE" != "cron"); then docker push $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER ; fi
+  - docker run -u "$UID" -it --env-file $ENV_PATH -w `pwd` --name="artefact" $DOCKER_REPO:$DOCKER_DIST sh -c "echo ok"
+  - docker cp -L $HOME_BUILD/. artefact:$HOME_BUILD
+  - docker commit -m "Build $TRAVIS_BUILD_NUMBER" artefact $DOCKER_REPO:$DOCKER_DIST-ros2java
+  - docker push $DOCKER_REPO:$DOCKER_DIST-ros2java
+  - 'if [ ${TRAVIS_EVENT_TYPE} != "cron" ]; then
+        docker tag $DOCKER_REPO:$DOCKER_DIST-ros2java $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER ;
+     fi'
+  - 'if [ ${TRAVIS_EVENT_TYPE} != "cron" ]; then
+        docker push $DOCKER_REPO:$DOCKER_DIST-ros2java_$TRAVIS_BUILD_NUMBER ;
+     fi'
 
 notifications:
   webhooks:
