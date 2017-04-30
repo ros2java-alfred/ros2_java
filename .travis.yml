@@ -5,13 +5,9 @@ sudo: required
 
 language: generic
 
-matrix:
-  include:
-    - env DOCKER_DIST="debian"
-    - env DOCKER_DIST="ubuntu"
-    - env DOCKER_DIST="debian-stable"
-    - env DOCKER_DIST="ubuntu-rolling"
-
+os:
+  - linux
+  
 services:
   - docker
 
@@ -29,6 +25,30 @@ cache:
     - .autoconf
     - $HOME/.m2
     - $HOME/.gradle
+
+matrix:
+  include:
+    - os: linux
+      env: DOCKER_DIST="ubuntu"
+      services:
+        - docker
+    - os: linux
+      env: DOCKER_DIST="debian-stable"
+      services:
+        - docker
+    - os: linux
+      env: DOCKER_DIST="ubuntu-rolling"
+      services:
+        - docker
+  allow_failures:
+    - os: linux
+      env: DOCKER_DIST="debian-stable"
+      services:
+        - docker
+    - os: linux
+      env: DOCKER_DIST="ubuntu-rolling"
+      services:
+        - docker
 
 before_install:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
