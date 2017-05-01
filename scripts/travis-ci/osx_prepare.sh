@@ -20,7 +20,7 @@ mkdir -p $HOME_BUILD/ament_ws/src
 cd $HOME_BUILD/ament_ws
 wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos
 vcs import $HOME_BUILD/ament_ws/src < ament_java.repos
-src/ament/ament_tools/scripts/ament.py build --parallel --symlink-install --isolated
+src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated
 
 echo "INSTALL ROS2 WS..."
 mkdir -p $ROS2WS/src
@@ -35,6 +35,7 @@ cd $ROS2WS/src/ros2/rosidl_typesupport && patch -p1 < ../../ros2_java/ros2_java/
 rm -rf $ROS2WS/src/ros2_java/ros2_java && ln -s ~/ros2java-alfred/ros2_java  $ROS2WS/src/ros2_java/ros2_java
 
 echo "BUILD ROS2 WS..."
+cd $HOME_BUILD
+. ./ament_ws/install_isolated/local_setup.sh
 cd $ROS2WS
-. $HOME_BUILD/ament_ws/install_isolated/local_setup.sh
-ament build --parallel --symlink-install --isolated --skip-packages $PKG_EXCLUDE --ament-gradle-args --parallel --daemon --configure-on-demand
+ament build --symlink-install --isolated --skip-packages $PKG_EXCLUDE --ament-gradle-args --parallel --daemon --configure-on-demand

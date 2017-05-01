@@ -24,7 +24,7 @@ env:
     - ROS2JAVA_PATH=${ROS2WS}/src/android-cmake/android-cmake/android.toolchain.cmake
     - PYTHON_PATH=/usr/bin/python3
     - COMMIT=${TRAVIS_COMMIT::8}
-    - ENV_PATH=${HOME_BUILD}/.env.txt
+    - ENV_PATH=${HOME_BUILD}/.env
 
 matrix:
   include:
@@ -41,18 +41,12 @@ matrix:
       services:
         - docker
     - os: osx
+      env: PYTHON_PATH="/usr/local/opt/python3/bin/python3.6"
       osx_image: xcode8.3
   allow_failures:
-    - os: linux
-      env: DOCKER_DIST="debian-stable"
-      services:
-        - docker
-    - os: linux
-      env: DOCKER_DIST="ubuntu-rolling"
-      services:
-        - docker
+    - env: DOCKER_DIST="debian-stable"
+    - env: DOCKER_DIST="ubuntu-rolling"
     - os: osx
-      osx_image: xcode8.3
 
 before_install:
   - ./scripts/travis-ci/${TRAVIS_OS_NAME}_prepare.sh
