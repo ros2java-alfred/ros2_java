@@ -29,7 +29,7 @@ docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_IMG sh -c "src/ame
 echo "INSTALL ROS2 WS..."
 mkdir -p $ROS2WS/src
 cd $ROS2WS
-docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_IMG sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/259bbc708c5145255fbdeb25e65e19/raw/ros2_java_desktop.repos"
+docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_IMG sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/d9259bbc708c5145255fbdeb25e65e19/raw/ros2_java_desktop.repos"
 docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` $DOCKER_IMG sh -c "/usr/bin/vcs import src < ros2_java_desktop.repos"
 
 # Patch for Java support.

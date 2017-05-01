@@ -25,8 +25,8 @@ src/ament/ament_tools/scripts/ament.py build --parallel --symlink-install --isol
 echo "INSTALL ROS2 WS..."
 mkdir -p $ROS2WS/src
 cd $ROS2WS
-wget https://gist.githubusercontent.com/Theosakamg/259bbc708c5145255fbdeb25e65e19/raw/ros2_java_desktop.repos
-vcs import $ROS2WS/src < ros2_java_desktop_travis.repos
+wget https://gist.githubusercontent.com/Theosakamg/d9259bbc708c5145255fbdeb25e65e19/raw/ros2_java_desktop.repos
+vcs import $ROS2WS/src < ros2_java_desktop.repos
 
 # Patch for Java support.
 cd $ROS2WS/src/ros2/rosidl_typesupport && patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_java.diff
