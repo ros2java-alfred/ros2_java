@@ -6,7 +6,7 @@ ROS2 for Java (Alfred variation)
 | Platform | Status |
 |----------|--------|
 | **OpenJDK** | [![Build Status](https://travis-ci.org/ros2java-alfred/ros2_java.svg?branch=master)](https://travis-ci.org/ros2java-alfred/ros2_java) |
-| **Android** | [![Build Status](https://travis-ci.org/ros2java-alfred/ros2_android.svg?branch=master)](https://travis-ci.org/ros2java-alfred/ros2_android) |
+| **Android** | [![Build Status](https://travis-ci.org/ros2java-alfred/ros2_android_examples.svg?branch=master)](https://travis-ci.org/ros2java-alfred/ros2_android_examples) |
 
 What is this?
 -------------
