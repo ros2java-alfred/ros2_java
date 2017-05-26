@@ -369,7 +369,7 @@ public class NodeTest {
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", 13, i);
+        Assert.assertEquals("Bad result", 0, i);
     }
 
     //TODO Test Parameters

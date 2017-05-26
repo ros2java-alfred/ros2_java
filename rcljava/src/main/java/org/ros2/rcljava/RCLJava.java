@@ -190,7 +190,10 @@ public abstract class RCLJava {
 
     private static void displayContext() {
         String libpath = System.getProperty("java.library.path");
+        String arch    = System.getProperty("os.arch");
+
         RCLJava.logger.debug("Native Library path : \n" + libpath.replace(':', '\n'));
+        RCLJava.logger.debug("Native Library Archi : " + arch + "\n");
     }
 
     /**
