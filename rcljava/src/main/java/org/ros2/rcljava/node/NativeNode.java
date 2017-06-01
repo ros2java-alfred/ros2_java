@@ -184,13 +184,15 @@ public class NativeNode implements Node {
      *
      * @param nodeHandle A pointer to the underlying ROS2 node structure. Must not
      *     be zero.
+     * @param nameSpace prefix path of node.
+     * @param nodeName name of node.
      */
-    public NativeNode(final long nodeHandle,final String ns, final String nodeName) {
+    public NativeNode(final long nodeHandle,final String nameSpace, final String nodeName) {
 
         if (nodeHandle==0) throw new NullPointerException("Node Handle is not define !");
         if (nodeName==null || nodeName.length() == 0) throw new NullPointerException("Node name is needed !");
 
-        this.nameSpace      = ns;
+        this.nameSpace      = nameSpace;
         this.name           = nodeName;
         this.nodeHandle     = nodeHandle;
         this.subscriptions  = new LinkedBlockingQueue<Subscription<?>>();

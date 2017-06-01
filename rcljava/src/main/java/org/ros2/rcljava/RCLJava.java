@@ -191,9 +191,12 @@ public abstract class RCLJava {
     private static void displayContext() {
         String libpath = System.getProperty("java.library.path");
         String arch    = System.getProperty("os.arch");
+        String os      = System.getProperty("os.name");
 
+        RCLJava.logger.debug("Native Library OS : " + os);
+        RCLJava.logger.debug("Native Library Archi : " + arch);
         RCLJava.logger.debug("Native Library path : \n" + libpath.replace(':', '\n'));
-        RCLJava.logger.debug("Native Library Archi : " + arch + "\n");
+
     }
 
     /**
@@ -256,21 +259,25 @@ public abstract class RCLJava {
     /**
      * Create a @{link Node}.
      *
-     * @param ns Name Space.
+     * @param namespace Name Space.
      * @param nodeName The name that will identify this node in a ROS2 graph.
      * @return A @{link Node} that represents the underlying ROS2 node
      *     structure.
      */
-    public static Node createNode(final String ns, final String nodeName) {
+    public static Node createNode(String namespace, final String nodeName) {
         RCLJava.logger.debug("Create Node stack : " + nodeName);
 
         if (!RCLJava.initialized) {
             throw new NotInitializedException();
         }
 
+        if (namespace == null) {
+            namespace = "";
+        }
+
 //        String fullName = GraphName.getFullName(ns, nodeName);
-        long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName, ns);
-        Node node = new NativeNode(nodeHandle, ns, nodeName);
+        long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName, namespace);
+        Node node = new NativeNode(nodeHandle, namespace, nodeName);
 
         return node;
     }

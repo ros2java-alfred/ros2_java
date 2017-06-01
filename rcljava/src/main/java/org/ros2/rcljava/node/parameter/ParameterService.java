@@ -62,12 +62,12 @@ import rcl_interfaces.srv.SetParametersAtomically_Response;
 public class ParameterService {
     private static final Logger logger = LoggerFactory.getLogger(ParameterService.class);
 
-    protected static final String TOPIC_GETPARAMETERS = "~/_get_parameters";
-    protected static final String TOPIC_GETPARAMETERTYPES = "~/_get_parameter_types";
-    protected static final String TOPIC_SETPARAMETERS = "~/_set_parameters";
+    protected static final String TOPIC_GETPARAMETERS 			= "~/_get_parameters";
+    protected static final String TOPIC_GETPARAMETERTYPES 		= "~/_get_parameter_types";
+    protected static final String TOPIC_SETPARAMETERS 			= "~/_set_parameters";
     protected static final String TOPIC_SETPARAMETERSATOMICALLY = "~/_set_parameters_atomically";
-    protected static final String TOPIC_DESCRIBEPARAMETERS = "~/_describe_parameters";
-    protected static final String TOPIC_LISTPARAMETERS = "~/_list_parameters";
+    protected static final String TOPIC_DESCRIBEPARAMETERS 		= "~/_describe_parameters";
+    protected static final String TOPIC_LISTPARAMETERS 			= "~/_list_parameters";
 
 
     private final Node ownerNode;
