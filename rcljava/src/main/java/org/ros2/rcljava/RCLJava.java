@@ -207,6 +207,12 @@ public abstract class RCLJava {
     public static void rclJavaInit(final String args[]) {
         synchronized (RCLJava.class) {
             if (!RCLJava.initialized) {
+                if (args != null) {
+                    for (String arg : args) {
+                        String[] keyVal = arg.split("=");
+                        RCLJava.logger.debug("Args : " + keyVal[0] + "\t : " + keyVal[1]);
+                    }
+                }
 
                 // Auto-detect RMW implementation.
                 if (RCLJava.rmwImplementation == null) {
