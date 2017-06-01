@@ -29,6 +29,10 @@ cache:
 matrix:
   include:
     - os: linux
+      env: DOCKER_DIST="debian"
+      services:
+        - docker
+    - os: linux
       env: DOCKER_DIST="ubuntu"
       services:
         - docker
