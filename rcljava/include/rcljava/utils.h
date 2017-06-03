@@ -44,6 +44,21 @@ jstring2String(JNIEnv * env, jstring jsubject)
   return result;
 }
 
+char ** JniStringArray2StringArray(JNIEnv * env, jobjectArray stringArray)
+{
+  jsize stringCount = env->GetArrayLength(stringArray);
+  char ** Strings = (char **)malloc(sizeof(char *) * stringCount);
+
+  int i = 0;
+  for (i = 0; i < stringCount; ++i) {
+    jstring jniString = (jstring) env->GetObjectArrayElement(stringArray, i);
+    const char * TempString = env->GetStringUTFChars(jniString, NULL);
+    Strings[i] = (char *)TempString;
+    env->ReleaseStringUTFChars(jniString, TempString);
+  }
+  return Strings;
+}
+
 /*
  * Convertion of Message type.
  */
