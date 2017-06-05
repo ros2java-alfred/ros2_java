@@ -20,7 +20,7 @@ package org.ros2.rcljava;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Topics;
@@ -47,7 +47,10 @@ public class Log {
     public Log(final Node defaultNode) {
         this.defaultNode = defaultNode;
         this.publisher = this.defaultNode.createPublisher(std_msgs.msg.String.class, Topics.ROSOUT);
-        this.log = LoggerFactory.getLogger(defaultNode.getClass());
+        this.log = LoggerFactory.getLogger(
+                GraphName.getFullName(
+                        this.defaultNode.getNameSpace(),
+                        this.defaultNode.getName()));
     }
 
 //    public Publisher<rosgraph_msgs.msg.Log> getPublisher() {

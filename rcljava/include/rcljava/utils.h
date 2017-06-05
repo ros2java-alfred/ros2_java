@@ -56,6 +56,7 @@ char ** JniStringArray2StringArray(JNIEnv * env, jobjectArray stringArray)
     Strings[i] = (char *)TempString;
     env->ReleaseStringUTFChars(jniString, TempString);
   }
+
   return Strings;
 }
 

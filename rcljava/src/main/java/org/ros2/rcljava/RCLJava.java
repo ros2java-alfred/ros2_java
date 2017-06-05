@@ -60,6 +60,8 @@ public abstract class RCLJava {
      */
     private static boolean initialized = false;
 
+    private static String[] arguments = null;
+
     /**
      * A mapping between RMW implementations and their typesupports.
      */
@@ -231,6 +233,7 @@ public abstract class RCLJava {
                     RCLJava.logger.debug("Initialize rclJava with " + RCLJava.rmwImplementation);
                     RCLJava.nativeRCLJavaInit(args);
                     RCLJava.initialized = true;
+                    RCLJava.arguments = args;
                 }
             } else {
                 NotInitializedException ex = new NotInitializedException("Cannot intialized twice !");
@@ -254,36 +257,52 @@ public abstract class RCLJava {
     /**
      * Create a @{link Node}.
      *
-     * @param nodeName Name of the node.
+     * @param defaultName Name of the node.
      * @return A @{link Node} that represents the underlying ROS2 node
      *     structure.
      */
-    public static Node createNode(final String nodeName) {
-        return RCLJava.createNode(null, nodeName);
+    public static Node createNode(final String defaultName) {
+        return RCLJava.createNode(null, defaultName);
     }
 
     /**
      * Create a @{link Node}.
      *
      * @param namespace Name Space.
-     * @param nodeName The name that will identify this node in a ROS2 graph.
+     * @param defaultName The name that will identify this node in a ROS2 graph.
      * @return A @{link Node} that represents the underlying ROS2 node
      *     structure.
      */
-    public static Node createNode(String namespace, final String nodeName) {
-        RCLJava.logger.debug("Create Node stack : " + nodeName);
+    public static Node createNode(final String namespace, final String defaultName) {
+        RCLJava.logger.debug("Create Node stack : " + defaultName);
 
         if (!RCLJava.initialized) {
             throw new NotInitializedException();
         }
 
-        if (namespace == null) {
-            namespace = "";
+        String prefix = namespace;
+        String nodeName = defaultName;
+
+        if (RCLJava.arguments != null) {
+            for (String arg : RCLJava.arguments) {
+                String[] item = arg.split("=");
+                if ("-node".equals(item[0])) {
+                    nodeName = item[1];
+                }
+
+                if ("-prefix".equals(item[0])) {
+                    prefix = item[1];
+                }
+            }
+        }
+
+        if (prefix == null) {
+            prefix = "";
         }
 
 //        String fullName = GraphName.getFullName(ns, nodeName);
-        long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName, namespace);
-        Node node = new NativeNode(nodeHandle, namespace, nodeName);
+        long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName, prefix);
+        Node node = new NativeNode(nodeHandle, prefix, nodeName, RCLJava.arguments);
 
         return node;
     }
