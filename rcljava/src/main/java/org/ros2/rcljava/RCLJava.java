@@ -60,6 +60,8 @@ public abstract class RCLJava {
      */
     private static boolean initialized = false;
 
+    private static String[] arguments = null;
+
     /**
      * A mapping between RMW implementations and their typesupports.
      */
@@ -191,9 +193,12 @@ public abstract class RCLJava {
     private static void displayContext() {
         String libpath = System.getProperty("java.library.path");
         String arch    = System.getProperty("os.arch");
+        String os      = System.getProperty("os.name");
 
+        RCLJava.logger.debug("Native Library OS : " + os);
+        RCLJava.logger.debug("Native Library Archi : " + arch);
         RCLJava.logger.debug("Native Library path : \n" + libpath.replace(':', '\n'));
-        RCLJava.logger.debug("Native Library Archi : " + arch + "\n");
+
     }
 
     /**
@@ -204,6 +209,12 @@ public abstract class RCLJava {
     public static void rclJavaInit(final String args[]) {
         synchronized (RCLJava.class) {
             if (!RCLJava.initialized) {
+                if (args != null) {
+                    for (String arg : args) {
+                        String[] keyVal = arg.split("=");
+                        RCLJava.logger.debug("Args : " + keyVal[0] + "\t : " + keyVal[1]);
+                    }
+                }
 
                 // Auto-detect RMW implementation.
                 if (RCLJava.rmwImplementation == null) {
@@ -222,6 +233,7 @@ public abstract class RCLJava {
                     RCLJava.logger.debug("Initialize rclJava with " + RCLJava.rmwImplementation);
                     RCLJava.nativeRCLJavaInit(args);
                     RCLJava.initialized = true;
+                    RCLJava.arguments = args;
                 }
             } else {
                 NotInitializedException ex = new NotInitializedException("Cannot intialized twice !");
@@ -245,32 +257,52 @@ public abstract class RCLJava {
     /**
      * Create a @{link Node}.
      *
-     * @param nodeName Name of the node.
+     * @param defaultName Name of the node.
      * @return A @{link Node} that represents the underlying ROS2 node
      *     structure.
      */
-    public static Node createNode(final String nodeName) {
-        return RCLJava.createNode(null, nodeName);
+    public static Node createNode(final String defaultName) {
+        return RCLJava.createNode(null, defaultName);
     }
 
     /**
      * Create a @{link Node}.
      *
-     * @param ns Name Space.
-     * @param nodeName The name that will identify this node in a ROS2 graph.
+     * @param namespace Name Space.
+     * @param defaultName The name that will identify this node in a ROS2 graph.
      * @return A @{link Node} that represents the underlying ROS2 node
      *     structure.
      */
-    public static Node createNode(final String ns, final String nodeName) {
-        RCLJava.logger.debug("Create Node stack : " + nodeName);
+    public static Node createNode(final String namespace, final String defaultName) {
+        RCLJava.logger.debug("Create Node stack : " + defaultName);
 
         if (!RCLJava.initialized) {
             throw new NotInitializedException();
         }
 
+        String prefix = namespace;
+        String nodeName = defaultName;
+
+        if (RCLJava.arguments != null) {
+            for (String arg : RCLJava.arguments) {
+                String[] item = arg.split("=");
+                if ("-node".equals(item[0])) {
+                    nodeName = item[1];
+                }
+
+                if ("-prefix".equals(item[0])) {
+                    prefix = item[1];
+                }
+            }
+        }
+
+        if (prefix == null) {
+            prefix = "";
+        }
+
 //        String fullName = GraphName.getFullName(ns, nodeName);
-        long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName, ns);
-        Node node = new NativeNode(nodeHandle, ns, nodeName);
+        long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName, prefix);
+        Node node = new NativeNode(nodeHandle, prefix, nodeName, RCLJava.arguments);
 
         return node;
     }

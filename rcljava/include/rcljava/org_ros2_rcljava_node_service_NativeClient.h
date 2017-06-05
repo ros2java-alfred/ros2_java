@@ -23,6 +23,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * Class:     org_ros2_rcljava_node_service_NativeClient
  * Method:    nativeSendClientRequest
@@ -30,8 +31,8 @@ extern "C" {
  */
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_service_NativeClient_nativeSendClientRequest
   (JNIEnv *, jclass, jlong, jlong, jlong, jlong, jobject);
+
 #ifdef __cplusplus
 }
 #endif
-
 #endif  // RCLJAVA__ORG_ROS2_RCLJAVA_NODE_SERVICE_NATIVECLIENT_H_

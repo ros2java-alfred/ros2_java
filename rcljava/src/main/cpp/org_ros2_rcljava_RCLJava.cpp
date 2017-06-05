@@ -44,9 +44,14 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit(
   jclass,
   jobjectArray arg)
 {
-  // TODO(esteve): parse args
-  int argc = arg != NULL ? env->GetArrayLength(arg) : 0;
+  int argc = 0;
   char ** argv = nullptr;
+
+  if (arg != NULL) {
+    argc = env->GetArrayLength(arg);
+    argv = JniStringArray2StringArray(env, arg);
+  }
+
   rcl_allocator_t allocator = rcl_get_default_allocator();
 
   rcl_ret_t ret = rcl_init(argc, argv, allocator);

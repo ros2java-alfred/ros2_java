@@ -184,13 +184,15 @@ public class NativeNode implements Node {
      *
      * @param nodeHandle A pointer to the underlying ROS2 node structure. Must not
      *     be zero.
+     * @param nameSpace prefix path of node.
+     * @param nodeName name of node.
      */
-    public NativeNode(final long nodeHandle,final String ns, final String nodeName) {
+    public NativeNode(final long nodeHandle,final String nameSpace, final String nodeName, final String[] args) {
 
         if (nodeHandle==0) throw new NullPointerException("Node Handle is not define !");
         if (nodeName==null || nodeName.length() == 0) throw new NullPointerException("Node name is needed !");
 
-        this.nameSpace      = ns;
+        this.nameSpace      = nameSpace;
         this.name           = nodeName;
         this.nodeHandle     = nodeHandle;
         this.subscriptions  = new LinkedBlockingQueue<Subscription<?>>();
@@ -199,12 +201,80 @@ public class NativeNode implements Node {
         this.services       = new LinkedBlockingQueue<Service<? extends org.ros2.rcljava.internal.service.Service>>();
         this.parameters     = new HashMap<String, ParameterVariant<?>>();
 
-        NativeNode.logger.debug("Init Node stack : " + GraphName.getFullName(this.nameSpace, this.name));
+        NativeNode.logger.debug("Create Node stack : " + GraphName.getFullName(this.nameSpace, this.name));
+
+        if (args != null) {
+            for (String arg : args) {
+                String[] item = arg.split("=");
+
+                // Remove dash
+                String keyRaw = item[0].trim();
+                String key = (keyRaw.startsWith("-")) ? keyRaw.substring(1) : keyRaw;
+                String val = item[1].trim();
+                NativeNode.logger.debug("Parse argument : " + arg + "\t\t key : " + key + "\t\t value : "+ val );
+
+                if (this.parameters.get(key) == null) {
+                    ParameterVariant<?> value = null;
+
+                    if (isLong(val)) {
+                        value = new ParameterVariant<Long>(key, Long.parseLong(val));
+                    } else if (isDouble(val)) {
+                        value = new ParameterVariant<Double>(key, Double.parseDouble(val));
+                    } else
+//                    	if (isBoolean(val)) {
+//                        value = new ParameterVariant<Boolean>(key, Boolean.parseBoolean(val));
+//                    } else
+                    {
+                        value = new ParameterVariant<String>(key, val);
+                    }
+
+                    this.parameters.put(key, value);
+                }
+            }
+        }
 
         GraphName.addNode(this);
         this.parameterService = new ParameterService(this);
         this.logRos = new Log(this);
     }
+
+    private boolean isInteger(String value) {
+        try {
+            Integer.parseInt(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isBoolean(String value) {
+        try {
+            Boolean.parseBoolean(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isDouble(String value) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isLong(String value) {
+        try {
+            Long.parseLong(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
 
     /**
      * Safely destroy the underlying ROS2 node structure.
