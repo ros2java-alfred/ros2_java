@@ -30,7 +30,8 @@ import org.ros2.rcljava.node.Node;
  *
  * @param <T> Service Type.
  */
-public class NativeClient<T extends org.ros2.rcljava.internal.service.Service> implements Client<T> {
+public class NativeClient<T extends org.ros2.rcljava.internal.service.Service>
+        implements Client<T>, java.lang.AutoCloseable {
 
     // Loading JNI library.
     static {
@@ -170,5 +171,10 @@ public class NativeClient<T extends org.ros2.rcljava.internal.service.Service> i
       //TODO
         throw new NotImplementedException();
 //        return false;
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.dispose();
     }
 }

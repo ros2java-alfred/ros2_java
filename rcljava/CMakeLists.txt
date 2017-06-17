@@ -70,6 +70,10 @@ set(${PROJECT_NAME}_sources
 
   "src/main/java/org/ros2/rcljava/namespace/GraphName.java"
 
+  "src/main/java/org/ros2/rcljava/time/NativeWallTimer.java"
+  "src/main/java/org/ros2/rcljava/time/WallTimer.java"
+  "src/main/java/org/ros2/rcljava/time/WallTimerCallback.java"
+
   "src/main/java/org/ros2/rcljava/node/NativeNode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
 
@@ -112,9 +116,7 @@ if(typesupport_impls STREQUAL "")
   return()
 endif()
 
-set(_jni_classes "RCLJava;node_NativeNode;node_topic_NativePublisher;node_service_NativeClient")
-#set(target_suffix "__rmw_fastrtps_cpp")
-message(WARNING "===>${target_suffix}")
+set(_jni_classes "RCLJava;node_NativeNode;node_topic_NativePublisher;node_service_NativeClient;time_NativeWallTimer")
 
 foreach(_jni_class ${_jni_classes})
   set(_target_name "${PROJECT_NAME}_${_jni_class}${target_suffix}")
@@ -231,6 +233,7 @@ if(BUILD_TESTING)
     "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
     "src/test/java/org/ros2/rcljava/RmwTest.java"
     "src/test/java/org/ros2/rcljava/SubscriptionTest.java"
+    "src/test/java/org/ros2/rcljava/TimerTest.java"
   )
 
   set(${PROJECT_NAME}_testsuites
@@ -241,6 +244,7 @@ if(BUILD_TESTING)
     "org.ros2.rcljava.RCLJavaTest"
     "org.ros2.rcljava.RmwTest"
     "org.ros2.rcljava.SubscriptionTest"
+    "org.ros2.rcljava.TimerTest"
   )
 
   set(_deps_library_paths "")

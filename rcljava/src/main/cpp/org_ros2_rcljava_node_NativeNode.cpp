@@ -293,14 +293,19 @@ JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountSubscrib
 JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTopics(
   JNIEnv * env,
   jclass,
-  jlong jnode_handle)
+  jlong jnode_handle,
+  jboolean no_demangle)
 {
   rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
-  rcl_topic_names_and_types_t topic_names_and_types =
-    rcl_get_zero_initialized_topic_names_and_types();
+  rcl_names_and_types_t topic_names_and_types =
+    rcl_get_zero_initialized_names_and_types();
 
-  rcl_ret_t ret = rcl_get_topic_names_and_types(node, rcl_get_default_allocator(),
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  rcl_ret_t ret = rcl_get_topic_names_and_types(node,
+      &allocator,
+      no_demangle,
       &topic_names_and_types);
+
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of topics: " +
       std::string(rcl_get_error_string_safe()));
@@ -309,7 +314,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTop
 
   jobject topics = makeJTopics(env, &topic_names_and_types);
 
-  ret = rcl_destroy_topic_names_and_types(&topic_names_and_types);
+  ret = rcl_names_and_types_fini(&topic_names_and_types);
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of topics: " +
       std::string(rcl_get_error_string_safe()));
@@ -317,6 +322,38 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTop
   }
 
   return topics;
+}
+
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListServices(
+  JNIEnv * env,
+  jclass,
+  jlong jnode_handle)
+{
+  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
+  rcl_names_and_types_t service_names_and_types =
+    rcl_get_zero_initialized_names_and_types();
+
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  rcl_ret_t ret = rcl_get_service_names_and_types(node,
+      &allocator,
+      &service_names_and_types);
+
+  if (ret != RCL_RET_OK) {
+    std::string message("Failed get list of services: " +
+      std::string(rcl_get_error_string_safe()));
+    throwException(env, message);
+  }
+
+  jobject services = makeJTopics(env, &service_names_and_types);
+
+  ret = rcl_names_and_types_fini(&service_names_and_types);
+  if (ret != RCL_RET_OK) {
+    std::string message("Failed get list of service: " +
+      std::string(rcl_get_error_string_safe()));
+    throwException(env, message);
+  }
+
+  return services;
 }
 
 JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNames(
@@ -337,7 +374,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNam
 
   jobject nodes = makeJNodes(env, &node_names);
 
-  ret = rcutils_string_array_fini(&node_names, &allocator);
+  ret = rcutils_string_array_fini(&node_names);
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of nodes: " +
       std::string(rcl_get_error_string_safe()));

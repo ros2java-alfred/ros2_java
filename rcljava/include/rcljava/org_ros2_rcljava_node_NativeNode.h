@@ -1,5 +1,5 @@
 // Copyright 2016 Esteve Fernandez <esteve@apache.org>
-// Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
+// Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -89,10 +89,19 @@ JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountSubscrib
 /*
  * Class:     org_ros2_rcljava_node_NativeNode
  * Method:    nativeGetListTopics
- * Signature: (J)Ljava/util/HashMap;
+ * Signature: (JZ)Ljava/util/HashMap;
  */
 JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTopics
+  (JNIEnv *, jclass, jlong, jboolean);
+
+/*
+ * Class:     org_ros2_rcljava_node_NativeNode
+ * Method:    nativeGetListServices
+ * Signature: (J)Ljava/util/HashMap;
+ */
+JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListServices
   (JNIEnv *, jclass, jlong);
+
 
 /*
  * Class:     org_ros2_rcljava_node_NativeNode

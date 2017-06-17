@@ -38,6 +38,7 @@ import org.ros2.rcljava.qos.QoSProfile;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.ros2.rcljava.RCLJava;
@@ -348,7 +349,7 @@ public class NodeTest {
     public void testGraphGetTopics() {
         boolean test = true;
         Node node = null;
-        HashMap<String, String> topics = null;
+        HashMap<String, List<String>> topics = null;
         String fqnNode = null;
 
         RCLJava.rclJavaInit();
@@ -364,7 +365,7 @@ public class NodeTest {
         RCLJava.shutdown();
 
         int i = 0;
-        for (Entry<String, String> topic : topics.entrySet()) {
+        for (Entry<String, List<String>> topic : topics.entrySet()) {
             if (topic.getKey().startsWith(fqnNode)) {
                 ++i;
             }

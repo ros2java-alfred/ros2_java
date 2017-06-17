@@ -35,8 +35,6 @@ macro(_ament_cmake_java_register_environment_hook)
 
     find_package(ament_cmake_core QUIET REQUIRED)
 
-    message("INFO _ament_cmake_java_register_environment_hook")
-
     # backup variable
     set(_JAVA_INSTALL_DIR "${JAVA_INSTALL_DIR}")
     # use native separators in environment hook to match what pure Python packages do

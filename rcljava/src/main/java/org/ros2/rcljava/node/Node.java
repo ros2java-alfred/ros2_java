@@ -153,7 +153,10 @@ public interface Node {
 
     ParameterVariant<?> getParameter(final String name);
 
-    HashMap<String, String> getTopicNamesAndTypes();
+    HashMap<String, List<String>> getTopicNamesAndTypes();
+    HashMap<String, List<String>> getTopicNamesAndTypes(boolean noDemangle);
+
+    HashMap<String, List<String>> getServiceNamesAndTypes();
 
     List<String> getNodeNames();
 

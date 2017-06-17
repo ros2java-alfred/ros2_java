@@ -30,7 +30,7 @@ import org.ros2.rcljava.node.NativeNode;
  *
  * @param <T> The type of the messages that this publisher will publish.
  */
-public class NativePublisher<T extends Message> implements Publisher<T> {
+public class NativePublisher<T extends Message> implements Publisher<T>, java.lang.AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(NativePublisher.class);
 
@@ -131,10 +131,15 @@ public class NativePublisher<T extends Message> implements Publisher<T> {
         return this.topic;
     }
 
+    /**
+     * Get node of publisher
+     * @return
+     */
     public final NativeNode getNode() {
         return this.ownerNode;
     }
 
+    // TODO make protected for test only...
     public final long getPublisherHandle() {
         return this.publisherHandle;
     }
@@ -147,5 +152,10 @@ public class NativePublisher<T extends Message> implements Publisher<T> {
         NativePublisher.logger.debug("Destroy Publisher of topic : " + this.topic);
         this.ownerNode.getPublishers().remove(this);
         NativePublisher.nativeDispose(this.ownerNode.getNodeHandle(), this.publisherHandle);
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.dispose();
     }
 }

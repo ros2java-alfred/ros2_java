@@ -58,7 +58,7 @@ import rcl_interfaces.msg.SetParametersResult;
  * A Node must be created via @{link RCLJava#createNode(String)}
  *
  */
-public class NativeNode implements Node {
+public class NativeNode implements Node, java.lang.AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeNode.class);
 
@@ -85,12 +85,12 @@ public class NativeNode implements Node {
     /**
      * All the @{link Subscription}s that have been created through this instance.
      */
-    private final Queue<Subscription<?>> subscriptions;
+    private final Queue<Subscription<? extends org.ros2.rcljava.internal.message.Message>> subscriptions;
 
     /**
      * All the @{link Publisher}s that have been created through this instance.
      */
-    private final Queue<Publisher<?>> publishers;
+    private final Queue<Publisher<? extends org.ros2.rcljava.internal.message.Message>> publishers;
 
     /**
      * All the @{link Service}s that have been created through this instance.
@@ -173,7 +173,10 @@ public class NativeNode implements Node {
 
     private static native int nativeCountSubscribers(long nodeHandle, String topic);
 
-    private static native HashMap<String, String> nativeGetListTopics(long nodeHandle);
+    private static native HashMap<String, List<String>> nativeGetListTopics(long nodeHandle, boolean noDemangle);
+
+    private static native HashMap<String, List<String>> nativeGetListServices(long nodeHandle);
+
 
     private static native List<String> nativeGetNodeNames(long nodeHandle);
 
@@ -718,14 +721,30 @@ public class NativeNode implements Node {
     }
 
     @Override
-    public HashMap<String, String> getTopicNamesAndTypes() {
-        HashMap<String, String> topics =  NativeNode.nativeGetListTopics(this.nodeHandle);
+    public HashMap<String, List<String>> getTopicNamesAndTypes() {
+        return this.getTopicNamesAndTypes(false);
+    }
 
-        for (Entry<String, String> entry : topics.entrySet()) {
+    @Override
+    public HashMap<String, List<String>> getTopicNamesAndTypes(boolean noDemangle) {
+        HashMap<String, List<String>> topics =  NativeNode.nativeGetListTopics(this.nodeHandle, noDemangle);
+
+        for (Entry<String, List<String>> entry : topics.entrySet()) {
             NativeNode.logger.debug("\t - Topics: " + entry.getKey() + "\t Value: " + entry.getValue());
         }
 
         return topics;
+    }
+
+    @Override
+    public HashMap<String, List<String>> getServiceNamesAndTypes() {
+        HashMap<String, List<String>> services =  NativeNode.nativeGetListServices(this.nodeHandle);
+
+        for (Entry<String, List<String>> entry : services.entrySet()) {
+            NativeNode.logger.debug("\t - Service: " + entry.getKey() + "\t Value: " + entry.getValue());
+        }
+
+        return services;
     }
 
     @Override
@@ -868,5 +887,10 @@ public class NativeNode implements Node {
 
     public String getNameSpace() {
         return this.nameSpace;
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.dispose();
     }
 }

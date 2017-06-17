@@ -27,7 +27,8 @@ import org.ros2.rcljava.node.NativeNode;
  *
  * @param <T> The type of the messages that this subscription will receive.
  */
-public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Message> implements Subscription<T> {
+public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Message>
+        implements Subscription<T>, java.lang.AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeSubscription.class);
 
@@ -146,5 +147,10 @@ public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Mess
         NativeSubscription.logger.debug("Destroy Subscription of topic : " + this.topic);
         this.ownerNode.getSubscriptions().remove(this);
         // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.dispose();
     }
 }

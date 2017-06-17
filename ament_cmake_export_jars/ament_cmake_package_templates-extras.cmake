@@ -19,7 +19,6 @@ if(NOT PYTHON_EXECUTABLE)
     "empty")
 endif()
 
-message("INFO ament_cmake_package_templates JAVA")
 # stamp script to generate CMake code
 set(_generator
   "${ament_cmake_export_jars_DIR}/package_templates/templates_2_cmake.py")

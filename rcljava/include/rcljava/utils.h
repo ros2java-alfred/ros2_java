@@ -179,21 +179,34 @@ throwException(JNIEnv * env, std::string message)
  *
  */
 jobject
-makeJTopics(JNIEnv * env, rcl_topic_names_and_types_t * topic_names_and_types)
+makeJTopics(JNIEnv * env, rcl_names_and_types_t * topic_names_and_types)
 {
   env->PushLocalFrame(256);  // fix for local references
 
-  jsize map_len = topic_names_and_types->topic_count;
+  size_t map_len = (size_t)topic_names_and_types->names.size;
   jclass mapClass = env->FindClass("java/util/HashMap");
-  jmethodID init = env->GetMethodID(mapClass, "<init>", "(I)V");
-  jobject hashMap = env->NewObject(mapClass, init, map_len);
+  jmethodID initMap = env->GetMethodID(mapClass, "<init>", "(I)V");
+  jobject hashMap = env->NewObject(mapClass, initMap, map_len);
   jmethodID put = env->GetMethodID(mapClass, "put",
       "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 
-  for (size_t i = 0; i < topic_names_and_types->topic_count; ++i) {
+  jclass listClass = env->FindClass("java/util/ArrayList");
+  jmethodID initList = env->GetMethodID(listClass, "<init>", "(I)V");
+  jmethodID add = env->GetMethodID(listClass, "add",
+      "(Ljava/lang/Object;)Z");
+
+  for (size_t i = 0; i < map_len; ++i) {
+    size_t list_len = (size_t)topic_names_and_types->types[i].size;
+    jobject arrayList = env->NewObject(listClass, initList, list_len);
+
+    for (size_t j = 0; j < list_len; ++j) {
+      env->CallObjectMethod(arrayList, add,
+        env->NewStringUTF(topic_names_and_types->types[i].data[j]));
+    }
+
     env->CallObjectMethod(hashMap, put,
-      env->NewStringUTF(topic_names_and_types->topic_names[i]),
-      env->NewStringUTF(topic_names_and_types->type_names[i]));
+      env->NewStringUTF(topic_names_and_types->names.data[i]),
+      arrayList);
   }
 
   env->PopLocalFrame(hashMap);
