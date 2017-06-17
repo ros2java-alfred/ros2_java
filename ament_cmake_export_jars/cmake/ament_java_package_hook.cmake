@@ -49,7 +49,6 @@ endmacro()
 macro(_ament_cmake_java_get_java_install_dir)
   if(NOT DEFINED JAVA_INSTALL_DIR)
 
-    message("INFO _ament_cmake_java_get_java_install_dir")
     # avoid storing backslash in cached variable since CMake will interpret it
     # as escape character
     set(_java_code
