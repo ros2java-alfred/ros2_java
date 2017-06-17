@@ -327,7 +327,8 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNam
   rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
   rcutils_string_array_t node_names = rcutils_get_zero_initialized_string_array();
 
-  rcl_ret_t ret = rcl_get_node_names(node, rcl_get_default_allocator(), &node_names);
+  auto allocator = rcl_get_default_allocator();
+  rcl_ret_t ret = rcl_get_node_names(node, allocator, &node_names);
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of nodes: " +
       std::string(rcl_get_error_string_safe()));
@@ -336,7 +337,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNam
 
   jobject nodes = makeJNodes(env, &node_names);
 
-  ret = rcutils_string_array_fini(&node_names);
+  ret = rcutils_string_array_fini(&node_names, &allocator);
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of nodes: " +
       std::string(rcl_get_error_string_safe()));
