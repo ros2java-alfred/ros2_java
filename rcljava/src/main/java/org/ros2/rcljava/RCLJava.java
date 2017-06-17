@@ -211,8 +211,12 @@ public abstract class RCLJava {
             if (!RCLJava.initialized) {
                 if (args != null) {
                     for (String arg : args) {
-                        String[] keyVal = arg.split("=");
-                        RCLJava.logger.debug("Args : " + keyVal[0] + "\t : " + keyVal[1]);
+                        if (arg.contains("=")) {
+                            String[] keyVal = arg.split("=");
+                            RCLJava.logger.debug("Args : " + keyVal[0] + "\t : " + keyVal[1]);
+                        } else {
+                            RCLJava.logger.debug("Args : " + arg);
+                        }
                     }
                 }
 
@@ -285,13 +289,15 @@ public abstract class RCLJava {
 
         if (RCLJava.arguments != null) {
             for (String arg : RCLJava.arguments) {
-                String[] item = arg.split("=");
-                if ("-node".equals(item[0])) {
-                    nodeName = item[1];
-                }
+                if (arg.contains("=")) {
+                    String[] item = arg.split("=");
+                    if ("-node".equals(item[0])) {
+                        nodeName = item[1];
+                    }
 
-                if ("-prefix".equals(item[0])) {
-                    prefix = item[1];
+                    if ("-prefix".equals(item[0])) {
+                        prefix = item[1];
+                    }
                 }
             }
         }
@@ -313,7 +319,7 @@ public abstract class RCLJava {
      *
      * @param node
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked", "rawtypes", "resource" })
     public static void spinOnce(final Node node) {
         if (!RCLJava.initialized) {
             throw new NotInitializedException();

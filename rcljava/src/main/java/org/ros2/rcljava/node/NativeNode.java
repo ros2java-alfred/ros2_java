@@ -208,30 +208,32 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
 
         if (args != null) {
             for (String arg : args) {
-                String[] item = arg.split("=");
+                if (arg.contains("=")) {
+                    String[] item = arg.split("=");
 
-                // Remove dash
-                String keyRaw = item[0].trim();
-                String key = (keyRaw.startsWith("-")) ? keyRaw.substring(1) : keyRaw;
-                String val = item[1].trim();
-                NativeNode.logger.debug("Parse argument : " + arg + "\t\t key : " + key + "\t\t value : "+ val );
+                    // Remove dash
+                    String keyRaw = item[0].trim();
+                    String key = (keyRaw.startsWith("-")) ? keyRaw.substring(1) : keyRaw;
+                    String val = item[1].trim();
+                    NativeNode.logger.debug("Parse argument : " + arg + "\t\t key : " + key + "\t\t value : "+ val );
 
-                if (this.parameters.get(key) == null) {
-                    ParameterVariant<?> value = null;
+                    if (this.parameters.get(key) == null) {
+                        ParameterVariant<?> value = null;
 
-                    if (isLong(val)) {
-                        value = new ParameterVariant<Long>(key, Long.parseLong(val));
-                    } else if (isDouble(val)) {
-                        value = new ParameterVariant<Double>(key, Double.parseDouble(val));
-                    } else
-//                    	if (isBoolean(val)) {
-//                        value = new ParameterVariant<Boolean>(key, Boolean.parseBoolean(val));
-//                    } else
-                    {
-                        value = new ParameterVariant<String>(key, val);
+                        if (isLong(val)) {
+                            value = new ParameterVariant<Long>(key, Long.parseLong(val));
+                        } else if (isDouble(val)) {
+                            value = new ParameterVariant<Double>(key, Double.parseDouble(val));
+                        } else
+//                    	  if (isBoolean(val)) {
+//                            value = new ParameterVariant<Boolean>(key, Boolean.parseBoolean(val));
+//                        } else
+                        {
+                            value = new ParameterVariant<String>(key, val);
+                        }
+
+                        this.parameters.put(key, value);
                     }
-
-                    this.parameters.put(key, value);
                 }
             }
         }
