@@ -1,4 +1,4 @@
-/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+/* Copyright 2016-2017 Esteve Fernandez <esteve@apache.org>
  * Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,12 +24,16 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.ros2.rcljava.Log;
 import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.time.NativeWallTimer;
+import org.ros2.rcljava.time.WallTimer;
+import org.ros2.rcljava.time.WallTimerCallback;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
@@ -39,6 +43,7 @@ import org.ros2.rcljava.node.parameter.ParameterService;
 import org.ros2.rcljava.node.parameter.ParameterVariant;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.NativeClient;
+import org.ros2.rcljava.node.service.NativeService;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceCallback;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
@@ -103,6 +108,11 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     private final Queue<Client<?>> clients;
 
     /**
+     * All the @{link WallTimer}s that have been created through this instance.
+     */
+    private final Queue<WallTimer> timers;
+
+    /**
      *  List of parameters
      */
     private final HashMap<String, ParameterVariant<?>> parameters;
@@ -165,6 +175,8 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     private static native <T> long nativeCreateServiceHandle(
             long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
 
+    private static native long nativeCreateTimerHandle(long timerPeriod); //TODO move to RCLJava
+
     private static native void nativeDispose(long nodeHandle);
 
     private static native String nativeGetName(long nodeHandle);
@@ -202,6 +214,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
         this.publishers     = new LinkedBlockingQueue<Publisher<?>>();
         this.clients        = new LinkedBlockingQueue<Client<?>>();
         this.services       = new LinkedBlockingQueue<Service<? extends org.ros2.rcljava.internal.service.Service>>();
+        this.timers 		= new LinkedBlockingQueue<WallTimer>();
         this.parameters     = new HashMap<String, ParameterVariant<?>>();
 
         NativeNode.logger.debug("Create Node stack : " + GraphName.getFullName(this.nameSpace, this.name));
@@ -576,7 +589,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
 //            long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service, qos);
 //            Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
 
-            Class<?> requestType = (Class<?>)serviceType.getField("RequestType").get(null);
+            Class<? extends Message> requestType = (Class<? extends Message>)serviceType.getField("RequestType").get(null);
 
             Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
             long requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
@@ -584,7 +597,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
             Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
             long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
 
-            Class<?> responseType = (Class<?>)serviceType.getField("ResponseType").get(null);
+            Class<? extends Message> responseType = (Class<? extends Message>)serviceType.getField("ResponseType").get(null);
 
             Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
             long responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
@@ -596,7 +609,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
             long serviceHandle = NativeNode.nativeCreateServiceHandle(this.nodeHandle, serviceType, serviceName, qosProfileHandle);
             RCLJava.disposeQoSProfile(qosProfileHandle);
 
-            service = new Service<T>(this,
+            service = new NativeService<T>(this,
                     serviceHandle,
                     serviceType,
                     fqnService,
@@ -876,6 +889,22 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      */
     public final Queue<Service<? extends org.ros2.rcljava.internal.service.Service>> getServices() {
         return this.services;
+    }
+
+    public WallTimer createTimer(final long period, final TimeUnit unit, final WallTimerCallback callback) {
+        long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
+        long timerHandle = nativeCreateTimerHandle(timerPeriodNS);
+
+        WallTimer timer = new NativeWallTimer(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
+        this.timers.add(timer);
+        return timer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final Queue<WallTimer> getTimers() {
+        return this.timers;
     }
 
     public Time getCurrentTime() {

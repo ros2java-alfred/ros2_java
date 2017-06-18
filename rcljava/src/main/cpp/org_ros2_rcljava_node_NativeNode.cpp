@@ -1,4 +1,4 @@
-// Copyright 2016 Esteve Fernandez <esteve@apache.org>
+// Copyright 2016-2017 Esteve Fernandez <esteve@apache.org>
 // Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,7 +50,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreatePublis
   std::string topic = jstring2String(env, jtopic);
 
   rcl_publisher_t * publisher = makeInstance<rcl_publisher_t>();
-  publisher->impl = NULL;
+  *publisher = rcl_get_zero_initialized_publisher();
 
   rcl_publisher_options_t publisher_ops = rcl_publisher_get_default_options();
 
@@ -92,7 +92,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateSubscr
   std::string topic = jstring2String(env, jtopic);
 
   rcl_subscription_t * subscription = makeInstance<rcl_subscription_t>();
-  subscription->impl = NULL;
+  *subscription = rcl_get_zero_initialized_subscription();
 
   rcl_subscription_options_t subscription_ops = rcl_subscription_get_default_options();
   rmw_qos_profile_t * qos_profile = handle2Instance<rmw_qos_profile_t>(qos_profile_handle);
@@ -133,7 +133,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateClient
   std::string service_topic = jstring2String(env, jservice_topic);
 
   rcl_client_t * client = makeInstance<rcl_client_t>();
-  client->impl = NULL;
+  *client = rcl_get_zero_initialized_client();
 
 //  bool is_available = false;
 //  rcl_ret_t ret = rcl_service_server_is_available(node, client, &is_available);
@@ -185,7 +185,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateServic
   std::string service_topic = jstring2String(env, jservice_topic);
 
   rcl_service_t * service = makeInstance<rcl_service_t>();
-  service->impl = NULL;
+  *service = rcl_get_zero_initialized_service();
 
   rcl_service_options_t service_ops = rcl_service_get_default_options();
   rmw_qos_profile_t * qos_profile = handle2Instance<rmw_qos_profile_t>(qos_profile_handle);
@@ -208,6 +208,27 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateServic
 
   jlong jservice = instance2Handle(service);
   return jservice;
+}
+
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateTimerHandle(
+  JNIEnv * env,
+  jclass,
+  jlong timer_period)
+{
+  rcl_timer_t * timer = makeInstance<rcl_timer_t>();
+  *timer = rcl_get_zero_initialized_timer();
+
+  rcl_ret_t ret = rcl_timer_init(timer, timer_period, NULL, rcl_get_default_allocator());
+
+  if (ret != RCL_RET_OK) {
+    std::string message("Failed to create timer: " +
+      std::string(rcl_get_error_string_safe()));
+    throwException(env, message);
+    return 0;
+  }
+
+  jlong jtimer = instance2Handle(timer);
+  return jtimer;
 }
 
 /*

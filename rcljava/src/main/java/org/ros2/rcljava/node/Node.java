@@ -18,8 +18,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.time.WallTimer;
+import org.ros2.rcljava.time.WallTimerCallback;
 
 import builtin_interfaces.msg.Time;
 
@@ -145,6 +148,9 @@ public interface Node {
             final String serviceName,
             final ServiceCallback<?, ?> callback) throws Exception;
 
+
+    WallTimer createTimer(final long period, final TimeUnit unit, final WallTimerCallback callback);
+
     List<SetParametersResult> setParameters(final List<ParameterVariant<?>> parameters);
 
     SetParametersResult setParametersAtomically(final List<ParameterVariant<?>> parameters);
@@ -247,6 +253,11 @@ public interface Node {
      * @return ArrayList of Services
      */
     Queue<Service<? extends org.ros2.rcljava.internal.service.Service>> getServices();
+
+    /**
+     * @return All the @{link WallTimer}s that were created by this instance.
+     */
+    Queue<WallTimer> getTimers();
 
     Log getLog();
 

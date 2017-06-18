@@ -1,4 +1,4 @@
-// Copyright 2016 Esteve Fernandez <esteve@apache.org>
+// Copyright 2016-2017 Esteve Fernandez <esteve@apache.org>
 // Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -199,6 +199,22 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToH
  */
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile
   (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeWaitSetClearTimers
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearTimers
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_RCLJava
+ * Method:    nativeWaitSetAddTimer
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddTimer
+  (JNIEnv *, jclass, jlong, jlong);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,4 @@
-/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
- * Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
+/* Copyright 2017 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,130 +14,30 @@
  */
 package org.ros2.rcljava.node.service;
 
-import org.ros2.rcljava.node.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.ros2.rcljava.internal.message.Message;
 
-/**
- * Service Server.
- *
- * @param <T> Service Type.
- */
-public class Service<T extends org.ros2.rcljava.internal.service.Service> {
+public interface Service<T extends org.ros2.rcljava.internal.service.Service> {
 
-    private static final Logger logger = LoggerFactory.getLogger(Service.class);
-
-    public static final String SCHEME = "rostopic://";
-
-    /** Name of the service */
-    private final String serviceName;
-
-    /** Node owner. */
-    private final Node ownerNode;
-
-    /** Service Handler. */
-    private final long serviceHandle;
-
-    private final Class<T> serviceType;
-
-    private final ServiceCallback<?, ?> callback;
-
-    private final long requestFromJavaConverterHandle;
-    private final long requestToJavaConverterHandle;
-
-    private final long responseFromJavaConverterHandle;
-    private final long responseToJavaConverterHandle;
-
-    private final Class<?> requestType;
-    private final Class<?> responseType;
+    public static final String SCHEME = "rosservice://";
 
     /**
-     * Constructor.
-     *
-     * @param nodeHandle
-     * @param serviceName
+     * Safely destroy the underlying ROS2 Service structure.
      */
-    public Service(
-            final Node node,
-            final long serviceHandle,
-            final Class<T> serviceType,
-            final String serviceName,
-            final ServiceCallback<?, ?> callback,
-            final Class<?> requestType,
-            final Class<?> responseType,
-            final long requestFromJavaConverterHandle,
-            final long requestToJavaConverterHandle,
-            final long responseFromJavaConverterHandle,
-            final long responseToJavaConverterHandle) {
+    void dispose();
 
-        if (node == null && serviceHandle == 0) {
-            throw new RuntimeException("Need to provide active node with handle object");
-        }
+    long getServiceHandle();
 
-        Service.logger.debug("Init Service stack : " + serviceName);
+    ServiceCallback<?, ?> getCallback();
 
-        this.ownerNode = node;
-        this.serviceHandle = serviceHandle;
+    long getRequestFromJavaConverterHandle();
 
-        this.serviceType = serviceType;
-        this.serviceName = serviceName;
-        this.callback = callback;
-        this.requestType = requestType;
-        this.responseType = responseType;
-        this.requestFromJavaConverterHandle = requestFromJavaConverterHandle;
-        this.requestToJavaConverterHandle = requestToJavaConverterHandle;
-        this.responseFromJavaConverterHandle = responseFromJavaConverterHandle;
-        this.responseToJavaConverterHandle = responseToJavaConverterHandle;
+    long getRequestToJavaConverterHandle();
 
-        this.ownerNode.getServices().add(this);
-    }
+    long getResponseFromJavaConverterHandle();
 
-    public void dispose() {
-        Service.logger.debug("Destroy Service stack : " + this.serviceName);
-        this.ownerNode.getServices().remove(this);
-    }
+    long getResponseToJavaConverterHandle();
 
-    public void sendResponse() {
+    Class<? extends Message> getRequestType();
 
-    }
-
-    public String getServiceName() {
-        return this.serviceName;
-    }
-
-    public final ServiceCallback<?, ?> getCallback() {
-        return callback;
-    }
-
-    public final Class<T> getServiceType() {
-        return serviceType;
-    }
-
-    public final long getServiceHandle() {
-        return this.serviceHandle;
-    }
-
-    public final long getRequestFromJavaConverterHandle() {
-        return this.requestFromJavaConverterHandle;
-    }
-
-    public final long getRequestToJavaConverterHandle() {
-        return this.requestToJavaConverterHandle;
-    }
-
-    public final long getResponseFromJavaConverterHandle() {
-        return this.responseFromJavaConverterHandle;
-    }
-
-    public final long getResponseToJavaConverterHandle() {
-        return this.responseToJavaConverterHandle;
-    }
-
-    public final Class<?> getRequestType() {
-        return this.requestType;
-    }
-
-    public final Class<?> getResponseType() {
-        return this.responseType;
-    }
+    Class<? extends Message> getResponseType();
 }

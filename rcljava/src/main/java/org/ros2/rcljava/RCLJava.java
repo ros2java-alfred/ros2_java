@@ -33,7 +33,7 @@ import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.qos.QoSProfile;
-
+import org.ros2.rcljava.time.WallTimer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,6 +127,8 @@ public abstract class RCLJava {
     private static native void nativeWaitSetAddSubscription(long waitSetHandle, long subscriptionHandle);
     private static native void nativeWaitSetClearServices(long waitSetHandle);
     private static native void nativeWaitSetAddService(long waitSetHandle, long serviceHandle);
+    private static native void nativeWaitSetClearTimers(long waitSetHandle);
+    private static native void nativeWaitSetAddTimer(long waitSetHandle, long timerHandle);
     private static native void nativeWaitSetClearClients(long waitSetHandle);
     private static native void nativeWaitSetAddClient(long waitSetHandle, long clientHandle);
     private static native void nativeWait(long waitSetHandle);
@@ -335,12 +337,13 @@ public abstract class RCLJava {
                     waitSetHandle,
                     node.getSubscriptions().size(),
                     0,
-                    0,
+                    node.getTimers().size(),
                     node.getClients().size(),
                     node.getServices().size());
 
             // Clean Waitset components.
             RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
+            RCLJava.nativeWaitSetClearTimers(waitSetHandle);
             RCLJava.nativeWaitSetClearServices(waitSetHandle);
             RCLJava.nativeWaitSetClearClients(waitSetHandle);
 
@@ -348,6 +351,10 @@ public abstract class RCLJava {
             for (Subscription<?> subscription : node.getSubscriptions()) {
                 NativeSubscription<?> nativeSubscription = (NativeSubscription<?>) subscription;
                 RCLJava.nativeWaitSetAddSubscription(waitSetHandle, nativeSubscription.getSubscriptionHandle());
+            }
+
+            for (WallTimer timer : node.getTimers()) {
+                nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
             }
 
             for (Service<?> service : node.getServices()) {
@@ -371,6 +378,13 @@ public abstract class RCLJava {
                         nativeSubscription.getMessageType());
                 if (message != null) {
                     subscription.getCallback().dispatch(message);
+                }
+            }
+
+            for (WallTimer timer : node.getTimers()) {
+                if (timer.isReady()) {
+                    timer.callTimer();
+                    timer.getCallback().tick();
                 }
             }
 

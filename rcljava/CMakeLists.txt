@@ -91,6 +91,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/node/topic/Topics.java"
 
   "src/main/java/org/ros2/rcljava/node/service/NativeClient.java"
+  "src/main/java/org/ros2/rcljava/node/service/NativeService.java"
   "src/main/java/org/ros2/rcljava/node/service/Client.java"
   "src/main/java/org/ros2/rcljava/node/service/RCLFuture.java"
   "src/main/java/org/ros2/rcljava/node/service/RMWRequestId.java"

@@ -1,4 +1,4 @@
-// Copyright 2016 Esteve Fernandez <esteve@apache.org>
+// Copyright 2016-2017 Esteve Fernandez <esteve@apache.org>
 // Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -109,6 +109,14 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListSer
  * Signature: (J)Ljava/util/List;
  */
 JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNames
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_node_NativeNode
+ * Method:    nativeCreateTimerHandle
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateTimerHandle
   (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
