@@ -149,7 +149,7 @@ public interface Node {
             final ServiceCallback<?, ?> callback) throws Exception;
 
 
-    WallTimer createTimer(final long period, final TimeUnit unit, final WallTimerCallback callback);
+    WallTimer createWallTimer(final long period, final TimeUnit unit, final WallTimerCallback callback);
 
     List<SetParametersResult> setParameters(final List<ParameterVariant<?>> parameters);
 
@@ -257,7 +257,7 @@ public interface Node {
     /**
      * @return All the @{link WallTimer}s that were created by this instance.
      */
-    Queue<WallTimer> getTimers();
+    Queue<WallTimer> getWallTimers();
 
     Log getLog();
 

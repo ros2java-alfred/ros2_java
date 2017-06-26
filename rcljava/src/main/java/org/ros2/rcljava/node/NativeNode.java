@@ -61,7 +61,6 @@ import rcl_interfaces.msg.SetParametersResult;
 /**
  * This class serves as a bridge between ROS2's rcl_node_t and RCLJava.
  * A Node must be created via @{link RCLJava#createNode(String)}
- *
  */
 public class NativeNode implements Node, java.lang.AutoCloseable {
 
@@ -335,7 +334,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     public String getName() {
         String name = NativeNode.nativeGetName(this.nodeHandle);
 
-        if (name.contains("/")) {
+        if (name != null && name.contains("/")) {
             if (this.nameSpace != null) {
                 name = name.replace(this.nameSpace+"/", "");
             } else {
@@ -568,6 +567,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Service instance of the service.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends org.ros2.rcljava.internal.service.Service> Service<T> createService(
             final Class<T> serviceType,
@@ -719,10 +719,12 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
         return result;
     }
 
+    @Override
     public List<String> getParametersNames() {
         return new ArrayList<String>(this.parameters.keySet());
     }
 
+    @Override
     public List<Byte> getParametersTypes(List<String> names) {
         List<Byte> result = new ArrayList<Byte>();
 
@@ -864,6 +866,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     /**
      * @return All the @{link Subscription}s that were created by this instance.
      */
+    @Override
     public Queue<Subscription<? extends org.ros2.rcljava.internal.message.Message>> getSubscriptions() {
         return this.subscriptions;
     }
@@ -871,6 +874,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     /**
      * @return All the @{link Publisher}s that were created by this instance.
      */
+    @Override
     public final Queue<Publisher<? extends org.ros2.rcljava.internal.message.Message>> getPublishers() {
       return this.publishers;
     }
@@ -879,6 +883,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * Get list of Clients.
      * @return ArrayList of Clients
      */
+    @Override
     public final Queue<Client<?>> getClients() {
         return this.clients;
     }
@@ -887,11 +892,13 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * Get list of Services.
      * @return ArrayList of Services
      */
+    @Override
     public final Queue<Service<? extends org.ros2.rcljava.internal.service.Service>> getServices() {
         return this.services;
     }
 
-    public WallTimer createTimer(final long period, final TimeUnit unit, final WallTimerCallback callback) {
+    @Override
+    public WallTimer createWallTimer(final long period, final TimeUnit unit, final WallTimerCallback callback) {
         long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
         long timerHandle = nativeCreateTimerHandle(timerPeriodNS);
 
@@ -903,19 +910,23 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     /**
      * {@inheritDoc}
      */
-    public final Queue<WallTimer> getTimers() {
+    @Override
+    public final Queue<WallTimer> getWallTimers() {
         return this.timers;
     }
 
+    @Override
     public Time getCurrentTime() {
         //TODO (theos)
         return null;
     }
 
+    @Override
     public Log getLog() {
         return this.logRos;
     }
 
+    @Override
     public String getNameSpace() {
         return this.nameSpace;
     }

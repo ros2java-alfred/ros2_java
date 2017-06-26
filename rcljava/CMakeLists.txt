@@ -77,6 +77,14 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/node/NativeNode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
 
+  "src/main/java/org/ros2/rcljava/executor/AnyExecutable.java"
+  "src/main/java/org/ros2/rcljava/executor/BaseThreadedExecutor.java"
+  "src/main/java/org/ros2/rcljava/executor/MemoryStrategy.java"
+  "src/main/java/org/ros2/rcljava/executor/MultiThreadedExecutor.java"
+  "src/main/java/org/ros2/rcljava/executor/NativeExecutor.java"
+  "src/main/java/org/ros2/rcljava/executor/SingleThreadedExecutor.java"
+  "src/main/java/org/ros2/rcljava/executor/ThreadedExecutor.java"
+
   "src/main/java/org/ros2/rcljava/qos/policies/Durability.java"
   "src/main/java/org/ros2/rcljava/qos/policies/History.java"
   "src/main/java/org/ros2/rcljava/qos/policies/QoSPolicy.java"

@@ -24,7 +24,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.lang.ref.WeakReference;
@@ -76,7 +75,6 @@ public class TimerTest {
   public void tearDown() throws Exception {
   }
 
-  @Ignore
   @Test
   public final void testCreate() {
     int max_iterations = 4;
@@ -88,7 +86,7 @@ public class TimerTest {
     RCLFuture<Boolean> future = new RCLFuture<Boolean>(new WeakReference<Node>(node));
     TimerCallback timerCallback = new TimerCallback(future, max_iterations);
 
-    WallTimer timer = node.createTimer(250, TimeUnit.MILLISECONDS, timerCallback);
+    WallTimer timer = node.createWallTimer(250, TimeUnit.MILLISECONDS, timerCallback);
     assertNotEquals(0, timer.getHandle());
 
     while (RCLJava.ok() && !future.isDone()) {

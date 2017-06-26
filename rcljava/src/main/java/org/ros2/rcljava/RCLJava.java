@@ -115,37 +115,37 @@ public abstract class RCLJava {
     private static native long nativeCreateNodeHandle(String nodeName, String spaceName);
 
     // Wait.h
-    private static native long nativeGetZeroInitializedWaitSet();
-    private static native void nativeWaitSetInit(
+    public static native long nativeGetZeroInitializedWaitSet();
+    public static native void nativeWaitSetInit(
             long waitSetHandle,
             int numberOfSubscriptions,
             int numberOfGuardConditions,
             int numberOfTimers,
             int numberOfClients,
             int numberOfServices);
-    private static native void nativeWaitSetClearSubscriptions(long waitSetHandle);
-    private static native void nativeWaitSetAddSubscription(long waitSetHandle, long subscriptionHandle);
-    private static native void nativeWaitSetClearServices(long waitSetHandle);
-    private static native void nativeWaitSetAddService(long waitSetHandle, long serviceHandle);
-    private static native void nativeWaitSetClearTimers(long waitSetHandle);
-    private static native void nativeWaitSetAddTimer(long waitSetHandle, long timerHandle);
-    private static native void nativeWaitSetClearClients(long waitSetHandle);
-    private static native void nativeWaitSetAddClient(long waitSetHandle, long clientHandle);
-    private static native void nativeWait(long waitSetHandle);
-    private static native Message nativeTake(long SubscriptionHandle, Class<?> msgType);
-    private static native void nativeWaitSetFini(long waitSetHandle);
-    private static native Object nativeTakeRequest(
+    public static native void nativeWaitSetClearSubscriptions(long waitSetHandle);
+    public static native void nativeWaitSetAddSubscription(long waitSetHandle, long subscriptionHandle);
+    public static native void nativeWaitSetClearServices(long waitSetHandle);
+    public static native void nativeWaitSetAddService(long waitSetHandle, long serviceHandle);
+    public static native void nativeWaitSetClearTimers(long waitSetHandle);
+    public static native void nativeWaitSetAddTimer(long waitSetHandle, long timerHandle);
+    public static native void nativeWaitSetClearClients(long waitSetHandle);
+    public static native void nativeWaitSetAddClient(long waitSetHandle, long clientHandle);
+    public static native void nativeWait(long waitSetHandle);
+    public static native Message nativeTake(long SubscriptionHandle, Class<?> msgType);
+    public static native void nativeWaitSetFini(long waitSetHandle);
+    public static native Object nativeTakeRequest(
             long serviceHandle,
             long requestFromJavaConverterHandle,
             long requestToJavaConverterHandle,
             Object requestMessage);
-    private static native void nativeSendServiceResponse(
+    public static native void nativeSendServiceResponse(
             long serviceHandle,
             Object header,
             long responseFromJavaConverterHandle,
             long responseToJavaConverterHandle,
             Object responseMessage);
-    private static native Object nativeTakeResponse(
+    public static native Object nativeTakeResponse(
             long clientHandle,
             long responseFromJavaConverterHandle,
             long responseToJavaConverterHandle,
@@ -331,13 +331,14 @@ public abstract class RCLJava {
                 node.getPublishers().size() > 0 ||
                 node.getServices().size() > 0 ||
                 node.getSubscriptions().size() > 0) {
+
             long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
 
             RCLJava.nativeWaitSetInit(
                     waitSetHandle,
                     node.getSubscriptions().size(),
                     0,
-                    node.getTimers().size(),
+                    node.getWallTimers().size(),
                     node.getClients().size(),
                     node.getServices().size());
 
@@ -353,8 +354,8 @@ public abstract class RCLJava {
                 RCLJava.nativeWaitSetAddSubscription(waitSetHandle, nativeSubscription.getSubscriptionHandle());
             }
 
-            for (WallTimer timer : node.getTimers()) {
-                nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
+            for (WallTimer timer : node.getWallTimers()) {
+                RCLJava.nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
             }
 
             for (Service<?> service : node.getServices()) {
@@ -381,7 +382,7 @@ public abstract class RCLJava {
                 }
             }
 
-            for (WallTimer timer : node.getTimers()) {
+            for (WallTimer timer : node.getWallTimers()) {
                 if (timer.isReady()) {
                     timer.callTimer();
                     timer.getCallback().tick();
@@ -389,10 +390,10 @@ public abstract class RCLJava {
             }
 
             for (Service service : node.getServices()) {
-                long requestFromJavaConverterHandle = service.getRequestFromJavaConverterHandle();
-                long requestToJavaConverterHandle = service.getRequestToJavaConverterHandle();
+                long requestFromJavaConverterHandle  = service.getRequestFromJavaConverterHandle();
+                long requestToJavaConverterHandle    = service.getRequestToJavaConverterHandle();
                 long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
-                long responseToJavaConverterHandle = service.getResponseToJavaConverterHandle();
+                long responseToJavaConverterHandle   = service.getResponseToJavaConverterHandle();
 
                 Class<?> requestType = service.getRequestType();
                 Class<?> responseType = service.getResponseType();

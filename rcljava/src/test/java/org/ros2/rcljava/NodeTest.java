@@ -32,9 +32,13 @@ import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceCallback;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
+import org.ros2.rcljava.node.topic.NativePublisher;
+import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.qos.QoSProfile;
+
+import std_msgs.msg.UInt32;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -42,19 +46,23 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.executor.MultiThreadedExecutor;
+import org.ros2.rcljava.executor.SingleThreadedExecutor;
+import org.ros2.rcljava.executor.ThreadedExecutor;
+import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.namespace.GraphName;
 
 
 public class NodeTest {
 
-    public class TestConsumer implements SubscriptionCallback<std_msgs.msg.String> {
-        private final RCLFuture<std_msgs.msg.String> future;
+    public class TestConsumer<T extends Message> implements SubscriptionCallback<T> {
+        private final RCLFuture<T> future;
 
-        TestConsumer(final RCLFuture<std_msgs.msg.String> future) {
+        TestConsumer(final RCLFuture<T> future) {
             this.future = future;
         }
 
-        public final void dispatch(final std_msgs.msg.String msg) {
+        public final void dispatch(final T msg) {
             if (!this.future.isDone()) {
                 this.future.set(msg);
             }
@@ -78,8 +86,9 @@ public class NodeTest {
             node.dispose();
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
-        RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
         Assert.assertNotEquals(0, node.getNodeHandle());
@@ -96,8 +105,9 @@ public class NodeTest {
             node.dispose();
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
-        RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
         Assert.assertEquals("Bad result", node, node);
@@ -109,15 +119,16 @@ public class NodeTest {
         Node node = null;
         String nodeName = null;
 
-        RCLJava.rclJavaInit();
         try {
+            RCLJava.rclJavaInit();
             node = RCLJava.createNode("testNodeName");
             nodeName = node.getName();
             node.dispose();
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
-        RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
         Assert.assertEquals("Bad result", "testNodeName", nodeName);
@@ -135,7 +146,7 @@ public class NodeTest {
         RCLFuture<std_msgs.msg.String> future = new RCLFuture<std_msgs.msg.String>(new WeakReference<Node>(node));
 
         Subscription<std_msgs.msg.String> subscription = node.<std_msgs.msg.String>createSubscription(
-                std_msgs.msg.String.class, "test_topic", new TestConsumer(future));
+                std_msgs.msg.String.class, "test_topic", new TestConsumer<std_msgs.msg.String>(future));
 
         std_msgs.msg.String msg = new std_msgs.msg.String();
         msg.setData("Hello");
@@ -159,8 +170,9 @@ public class NodeTest {
         Node node = null;
         Publisher<std_msgs.msg.String> pub = null;
 
-        RCLJava.rclJavaInit();
+
         try {
+            RCLJava.rclJavaInit();
             node = RCLJava.createNode("testPublisher");
 //            RCLFuture<std_msgs.msg.String> future = new RCLFuture<std_msgs.msg.String>(new WeakReference<Node>(node));
             pub = node.<std_msgs.msg.String>createPublisher(
@@ -180,8 +192,9 @@ public class NodeTest {
             node.dispose();
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
-        RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
         Assert.assertNotNull("Bad result", pub);
@@ -198,8 +211,8 @@ public class NodeTest {
             public void dispatch(std_msgs.msg.String msg) { }
         };
 
-        RCLJava.rclJavaInit();
         try {
+            RCLJava.rclJavaInit();
             node = RCLJava.createNode("testSubscription");
             sub = node.<std_msgs.msg.String>createSubscription(
                     std_msgs.msg.String.class,
@@ -211,8 +224,9 @@ public class NodeTest {
             node.dispose();
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
-        RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
         Assert.assertNotNull("Bad result", sub);
@@ -224,8 +238,8 @@ public class NodeTest {
         Node node = null;
         Client<rcl_interfaces.srv.GetParameters> clt = null;
 
-        RCLJava.rclJavaInit();
         try {
+            RCLJava.rclJavaInit();
             node = RCLJava.createNode("testClient");
             clt = node.<rcl_interfaces.srv.GetParameters>createClient(
                     rcl_interfaces.srv.GetParameters.class,
@@ -236,8 +250,9 @@ public class NodeTest {
             node.dispose();
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
-        RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
         Assert.assertNotNull("Bad result", clt);
@@ -255,8 +270,8 @@ public class NodeTest {
             public void dispatch(RMWRequestId header, rcl_interfaces.srv.GetParameters_Request request, rcl_interfaces.srv.GetParameters_Response response) { }
         };
 
-        RCLJava.rclJavaInit();
         try {
+            RCLJava.rclJavaInit();
             node = RCLJava.createNode("testSubscription");
             srv = node.<rcl_interfaces.srv.GetParameters>createService(
                     rcl_interfaces.srv.GetParameters.class,
@@ -268,8 +283,9 @@ public class NodeTest {
             node.dispose();
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
-        RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
         Assert.assertNotNull("Bad result", srv);
@@ -280,31 +296,32 @@ public class NodeTest {
         boolean test = true;
         int count = -2;
         Node node = null;
-//        Publisher<std_msgs.msg.String> pub = null;
+        Publisher<std_msgs.msg.String> pub = null;
+        final String topicPath = "/testChannel";
 
-        RCLJava.rclJavaInit();
         try {
+            RCLJava.rclJavaInit();
             node = RCLJava.createNode("testPublisher");
 
-            count = node.countPublishers("testChannel");
+            count = node.countPublishers(topicPath);
             Assert.assertEquals("Bad result", 0, count);
-            // TODO
-//            pub = node.<std_msgs.msg.String>createPublisher(
-//                    std_msgs.msg.String.class,
-//                    "testChannel",
-//                    QoSProfile.PROFILE_DEFAULT);
-//            count = node.countPublishers("testChannel");
-//            Assert.assertEquals("Bad result", 1, count);
-//            pub.dispose();
-            count = node.countPublishers("testChannel");
+
+            pub = node.<std_msgs.msg.String>createPublisher(
+                    std_msgs.msg.String.class,
+                    topicPath,
+                    QoSProfile.DEFAULT);
+            count = node.countPublishers(topicPath);
+            Assert.assertEquals("Bad result", 1, count);
+
+            pub.dispose();
             node.dispose();
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
-        RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", 0, count);
     }
 
     @Test
@@ -319,8 +336,8 @@ public class NodeTest {
 //            public void accept(std_msgs.msg.String msg) { }
 //        };
 
-        RCLJava.rclJavaInit();
         try {
+            RCLJava.rclJavaInit();
             node = RCLJava.createNode("testSubscription");
             count = node.countPublishers("testChannel");
             Assert.assertEquals("Bad result", 0, count);
@@ -337,23 +354,24 @@ public class NodeTest {
             node.dispose();
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
-        RCLJava.shutdown();
 
         Assert.assertTrue("Expected Runtime error.", test);
         Assert.assertEquals("Bad result", 0, count);
     }
 
-    @Ignore
     @Test
+    @Ignore
     public void testGraphGetTopics() {
         boolean test = true;
         Node node = null;
         HashMap<String, List<String>> topics = null;
         String fqnNode = null;
 
-        RCLJava.rclJavaInit();
         try {
+            RCLJava.rclJavaInit();
             node = RCLJava.createNode("testSubscription");
             topics = node.getTopicNamesAndTypes();
             fqnNode = GraphName.getFullName(node.getNameSpace(), node.getName());
@@ -361,8 +379,9 @@ public class NodeTest {
             node.dispose();
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
-        RCLJava.shutdown();
 
         int i = 0;
         for (Entry<String, List<String>> topic : topics.entrySet()) {
@@ -376,4 +395,264 @@ public class NodeTest {
     }
 
     //TODO Test Parameters
+
+    @Test
+    public final void testPubUInt32LinkMultipleProcess() throws Exception {
+        boolean test = true;
+
+        try {
+            RCLJava.rclJavaInit();
+            ThreadedExecutor executor = new MultiThreadedExecutor();
+
+            final Node publisherNode        = RCLJava.createNode("publisher_node");
+            final Node subscriptionNodeOne  = RCLJava.createNode("subscription_node_one");
+            final Node subscriptionNodeTwo  = RCLJava.createNode("subscription_node_two");
+
+            NativePublisher<UInt32> publisher = (NativePublisher<UInt32>) publisherNode.<UInt32>createPublisher(
+                    UInt32.class, "test_topic_multiple");
+
+            final RCLFuture<UInt32> futureOne = new RCLFuture<UInt32>(executor);
+
+            NativeSubscription<UInt32> subscriptionOne = (NativeSubscription<UInt32>) subscriptionNodeOne.<UInt32>createSubscription(
+                    UInt32.class, "test_topic_multiple", new TestConsumer<UInt32>(futureOne));
+
+            final RCLFuture<UInt32> futureTwo = new RCLFuture<UInt32>(executor);
+
+            NativeSubscription<UInt32> subscriptionTwo = (NativeSubscription<UInt32>) subscriptionNodeTwo.<UInt32>createSubscription(
+                    UInt32.class, "test_topic_multiple", new TestConsumer<UInt32>(futureTwo));
+
+            UInt32 msg = new UInt32();
+            msg.setData(54321);
+
+            executor.addNode(publisherNode);
+            executor.addNode(subscriptionNodeOne);
+            executor.addNode(subscriptionNodeTwo);
+
+//            executor.spin();
+
+            while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
+                publisher.publish(msg);
+                executor.spinOnce(0);
+            }
+
+            UInt32 valueOne = futureOne.get();
+            assertEquals(54321, valueOne.getData());
+
+            UInt32 valueTwo = futureTwo.get();
+            assertEquals(54321, valueTwo.getData());
+
+            executor.removeNode(subscriptionNodeTwo);
+            executor.removeNode(subscriptionNodeOne);
+            executor.removeNode(publisherNode);
+            executor.cancel();
+
+            publisher.dispose();
+            subscriptionOne.dispose();
+            subscriptionTwo.dispose();
+
+            publisherNode.dispose();
+            subscriptionNodeOne.dispose();
+            subscriptionNodeTwo.dispose();
+        } catch (Exception e) {
+            test = false;
+        } finally {
+            RCLJava.shutdown();
+        }
+
+        Assert.assertTrue("Expected Runtime error.", test);
+    }
+
+    @Test
+    public final void testPubUInt32SeparateMultipleProcess() throws Exception {
+        boolean test = true;
+
+        try {
+            RCLJava.rclJavaInit();
+            ThreadedExecutor executor = new MultiThreadedExecutor();
+
+            final Node publisherNode        = RCLJava.createNode("publisher_node");
+            final Node subscriptionNodeOne  = RCLJava.createNode("subscription_node_one");
+            final Node subscriptionNodeTwo  = RCLJava.createNode("subscription_node_two");
+
+            NativePublisher<UInt32> publisher = (NativePublisher<UInt32>) publisherNode.<UInt32>createPublisher(
+                    UInt32.class, "test_topic_multiple");
+
+            final RCLFuture<UInt32> futureOne = new RCLFuture<UInt32>(executor);
+
+            NativeSubscription<UInt32> subscriptionOne = (NativeSubscription<UInt32>) subscriptionNodeOne.<UInt32>createSubscription(
+                    UInt32.class, "test_topic_multiple", new TestConsumer<UInt32>(futureOne));
+
+            final RCLFuture<UInt32> futureTwo = new RCLFuture<UInt32>(executor);
+
+            NativeSubscription<UInt32> subscriptionTwo = (NativeSubscription<UInt32>) subscriptionNodeTwo.<UInt32>createSubscription(
+                    UInt32.class, "test_topic_multiple", new TestConsumer<UInt32>(futureTwo));
+
+            UInt32 msg = new UInt32();
+            msg.setData(54321);
+
+            executor.addNode(publisherNode);
+            executor.addNode(subscriptionNodeOne);
+            executor.addNode(subscriptionNodeTwo);
+
+            executor.spin();
+
+            while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
+                publisher.publish(msg);
+            }
+
+            UInt32 valueOne = futureOne.get();
+            assertEquals(54321, valueOne.getData());
+
+            UInt32 valueTwo = futureTwo.get();
+            assertEquals(54321, valueTwo.getData());
+
+            executor.removeNode(subscriptionNodeTwo);
+            executor.removeNode(subscriptionNodeOne);
+            executor.removeNode(publisherNode);
+            executor.cancel();
+
+            publisher.dispose();
+            subscriptionOne.dispose();
+            subscriptionTwo.dispose();
+
+            publisherNode.dispose();
+            subscriptionNodeOne.dispose();
+            subscriptionNodeTwo.dispose();
+        } catch (Exception e) {
+            test = false;
+        } finally {
+            RCLJava.shutdown();
+        }
+
+        Assert.assertTrue("Expected Runtime error.", test);
+    }
+
+    @Test
+    public final void testPubUInt32SeparateSingleProcess() throws Exception {
+        boolean test = true;
+
+        try {
+            RCLJava.rclJavaInit();
+            ThreadedExecutor executor = new SingleThreadedExecutor();
+
+            final Node publisherNode        = RCLJava.createNode("publisher_node");
+            final Node subscriptionNodeOne  = RCLJava.createNode("subscription_node_one");
+            final Node subscriptionNodeTwo  = RCLJava.createNode("subscription_node_two");
+
+            NativePublisher<UInt32> publisher = (NativePublisher<UInt32>) publisherNode.<UInt32>createPublisher(
+                    UInt32.class, "test_topic_single");
+
+            final RCLFuture<UInt32> futureOne = new RCLFuture<UInt32>(executor);
+
+            NativeSubscription<UInt32> subscriptionOne = (NativeSubscription<UInt32>) subscriptionNodeOne.<UInt32>createSubscription(
+                    UInt32.class, "test_topic_single", new TestConsumer<UInt32>(futureOne));
+
+            final RCLFuture<UInt32> futureTwo = new RCLFuture<UInt32>(executor);
+
+            NativeSubscription<UInt32> subscriptionTwo = (NativeSubscription<UInt32>) subscriptionNodeTwo.<UInt32>createSubscription(
+                    UInt32.class, "test_topic_single", new TestConsumer<UInt32>(futureTwo));
+
+            UInt32 msg = new UInt32();
+            msg.setData(54321);
+
+            executor.addNode(publisherNode);
+            executor.addNode(subscriptionNodeOne);
+            executor.addNode(subscriptionNodeTwo);
+
+            executor.spin();
+
+            while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
+                publisher.publish(msg);
+            }
+
+            UInt32 valueOne = futureOne.get();
+            assertEquals(54321, valueOne.getData());
+
+            UInt32 valueTwo = futureTwo.get();
+            assertEquals(54321, valueTwo.getData());
+
+            executor.removeNode(subscriptionNodeTwo);
+            executor.removeNode(subscriptionNodeOne);
+            executor.removeNode(publisherNode);
+            executor.cancel();
+
+            publisher.dispose();
+            subscriptionOne.dispose();
+            subscriptionTwo.dispose();
+
+            publisherNode.dispose();
+            subscriptionNodeOne.dispose();
+            subscriptionNodeTwo.dispose();
+        } catch (Exception e) {
+            test = false;
+        } finally {
+            RCLJava.shutdown();
+        }
+
+        Assert.assertTrue("Expected Runtime error.", test);
+    }
+
+    @Test
+    public final void testPubUInt32LinkSingleProcess() throws Exception {
+        boolean test = true;
+
+        try {
+            RCLJava.rclJavaInit();
+            ThreadedExecutor executor = new SingleThreadedExecutor();
+
+            final Node publisherNode        = RCLJava.createNode("publisher_node");
+            final Node subscriptionNodeOne  = RCLJava.createNode("subscription_node_one");
+            final Node subscriptionNodeTwo  = RCLJava.createNode("subscription_node_two");
+
+            NativePublisher<UInt32> publisher = (NativePublisher<UInt32>) publisherNode.<UInt32>createPublisher(
+                    UInt32.class, "test_topic_single");
+
+            final RCLFuture<UInt32> futureOne = new RCLFuture<UInt32>(executor);
+
+            NativeSubscription<UInt32> subscriptionOne = (NativeSubscription<UInt32>) subscriptionNodeOne.<UInt32>createSubscription(
+                    UInt32.class, "test_topic_single", new TestConsumer<UInt32>(futureOne));
+
+            final RCLFuture<UInt32> futureTwo = new RCLFuture<UInt32>(executor);
+
+            NativeSubscription<UInt32> subscriptionTwo = (NativeSubscription<UInt32>) subscriptionNodeTwo.<UInt32>createSubscription(
+                    UInt32.class, "test_topic_single", new TestConsumer<UInt32>(futureTwo));
+
+            UInt32 msg = new UInt32();
+            msg.setData(54321);
+
+            executor.addNode(publisherNode);
+            executor.addNode(subscriptionNodeOne);
+            executor.addNode(subscriptionNodeTwo);
+
+            while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
+                publisher.publish(msg);
+                executor.spinOnce(0);
+            }
+
+            UInt32 valueOne = futureOne.get();
+            assertEquals(54321, valueOne.getData());
+
+            UInt32 valueTwo = futureTwo.get();
+            assertEquals(54321, valueTwo.getData());
+
+            executor.removeNode(subscriptionNodeTwo);
+            executor.removeNode(subscriptionNodeOne);
+            executor.removeNode(publisherNode);
+            executor.cancel();
+
+            publisher.dispose();
+            subscriptionOne.dispose();
+            subscriptionTwo.dispose();
+
+            publisherNode.dispose();
+            subscriptionNodeOne.dispose();
+            subscriptionNodeTwo.dispose();
+        } catch (Exception e) {
+            test = false;
+        } finally {
+            RCLJava.shutdown();
+        }
+
+        Assert.assertTrue("Expected Runtime error.", test);
+    }
 }

@@ -22,82 +22,99 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.executor.ThreadedExecutor;
 import org.ros2.rcljava.node.Node;
 
 public class RCLFuture<V> implements Future<V> {
-  private WeakReference<Node> nodeReference;
-  private boolean done = false;
-  private V value = null;
+    private ThreadedExecutor executor = null;
+    private WeakReference<Node> nodeReference;
+    private boolean done = false;
+    private V value = null;
 
-  public RCLFuture(final WeakReference<Node> nodeReference) {
-    this.nodeReference = nodeReference;
-  }
-
-  @Override
-  public final V get() throws InterruptedException, ExecutionException {
-    while (RCLJava.ok() && !isDone()) {
-      Node node = nodeReference.get();
-      if (node == null) {
-        return null; // TODO(esteve) do something
-      }
-
-      RCLJava.spinOnce(node);
-    }
-    return value;
-  }
-
-  @Override
-  public final V get(final long timeout, final TimeUnit unit) throws
-      InterruptedException, ExecutionException, TimeoutException {
-    if (isDone()) {
-      return value;
+    public RCLFuture(final WeakReference<Node> nodeReference) {
+        this.nodeReference = nodeReference;
     }
 
-    long endTime = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-
-    long timeoutNS = TimeUnit.NANOSECONDS.convert(timeout, unit);
-
-    if (timeoutNS > 0) {
-      endTime += timeoutNS;
+    public RCLFuture(final ThreadedExecutor executor) {
+        this.executor = executor;
     }
 
-    while (RCLJava.ok()) {
-      Node node = nodeReference.get();
-      if (node == null) {
-        return null; // TODO(esteve) do something
-      }
+    @Override
+    public final V get() throws InterruptedException, ExecutionException {
+        if(this.value != null) {
+            return this.value;
+        }
 
-      RCLJava.spinOnce(node);
-
-      if (isDone()) {
-        return value;
-      }
-
-      long now = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-      if (now >= endTime) {
-        throw new TimeoutException();
-      }
+        while (RCLJava.ok() && !this.isDone()) {
+            if (this.executor != null) {
+                this.executor.spinOnce(0);
+            } else {
+                Node node = nodeReference.get();
+                if (node == null) {
+                    return null; // TODO(esteve) do something
+                }
+                RCLJava.spinOnce(node);
+            }
+        }
+        return this.value;
     }
-    throw new InterruptedException();
-  }
 
-  @Override
-  public final boolean isDone() {
-    return done;
-  }
+    @Override
+    public final V get(final long timeout, final TimeUnit unit)
+            throws InterruptedException, ExecutionException, TimeoutException {
+        if (this.isDone()) {
+            return this.value;
+        }
 
-  @Override
-  public final boolean isCancelled() {
-    return false;
-  }
+        long endTime = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 
-  @Override
-  public final boolean cancel(final boolean mayInterruptIfRunning) {
-    return false;
-  }
+        long timeoutNS = TimeUnit.NANOSECONDS.convert(timeout, unit);
 
-  public final synchronized void set(final V value) {
-    this.value = value;
-    done = true;
-  }
+        if (timeoutNS > 0) {
+            endTime += timeoutNS;
+        }
+
+        while (RCLJava.ok()) {
+            if (this.executor != null) {
+                this.executor.spinOnce(0);
+            } else {
+                Node node = nodeReference.get();
+                if (node == null) {
+                    return null; // TODO(esteve) do something
+                }
+
+                RCLJava.spinOnce(node);
+            }
+
+            if (this.isDone()) {
+                return this.value;
+            }
+
+            long now = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+            if (now >= endTime) {
+                throw new TimeoutException();
+            }
+        }
+        throw new InterruptedException();
+    }
+
+    @Override
+    public final boolean isDone() {
+        return this.done;
+    }
+
+    @Override
+    public final boolean isCancelled() {
+        return false;
+    }
+
+    @Override
+    public final boolean cancel(final boolean mayInterruptIfRunning) {
+        return false;
+    }
+
+    public final synchronized void set(final V value) {
+        this.value = value;
+        this.done = true;
+    }
 }
