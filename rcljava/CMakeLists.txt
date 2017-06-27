@@ -235,6 +235,7 @@ if(BUILD_TESTING)
     PROPERTY "JAR_FILE")
 
   set(${PROJECT_NAME}_test_sources
+    "src/test/java/org/ros2/rcljava/ExecutorTest.java"
     "src/test/java/org/ros2/rcljava/GraphNameTest.java"
     "src/test/java/org/ros2/rcljava/NodeTest.java"
 #    "src/test/java/org/ros2/rcljava/MessageTest.java"
@@ -246,6 +247,7 @@ if(BUILD_TESTING)
   )
 
   set(${PROJECT_NAME}_testsuites
+    "org.ros2.rcljava.ExecutorTest"
     "org.ros2.rcljava.GraphNameTest"
     "org.ros2.rcljava.NodeTest"
 #    "org.ros2.rcljava.MessageTest"

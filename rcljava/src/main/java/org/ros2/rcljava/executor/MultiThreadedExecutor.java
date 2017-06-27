@@ -15,6 +15,7 @@
 package org.ros2.rcljava.executor;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Pool-multiple-threaded executor implementation
@@ -48,6 +49,7 @@ public final class MultiThreadedExecutor extends BaseThreadedExecutor {
      * Pool-multiple threaded implementation of spin.
      * This function will block until work comes in, execute it, and keep blocking.
      * It will only be interrupt by a CTRL-C (managed by the global signal handler).
+     * @throws InterruptedException
      */
     @Override
     public void spin() {
@@ -59,6 +61,11 @@ public final class MultiThreadedExecutor extends BaseThreadedExecutor {
 
         if (!this.executorService.isShutdown()) {
             this.executorService.shutdown();
+            try {
+                this.executorService.awaitTermination(2, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

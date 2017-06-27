@@ -15,19 +15,19 @@
 package org.ros2.rcljava.executor;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ExecutorService;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
 
 public abstract class BaseThreadedExecutor implements ThreadedExecutor {
 
-    protected Object mutex = new Object();
-    protected NativeExecutor baseExecutor;
+    protected final Object mutex = new Object();
+    protected final NativeExecutor baseExecutor;
     protected volatile ExecutorService executorService;
 
-    protected BlockingQueue<Node> nodes = new LinkedBlockingQueue<Node>();
+    protected final BlockingQueue<Node> nodes = new LinkedBlockingQueue<Node>();
 
     public BaseThreadedExecutor() {
         this.baseExecutor = new NativeExecutor(this);
@@ -69,18 +69,25 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     public void spinSome() {
         AnyExecutable anyExecutable = this.baseExecutor.getNextExecutable();
         while (RCLJava.ok() && anyExecutable != null) {
-            this.baseExecutor.executeAnyExecutable(anyExecutable);
+            BaseThreadedExecutor.executeAnyExecutable(anyExecutable);
             anyExecutable = this.baseExecutor.getNextExecutable(0);
         }
-
     }
 
     @Override
     public void spinOnce(long timeout) {
-        AnyExecutable anyExecutable = this.baseExecutor.getNextExecutable(timeout);
+        final AnyExecutable anyExecutable = this.baseExecutor.getNextExecutable(timeout);
 
         if (anyExecutable != null) {
-            this.baseExecutor.executeAnyExecutable(anyExecutable);
+            BaseThreadedExecutor.executeAnyExecutable(anyExecutable);
+        }
+    }
+
+    private static void executeAnyExecutable(final AnyExecutable anyExecutable) {
+        try {
+            NativeExecutor.executeAnyExecutable(anyExecutable);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -101,9 +108,7 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     @Override
     public void run() {
         while (RCLJava.ok()) {
-            synchronized (mutex) {
-                this.spinOnce(0);
-            }
+            this.spinOnce(0);
         }
     }
 

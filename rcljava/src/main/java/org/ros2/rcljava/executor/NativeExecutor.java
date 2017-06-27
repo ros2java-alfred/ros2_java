@@ -161,7 +161,7 @@ public class NativeExecutor {
      * @param timeout
      * @return
      */
-    public AnyExecutable getNextExecutable(long timeout) {
+    public synchronized AnyExecutable getNextExecutable(long timeout) {
         AnyExecutable anyExecutable = this.getNextReadyExecutable();
 
         if (anyExecutable == null) {
@@ -176,26 +176,26 @@ public class NativeExecutor {
      * Execute any type from Memory.
      * @param anyExecutable
      */
-    public void executeAnyExecutable(final AnyExecutable anyExecutable) {
+    public static void executeAnyExecutable(final AnyExecutable anyExecutable) {
 
         if (anyExecutable == null) {
             return;
         }
 
         if (anyExecutable.timer != null) {
-            this.executeTimer(anyExecutable.timer);
+            NativeExecutor.executeTimer(anyExecutable.timer);
         }
 
         if (anyExecutable.subscription != null) {
-            this.executeSubscription(anyExecutable.subscription);
+            NativeExecutor.executeSubscription(anyExecutable.subscription);
         }
 
         if (anyExecutable.service != null) {
-            this.executeService(anyExecutable.service);
+            NativeExecutor.executeService(anyExecutable.service);
         }
 
         if (anyExecutable.client != null) {
-            this.executeClient(anyExecutable.client);
+            NativeExecutor.executeClient(anyExecutable.client);
         }
     }
 
@@ -203,7 +203,7 @@ public class NativeExecutor {
      * Execute Timer from Memory.
      * @param timer to execute.
      */
-    private void executeTimer(final WallTimer timer) {
+    private static void executeTimer(final WallTimer timer) {
         timer.callTimer();
         timer.getCallback().tick();
     }
@@ -213,7 +213,7 @@ public class NativeExecutor {
      * @param subscription to execute.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void executeSubscription(final Subscription subscription) {
+    private static void executeSubscription(final Subscription subscription) {
         NativeSubscription<? extends Message> nativeSubscription = (NativeSubscription<?> ) subscription;
         Message message = RCLJava.nativeTake(nativeSubscription.getSubscriptionHandle(), nativeSubscription.getMessageType());
         if (message != null) {
@@ -226,7 +226,7 @@ public class NativeExecutor {
      * @param service to execute.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void executeService(final Service service) {
+    private static void executeService(final Service service) {
         Class<?> requestType = service.getRequestType();
         Class<?> responseType = service.getResponseType();
 
@@ -267,7 +267,7 @@ public class NativeExecutor {
     }
 
     @SuppressWarnings("rawtypes")
-    private void executeClient(Client client) {
+    private static void executeClient(Client client) {
 
     }
 }
