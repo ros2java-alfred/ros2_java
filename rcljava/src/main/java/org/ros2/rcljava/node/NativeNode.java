@@ -18,7 +18,6 @@ package org.ros2.rcljava.node;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -37,6 +36,7 @@ import org.ros2.rcljava.time.WallTimerCallback;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.parameter.ParameterCallback;
 import org.ros2.rcljava.node.parameter.ParameterService;
@@ -89,17 +89,17 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     /**
      * All the @{link Subscription}s that have been created through this instance.
      */
-    private final Queue<Subscription<? extends org.ros2.rcljava.internal.message.Message>> subscriptions;
+    private final Queue<Subscription<? extends Message>> subscriptions;
 
     /**
      * All the @{link Publisher}s that have been created through this instance.
      */
-    private final Queue<Publisher<? extends org.ros2.rcljava.internal.message.Message>> publishers;
+    private final Queue<Publisher<? extends Message>> publishers;
 
     /**
      * All the @{link Service}s that have been created through this instance.
      */
-    private final Queue<Service<? extends org.ros2.rcljava.internal.service.Service>> services;
+    private final Queue<Service<? extends MessageService>> services;
 
     /**
      * All the @{link Client}s that have been created through this instance.
@@ -212,7 +212,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
         this.subscriptions  = new LinkedBlockingQueue<Subscription<?>>();
         this.publishers     = new LinkedBlockingQueue<Publisher<?>>();
         this.clients        = new LinkedBlockingQueue<Client<?>>();
-        this.services       = new LinkedBlockingQueue<Service<? extends org.ros2.rcljava.internal.service.Service>>();
+        this.services       = new LinkedBlockingQueue<Service<? extends MessageService>>();
         this.timers 		= new LinkedBlockingQueue<WallTimer>();
         this.parameters     = new HashMap<String, ParameterVariant<?>>();
 
@@ -484,7 +484,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @throws NoSuchMethodException
      */
     @Override
-    public <T extends org.ros2.rcljava.internal.service.Service> Client<T> createClient(
+    public <T extends MessageService> Client<T> createClient(
             final Class<T> serviceType,
             final String serviceName,
             final QoSProfile qosProfile) throws Exception {
@@ -551,7 +551,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @throws Exception
      */
     @Override
-    public <T extends org.ros2.rcljava.internal.service.Service> Client<T> createClient(
+    public <T extends MessageService> Client<T> createClient(
             final Class<T> serviceType,
             final String serviceName) throws Exception {
         return this.createClient(serviceType, serviceName, QoSProfile.SERVICES_DEFAULT);
@@ -567,9 +567,8 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Service instance of the service.
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public <T extends org.ros2.rcljava.internal.service.Service> Service<T> createService(
+    public <T extends MessageService> Service<T> createService(
             final Class<T> serviceType,
             final String serviceName,
             final ServiceCallback<?, ?> callback,
@@ -589,6 +588,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
 //            long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service, qos);
 //            Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
 
+            @SuppressWarnings("unchecked")
             Class<? extends Message> requestType = (Class<? extends Message>)serviceType.getField("RequestType").get(null);
 
             Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
@@ -597,6 +597,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
             Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
             long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
 
+            @SuppressWarnings("unchecked")
             Class<? extends Message> responseType = (Class<? extends Message>)serviceType.getField("ResponseType").get(null);
 
             Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
@@ -635,7 +636,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @return Service instance of the service.
      */
     @Override
-    public <T extends org.ros2.rcljava.internal.service.Service> Service<T> createService(
+    public <T extends MessageService> Service<T> createService(
             final Class<T> serviceType,
             final String serviceName,
             final ServiceCallback<?, ?> callback) throws Exception {
@@ -647,8 +648,12 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     public List<SetParametersResult> setParameters(final List<ParameterVariant<?>> parameters) {
         List<SetParametersResult> results = new ArrayList<SetParametersResult>();
 
+        ArrayList<ParameterVariant<?>> container = new ArrayList<ParameterVariant<?>>(1);
         for (ParameterVariant<?> parameterVariantRequest : parameters) {
-            SetParametersResult result = this.setParametersAtomically(new ArrayList<ParameterVariant<?>>(Arrays.asList(parameterVariantRequest)));
+            container.clear();
+            container.add(parameterVariantRequest);
+
+            SetParametersResult result = this.setParametersAtomically(container);
             results.add(result);
         }
 
@@ -893,7 +898,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @return ArrayList of Services
      */
     @Override
-    public final Queue<Service<? extends org.ros2.rcljava.internal.service.Service>> getServices() {
+    public final Queue<Service<? extends MessageService>> getServices() {
         return this.services;
     }
 

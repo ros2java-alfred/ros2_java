@@ -15,27 +15,27 @@
 
 package org.ros2.rcljava;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.lang.ref.WeakReference;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.ros2.rcljava.node.Node;
-import org.ros2.rcljava.node.service.RCLFuture;
-import org.ros2.rcljava.node.topic.SubscriptionCallback;
-import org.ros2.rcljava.node.topic.Publisher;
-import org.ros2.rcljava.node.topic.Subscription;
-import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.internal.message.Message;
+//import static org.junit.Assert.assertEquals;
+//import static org.junit.Assert.assertNotEquals;
+//import static org.junit.Assert.assertTrue;
+//
+//import org.junit.Before;
+//import org.junit.BeforeClass;
+//import org.junit.Ignore;
+//import org.junit.Test;
+//
+//import java.lang.ref.WeakReference;
+//
+//import java.util.Arrays;
+//import java.util.List;
+//
+//import org.ros2.rcljava.node.Node;
+//import org.ros2.rcljava.node.service.RCLFuture;
+//import org.ros2.rcljava.node.topic.SubscriptionCallback;
+//import org.ros2.rcljava.node.topic.Publisher;
+//import org.ros2.rcljava.node.topic.Subscription;
+//import org.ros2.rcljava.RCLJava;
+//import org.ros2.rcljava.internal.message.Message;
 
 
 public class MessageTest {

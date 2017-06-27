@@ -27,6 +27,8 @@ import org.ros2.rcljava.time.WallTimerCallback;
 import builtin_interfaces.msg.Time;
 
 import org.ros2.rcljava.Log;
+import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.parameter.ParameterVariant;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.Service;
@@ -64,7 +66,7 @@ public interface Node {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Publisher instance of the created publisher.
      */
-    <T extends org.ros2.rcljava.internal.message.Message> Publisher<T> createPublisher(Class<T> message, String topic, QoSProfile qos);
+    <T extends Message> Publisher<T> createPublisher(Class<T> message, String topic, QoSProfile qos);
 
     /**
      * Create and return a Publisher. (Retro-compatibility)
@@ -74,7 +76,7 @@ public interface Node {
      * @param topic The topic for this publisher to publish on.
      * @return Publisher instance of the created publisher.
      */
-    <T extends org.ros2.rcljava.internal.message.Message> Publisher<T> createPublisher(Class<T> message, String topic);
+    <T extends Message> Publisher<T> createPublisher(Class<T> message, String topic);
 
     /**
      * Create and return a Subscription.
@@ -86,7 +88,7 @@ public interface Node {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Subscription instance of the created subscription.
      */
-    <T extends org.ros2.rcljava.internal.message.Message> Subscription<T> createSubscription(Class<T> message, String topic, SubscriptionCallback<T> callback, QoSProfile qos);
+    <T extends Message> Subscription<T> createSubscription(Class<T> message, String topic, SubscriptionCallback<T> callback, QoSProfile qos);
 
     /**
      * Create and return a Subscription. (Retro-compatibility)
@@ -97,7 +99,7 @@ public interface Node {
      * @param callback The user-defined callback function.
      * @return Subscription instance of the created subscription.
      */
-    <T extends org.ros2.rcljava.internal.message.Message> Subscription<T> createSubscription(Class<T> message, String topic, SubscriptionCallback<T> callback);
+    <T extends Message> Subscription<T> createSubscription(Class<T> message, String topic, SubscriptionCallback<T> callback);
 
     /**
      * Create and return a Client.
@@ -108,7 +110,7 @@ public interface Node {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Client instance of the service.
      */
-    <T extends org.ros2.rcljava.internal.service.Service> Client<T> createClient(Class<T> message, String service, QoSProfile qos) throws Exception;
+    <T extends MessageService> Client<T> createClient(Class<T> message, String service, QoSProfile qos) throws Exception;
 
     /**
      * Create and return a Client. (Retro-compatibility)
@@ -118,7 +120,7 @@ public interface Node {
      * @param service The service to subscribe on.
      * @return Client instance of the service.
      */
-    <T extends org.ros2.rcljava.internal.service.Service> Client<T> createClient(Class<T> message, String service) throws Exception ;
+    <T extends MessageService> Client<T> createClient(Class<T> message, String service) throws Exception ;
 
     /**
      * Create and return a Service.
@@ -130,7 +132,7 @@ public interface Node {
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Service instance of the service.
      */
-    <T extends org.ros2.rcljava.internal.service.Service> Service<T> createService(final Class<T> serviceType,
+    <T extends MessageService> Service<T> createService(final Class<T> serviceType,
             final String serviceName,
             final ServiceCallback<?, ?> callback,
             final QoSProfile qos) throws Exception;
@@ -144,7 +146,7 @@ public interface Node {
      * @param callback The user-defined callback function.
      * @return Service instance of the service.
      */
-    <T extends org.ros2.rcljava.internal.service.Service> Service<T> createService(final Class<T> serviceType,
+    <T extends MessageService> Service<T> createService(final Class<T> serviceType,
             final String serviceName,
             final ServiceCallback<?, ?> callback) throws Exception;
 
@@ -246,13 +248,13 @@ public interface Node {
      * Get list of Clients.
      * @return ArrayList of Clients
      */
-    Queue<Client<? extends org.ros2.rcljava.internal.service.Service>> getClients();
+    Queue<Client<? extends MessageService>> getClients();
 
     /**
      * Get list of Services.
      * @return ArrayList of Services
      */
-    Queue<Service<? extends org.ros2.rcljava.internal.service.Service>> getServices();
+    Queue<Service<? extends MessageService>> getServices();
 
     /**
      * @return All the @{link WallTimer}s that were created by this instance.

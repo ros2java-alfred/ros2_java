@@ -26,11 +26,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import org.ros2.rcljava.node.Node;
-import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.RCLFuture;
-import org.ros2.rcljava.node.service.RMWRequestId;
-import org.ros2.rcljava.node.service.Service;
-import org.ros2.rcljava.node.service.ServiceCallback;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
@@ -224,65 +220,6 @@ public class NodeTest {
 
         Assert.assertTrue("Expected Runtime error.", test);
         Assert.assertNotNull("Bad result", sub);
-    }
-
-    @Test
-    public void testClient() {
-        boolean test = true;
-        Node node = null;
-        Client<rcl_interfaces.srv.GetParameters> clt = null;
-
-        try {
-            RCLJava.rclJavaInit();
-            node = RCLJava.createNode("testClient");
-            clt = node.<rcl_interfaces.srv.GetParameters>createClient(
-                    rcl_interfaces.srv.GetParameters.class,
-                    "testChannel",
-                    QoSProfile.DEFAULT);
-
-            clt.dispose();
-            node.dispose();
-        } catch (Exception e) {
-            test = false;
-        } finally {
-            RCLJava.shutdown();
-        }
-
-        Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertNotNull("Bad result", clt);
-    }
-
-    @Test
-    public void testService() {
-        boolean test = true;
-        Node node = null;
-        Service<rcl_interfaces.srv.GetParameters> srv = null;
-
-        ServiceCallback<rcl_interfaces.srv.GetParameters_Request, rcl_interfaces.srv.GetParameters_Response> callback =
-                new ServiceCallback<rcl_interfaces.srv.GetParameters_Request, rcl_interfaces.srv.GetParameters_Response>() {
-            @Override
-            public void dispatch(RMWRequestId header, rcl_interfaces.srv.GetParameters_Request request, rcl_interfaces.srv.GetParameters_Response response) { }
-        };
-
-        try {
-            RCLJava.rclJavaInit();
-            node = RCLJava.createNode("testSubscription");
-            srv = node.<rcl_interfaces.srv.GetParameters>createService(
-                    rcl_interfaces.srv.GetParameters.class,
-                    "testChannel",
-                    callback,
-                    QoSProfile.DEFAULT);
-
-            srv.dispose();
-            node.dispose();
-        } catch (Exception e) {
-            test = false;
-        } finally {
-            RCLJava.shutdown();
-        }
-
-        Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertNotNull("Bad result", srv);
     }
 
     @Test

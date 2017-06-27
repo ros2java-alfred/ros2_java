@@ -21,7 +21,7 @@ import org.ros2.rcljava.internal.message.Message;
  *
  * @author Mickael Gaillard <mick.gaillard@gmail.com>
  */
-public interface Service {
+public interface MessageService {
 
     public Class<? extends Message> getRequestType();
     public Class<? extends Message> getResponseType();

@@ -45,6 +45,19 @@ public class QoSProfile {
     private final Durability durability;
 
     /**
+     * If true, any ROS specific namespacing conventions will be circumvented.
+     *
+     * In the case of DDS and topics, for example, this means the typical
+     * ROS specific prefix of `rt` would not be applied as described here:
+     *
+     *   {@linkplain http://design.ros2.org/articles/topic_and_service_names.html#ros-specific-namespace-prefix}
+     *
+     * This might be useful when trying to directly connect a native DDS topic
+     * with a ROS 2 topic.
+     */
+    private final boolean avoidRosNamespaceConventions = false;
+
+    /**
      * Constructor.
      * @param history
      * @param depth
@@ -74,13 +87,17 @@ public class QoSProfile {
         return this.durability;
     }
 
+    public final boolean getAvoidRosNamespaceConventions() {
+        return this.avoidRosNamespaceConventions;
+    }
+
     public static final int DEPTH_SYSTEM_DEFAULT = 0;
 
     public static final QoSProfile SENSOR_DATA = new QoSProfile(
             History.KEEP_LAST,
             5,
             Reliability.BEST_EFFORT,
-            Durability.SYSTEM_DEFAULT);
+            Durability.VOLATILE);
 
     /**
      * Default for Parameter layer.
@@ -89,16 +106,16 @@ public class QoSProfile {
             History.KEEP_LAST,
             1000,
             Reliability.RELIABLE,
-            Durability.SYSTEM_DEFAULT);
+            Durability.VOLATILE);
 
     /**
      * Default for Sub/Pub layer.
      */
     public static final QoSProfile DEFAULT = new QoSProfile(
-            History.KEEP_ALL,
+            History.KEEP_LAST,
             10,
             Reliability.RELIABLE,
-            Durability.SYSTEM_DEFAULT);
+            Durability.VOLATILE);
 
     /**
      * Default for Service layer.
@@ -107,13 +124,13 @@ public class QoSProfile {
             History.KEEP_LAST,
             10,
             Reliability.RELIABLE,
-            Durability.TRANSIENT_LOCAL);
+            Durability.VOLATILE);
 
     public static final QoSProfile PARAMETER_EVENTS = new QoSProfile(
             History.KEEP_ALL,
             1000,
             Reliability.RELIABLE,
-            Durability.SYSTEM_DEFAULT);
+            Durability.VOLATILE);
 
     public static final QoSProfile SYSTEM_DEFAULT = new QoSProfile(
             History.SYSTEM_DEFAULT,

@@ -325,7 +325,7 @@ template<typename T>
 T *
 makeInstance()
 {
-  return (T *)malloc(sizeof(T));
+  return static_cast<T *>(malloc(sizeof(T)));
 }
 
 /*

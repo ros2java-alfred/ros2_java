@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.Node;
 
 /**
@@ -30,7 +31,7 @@ import org.ros2.rcljava.node.Node;
  *
  * @param <T> Service Type.
  */
-public class NativeClient<T extends org.ros2.rcljava.internal.service.Service>
+public class NativeClient<T extends MessageService>
         implements Client<T>, java.lang.AutoCloseable {
 
     // Loading JNI library.
@@ -122,10 +123,10 @@ public class NativeClient<T extends org.ros2.rcljava.internal.service.Service>
             }
     }
 
-    @SuppressWarnings("unchecked")
     public final <V extends Message> void handleResponse(final RMWRequestId header,final V response) {
         synchronized(pendingRequests) {
             long sequenceNumber = header.sequenceNumber;
+            @SuppressWarnings("unchecked")
             RCLFuture<V> future = (RCLFuture<V>) pendingRequests.remove(sequenceNumber);
             future.set(response);
         }

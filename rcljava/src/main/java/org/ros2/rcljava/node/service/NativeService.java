@@ -16,6 +16,7 @@
 package org.ros2.rcljava.node.service;
 
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> Service Type.
  */
-public class NativeService<T extends org.ros2.rcljava.internal.service.Service> implements Service<T> {
+public class NativeService<T extends MessageService> implements Service<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeService.class);
 

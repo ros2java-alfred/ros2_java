@@ -15,8 +15,9 @@
 package org.ros2.rcljava.node.service;
 
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.internal.service.MessageService;
 
-public interface Service<T extends org.ros2.rcljava.internal.service.Service> {
+public interface Service<T extends MessageService> {
 
     public static final String SCHEME = "rosservice://";
 

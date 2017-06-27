@@ -486,15 +486,18 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToH
   jint history,
   jint depth,
   jint reliability,
-  jint durability)
+  jint durability,
+  jboolean avoid_ros_namespace_conventions)
 {
-  rmw_qos_profile_t * qos_profile =
-    static_cast<rmw_qos_profile_t *>(malloc(sizeof(rmw_qos_profile_t)));
+  rmw_qos_profile_t * qos_profile = makeInstance<rmw_qos_profile_t>();
+
   qos_profile->history = static_cast<rmw_qos_history_policy_t>(history);
   qos_profile->depth = depth;
   qos_profile->reliability = static_cast<rmw_qos_reliability_policy_t>(reliability);
   qos_profile->durability = static_cast<rmw_qos_durability_policy_t>(durability);
-  return reinterpret_cast<jlong>(qos_profile);
+  qos_profile->avoid_ros_namespace_conventions = avoid_ros_namespace_conventions;
+
+  return instance2Handle(qos_profile);
 }
 
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile(

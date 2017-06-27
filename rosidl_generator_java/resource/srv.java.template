@@ -18,7 +18,7 @@ package @(package_name).@(subfolder);
 // IMPORTS
 import org.ros2.rcljava.common.RCLJavaProxy;
 import org.ros2.rcljava.internal.message.Message;
-import org.ros2.rcljava.internal.service.Service;
+import org.ros2.rcljava.internal.service.MessageService;
 
 import @(package_name).@(subfolder).@(type_name)_Request;
 import @(package_name).@(subfolder).@(type_name)_Response;
@@ -26,7 +26,7 @@ import @(package_name).@(subfolder).@(type_name)_Response;
 /**
  * Java Service for ROS2(idl) of @(type_name).
  */
-public class @(type_name) implements Service {
+public class @(type_name) implements MessageService {
 
     /** AutoLoader JNI library. */
     static {

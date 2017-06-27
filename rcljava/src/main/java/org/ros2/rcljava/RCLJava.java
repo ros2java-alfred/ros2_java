@@ -151,7 +151,7 @@ public abstract class RCLJava {
             long responseToJavaConverterHandle,
             Object responseMessage);
     private static native long nativeConvertQoSProfileToHandle(
-            int history, int depth, int reliability, int durability);
+            int history, int depth, int reliability, int durability, boolean avoidRos);
     private static native void nativeDisposeQoSProfile(
             long qosProfileHandle);
 
@@ -321,7 +321,7 @@ public abstract class RCLJava {
      *
      * @param node
      */
-    @SuppressWarnings({ "unchecked", "rawtypes", "resource" })
+    @SuppressWarnings({ "resource", "unchecked" })
     public static void spinOnce(final Node node) {
         if (!RCLJava.initialized) {
             throw new NotInitializedException();
@@ -363,7 +363,7 @@ public abstract class RCLJava {
             }
 
             for (Client<?> client : node.getClients()) {
-                NativeClient nativeClient = (NativeClient) client;
+                NativeClient<?> nativeClient = (NativeClient<?>) client;
                 RCLJava.nativeWaitSetAddClient(waitSetHandle, nativeClient.getClientHandle());
             }
 
@@ -372,13 +372,17 @@ public abstract class RCLJava {
             RCLJava.nativeWaitSetFini(waitSetHandle);
 
             // Take all components.
-            for (Subscription subscription : node.getSubscriptions()) {
-                NativeSubscription<?> nativeSubscription = (NativeSubscription<?>) subscription;
+            for (Subscription<? extends Message> subscription : node.getSubscriptions()) {
+
+                Subscription<Message> safeSubscription = (Subscription<Message>) subscription;
+                NativeSubscription<Message> nativeSubscription = (NativeSubscription<Message>) subscription;
+
                 Message message = RCLJava.nativeTake(
                         nativeSubscription.getSubscriptionHandle(),
                         nativeSubscription.getMessageType());
+
                 if (message != null) {
-                    subscription.getCallback().dispatch(message);
+                    safeSubscription.getCallback().dispatch(message);
                 }
             }
 
@@ -389,7 +393,7 @@ public abstract class RCLJava {
                 }
             }
 
-            for (Service service : node.getServices()) {
+            for (@SuppressWarnings("rawtypes") Service service : node.getServices()) {
                 long requestFromJavaConverterHandle  = service.getRequestFromJavaConverterHandle();
                 long requestToJavaConverterHandle    = service.getRequestToJavaConverterHandle();
                 long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
@@ -426,7 +430,7 @@ public abstract class RCLJava {
             }
 
             for (Client<?> client : node.getClients()) {
-                NativeClient nativeClient = (NativeClient) client;
+                NativeClient<?> nativeClient = (NativeClient<?>) client;
                 long responseFromJavaConverterHandle = nativeClient.getResponseFromJavaConverterHandle();
                 long responseToJavaConverterHandle = nativeClient.getResponseToJavaConverterHandle();
 
@@ -620,10 +624,11 @@ public abstract class RCLJava {
       int depth = qosProfile.getDepth();
       int reliability = qosProfile.getReliability().getValue();
       int durability = qosProfile.getDurability().getValue();
+      boolean avoidRos = qosProfile.getAvoidRosNamespaceConventions();
 
       RCLJava.logger.debug("Convert QosProfile...");
 
-      return RCLJava.nativeConvertQoSProfileToHandle(history, depth, reliability, durability);
+      return RCLJava.nativeConvertQoSProfileToHandle(history, depth, reliability, durability, avoidRos);
     }
 
     /**

@@ -17,9 +17,9 @@ package org.ros2.rcljava.node.service;
 import java.util.concurrent.Future;
 
 import org.ros2.rcljava.internal.message.Message;
-import org.ros2.rcljava.internal.service.Service;
+import org.ros2.rcljava.internal.service.MessageService;
 
-public interface Client<T extends Service> {
+public interface Client<T extends MessageService> {
 
     /**
      * Query Service.
