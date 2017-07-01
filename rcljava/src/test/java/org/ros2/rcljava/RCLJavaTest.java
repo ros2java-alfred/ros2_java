@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.ros2.rcljava.exception.NotInitializedException;
 import org.ros2.rcljava.node.NativeNode;
-import org.ros2.rcljava.node.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
