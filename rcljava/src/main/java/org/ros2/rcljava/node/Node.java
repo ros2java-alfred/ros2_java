@@ -46,7 +46,7 @@ import rcl_interfaces.msg.SetParametersResult;
 public interface Node {
 
     /**
-     * Release all ressource.
+     * Release all resource.
      */
     void dispose();
 

@@ -112,7 +112,7 @@ public abstract class RCLJava {
      * @param spaceName The name-space that will identify this node in a ROS2 graph.
      * @return A pointer to the underlying ROS2 node structure.
      */
-    private static native long nativeCreateNodeHandle(String nodeName, String spaceName);
+    public static native long nativeCreateNodeHandle(String nodeName, String spaceName);
 
     // Wait.h
     public static native long nativeGetZeroInitializedWaitSet();
@@ -273,6 +273,7 @@ public abstract class RCLJava {
 
     /**
      * Create a @{link Node}.
+     * Take the value from argument app, if you pass null parameter on defaultName.
      *
      * @param namespace Name Space.
      * @param defaultName The name that will identify this node in a ROS2 graph.
@@ -280,37 +281,8 @@ public abstract class RCLJava {
      *     structure.
      */
     public static Node createNode(final String namespace, final String defaultName) {
-        RCLJava.logger.debug("Create Node stack : " + defaultName);
-
-        if (!RCLJava.initialized) {
-            throw new NotInitializedException();
-        }
-
-        String prefix = namespace;
-        String nodeName = defaultName;
-
-        if (RCLJava.arguments != null) {
-            for (String arg : RCLJava.arguments) {
-                if (arg.contains("=")) {
-                    String[] item = arg.split("=");
-                    if ("-node".equals(item[0])) {
-                        nodeName = item[1];
-                    }
-
-                    if ("-prefix".equals(item[0])) {
-                        prefix = item[1];
-                    }
-                }
-            }
-        }
-
-        if (prefix == null) {
-            prefix = "";
-        }
-
 //        String fullName = GraphName.getFullName(ns, nodeName);
-        long nodeHandle = RCLJava.nativeCreateNodeHandle(nodeName, prefix);
-        Node node = new NativeNode(nodeHandle, prefix, nodeName, RCLJava.arguments);
+        Node node = new NativeNode(namespace, defaultName, RCLJava.arguments);
 
         return node;
     }

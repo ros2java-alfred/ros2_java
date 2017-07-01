@@ -35,6 +35,7 @@ import org.ros2.rcljava.time.WallTimer;
 import org.ros2.rcljava.time.WallTimerCallback;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
+import org.ros2.rcljava.exception.NotInitializedException;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.namespace.GraphName;
@@ -198,23 +199,51 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      *
      * @param nodeHandle A pointer to the underlying ROS2 node structure. Must not
      *     be zero.
-     * @param nameSpace prefix path of node.
-     * @param nodeName name of node.
+     * @param namespace prefix path of node.
+     * @param defaultName name of node.
      */
-    public NativeNode(final long nodeHandle,final String nameSpace, final String nodeName, final String[] args) {
+    public NativeNode(final String namespace, final String defaultName, final String[] args) {
+        NativeNode.logger.debug("Create Node stack : " + defaultName);
 
-        if (nodeHandle==0) throw new NullPointerException("Node Handle is not define !");
+        if (!RCLJava.isInitialized()) {
+            throw new NotInitializedException();
+        }
+
+        String prefix = namespace;
+        String nodeName = defaultName;
+
+        if (args != null && defaultName == null) {
+            for (String arg : args) {
+                if (arg.contains("=")) {
+                    String[] item = arg.split("=");
+                    if ("-node".equals(item[0])) {
+                        nodeName = item[1];
+                    }
+
+                    if ("-prefix".equals(item[0])) {
+                        prefix = item[1];
+                    }
+                }
+            }
+        }
+
+        if (prefix == null) {
+            prefix = "";
+        }
+
         if (nodeName==null || nodeName.length() == 0) throw new NullPointerException("Node name is needed !");
-
-        this.nameSpace      = nameSpace;
+        this.nameSpace      = prefix;
         this.name           = nodeName;
-        this.nodeHandle     = nodeHandle;
         this.subscriptions  = new LinkedBlockingQueue<Subscription<?>>();
         this.publishers     = new LinkedBlockingQueue<Publisher<?>>();
         this.clients        = new LinkedBlockingQueue<Client<?>>();
         this.services       = new LinkedBlockingQueue<Service<? extends MessageService>>();
         this.timers 		= new LinkedBlockingQueue<WallTimer>();
         this.parameters     = new HashMap<String, ParameterVariant<?>>();
+
+        long nodeHandle = RCLJava.nativeCreateNodeHandle(this.name, this.nameSpace);
+        if (nodeHandle==0) throw new NullPointerException("Node Handle is not define !");
+        this.nodeHandle     = nodeHandle;
 
         NativeNode.logger.debug("Create Node stack : " + GraphName.getFullName(this.nameSpace, this.name));
 
