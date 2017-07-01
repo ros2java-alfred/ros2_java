@@ -205,33 +205,8 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  set(${PROJECT_NAME}_message_files
-    "msg/BoundedArrayNested.msg"
-    "msg/BoundedArrayPrimitives.msg"
-    "msg/Builtins.msg"
-    "msg/DynamicArrayNested.msg"
-    "msg/DynamicArrayPrimitives.msg"
-    "msg/Empty.msg"
-    "msg/FieldsWithSameType.msg"
-    "msg/Nested.msg"
-    "msg/Primitives.msg"
-    "msg/StaticArrayNested.msg"
-    "msg/StaticArrayPrimitives.msg"
-    "msg/UInt32.msg"
-  )
-
-  rosidl_generate_interfaces(${PROJECT_NAME}
-    ${${PROJECT_NAME}_message_files}
-    DEPENDENCIES builtin_interfaces
-    SKIP_INSTALL
-  )
-
   get_property(_${PROJECT_NAME}_jar_file
     TARGET "${PROJECT_NAME}_jar"
-    PROPERTY "JAR_FILE")
-
-  get_property(_${PROJECT_NAME}_messages_jar_file
-    TARGET "${PROJECT_NAME}_messages_jar"
     PROPERTY "JAR_FILE")
 
   set(${PROJECT_NAME}_test_sources
@@ -293,13 +268,10 @@ if(BUILD_TESTING)
       "${builtin_interfaces_JARS}"
       "${rcl_interfaces_JARS}"
       "${_${PROJECT_NAME}_jar_file}"
-      "${_${PROJECT_NAME}_messages_jar_file}"
       "${_jar_file}"
       LIBRARY_PATHS
       "${_deps_library_paths}"
     )
-
-    add_dependencies("${PROJECT_NAME}_tests_${testsuite}" "${PROJECT_NAME}_messages_jar")
   endforeach()
 
 endif()
