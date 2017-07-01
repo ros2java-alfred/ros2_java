@@ -20,11 +20,20 @@ import static org.junit.Assert.assertEquals;
 import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.ros2.rcljava.exception.NotInitializedException;
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@FixMethodOrder(MethodSorters.JVM)
 public class RCLJavaTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(RCLJavaTest.class);
+
 
     @BeforeClass
     public static void beforeClass() {
@@ -35,6 +44,7 @@ public class RCLJavaTest {
     @Test
     public void testInit() {
         boolean test = true;
+        logger.debug("testInit()");
 
         try {
             Assert.assertEquals(false, RCLJava.isInitialized());
@@ -42,15 +52,17 @@ public class RCLJavaTest {
             Assert.assertEquals(true, RCLJava.isInitialized());
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
 
-        RCLJava.shutdown();
         Assert.assertTrue("failed to initialize rclJava", test);
     }
 
     @Test
     public void testInitShutdown() {
         boolean test = true;
+        logger.debug("testInitShutdown()");
 
         try {
             RCLJava.rclJavaInit();
@@ -65,9 +77,11 @@ public class RCLJavaTest {
     @Test
     public void testInitShutdownSequence() {
         boolean test = true;
+        logger.debug("testInitShutdownSequence()");
 
         RCLJava.rclJavaInit();
         RCLJava.shutdown();
+
         try {
             RCLJava.rclJavaInit();
             RCLJava.shutdown();
@@ -81,24 +95,29 @@ public class RCLJavaTest {
     @Test
     public void testInitDouble() {
         boolean test = false;
+        logger.debug("testInitDouble()");
 
         RCLJava.rclJavaInit();
+
         try {
             RCLJava.rclJavaInit();
         } catch (Exception e) {
             test = true;
+        } finally {
+            RCLJava.shutdown();
         }
 
-        RCLJava.shutdown();
         Assert.assertTrue("Expected Runtime error when initializing rclJava twice", test);
     }
 
     @Test
     public void testShutdownDouble() {
         boolean test = false;
+        logger.debug("testShutdownDouble()");
 
         RCLJava.rclJavaInit();
         RCLJava.shutdown();
+
         try {
             RCLJava.shutdown();
         } catch (Exception e) {
@@ -111,25 +130,27 @@ public class RCLJavaTest {
     @Test
     public void testCreateNode() {
         boolean test = true;
-        Node node = null;
+        NativeNode node = null;
+        logger.debug("testCreateNode()");
 
         RCLJava.rclJavaInit();
-
         try {
-            node = RCLJava.createNode("testNode");
-            node.dispose();
+            node = (NativeNode)RCLJava.createNode("testNode");
+            node.getName();
+            node.close();
         } catch (Exception e) {
             test = false;
+        } finally {
+            RCLJava.shutdown();
         }
 
-        RCLJava.shutdown();
         Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", node, node);
     }
 
     @Test
     public void testOk() {
         boolean test = true;
+        logger.debug("testOk()");
 
         RCLJava.rclJavaInit();
 
@@ -139,26 +160,46 @@ public class RCLJavaTest {
         } catch (Exception e) {
             test = false;
         }
+        Assert.assertTrue("Expected Runtime error.", test);
 
         try {
             RCLJava.shutdown();
             assertEquals(false, RCLJava.ok());
             test = false;
         } catch (Exception e) {  }
-
         Assert.assertTrue("Expected Runtime error.", test);
     }
 
     @Test
     public void testNotInitializedException() {
         boolean test = false;
+        NativeNode node = null;
+        logger.debug("testNotInitializedException()");
 
         try {
-            RCLJava.createNode("testNode");
+            node = (NativeNode)RCLJava.createNode("testNode");
+            node.close();
         } catch (NotInitializedException e) {
             test = true;
+        } catch (ExceptionInInitializerError e) {
+            if (e.getCause() != null && e.getCause().getClass() == NotInitializedException.class) {
+                test = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        Assert.assertTrue("failed not initialized exception !", test);
 
+        try {
+            node = new NativeNode("testNode");
+            node.close();
+//        } catch (NoClassDefFoundError e) {
+//            test = true;
+        } catch (NotInitializedException e) {
+            test = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Assert.assertTrue("failed not initialized exception !", test);
     }
 

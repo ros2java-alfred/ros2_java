@@ -148,7 +148,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      *     structure.
      * @return A pointer to the underlying ROS2 publisher structure.
      */
-    private static native <T extends org.ros2.rcljava.internal.message.Message> long nativeCreatePublisherHandle(
+    private static native <T extends Message> long nativeCreatePublisherHandle(
             long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
 
     /**
@@ -197,6 +197,15 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     /**
      * Constructor.
      *
+     * @param defaultName name of node.
+     */
+    public NativeNode(final String defaultName) {
+        this(null, defaultName, null);
+    }
+
+    /**
+     * Constructor.
+     *
      * @param nodeHandle A pointer to the underlying ROS2 node structure. Must not
      *     be zero.
      * @param namespace prefix path of node.
@@ -216,11 +225,11 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
             for (String arg : args) {
                 if (arg.contains("=")) {
                     String[] item = arg.split("=");
-                    if ("-node".equals(item[0])) {
+                    if ("-node".equals(item[0]) && item[1] != null) {
                         nodeName = item[1];
                     }
 
-                    if ("-prefix".equals(item[0])) {
+                    if ("-prefix".equals(item[0]) && item[1] != null) {
                         prefix = item[1];
                     }
                 }
@@ -232,6 +241,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
         }
 
         if (nodeName==null || nodeName.length() == 0) throw new NullPointerException("Node name is needed !");
+
         this.nameSpace      = prefix;
         this.name           = nodeName;
         this.subscriptions  = new LinkedBlockingQueue<Subscription<?>>();
@@ -393,7 +403,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      *     structure.
      */
     @Override
-    public <T extends org.ros2.rcljava.internal.message.Message> Publisher<T> createPublisher(
+    public <T extends Message> Publisher<T> createPublisher(
             final Class<T> messageType,
             final String topic,
             final QoSProfile qosProfile) {
@@ -426,7 +436,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @return Publisher instance of the created publisher.
      */
     @Override
-    public <T extends org.ros2.rcljava.internal.message.Message> Publisher<T> createPublisher(
+    public <T extends Message> Publisher<T> createPublisher(
             final Class<T> messageType,
             final String topic) {
         return this.createPublisher(messageType, topic, QoSProfile.DEFAULT);
@@ -448,7 +458,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      *     subscription structure.
      */
     @Override
-    public <T extends org.ros2.rcljava.internal.message.Message> Subscription<T> createSubscription(
+    public <T extends Message> Subscription<T> createSubscription(
             final Class<T> messageType,
             final String topic,
             final SubscriptionCallback<T> callback,
@@ -491,7 +501,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @return Subscription instance of the created subscription.
      */
     @Override
-    public <T extends org.ros2.rcljava.internal.message.Message> Subscription<T> createSubscription(
+    public <T extends Message> Subscription<T> createSubscription(
             final Class<T> messageType,
             final String topic,
             final SubscriptionCallback<T> callback) {
@@ -892,7 +902,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @param User defined callback function, It is expected to atomically set parameters.
      */
     @Override
-    public <T extends org.ros2.rcljava.internal.message.Message> void registerParamChangeCallback(SubscriptionCallback<T> callback) {
+    public <T extends Message> void registerParamChangeCallback(SubscriptionCallback<T> callback) {
         //TODO
         throw new NotImplementedException();
     }
@@ -901,7 +911,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @return All the @{link Subscription}s that were created by this instance.
      */
     @Override
-    public Queue<Subscription<? extends org.ros2.rcljava.internal.message.Message>> getSubscriptions() {
+    public Queue<Subscription<? extends Message>> getSubscriptions() {
         return this.subscriptions;
     }
 
@@ -909,7 +919,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @return All the @{link Publisher}s that were created by this instance.
      */
     @Override
-    public final Queue<Publisher<? extends org.ros2.rcljava.internal.message.Message>> getPublishers() {
+    public final Queue<Publisher<? extends Message>> getPublishers() {
       return this.publishers;
     }
 

@@ -52,15 +52,15 @@ public abstract class RCLJava {
     /**
      * The identifier of the currently active RMW implementation.
      */
-    private static String rmwImplementation = null;
+    private static volatile String rmwImplementation = null;
 
     /**
      * Flag to indicate if RCLJava has been fully initialized, with a valid RMW
      *   implementation.
      */
-    private static boolean initialized = false;
+    private static volatile boolean initialized = false;
 
-    private static String[] arguments = null;
+    private static volatile String[] arguments = null;
 
     /**
      * A mapping between RMW implementations and their typesupports.
@@ -159,20 +159,22 @@ public abstract class RCLJava {
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                if (RCLJava.initialized) {
-                    RCLJava.logger.debug("Final Shutdown...");
+                synchronized (RCLJava.class) {
+                    if (RCLJava.initialized) {
+                        RCLJava.logger.debug("Final Shutdown...");
 
-                    // List loaded libraries.
-                    String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
-                    StringBuilder msgLog = new StringBuilder();
-                    for (String key : list) {
-                        msgLog.append(key);
-                        msgLog.append("\n");
+                        // List loaded libraries.
+                        String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
+                        StringBuilder msgLog = new StringBuilder();
+                        for (String key : list) {
+                            msgLog.append(key);
+                            msgLog.append("\n");
+                        }
+                        RCLJava.logger.debug("Native libraries Loaded: \n" + msgLog.toString());
                     }
-                    RCLJava.logger.debug("Native libraries Loaded: \n" + msgLog.toString());
-                }
 
-                GraphName.dispose();
+                    GraphName.dispose();
+                }
             }
         });
     }
@@ -212,7 +214,9 @@ public abstract class RCLJava {
         synchronized (RCLJava.class) {
             if (!RCLJava.initialized) {
                 if (args != null) {
-                    for (String arg : args) {
+                    RCLJava.arguments = args;
+
+                    for (String arg : RCLJava.arguments) {
                         if (arg.contains("=")) {
                             String[] keyVal = arg.split("=");
                             RCLJava.logger.debug("Args : " + keyVal[0] + "\t : " + keyVal[1]);
@@ -237,9 +241,8 @@ public abstract class RCLJava {
                 // RMW implementation founded.
                 {
                     RCLJava.logger.debug("Initialize rclJava with " + RCLJava.rmwImplementation);
-                    RCLJava.nativeRCLJavaInit(args);
+                    RCLJava.nativeRCLJavaInit(RCLJava.arguments);
                     RCLJava.initialized = true;
-                    RCLJava.arguments = args;
                 }
             } else {
                 NotInitializedException ex = new NotInitializedException("Cannot intialized twice !");
@@ -252,7 +255,7 @@ public abstract class RCLJava {
     /**
      * @return true if RCLJava has been fully initialized, false otherwise.
      */
-    public static boolean isInitialized() {
+    public synchronized static boolean isInitialized() {
         return RCLJava.initialized;
     }
 
@@ -281,6 +284,7 @@ public abstract class RCLJava {
      *     structure.
      */
     public static Node createNode(final String namespace, final String defaultName) {
+
 //        String fullName = GraphName.getFullName(ns, nodeName);
         Node node = new NativeNode(namespace, defaultName, RCLJava.arguments);
 
@@ -295,8 +299,10 @@ public abstract class RCLJava {
      */
     @SuppressWarnings({ "resource", "unchecked" })
     public static void spinOnce(final Node node) {
-        if (!RCLJava.initialized) {
-            throw new NotInitializedException();
+        synchronized (RCLJava.class) {
+            if (!RCLJava.initialized) {
+                throw new NotInitializedException();
+            }
         }
 
         if (node.getClients().size() > 0 ||
@@ -459,8 +465,10 @@ public abstract class RCLJava {
      * @return true if RCLJava hasn't been shut down, false otherwise.
      */
     public static boolean ok() {
-        if (!RCLJava.initialized) {
-            throw new NotInitializedException();
+        synchronized (RCLJava.class) {
+            if (!RCLJava.initialized) {
+                throw new NotInitializedException();
+            }
         }
 
         return RCLJava.nativeOk();
@@ -477,20 +485,24 @@ public abstract class RCLJava {
     public static void shutdown() {
         RCLJava.logger.debug("Shutdown...");
 
-        if (!RCLJava.initialized) {
-            throw new NotInitializedException();
-        }
+        synchronized (RCLJava.class) {
+            if (!RCLJava.initialized) {
+                throw new NotInitializedException();
+            }
 
-        RCLJava.nativeShutdown();
-        RCLJava.initialized = false;
+            RCLJava.nativeShutdown();
+            RCLJava.initialized = false;
+        }
     }
 
     /**
      * @return The identifier of the currently active RMW implementation.
      */
     public static String getRMWIdentifier() {
-        if (!RCLJava.initialized) {
-            throw new NotInitializedException();
+        synchronized (RCLJava.class) {
+            if (!RCLJava.initialized) {
+                throw new NotInitializedException();
+            }
         }
 
         return RCLJava.nativeGetRMWIdentifier();
@@ -561,8 +573,6 @@ public abstract class RCLJava {
                 System.loadLibrary(name);
             } catch (UnsatisfiedLinkError e) {
                 RCLJava.logger.error("Native code library failed to load.", e);
-
-                System.exit(1);
             }
         }
     }
