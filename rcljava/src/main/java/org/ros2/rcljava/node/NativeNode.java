@@ -105,7 +105,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     /**
      * All the @{link Client}s that have been created through this instance.
      */
-    private final Queue<Client<?>> clients;
+    private final Queue<Client<? extends MessageService>> clients;
 
     /**
      * All the @{link WallTimer}s that have been created through this instance.
@@ -928,7 +928,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @return ArrayList of Clients
      */
     @Override
-    public final Queue<Client<?>> getClients() {
+    public final Queue<Client<? extends MessageService>> getClients() {
         return this.clients;
     }
 

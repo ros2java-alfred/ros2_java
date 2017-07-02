@@ -14,7 +14,6 @@
  */
 package org.ros2.rcljava.node;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
@@ -163,7 +162,6 @@ public interface Node {
 
     HashMap<String, List<String>> getTopicNamesAndTypes();
     HashMap<String, List<String>> getTopicNamesAndTypes(boolean noDemangle);
-
     HashMap<String, List<String>> getServiceNamesAndTypes();
 
     List<String> getNodeNames();
@@ -226,23 +224,23 @@ public interface Node {
      *
      * @param User defined callback function, It is expected to atomically set parameters.
      */
-    <T extends org.ros2.rcljava.internal.message.Message> void registerParamChangeCallback(SubscriptionCallback<T> callback);
+    <T extends Message> void registerParamChangeCallback(SubscriptionCallback<T> callback);
 
     String getNameSpace();
 
-    Collection<Byte> getParametersTypes(List<String> names);
+    List<Byte> getParametersTypes(List<String> names);
 
-    Collection<String> getParametersNames();
+    List<String> getParametersNames();
 
     /**
      * @return All the @{link Subscription}s that were created by this instance.
      */
-    Queue<Subscription<? extends org.ros2.rcljava.internal.message.Message>> getSubscriptions();
+    Queue<Subscription<? extends Message>> getSubscriptions();
 
     /**
      * @return All the @{link Publisher}s that were created by this instance.
      */
-    Queue<Publisher<? extends org.ros2.rcljava.internal.message.Message>> getPublishers();
+    Queue<Publisher<? extends Message>> getPublishers();
 
     /**
      * Get list of Clients.

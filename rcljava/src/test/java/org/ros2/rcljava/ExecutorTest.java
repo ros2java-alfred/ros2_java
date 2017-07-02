@@ -95,8 +95,6 @@ public class ExecutorTest {
             executor.addNode(subscriptionNodeOne);
             executor.addNode(subscriptionNodeTwo);
 
-//            executor.spin();
-
             while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
                 publisher.publish(msg);
                 executor.spinOnce(0);
