@@ -22,12 +22,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * Class:     org_ros2_rcljava_time_NativeWallTimer
  * Method:    nativeDispose
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_timer_WallTimerImpl_nativeDispose
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeDispose
   (JNIEnv *, jclass, jlong);
 
 /*
