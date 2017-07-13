@@ -34,73 +34,83 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.time.WallTimer;
 import org.ros2.rcljava.time.WallTimerCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TimerTest {
-  public static class TimerCallback implements WallTimerCallback {
-    private final RCLFuture<Boolean> future;
-    private int counter;
-    private final int maxCount;
+    private static final Logger logger = LoggerFactory.getLogger(TimerTest.class);
 
-    TimerCallback(final RCLFuture<Boolean> future, int maxCount) {
-      this.future = future;
-      this.counter = 0;
-      this.maxCount = maxCount;
+    public static class TimerCallback implements WallTimerCallback {
+        private final RCLFuture<Boolean> future;
+        private int counter;
+        private final int maxCount;
+
+        TimerCallback(final RCLFuture<Boolean> future, int maxCount) {
+            this.future = future;
+            this.counter = 0;
+            this.maxCount = maxCount;
+        }
+
+        public void tick() {
+            this.counter++;
+            if (this.counter >= this.maxCount) {
+                this.future.set(true);
+            }
+        }
+
+        public int getCounter() {
+            return this.counter;
+        }
     }
 
-    public void tick() {
-      this.counter++;
-      if (this.counter >= this.maxCount) {
-        this.future.set(true);
-      }
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
     }
 
-    public int getCounter() {
-      return this.counter;
-    }
-  }
-
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
-  }
-
-  @AfterClass
-  public static void tearDownAfterClass() throws Exception {
-  }
-
-  @Before
-  public void setUp() throws Exception {
-  }
-
-  @After
-  public void tearDown() throws Exception {
-  }
-
-  @Test
-  public final void testCreate() {
-    int max_iterations = 4;
-
-    RCLJava.rclJavaInit();
-
-    Node node = RCLJava.createNode("test_node");
-
-    RCLFuture<Boolean> future = new RCLFuture<Boolean>(new WeakReference<Node>(node));
-    TimerCallback timerCallback = new TimerCallback(future, max_iterations);
-
-    WallTimer timer = node.createWallTimer(250, TimeUnit.MILLISECONDS, timerCallback);
-    assertNotEquals(0, timer.getHandle());
-
-    while (RCLJava.ok() && !future.isDone()) {
-      RCLJava.spinOnce(node);
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
     }
 
-    assertFalse(timer.isCanceled());
-    timer.cancel();
+    @Before
+    public void setUp() throws Exception {
+    }
 
-    assertEquals(
-        TimeUnit.NANOSECONDS.convert(250, TimeUnit.MILLISECONDS), timer.getTimerPeriodNS());
-    assertFalse(timer.isReady());
-    assertTrue(timer.isCanceled());
+    @After
+    public void tearDown() throws Exception {
+    }
 
-    assertEquals(4, timerCallback.getCounter());
-  }
+    @Test
+    public final void testCreate() {
+        logger.debug(new Object() {
+        }.getClass().getEnclosingMethod().getName());
+
+        int max_iterations = 4;
+
+        RCLJava.rclJavaInit();
+
+        Node node = RCLJava.createNode("test_node");
+
+        RCLFuture<Boolean> future = new RCLFuture<Boolean>(new WeakReference<Node>(node));
+        TimerCallback timerCallback = new TimerCallback(future, max_iterations);
+
+        WallTimer timer = node.createWallTimer(250, TimeUnit.MILLISECONDS, timerCallback);
+        assertNotEquals(0, timer.getHandle());
+
+        while (RCLJava.ok() && !future.isDone()) {
+            RCLJava.spinOnce(node);
+        }
+
+        assertFalse(timer.isCanceled());
+        timer.cancel();
+
+        assertEquals(TimeUnit.NANOSECONDS.convert(250, TimeUnit.MILLISECONDS), timer.getTimerPeriodNS());
+        assertFalse(timer.isReady());
+        assertTrue(timer.isCanceled());
+
+        assertEquals(4, timerCallback.getCounter());
+
+        timer.dispose();
+        node.dispose();
+        RCLJava.shutdown();
+    }
 }

@@ -13,6 +13,8 @@ find_package(rcljava_common REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rcl_interfaces REQUIRED)
 find_package(builtin_interfaces REQUIRED)
+find_package(geometry_msgs)
+find_package(sensor_msgs)
 
 include(CrossCompilingExtra)
 
@@ -47,6 +49,10 @@ find_jar(JUNIT_JAR NAMES junit PATHS /usr/share/java VERSIONS 4)
 find_jar(LOG_JAR NAMES commons-logging PATHS /usr/share/java)
 find_jar(STD_MSGS_JARS NAMES std_msgs
   PATHS "${CMAKE_BINARY_DIR}/../std_msgs/")
+find_jar(GEOMETRY_MSGS_JARS NAMES geometry_msgs
+  PATHS "${CMAKE_BINARY_DIR}/../geometry_msgs/")
+find_jar(SENSOR_MSGS_JARS NAMES sensor_msgs
+  PATHS "${CMAKE_BINARY_DIR}/../sensor_msgs/")
 find_jar(RCLINTERFACE_MSGS_JARS NAMES rcl_interfaces
   PATHS "${CMAKE_BINARY_DIR}/../rcl_interfaces/")
 find_jar(BUILTIN_MSGS_JARS NAMES builtin_interfaces
@@ -55,6 +61,8 @@ find_jar(BUILTIN_COMMON_JARS NAMES rosidl_generator_java
   PATHS "${CMAKE_BINARY_DIR}/../rosjava_common/")
 
 set(STD_MSGS_JARS "${CMAKE_BINARY_DIR}/../std_msgs/std_msgs.jar")
+set(GEOMETRY_MSGS_JARS "${CMAKE_BINARY_DIR}/../geometry_msgs/geometry_msgs.jar")
+set(SENSOR_MSGS_JARS "${CMAKE_BINARY_DIR}/../sensor_msgs/sensor_msgs.jar")
 set(BUILTIN_MSGS_JARS "${CMAKE_BINARY_DIR}/../builtin_interfaces/builtin_interfaces.jar")
 set(RCLINTERFACE_MSGS_JARS NAMES "${CMAKE_BINARY_DIR}/../rcl_interfaces/rcl_interfaces.jar")
 set(BUILTIN_COMMON_JARS NAMES "${CMAKE_BINARY_DIR}/../rosjava_common/rosjava_common.jar")
@@ -189,6 +197,8 @@ add_jar("${PROJECT_NAME}_jar"
   "${PROJECT_NAME}"
   INCLUDE_JARS
   "${std_msgs_JARS}"
+  "${geometry_msgs_JARS}"
+  "${sensor_msgs_JARS}"
   "${rcl_interfaces_JARS}"
   "${builtin_interfaces_JARS}"
   "${rcljava_common_JARS}"
@@ -213,7 +223,9 @@ if(BUILD_TESTING)
     "src/test/java/org/ros2/rcljava/ExecutorTest.java"
     "src/test/java/org/ros2/rcljava/GraphNameTest.java"
     "src/test/java/org/ros2/rcljava/NodeTest.java"
-#    "src/test/java/org/ros2/rcljava/MessageTest.java"
+    "src/test/java/org/ros2/rcljava/AbstractMessageTest.java"
+    "src/test/java/org/ros2/rcljava/MessageStdTest.java"
+    "src/test/java/org/ros2/rcljava/MessageSensorTest.java"
     "src/test/java/org/ros2/rcljava/PublisherTest.java"
     "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
     "src/test/java/org/ros2/rcljava/RmwTest.java"
@@ -225,7 +237,8 @@ if(BUILD_TESTING)
     "org.ros2.rcljava.ExecutorTest"
     "org.ros2.rcljava.GraphNameTest"
     "org.ros2.rcljava.NodeTest"
-#    "org.ros2.rcljava.MessageTest"
+    "org.ros2.rcljava.MessageStdTest"
+    "org.ros2.rcljava.MessageSensorTest"
     "org.ros2.rcljava.PublisherTest"
     "org.ros2.rcljava.RCLJavaTest"
     "org.ros2.rcljava.RmwTest"
@@ -239,6 +252,14 @@ if(BUILD_TESTING)
     list(APPEND _deps_library_paths ${_dep_dir})
   endforeach()
   foreach(_dep_lib ${std_msgs_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list(APPEND _deps_library_paths ${_dep_dir})
+  endforeach()
+  foreach(_dep_lib ${geometry_msgs_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list(APPEND _deps_library_paths ${_dep_dir})
+  endforeach()
+  foreach(_dep_lib ${sensor_msgs_LIBRARIES})
     get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
     list(APPEND _deps_library_paths ${_dep_dir})
   endforeach()
@@ -265,6 +286,8 @@ if(BUILD_TESTING)
       "${rcljava_common_JARS}"
       "${rcljava_test_msgs_JARS}"
       "${std_msgs_JARS}"
+      "${geometry_msgs_JARS}"
+      "${sensor_msgs_JARS}"
       "${builtin_interfaces_JARS}"
       "${rcl_interfaces_JARS}"
       "${_${PROJECT_NAME}_jar_file}"

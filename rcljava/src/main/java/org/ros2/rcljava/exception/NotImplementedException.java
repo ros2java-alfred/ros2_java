@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava.exception;
 
 /**
@@ -21,7 +22,7 @@ package org.ros2.rcljava.exception;
  */
 public class NotImplementedException extends RuntimeException {
 
-    /** Serial ID */
+    /** Serial ID. */
     private static final long serialVersionUID = -2351440132432398102L;
 
     /**

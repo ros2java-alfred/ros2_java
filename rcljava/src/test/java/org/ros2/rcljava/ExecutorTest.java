@@ -16,7 +16,9 @@ package org.ros2.rcljava;
 
 import static org.junit.Assert.*;
 
+import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.ros2.rcljava.executor.MultiThreadedExecutor;
@@ -28,11 +30,14 @@ import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.node.topic.NativePublisher;
 import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ros2.rcljava.internal.message.Message;
 import std_msgs.msg.UInt32;
 
 public class ExecutorTest {
+    private static final Logger logger = LoggerFactory.getLogger(ExecutorTest.class);
+
 
     public class TestConsumer<T extends Message> implements SubscriptionCallback<T> {
         private final RCLFuture<T> future;
@@ -63,8 +68,16 @@ public class ExecutorTest {
         }
     }
 
+    @BeforeClass
+    public static void beforeClass() {
+        BasicConfigurator.resetConfiguration();
+        BasicConfigurator.configure();
+    }
+
     @Test
     public final void testLinkMultipleProcess() throws Exception {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
 
         try {
@@ -129,6 +142,8 @@ public class ExecutorTest {
 
     @Test
     public final void testSeparateMultipleProcess() throws Exception {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
 
         try {
@@ -194,6 +209,8 @@ public class ExecutorTest {
 
     @Test
     public final void testSeparateSingleProcess() throws Exception {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
 
         try {
@@ -259,6 +276,8 @@ public class ExecutorTest {
 
     @Test
     public final void testLinkSingleProcess() throws Exception {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
 
         try {
@@ -323,6 +342,8 @@ public class ExecutorTest {
 
     @Test
     public final void testSeparateSingleProcessFail() throws Exception {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
 
         try {

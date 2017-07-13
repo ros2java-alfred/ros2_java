@@ -30,9 +30,7 @@ import org.slf4j.LoggerFactory;
 
 @FixMethodOrder(MethodSorters.JVM)
 public class RCLJavaTest {
-
     private static final Logger logger = LoggerFactory.getLogger(RCLJavaTest.class);
-
 
     @BeforeClass
     public static void beforeClass() {
@@ -42,8 +40,9 @@ public class RCLJavaTest {
 
     @Test
     public void testInit() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
-        logger.debug("testInit()");
 
         try {
             Assert.assertEquals(false, RCLJava.isInitialized());
@@ -60,8 +59,9 @@ public class RCLJavaTest {
 
     @Test
     public void testInitShutdown() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
-        logger.debug("testInitShutdown()");
 
         try {
             RCLJava.rclJavaInit();
@@ -75,8 +75,9 @@ public class RCLJavaTest {
 
     @Test
     public void testInitShutdownSequence() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
-        logger.debug("testInitShutdownSequence()");
 
         RCLJava.rclJavaInit();
         RCLJava.shutdown();
@@ -93,8 +94,9 @@ public class RCLJavaTest {
 
     @Test
     public void testInitDouble() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = false;
-        logger.debug("testInitDouble()");
 
         RCLJava.rclJavaInit();
 
@@ -111,8 +113,9 @@ public class RCLJavaTest {
 
     @Test
     public void testShutdownDouble() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = false;
-        logger.debug("testShutdownDouble()");
 
         RCLJava.rclJavaInit();
         RCLJava.shutdown();
@@ -128,9 +131,10 @@ public class RCLJavaTest {
 
     @Test
     public void testCreateNode() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
         NativeNode node = null;
-        logger.debug("testCreateNode()");
 
         RCLJava.rclJavaInit();
         try {
@@ -148,8 +152,9 @@ public class RCLJavaTest {
 
     @Test
     public void testOk() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
-        logger.debug("testOk()");
 
         RCLJava.rclJavaInit();
 
@@ -171,9 +176,10 @@ public class RCLJavaTest {
 
     @Test
     public void testNotInitializedException() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = false;
         NativeNode node = null;
-        logger.debug("testNotInitializedException()");
 
         try {
             node = (NativeNode)RCLJava.createNode("testNode");

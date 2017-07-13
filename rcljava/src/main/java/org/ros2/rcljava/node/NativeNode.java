@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava.node;
 
 import java.lang.ref.WeakReference;
@@ -25,14 +26,7 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.ros2.rcljava.Log;
-import org.ros2.rcljava.qos.QoSProfile;
-import org.ros2.rcljava.time.NativeWallTimer;
-import org.ros2.rcljava.time.WallTimer;
-import org.ros2.rcljava.time.WallTimerCallback;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.exception.NotInitializedException;
@@ -47,11 +41,18 @@ import org.ros2.rcljava.node.service.NativeClient;
 import org.ros2.rcljava.node.service.NativeService;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceCallback;
-import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.NativePublisher;
 import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
+import org.ros2.rcljava.node.topic.SubscriptionCallback;
+import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.time.NativeWallTimer;
+import org.ros2.rcljava.time.WallTimer;
+import org.ros2.rcljava.time.WallTimerCallback;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import builtin_interfaces.msg.Time;
 import rcl_interfaces.msg.Parameter;
@@ -248,7 +249,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
         this.publishers     = new LinkedBlockingQueue<Publisher<?>>();
         this.clients        = new LinkedBlockingQueue<Client<?>>();
         this.services       = new LinkedBlockingQueue<Service<? extends MessageService>>();
-        this.timers 		= new LinkedBlockingQueue<WallTimer>();
+        this.timers         = new LinkedBlockingQueue<WallTimer>();
         this.parameters     = new HashMap<String, ParameterVariant<?>>();
 
         long nodeHandle = RCLJava.nativeCreateNodeHandle(this.name, this.nameSpace);
@@ -276,7 +277,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
                         } else if (isDouble(val)) {
                             value = new ParameterVariant<Double>(key, Double.parseDouble(val));
                         } else
-//                    	  if (isBoolean(val)) {
+//                        if (isBoolean(val)) {
 //                            value = new ParameterVariant<Boolean>(key, Boolean.parseBoolean(val));
 //                        } else
                         {

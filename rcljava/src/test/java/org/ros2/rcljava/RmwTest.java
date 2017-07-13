@@ -24,11 +24,15 @@ import org.junit.Test;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public class RmwTest {
+    private static final Logger logger = LoggerFactory.getLogger(RmwTest.class);
+
 
     @BeforeClass
     public static void beforeClass() {
@@ -38,6 +42,8 @@ public class RmwTest {
 
     @Test
     public void testRmwFastrtps() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
 
         try {
@@ -58,6 +64,8 @@ public class RmwTest {
     @Ignore
     @Test
     public void testRmwOpensplice() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
 
         try {
@@ -78,6 +86,8 @@ public class RmwTest {
     @Ignore
     @Test
     public void testRmwConnext() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
 
         try {
@@ -98,6 +108,8 @@ public class RmwTest {
     @Ignore
     @Test
     public void testRmwConnextDynamic() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
 
         try {
@@ -117,6 +129,8 @@ public class RmwTest {
 
     @Test
     public void testNoImplementationAvailableException() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = false;
 
         try {
@@ -136,6 +150,8 @@ public class RmwTest {
 
     @Test
     public void testImplementationAlreadyImportedException() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = false;
 
         try {

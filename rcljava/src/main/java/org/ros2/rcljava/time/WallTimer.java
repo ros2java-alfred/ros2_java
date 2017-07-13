@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava.time;
 
 public interface WallTimer {
@@ -21,6 +22,7 @@ public interface WallTimer {
     void setTimerPeriodNS(long period);
 
     boolean isReady();
+
     boolean isCanceled();
 
     void cancel();

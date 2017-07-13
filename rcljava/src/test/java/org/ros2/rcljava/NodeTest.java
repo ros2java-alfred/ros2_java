@@ -22,7 +22,6 @@ import org.apache.log4j.BasicConfigurator;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.ros2.rcljava.node.Node;
@@ -31,7 +30,8 @@ import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.qos.QoSProfile;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -44,6 +44,7 @@ import org.ros2.rcljava.namespace.GraphName;
 
 
 public class NodeTest {
+    private static final Logger logger = LoggerFactory.getLogger(NodeTest.class);
 
     public class TestConsumer<T extends Message> implements SubscriptionCallback<T> {
         private final RCLFuture<T> future;
@@ -67,6 +68,8 @@ public class NodeTest {
 
     @Test
     public final void testCreate() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
         Node node = null;
 
@@ -86,6 +89,8 @@ public class NodeTest {
 
     @Test
     public void testDestroyNode() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
         Node node = null;
 
@@ -105,6 +110,8 @@ public class NodeTest {
 
     @Test
     public void testGetNodeName() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
         Node node = null;
         String nodeName = null;
@@ -126,6 +133,8 @@ public class NodeTest {
 
     @Test
     public final void testPubSub() throws Exception {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         RCLJava.rclJavaInit();
         Node node = RCLJava.createNode("test_node");
         assertNotEquals(0, node.getNodeHandle());
@@ -156,6 +165,8 @@ public class NodeTest {
 
     @Test
     public void testPublisher() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
         Node node = null;
         Publisher<std_msgs.msg.String> pub = null;
@@ -192,6 +203,8 @@ public class NodeTest {
 
     @Test
     public void testSubscription() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
         Node node = null;
         Subscription<std_msgs.msg.String> sub = null;
@@ -224,6 +237,8 @@ public class NodeTest {
 
     @Test
     public void testGraphPublisherCount() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
         int count = -2;
         Node node = null;
@@ -257,6 +272,8 @@ public class NodeTest {
 
     @Test
     public void testGraphSubscriptionCount() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
         int count = -2;
         Node node = null;
@@ -294,8 +311,9 @@ public class NodeTest {
     }
 
     @Test
-    @Ignore
     public void testGraphGetTopics() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
         Node node = null;
         HashMap<String, List<String>> topics = null;
@@ -322,7 +340,7 @@ public class NodeTest {
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", 13, i);
+        Assert.assertEquals("Bad result", 1, i);
     }
 
     //TODO Test Parameters

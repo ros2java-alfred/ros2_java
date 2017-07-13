@@ -17,11 +17,11 @@ package org.ros2.rcljava.time;
 
 import java.lang.ref.WeakReference;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NativeWallTimer implements WallTimer, java.lang.AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(NativeWallTimer.class);

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava.exception;
 
 /**
@@ -22,7 +23,7 @@ package org.ros2.rcljava.exception;
  */
 public class ImplementationAlreadyImportedException extends Exception {
 
-    /** Serial ID */
+    /** Serial ID. */
     private static final long serialVersionUID = 4388424558654481791L;
 
     /**
@@ -35,7 +36,7 @@ public class ImplementationAlreadyImportedException extends Exception {
     /**
      * Constructor.
      *
-     * @param cause
+     * @param cause Throwable instance of the cause.
      */
     public ImplementationAlreadyImportedException(Throwable cause) {
         super("rmw implementation already imported", cause);

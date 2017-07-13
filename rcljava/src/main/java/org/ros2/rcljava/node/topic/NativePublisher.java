@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava.node.topic;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.NativeNode;
+import org.ros2.rcljava.qos.QoSProfile;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class serves as a bridge between ROS2's rcl_publisher_t and RCLJava.
@@ -84,12 +85,10 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
     /**
      * Constructor.
      *
-     * @param nodeHandle A pointer to the underlying ROS2 node structure that
-     *     created this subscription, as an integer. Must not be zero.
      * @param publisherHandle A pointer to the underlying ROS2 publisher
      *     structure, as an integer. Must not be zero.
      * @param topic The topic to which this publisher will publish messages.
-     * @param qos Quality of Service profile.
+     * @param qosProfile Quality of Service profile.
      */
     public NativePublisher(final NativeNode node, final long publisherHandle, final Class<T> messageType, final String topic, final QoSProfile qosProfile) {
         if (node == null && publisherHandle == 0) {
@@ -117,7 +116,7 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
 
     /**
      * Get message type.
-     * @return
+     * @return Class Type of message.
      */
     public final Class<T> getMsgType() {
         return this.messageType;
@@ -125,15 +124,15 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
 
     /**
      * Get topic name.
-     * @return
+     * @return Name of topic.
      */
     public final String getTopic() {
         return this.topic;
     }
 
     /**
-     * Get node of publisher
-     * @return
+     * Get node of publisher.
+     * @return Instance of owner node.
      */
     public final NativeNode getNode() {
         return this.ownerNode;

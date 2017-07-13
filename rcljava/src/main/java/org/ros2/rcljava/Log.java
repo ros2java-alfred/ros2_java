@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava;
+
+import org.ros2.rcljava.namespace.GraphName;
+import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Topics;
 
 //import java.io.PrintWriter;
 //import java.io.StringWriter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ros2.rcljava.namespace.GraphName;
-import org.ros2.rcljava.node.Node;
-import org.ros2.rcljava.node.topic.Publisher;
-import org.ros2.rcljava.node.topic.Topics;
 
 import std_msgs.msg.String;
 

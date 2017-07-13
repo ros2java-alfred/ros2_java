@@ -23,8 +23,11 @@ import org.junit.Test;
 import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.Topics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GraphNameTest {
+    private static final Logger logger = LoggerFactory.getLogger(GraphNameTest.class);
 
     @BeforeClass
     public static void beforeClass() {
@@ -35,6 +38,7 @@ public class GraphNameTest {
     @Test
     public final void testIsTopicName() {
         // @see http://design.ros2.org/articles/topic_and_service_names.html
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         // must not be empty
         Assert.assertFalse("Topic must not be null.", GraphName.isValidTopic(null));
@@ -115,6 +119,8 @@ public class GraphNameTest {
 
     @Test
     public final void testIsSubstitution() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         // must not be empty
         Assert.assertFalse("Substitution must not be null.", GraphName.isValidSubstitution(null));
         Assert.assertFalse("Substitution must not be empty.", GraphName.isValidSubstitution(""));
@@ -137,6 +143,8 @@ public class GraphNameTest {
 
     @Test
     public final void testIsTopicFQN() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         // must start with a forward slash (/), i.e. they must be absolute
         Assert.assertTrue("FQN must start with a forward slash.", GraphName.isValideFQDN("/foo"));
         Assert.assertFalse("FQN must start with a forward slash.", GraphName.isValideFQDN("foo"));
@@ -154,6 +162,7 @@ public class GraphNameTest {
 
     @Test
     public final void testGetFullName() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
         RCLJava.rclJavaInit();
 
         Node node = RCLJava.createNode("my_node");

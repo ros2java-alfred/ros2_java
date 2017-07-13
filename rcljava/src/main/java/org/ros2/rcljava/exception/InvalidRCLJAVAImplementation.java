@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava.exception;
 
 /**
@@ -21,13 +22,13 @@ package org.ros2.rcljava.exception;
  */
 public class InvalidRCLJAVAImplementation extends RuntimeException {
 
-    /** Serial ID */
+    /** Serial ID. */
     private static final long serialVersionUID = -7328914635553812875L;
 
     /**
      * Constructor.
      *
-     * @param cause
+     * @param cause Throwable instance of the cause.
      */
     public InvalidRCLJAVAImplementation(Throwable cause) {
         super("requested invalid rmw implementation", cause);

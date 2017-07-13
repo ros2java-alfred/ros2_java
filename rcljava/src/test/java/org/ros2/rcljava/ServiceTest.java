@@ -9,11 +9,16 @@ import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceCallback;
 import org.ros2.rcljava.qos.QoSProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServiceTest {
+    private static final Logger logger = LoggerFactory.getLogger(ServiceTest.class);
 
     @Test
     public void testService() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
         Node node = null;
         Service<rcl_interfaces.srv.GetParameters> srv = null;
@@ -48,6 +53,8 @@ public class ServiceTest {
 
     @Test
     public void testClient() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         boolean test = true;
         Node node = null;
         Client<rcl_interfaces.srv.GetParameters> clt = null;

@@ -24,12 +24,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import std_msgs.msg.String;
 
 import org.ros2.rcljava.node.topic.NativeSubscription;
 
 public class SubscriptionTest {
+    private static final Logger logger = LoggerFactory.getLogger(SubscriptionTest.class);
 
     @BeforeClass
     public static void beforeClass() {
@@ -39,6 +42,8 @@ public class SubscriptionTest {
 
     @Test
     public final void testCreate() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
         RCLJava.rclJavaInit();
         NativeNode node = (NativeNode) RCLJava.createNode("test_node");
         NativeSubscription<std_msgs.msg.String> subscription =

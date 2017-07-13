@@ -12,15 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava.node.parameter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RMWRequestId;
@@ -28,13 +25,17 @@ import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceCallback;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Topics;
+import org.ros2.rcljava.qos.QoSProfile;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import rcl_interfaces.msg.ListParametersResult;
 import rcl_interfaces.msg.Parameter;
 import rcl_interfaces.msg.ParameterDescriptor;
+import rcl_interfaces.msg.ParameterEvent;
 import rcl_interfaces.msg.ParameterValue;
 import rcl_interfaces.msg.SetParametersResult;
-import rcl_interfaces.msg.ParameterEvent;
 
 import rcl_interfaces.srv.DescribeParameters;
 import rcl_interfaces.srv.DescribeParameters_Request;
@@ -49,11 +50,11 @@ import rcl_interfaces.srv.ListParameters;
 import rcl_interfaces.srv.ListParameters_Request;
 import rcl_interfaces.srv.ListParameters_Response;
 import rcl_interfaces.srv.SetParameters;
-import rcl_interfaces.srv.SetParameters_Request;
-import rcl_interfaces.srv.SetParameters_Response;
 import rcl_interfaces.srv.SetParametersAtomically;
 import rcl_interfaces.srv.SetParametersAtomically_Request;
 import rcl_interfaces.srv.SetParametersAtomically_Response;
+import rcl_interfaces.srv.SetParameters_Request;
+import rcl_interfaces.srv.SetParameters_Response;
 
 /**
  * Parameter Variant.

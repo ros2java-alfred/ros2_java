@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava.node.topic;
 
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.qos.QoSProfile;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ros2.rcljava.node.NativeNode;
 
 /**
  * This class serves as a bridge between ROS2's rcl_subscription_t and RCLJava.

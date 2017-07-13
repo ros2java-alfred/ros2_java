@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava.exception;
 
 /**
@@ -21,13 +22,11 @@ package org.ros2.rcljava.exception;
  */
 public class NotInitializedException extends RuntimeException {
 
-    /** Serial ID */
+    /** Serial ID. */
     private static final long serialVersionUID = -5109722435632105485L;
 
     /**
      * Constructor.
-     *
-     * @param cause
      */
     public NotInitializedException() {
         this("RCLJava.rclJavaInit() has not been called !", null);
@@ -36,7 +35,7 @@ public class NotInitializedException extends RuntimeException {
     /**
      * Constructor.
      *
-     * @param cause
+     * @param msg cause message.
      */
     public NotInitializedException(String msg) {
         this(msg, null);
@@ -45,7 +44,8 @@ public class NotInitializedException extends RuntimeException {
     /**
      * Constructor.
      *
-     * @param cause
+     * @param msg cause message.
+     * @param cause Throwable instance of the cause.
      */
     public NotInitializedException(String msg, Throwable cause) {
         super(msg, cause);

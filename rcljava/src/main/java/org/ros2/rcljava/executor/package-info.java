@@ -1,5 +1,4 @@
-/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
- * Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
+/* Copyright 2017 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +13,8 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava.node.topic;
-
 /**
- * Topics built-in.
+ * ROS2 Executor.
+ *
  */
-public class Topics {
-
-    /** Standard ros2 out. */
-    public static final String ROSOUT = "/rosout";
-
-    /** Parameter events topic. */
-    public static final String PARAM_EVENT = "~/parameter_events";
-
-    public static final String SCHEME = "rostopic://";
-
-}
+package org.ros2.rcljava.executor;
