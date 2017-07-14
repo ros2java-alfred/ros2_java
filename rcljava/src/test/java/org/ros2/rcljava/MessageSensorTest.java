@@ -24,6 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import geometry_msgs.msg.Point32;
+import geometry_msgs.msg.Transform;
+import geometry_msgs.msg.Twist;
+import geometry_msgs.msg.Wrench;
 import sensor_msgs.msg.*;
 
 
@@ -62,7 +65,7 @@ public class MessageSensorTest extends AbstractMessageTest {
     }
 
     @Test
-    @Ignore
+    @Ignore //TODO Remove after fix.
     public final void testPubImu() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
@@ -81,24 +84,33 @@ public class MessageSensorTest extends AbstractMessageTest {
     }
 
     @Test
-    @Ignore
+    @Ignore //TODO Remove after fix.
     public final void testPubCameraInfo() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         CameraInfo msg = new CameraInfo();
-        msg.setBinningX(1);
-        msg.setBinningY(2);
+        msg.setBinningX(10);
+        msg.setBinningY(20);
+        msg.getD().add(30d);
         msg.setDistortionModel("distortion");
-        msg.setHeight(3);
-        msg.setWidth(4);
-        //TODO
+        msg.setHeight(40);
+        msg.setWidth(50);
+        msg.getK().add(60d);
+        msg.getP().add(70d);
+        msg.getR().add(80d);
+        msg.getRoi().setDoRectify(true);
 
         CameraInfo value = this.pubSubTest(msg);
-        assertEquals(1, value.getBinningX());
-        assertEquals(2, value.getBinningY());
+        assertEquals(10, value.getBinningX());
+        assertEquals(20, value.getBinningY());
+        assertEquals(30d, value.getD().get(0), 0.1d);
         assertEquals("distortion", value.getDistortionModel());
-        assertEquals(3, value.getHeight());
-        assertEquals(4, value.getWidth());
+        assertEquals(40, value.getHeight());
+        assertEquals(50, value.getWidth());
+        assertEquals(60d, value.getK().get(0), 0.1d);
+        assertEquals(70d, value.getP().get(0), 0.1d);
+        assertEquals(80d, value.getR().get(0), 0.1d);
+        assertTrue(value.getRoi().getDoRectify());
     }
 
     @Test
@@ -120,10 +132,11 @@ public class MessageSensorTest extends AbstractMessageTest {
 
         CompressedImage msg = new CompressedImage();
         msg.setFormat("format");
-        //TODO
+        msg.getData().add((byte) 10);
 
         CompressedImage value = this.pubSubTest(msg);
         assertEquals("format", value.getFormat());
+        assertEquals((byte) 10, (byte)value.getData().get(0));
     }
 
     @Test
@@ -132,10 +145,11 @@ public class MessageSensorTest extends AbstractMessageTest {
 
         FluidPressure msg = new FluidPressure();
         msg.setFluidPressure(10.0d);
-        //TODO
+        msg.setVariance(20.0d);
 
         FluidPressure value = this.pubSubTest(msg);
         assertEquals(10.0d, value.getFluidPressure(), 0.1d);
+        assertEquals(20.0d, value.getVariance(), 0.1d);
     }
 
     @Test
@@ -156,12 +170,20 @@ public class MessageSensorTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         Image msg = new Image();
-        msg.setHeight(2);
-        msg.setWidth(3);
-        //TODO
+        msg.getData().add((byte)10);
+        msg.setEncoding("encodingTest");
+        msg.setHeight(20);
+        msg.setIsBigendian((byte)30);
+        msg.setStep(40);
+        msg.setWidth(50);
 
         Image value = this.pubSubTest(msg);
-        assertEquals(2, value.getHeight());
+        assertEquals((byte)10, (byte)value.getData().get(0));
+        assertEquals("encodingTest", value.getEncoding());
+        assertEquals(20, value.getHeight());
+        assertEquals((byte)30, (byte)value.getIsBigendian());
+        assertEquals(40, value.getStep());
+        assertEquals(50, value.getWidth());
     }
 
     @Test
@@ -169,11 +191,16 @@ public class MessageSensorTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         JointState msg = new JointState();
+        msg.getEffort().add(10d);
         msg.getName().add("name");
-        //TODO
+        msg.getPosition().add(20d);
+        msg.getVelocity().add(30d);
 
         JointState value = this.pubSubTest(msg);
+        assertEquals(10d, value.getEffort().get(0), 0.1d);
         assertEquals("name", value.getName().get(0));
+        assertEquals(20d, value.getPosition().get(0), 0.1d);
+        assertEquals(30d, value.getVelocity().get(0), 0.1d);
     }
 
     @Test
@@ -211,9 +238,10 @@ public class MessageSensorTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         JoyFeedbackArray msg = new JoyFeedbackArray();
-        //TODO
+        msg.getArray().add(new JoyFeedback());
 
         JoyFeedbackArray value = this.pubSubTest(msg);
+        assertNotNull(value.getArray().get(0));
     }
 
     @Test
@@ -256,7 +284,7 @@ public class MessageSensorTest extends AbstractMessageTest {
     }
 
     @Test
-    @Ignore
+    @Ignore //TODO Remove after fix.
     public final void testPubMagneticField() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
@@ -278,9 +306,16 @@ public class MessageSensorTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         MultiDOFJointState msg = new MultiDOFJointState();
-        //TODO
+        msg.getJointNames().add("test");
+        msg.getTransforms().add(new Transform());
+        msg.getTwist().add(new Twist());
+        msg.getWrench().add(new Wrench());
 
         MultiDOFJointState value = this.pubSubTest(msg);
+        assertNotNull(value.getJointNames().get(0));
+        assertNotNull(value.getTransforms().get(0));
+        assertNotNull(value.getTwist().get(0));
+        assertNotNull(value.getWrench().get(0));
     }
 
     @Test
@@ -311,7 +346,7 @@ public class MessageSensorTest extends AbstractMessageTest {
     }
 
     @Test
-    @Ignore
+    @Ignore //TODO Remove after fix.
     public final void testPubNavSatFix() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
@@ -337,9 +372,12 @@ public class MessageSensorTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         NavSatStatus msg = new NavSatStatus();
-        //TODO
+        msg.setService((short) 10);
+        msg.setStatus((byte)20);
 
         NavSatStatus value = this.pubSubTest(msg);
+        assertEquals((short)10, value.getService());
+        assertEquals((byte)20, value.getStatus());
     }
 
     @Test
@@ -360,9 +398,24 @@ public class MessageSensorTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         PointCloud2 msg = new PointCloud2();
-        //TODO
+        msg.getData().add((byte) 10);
+        msg.getFields().add(new PointField());
+        msg.setHeight(20);
+        msg.setIsBigendian(true);
+        msg.setIsDense(true);
+        msg.setPointStep(30);
+        msg.setRowStep(40);
+        msg.setWidth(50);
 
         PointCloud2 value = this.pubSubTest(msg);
+        assertEquals((byte)10, (byte)value.getData().get(0));
+        assertNotNull(value.getFields().get(0));
+        assertEquals(20, value.getHeight());
+        assertTrue(value.getIsBigendian());
+        assertTrue(value.getIsDense());
+        assertEquals(30, value.getPointStep());
+        assertEquals(40, value.getRowStep());
+        assertEquals(50, value.getWidth());
     }
 
     @Test

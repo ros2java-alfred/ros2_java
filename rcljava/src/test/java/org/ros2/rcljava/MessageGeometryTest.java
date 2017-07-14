@@ -1,6 +1,7 @@
 package org.ros2.rcljava;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -54,24 +55,28 @@ public class MessageGeometryTest extends AbstractMessageTest {
 
         AccelStamped msg = new AccelStamped();
         msg.getAccel().getAngular().setX(10d);
+        msg.getAccel().getAngular().setY(20d);
+        msg.getAccel().getAngular().setZ(30d);
 
         AccelStamped value = this.pubSubTest(msg);
         assertEquals(10d, value.getAccel().getAngular().getX(), 0.1d);
+        assertEquals(20d, value.getAccel().getAngular().getY(), 0.1d);
+        assertEquals(30d, value.getAccel().getAngular().getZ(), 0.1d);
     }
 
     @Test
-    @Ignore
+    @Ignore //TODO Remove after fix.
     public final void testPubAccelWithCovariance() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         AccelWithCovariance msg = new AccelWithCovariance();
-        //TODO
+
 
         AccelWithCovariance value = this.pubSubTest(msg);
     }
 
     @Test
-    @Ignore
+    @Ignore //TODO Remove after fix.
     public final void testPubAccelWithCovarianceStamped() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
@@ -86,9 +91,28 @@ public class MessageGeometryTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         Inertia msg = new Inertia();
-        //TODO
+        msg.getCom().setX(10.0d);
+        msg.getCom().setY(20.0d);
+        msg.getCom().setZ(30.0d);
+        msg.setIxx(40.0d);
+        msg.setIxy(50.0d);
+        msg.setIxz(60.0d);
+        msg.setIyy(70.0d);
+        msg.setIyz(80.0d);
+        msg.setIzz(90.0d);
+        msg.setM(100.0d);
 
         Inertia value = this.pubSubTest(msg);
+        assertEquals(10d, value.getCom().getX(), 0.1d);
+        assertEquals(20d, value.getCom().getY(), 0.1d);
+        assertEquals(30d, value.getCom().getZ(), 0.1d);
+        assertEquals(40d, value.getIxx(), 0.1d);
+        assertEquals(50d, value.getIxy(), 0.1d);
+        assertEquals(60d, value.getIxz(), 0.1d);
+        assertEquals(70d, value.getIyy(), 0.1d);
+        assertEquals(80d, value.getIyz(), 0.1d);
+        assertEquals(90d, value.getIzz(), 0.1d);
+        assertEquals(100.0d, value.getM(), 0.1d);
     }
 
     @Test
@@ -96,9 +120,10 @@ public class MessageGeometryTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         InertiaStamped msg = new InertiaStamped();
-        //TODO
+        msg.getInertia().setM(10.0d);
 
         InertiaStamped value = this.pubSubTest(msg);
+        assertEquals(10.0d, value.getInertia().getM(), 0.1d);
     }
 
     @Test
@@ -106,19 +131,25 @@ public class MessageGeometryTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         Point msg = new Point();
-        //TODO
+        msg.setX(10.0d);
+        msg.setX(20.0d);
+        msg.setX(30.0d);
 
         Point value = this.pubSubTest(msg);
+        assertEquals(10.0d, value.getX(), 0.1d);
+        assertEquals(10.0d, value.getY(), 0.1d);
+        assertEquals(10.0d, value.getZ(), 0.1d);
     }
 
     @Test
     public final void testPubPointStamped() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
-        geometry_msgs.msg.PointStamped msg = new PointStamped();
-        //TODO
+        PointStamped msg = new PointStamped();
+        msg.getPoint().setX(10);
 
         PointStamped value = this.pubSubTest(msg);
+        assertEquals(10.0d, value.getPoint().getX(), 0.1d);
     }
 
     @Test
@@ -126,9 +157,10 @@ public class MessageGeometryTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         Polygon msg = new Polygon();
-        //TODO
+        msg.getPoints().add(new Point32());
 
         Polygon value = this.pubSubTest(msg);
+        assertNotNull(value.getPoints().get(0));
     }
 
     @Test
@@ -136,9 +168,10 @@ public class MessageGeometryTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         PolygonStamped msg = new PolygonStamped();
-        //TODO
+        msg.getPolygon().getPoints().add(new Point32());
 
         PolygonStamped value = this.pubSubTest(msg);
+        assertNotNull(value.getPolygon().getPoints().get(0));
     }
 
     @Test
@@ -146,9 +179,22 @@ public class MessageGeometryTest extends AbstractMessageTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         Pose msg = new Pose();
-        //TODO
+        msg.getOrientation().setW(10.0d);
+        msg.getOrientation().setX(20.0d);
+        msg.getOrientation().setY(30.0d);
+        msg.getOrientation().setZ(40.0d);
+        msg.getPosition().setX(50.0D);
+        msg.getPosition().setX(60.0D);
+        msg.getPosition().setX(70.0D);
 
         Pose value = this.pubSubTest(msg);
+        assertEquals(10.0d, value.getOrientation().getW(), 0.1d);
+        assertEquals(20.0d, value.getOrientation().getX(), 0.1d);
+        assertEquals(30.0d, value.getOrientation().getY(), 0.1d);
+        assertEquals(40.0d, value.getOrientation().getZ(), 0.1d);
+        assertEquals(50.0d, value.getPosition().getX(), 0.1d);
+        assertEquals(60.0d, value.getPosition().getY(), 0.1d);
+        assertEquals(70.0d, value.getPosition().getZ(), 0.1d);
     }
 
     @Test
