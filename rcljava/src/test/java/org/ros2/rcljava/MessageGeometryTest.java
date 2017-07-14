@@ -132,13 +132,13 @@ public class MessageGeometryTest extends AbstractMessageTest {
 
         Point msg = new Point();
         msg.setX(10.0d);
-        msg.setX(20.0d);
-        msg.setX(30.0d);
+        msg.setY(20.0d);
+        msg.setZ(30.0d);
 
         Point value = this.pubSubTest(msg);
         assertEquals(10.0d, value.getX(), 0.1d);
-        assertEquals(10.0d, value.getY(), 0.1d);
-        assertEquals(10.0d, value.getZ(), 0.1d);
+        assertEquals(20.0d, value.getY(), 0.1d);
+        assertEquals(30.0d, value.getZ(), 0.1d);
     }
 
     @Test
@@ -183,9 +183,9 @@ public class MessageGeometryTest extends AbstractMessageTest {
         msg.getOrientation().setX(20.0d);
         msg.getOrientation().setY(30.0d);
         msg.getOrientation().setZ(40.0d);
-        msg.getPosition().setX(50.0D);
-        msg.getPosition().setX(60.0D);
-        msg.getPosition().setX(70.0D);
+        msg.getPosition().setX(50.0d);
+        msg.getPosition().setY(60.0d);
+        msg.getPosition().setZ(70.0d);
 
         Pose value = this.pubSubTest(msg);
         assertEquals(10.0d, value.getOrientation().getW(), 0.1d);

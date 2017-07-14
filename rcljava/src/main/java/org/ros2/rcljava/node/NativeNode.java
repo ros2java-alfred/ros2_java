@@ -213,7 +213,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @param defaultName name of node.
      */
     public NativeNode(final String namespace, final String defaultName, final String[] args) {
-        NativeNode.logger.debug("Create Node stack : " + defaultName);
+        NativeNode.logger.debug("Create Node stack...");
 
         if (!RCLJava.isInitialized()) {
             throw new NotInitializedException();
@@ -256,7 +256,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
         if (nodeHandle==0) throw new NullPointerException("Node Handle is not define !");
         this.nodeHandle     = nodeHandle;
 
-        NativeNode.logger.debug("Create Node stack : " + GraphName.getFullName(this.nameSpace, this.name));
+        NativeNode.logger.debug("Created Node stack : " + GraphName.getFullName(this.nameSpace, this.name));
 
         if (args != null) {
             for (String arg : args) {

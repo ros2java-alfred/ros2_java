@@ -609,8 +609,7 @@ public abstract class RCLJava {
       int durability = qosProfile.getDurability().getValue();
       boolean avoidRos = qosProfile.getAvoidRosNamespaceConventions();
 
-      RCLJava.logger.debug("Convert QosProfile...");
-
+      // RCLJava.logger.debug("Convert QosProfile...");
       return RCLJava.nativeConvertQoSProfileToHandle(history, depth, reliability, durability, avoidRos);
     }
 
