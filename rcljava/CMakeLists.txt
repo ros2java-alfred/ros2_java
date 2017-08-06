@@ -221,6 +221,7 @@ if(BUILD_TESTING)
 
   set(${PROJECT_NAME}_test_sources
     "src/test/java/org/ros2/rcljava/ExecutorTest.java"
+    "src/test/java/org/ros2/rcljava/ExecutorFailTest.java"
     "src/test/java/org/ros2/rcljava/GraphNameTest.java"
     "src/test/java/org/ros2/rcljava/NodeTest.java"
     "src/test/java/org/ros2/rcljava/AbstractMessageTest.java"
@@ -228,6 +229,7 @@ if(BUILD_TESTING)
     "src/test/java/org/ros2/rcljava/MessageSensorTest.java"
     "src/test/java/org/ros2/rcljava/PublisherTest.java"
     "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
+    "src/test/java/org/ros2/rcljava/RCLJavaFailTest.java"
     "src/test/java/org/ros2/rcljava/RmwTest.java"
     "src/test/java/org/ros2/rcljava/SubscriptionTest.java"
     "src/test/java/org/ros2/rcljava/TimerTest.java"
@@ -235,12 +237,14 @@ if(BUILD_TESTING)
 
   set(${PROJECT_NAME}_testsuites
     "org.ros2.rcljava.ExecutorTest"
+    "org.ros2.rcljava.ExecutorFailTest"
     "org.ros2.rcljava.GraphNameTest"
     "org.ros2.rcljava.NodeTest"
     "org.ros2.rcljava.MessageStdTest"
     "org.ros2.rcljava.MessageSensorTest"
     "org.ros2.rcljava.PublisherTest"
     "org.ros2.rcljava.RCLJavaTest"
+    "org.ros2.rcljava.RCLJavaFailTest"
     "org.ros2.rcljava.RmwTest"
     "org.ros2.rcljava.SubscriptionTest"
     "org.ros2.rcljava.TimerTest"

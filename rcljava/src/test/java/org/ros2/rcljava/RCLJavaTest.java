@@ -93,26 +93,6 @@ public class RCLJavaTest {
     }
 
     @Test
-    public void testInitTwice() {
-        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
-
-        boolean test = false;
-
-        RCLJava.rclJavaInit();
-
-        try {
-            logger.error(">>>>>>>>>>>>> Controled Fail !!! <<<<<<<<<<<<<<<");
-            RCLJava.rclJavaInit();
-        } catch (Exception e) {
-            test = true;
-        } finally {
-            RCLJava.shutdown();
-        }
-
-        Assert.assertTrue("Expected Runtime error when initializing rclJava twice", test);
-    }
-
-    @Test
     public void testShutdownDouble() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
