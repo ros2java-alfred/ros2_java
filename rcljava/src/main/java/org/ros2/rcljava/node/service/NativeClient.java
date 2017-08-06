@@ -105,7 +105,9 @@ public class NativeClient<T extends MessageService>
 
     @Override
     public void dispose() {
-        this.nodeReference.get().getClients().remove(this);
+    	if (this.nodeReference.get().getClients().contains(this)) {
+    		this.nodeReference.get().getClients().remove(this);
+    	}
     }
 
     @Override

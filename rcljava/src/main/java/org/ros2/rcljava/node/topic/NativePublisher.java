@@ -149,7 +149,10 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
     @Override
     public void dispose() {
         NativePublisher.logger.debug("Destroy Publisher of topic : " + this.topic);
-        this.ownerNode.getPublishers().remove(this);
+        
+        if (this.ownerNode.getPublishers().contains(this)) {
+        	this.ownerNode.getPublishers().remove(this);
+        }
         NativePublisher.nativeDispose(this.ownerNode.getNodeHandle(), this.publisherHandle);
     }
 

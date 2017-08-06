@@ -98,7 +98,10 @@ public class NativeService<T extends MessageService> implements Service<T> {
 
     public void dispose() {
         NativeService.logger.debug("Destroy Service stack : " + this.serviceName);
-        this.ownerNode.getServices().remove(this);
+        
+        if (this.ownerNode.getServices().contains(this)) {
+        	this.ownerNode.getServices().remove(this);
+        }
     }
 
     public void sendResponse() {

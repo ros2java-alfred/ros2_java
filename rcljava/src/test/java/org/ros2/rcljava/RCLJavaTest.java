@@ -93,7 +93,7 @@ public class RCLJavaTest {
     }
 
     @Test
-    public void testInitDouble() {
+    public void testInitTwice() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         boolean test = false;
@@ -101,6 +101,7 @@ public class RCLJavaTest {
         RCLJava.rclJavaInit();
 
         try {
+            logger.error(">>>>>>>>>>>>> Controled Fail !!! <<<<<<<<<<<<<<<");
             RCLJava.rclJavaInit();
         } catch (Exception e) {
             test = true;

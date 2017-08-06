@@ -63,6 +63,8 @@ public class ExecutorTest {
         public final void dispatch(final T msg) {
             if (!this.future.isDone()) {
                 this.future.set(msg);
+
+                logger.error(">>>>>>>>>>>>> Controled Fail !!! <<<<<<<<<<<<<<<");
                 throw new NullPointerException();
             }
         }
@@ -124,9 +126,9 @@ public class ExecutorTest {
             executor.removeNode(publisherNode);
             executor.cancel();
 
-            publisher.dispose();
-            subscriptionOne.dispose();
             subscriptionTwo.dispose();
+            subscriptionOne.dispose();
+            publisher.dispose();
 
             publisherNode.dispose();
             subscriptionNodeOne.dispose();
@@ -191,9 +193,9 @@ public class ExecutorTest {
             executor.removeNode(publisherNode);
             executor.cancel();
 
-            publisher.dispose();
-            subscriptionOne.dispose();
             subscriptionTwo.dispose();
+            subscriptionOne.dispose();
+            publisher.dispose();
 
             publisherNode.dispose();
             subscriptionNodeOne.dispose();
@@ -258,9 +260,9 @@ public class ExecutorTest {
             executor.removeNode(publisherNode);
             executor.cancel();
 
-            publisher.dispose();
-            subscriptionOne.dispose();
             subscriptionTwo.dispose();
+            subscriptionOne.dispose();
+            publisher.dispose();
 
             publisherNode.dispose();
             subscriptionNodeOne.dispose();
@@ -324,9 +326,9 @@ public class ExecutorTest {
             executor.removeNode(publisherNode);
             executor.cancel();
 
-            publisher.dispose();
-            subscriptionOne.dispose();
             subscriptionTwo.dispose();
+            subscriptionOne.dispose();
+            publisher.dispose();
 
             publisherNode.dispose();
             subscriptionNodeOne.dispose();
@@ -391,13 +393,13 @@ public class ExecutorTest {
             executor.removeNode(publisherNode);
             executor.cancel();
 
-            publisher.dispose();
-            subscriptionOne.dispose();
             subscriptionTwo.dispose();
+            subscriptionOne.dispose();
+            publisher.dispose();
 
-            publisherNode.dispose();
-            subscriptionNodeOne.dispose();
             subscriptionNodeTwo.dispose();
+            subscriptionNodeOne.dispose();
+            publisherNode.dispose();
         } catch (Exception e) {
             test = false;
         } finally {

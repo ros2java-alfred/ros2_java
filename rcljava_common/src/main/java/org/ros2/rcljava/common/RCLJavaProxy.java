@@ -33,7 +33,7 @@ public final class RCLJavaProxy {
        */
     public static synchronized String getTypesupportIdentifier() {
         try {
-            Class cls = Class.forName("org.ros2.rcljava.RCLJava");
+            Class<?> cls = Class.forName("org.ros2.rcljava.RCLJava");
             Method meth = cls.getDeclaredMethod("getTypesupportIdentifier", (Class<?> []) null);
             Object obj = meth.invoke(null);
             return (String) obj;
@@ -48,7 +48,7 @@ public final class RCLJavaProxy {
      */
     public static synchronized String getRMWIdentifier() {
         try {
-            Class cls = Class.forName("org.ros2.rcljava.RCLJava");
+            Class<?> cls = Class.forName("org.ros2.rcljava.RCLJava");
             Method meth = cls.getDeclaredMethod("getRMWIdentifier", (Class<?> []) null);
             Object obj = meth.invoke(null);
             return (String) obj;
@@ -63,7 +63,7 @@ public final class RCLJavaProxy {
      */
     public static synchronized void loadLibrary(String name) {
         try {
-            Class cls = Class.forName("org.ros2.rcljava.RCLJava");
+            Class<?> cls = Class.forName("org.ros2.rcljava.RCLJava");
             Method meth = cls.getDeclaredMethod("loadLibrary", String.class);
             Object obj = meth.invoke(null, name);
         } catch(Exception e) {

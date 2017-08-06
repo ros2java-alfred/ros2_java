@@ -147,7 +147,10 @@ public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Mess
     @Override
     public void dispose() {
         NativeSubscription.logger.debug("Destroy Subscription of topic : " + this.topic);
-        this.ownerNode.getSubscriptions().remove(this);
+        
+        if (this.ownerNode.getSubscriptions().contains(this)) {
+        	this.ownerNode.getSubscriptions().remove(this);
+        }
         // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
     }
 
