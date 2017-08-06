@@ -25,8 +25,9 @@
 #include "rmw/types.h"
 #include "rosidl_generator_c/message_type_support_struct.h"
 
-#ifndef RCLJAVA__UTILS_H_
-#define RCLJAVA__UTILS_H_
+#ifndef RCLJAVA__UTILS_HPP_
+#define RCLJAVA__UTILS_HPP_
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -47,17 +48,17 @@ jstring2String(JNIEnv * env, jstring jsubject)
 char ** JniStringArray2StringArray(JNIEnv * env, jobjectArray stringArray)
 {
   jsize stringCount = env->GetArrayLength(stringArray);
-  char ** Strings = (char **)malloc(sizeof(char *) * stringCount);
+  char ** strings = reinterpret_cast<char **>(malloc(sizeof(char *) * stringCount));
 
   int i = 0;
   for (i = 0; i < stringCount; ++i) {
     jstring jniString = (jstring) env->GetObjectArrayElement(stringArray, i);
     const char * TempString = env->GetStringUTFChars(jniString, NULL);
-    Strings[i] = (char *)TempString;
+    strings[i] = const_cast<char *>(TempString);
     env->ReleaseStringUTFChars(jniString, TempString);
   }
 
-  return Strings;
+  return strings;
 }
 
 /*
@@ -342,4 +343,4 @@ handle2Instance(jlong handle)
   return obj;
 }
 
-#endif  // RCLJAVA__UTILS_H_
+#endif  // RCLJAVA__UTILS_HPP_

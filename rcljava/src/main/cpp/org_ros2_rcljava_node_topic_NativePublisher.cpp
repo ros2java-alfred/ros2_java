@@ -29,7 +29,7 @@
 #include "rcljava_common/signatures.h"
 
 #include "rcljava/org_ros2_rcljava_node_topic_NativePublisher.h"
-#include "rcljava/utils.h"
+#include "rcljava/utils.hpp"
 
 /*
  * nativePublish

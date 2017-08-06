@@ -31,7 +31,7 @@
 #include "rcljava_common/signatures.h"
 
 #include "rcljava/org_ros2_rcljava_RCLJava.h"
-#include "rcljava/utils.h"
+#include "rcljava/utils.hpp"
 
 jobject convert_rmw_request_id_to_java(JNIEnv *, rmw_request_id_t *);
 
