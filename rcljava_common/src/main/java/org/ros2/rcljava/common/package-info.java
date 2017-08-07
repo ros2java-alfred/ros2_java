@@ -16,7 +16,7 @@
 
 /**
  * Contains a utility class for retrieving information about the RMW and
- * typesupport implemnetations via reflection, to avoid a circular
+ * typesupport implementations via reflection, to avoid a circular
  * dependency between rcljava and generated messages.
  */
 package org.ros2.rcljava.common;

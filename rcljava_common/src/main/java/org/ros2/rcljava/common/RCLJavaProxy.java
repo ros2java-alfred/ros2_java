@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava.common;
 
 import java.lang.reflect.Method;
@@ -65,7 +66,7 @@ public final class RCLJavaProxy {
         try {
             Class<?> cls = Class.forName("org.ros2.rcljava.RCLJava");
             Method meth = cls.getDeclaredMethod("loadLibrary", String.class);
-            Object obj = meth.invoke(null, name);
+            meth.invoke(null, name);
         } catch(Exception e) {
             // TODO(esteve): handle exception
         }
