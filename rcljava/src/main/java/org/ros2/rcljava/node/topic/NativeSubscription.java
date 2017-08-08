@@ -52,7 +52,7 @@ public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Mess
     /**
      * The topic to which this subscription is subscribed.
      */
-    private final String topic;
+    private final String topicName;
 
     /**
      * The callback function that will be triggered when a new message is
@@ -96,7 +96,7 @@ public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Mess
         this.ownerNode = node;
         this.subscriptionHandle = subscriptionHandle;
         this.messageType = messageType;
-        this.topic = topic;
+        this.topicName = topic;
         this.callback = callback;
         this.qosProfile = qosProfile;
 
@@ -129,11 +129,10 @@ public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Mess
     }
 
     /**
-     * Get topic name.
-     * @return
+     * @return the topic that this subscription is subscribed on.
      */
-    public final String getTopic() {
-        return this.topic;
+    public final String getTopicName() {
+        return this.topicName;
     }
 
     /**
@@ -146,10 +145,10 @@ public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Mess
 
     @Override
     public void dispose() {
-        NativeSubscription.logger.debug("Destroy Subscription of topic : " + this.topic);
-        
+        NativeSubscription.logger.debug("Destroy Subscription of topic : " + this.topicName);
+
         if (this.ownerNode.getSubscriptions().contains(this)) {
-        	this.ownerNode.getSubscriptions().remove(this);
+            this.ownerNode.getSubscriptions().remove(this);
         }
         // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
     }

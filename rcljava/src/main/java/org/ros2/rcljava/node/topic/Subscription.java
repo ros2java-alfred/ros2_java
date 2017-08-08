@@ -25,4 +25,11 @@ public interface Subscription<T extends Message> {
     void dispose();
 
     SubscriptionCallback<T> getCallback();
+
+    /**
+     * Get the topic that this subscription is subscribed on.
+     *
+     * @return The topic name.
+     */
+    String getTopicName();
 }

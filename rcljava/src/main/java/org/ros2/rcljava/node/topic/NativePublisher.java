@@ -17,6 +17,7 @@
 package org.ros2.rcljava.node.topic;
 
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.qos.QoSProfile;
@@ -56,7 +57,7 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
     /**
      * The topic to which this publisher will publish messages.
      */
-    private final String topic;
+    private final String topicName;
 
     /** Quality of Service profil. */
     private final QoSProfile qosProfile;
@@ -98,7 +99,7 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
         this.ownerNode = node;
         this.publisherHandle = publisherHandle;
         this.messageType = messageType;
-        this.topic = topic;
+        this.topicName = topic;
         this.qosProfile = qosProfile;
 
         this.ownerNode.getPublishers().add(this);
@@ -126,8 +127,8 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
      * Get topic name.
      * @return Name of topic.
      */
-    public final String getTopic() {
-        return this.topic;
+    public final String getTopicName() {
+        return this.topicName;
     }
 
     /**
@@ -148,10 +149,10 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
      */
     @Override
     public void dispose() {
-        NativePublisher.logger.debug("Destroy Publisher of topic : " + this.topic);
-        
+        NativePublisher.logger.debug("Destroy Publisher of topic : " + this.topicName);
+
         if (this.ownerNode.getPublishers().contains(this)) {
-        	this.ownerNode.getPublishers().remove(this);
+            this.ownerNode.getPublishers().remove(this);
         }
         NativePublisher.nativeDispose(this.ownerNode.getNodeHandle(), this.publisherHandle);
     }
@@ -159,5 +160,25 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
     @Override
     public void close() throws Exception {
         this.dispose();
+    }
+
+    @Override
+    public void doInterProcessPublish(T message) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public int getQueueSize() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public String getGid() {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public String getIntraProcessGid() {
+        throw new NotImplementedException();
     }
 }

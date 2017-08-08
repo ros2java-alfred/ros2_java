@@ -3,7 +3,7 @@
   <name>rcljava_common</name>
   <version>0.0.0</version>
   <description>Common code for ROS2 Java projects.</description>
-  <maintainer email="esteve@apache.org">Esteve Fernandez</maintainer>
+  <maintainer email="mick.gaillard@gmail.com">Mickael Gaillard</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

@@ -20,14 +20,50 @@ import org.ros2.rcljava.internal.message.Message;
 public interface Publisher<T extends Message>  {
 
     /**
-     * Publish a message.
+     * Safely destroy the underlying ROS2 publisher structure.
+     */
+    void dispose();
+
+    /**
+     * Send a message to the topic for this publisher.
+     * This function is templated on the input message type, Message T.
      *
-     * @param message An instance of the &lt;T&gt; parameter.
+     * @param message An instance of the message to send.
      */
     void publish(final T message);
 
     /**
-     * Safely destroy the underlying ROS2 publisher structure.
+     *
+     * @param message An instance of the message to send.
      */
-    void dispose();
+    void doInterProcessPublish(final T message);
+
+    /**
+     * Get the topic that this publisher publishes on.
+     *
+     * @return The topic name.
+     */
+    String getTopicName();
+
+    /**
+     * Get the queue size for this publisher.
+     *
+     * @return The queue size.
+     */
+    int getQueueSize();
+
+    /**
+     * Get the global identifier for this publisher (used in rmw and by DDS).
+     *
+     * @return The gid.
+     */
+    String getGid();
+
+    /**
+     * Get the global identifier for this publisher used by intra-process communication.
+     *
+     * @return The intra-process gid.
+     */
+    String getIntraProcessGid();
+
 }

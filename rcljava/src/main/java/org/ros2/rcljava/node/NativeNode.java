@@ -55,7 +55,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import builtin_interfaces.msg.Time;
+import rcl_interfaces.msg.ListParametersResult;
 import rcl_interfaces.msg.Parameter;
+import rcl_interfaces.msg.ParameterDescriptor;
 import rcl_interfaces.msg.ParameterEvent;
 import rcl_interfaces.msg.ParameterType;
 import rcl_interfaces.msg.SetParametersResult;
@@ -295,46 +297,8 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
         this.logRos = new Log(this);
     }
 
-    private boolean isInteger(String value) {
-        try {
-            Integer.parseInt(value);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean isBoolean(String value) {
-        try {
-            Boolean.parseBoolean(value);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean isDouble(String value) {
-        try {
-            Double.parseDouble(value);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean isLong(String value) {
-        try {
-            Long.parseLong(value);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-
-
     /**
-     * Safely destroy the underlying ROS2 node structure.
+     * Release all resource.
      */
     @Override
     public void dispose() {
@@ -391,29 +355,35 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     }
 
     /**
-     * Create a Publisher&lt;T&gt;.
+     * Get the namespace of the node.
      *
-     * @param <T> The type of the messages that will be published by the
-     *     created @{link Publisher}.
-     * @param messageType The class of the messages that will be published by the
-     *     created @{link Publisher}.
-     * @param topic The topic to which the created @{link Publisher} will
-     *     publish messages.
+     * @return The namespace of the node.
+     */
+    @Override
+    public String getNameSpace() {
+        return this.nameSpace;
+    }
+
+    /**
+     * Create and return a Publisher.
      *
-     * @return A @{link Publisher} that represents the underlying ROS2 publisher
-     *     structure.
+     * @param <T> Message definition.
+     * @param message Message class.
+     * @param topicName The topic for this publisher to publish on.
+     * @param qos The quality of service profile to pass on to the rmw implementation.
+     * @return Publisher instance of the created publisher.
      */
     @Override
     public <T extends Message> Publisher<T> createPublisher(
             final Class<T> messageType,
-            final String topic,
+            final String topicName,
             final QoSProfile qosProfile) {
 
         if (messageType==null) throw new NullPointerException("Message Type can't be null.");
-        if (topic==null) throw new NullPointerException("Topic can't be null.");
+        if (topicName==null) throw new NullPointerException("Topic can't be null.");
         if (qosProfile==null) throw new NullPointerException("QOS can't be null;");
 
-        String fqnTopic =  GraphName.getFullName(this, topic, null);
+        String fqnTopic =  GraphName.getFullName(this, topicName, null);
         NativeNode.logger.debug("Create Publisher : " + fqnTopic);
         Publisher<T> publisher = null;
 
@@ -422,55 +392,71 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
             long publisherHandle = NativeNode.nativeCreatePublisherHandle(this.nodeHandle, messageType, fqnTopic, qosProfileHandle);
             RCLJava.disposeQoSProfile(qosProfileHandle);
 
-            publisher = new NativePublisher<T>(this, publisherHandle, messageType, topic, qosProfile);
+            publisher = new NativePublisher<T>(this, publisherHandle, messageType, topicName, qosProfile);
         }
 
         return publisher;
     }
 
     /**
+     * Create and return a Publisher.
+     *
+     * @param <T> Message definition.
+     * @param message Message class.
+     * @param topicName The topic for this publisher to publish on.
+     * @param qosHistoryDepth The depth of the publisher message queue.
+     * @return Publisher instance of the created publisher.
+     */
+    @Override
+    public <T extends Message> Publisher<T> createPublisher(
+            final Class<T> message,
+            final String topicName,
+            final int qosHistoryDepth) {
+        QoSProfile qos = QoSProfile.SYSTEM_DEFAULT;
+        //TODO fix the depth.
+        return this.createPublisher(message, topicName, qos);
+    }
+
+    /**
      * Create and return a Publisher. (Retro-compatibility)
      *
      * @param <T> Message definition.
-     * @param messageType Message class.
-     * @param topic The topic for this publisher to publish on.
+     * @param message Message class.
+     * @param topicName The topic for this publisher to publish on.
      * @return Publisher instance of the created publisher.
      */
     @Override
     public <T extends Message> Publisher<T> createPublisher(
             final Class<T> messageType,
-            final String topic) {
-        return this.createPublisher(messageType, topic, QoSProfile.DEFAULT);
+            final String topicName) {
+        return this.createPublisher(messageType, topicName, QoSProfile.DEFAULT);
     }
 
     /**
-     * Create a Subscription&lt;T&gt;.
+     * Create and return a Subscription.
      *
-     * @param <T> The type of the messages that will be received by the
-     *     created @{link Subscription}.
-     * @param messageType The class of the messages that will be received by the
-     *     created @{link Subscription}.
-     * @param topic The topic from which the created @{link Subscription} will
-     *     receive messages.
-     * @param callback The callback function that will be triggered when a
-     *     message is received by the @{link Subscription}.
+     * @param <T> Message definition.
+     * @param message Message Class
+     * @param topicName The topic to subscribe on.
+     * @param callback The user-defined callback function.
      * @param qos The quality of service profile to pass on to the rmw implementation.
-     * @return A @{link Subscription} that represents the underlying ROS2
-     *     subscription structure.
+     * @param ignoreLocalPublications True to ignore local publications.
+     * @return Subscription instance of the created subscription.
      */
     @Override
     public <T extends Message> Subscription<T> createSubscription(
             final Class<T> messageType,
-            final String topic,
+            final String topicName,
             final SubscriptionCallback<T> callback,
-            final QoSProfile qosProfile) {
+            final QoSProfile qosProfile,
+            final boolean ignoreLocalPublication ) {  //TODO use it
 
         if (messageType==null) throw new NullPointerException("Message Type can't be null.");
-        if (topic==null) throw new NullPointerException("Topic can't be null.");
+        if (topicName==null) throw new NullPointerException("Topic can't be null.");
         if (callback==null) throw new NullPointerException("Callback can't be null;");
         if (qosProfile==null) throw new NullPointerException("QOS can't be null;");
 
-        String fqnTopic =  GraphName.getFullName(this, topic, null);
+        String fqnTopic =  GraphName.getFullName(this, topicName, null);
         NativeNode.logger.debug("Create Subscription : " + fqnTopic);
         Subscription<T> subscription = null;
 
@@ -483,7 +469,7 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
                     this,
                     subscriptionHandle,
                     messageType,
-                    topic,
+                    topicName,
                     callback,
                     qosProfile);
         }
@@ -491,22 +477,74 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
         return subscription;
     }
 
+    @Override
+    public <T extends Message> Subscription<T> createSubscription(Class<T> message, String topicName,
+            SubscriptionCallback<T> callback, QoSProfile qos) {
+        return this.createSubscription(message, topicName, callback, qos, false);
+    }
+
+    @Override
+    public <T extends Message> Subscription<T> createSubscription(Class<T> message, String topicName,
+            SubscriptionCallback<T> callback, int qosHistoryDepth) {
+        return this.createSubscription(message, topicName, callback, qosHistoryDepth, false);
+    }
+
     /**
-     * Create and return a Subscription. (Retro-compatibility)
+     * Create and return a Subscription.
      *
      * @param <T> Message definition.
-     * @param messageType Message Class
-     * @param topic The topic to subscribe on.
+     * @param message Message Class
+     * @param topicName The topic to subscribe on.
      * @param callback The user-defined callback function.
-     * @param qos The quality of service profile to pass on to the rmw implementation.
+     * @param qosHistoryDepth The depth of the subscription's incoming message queue.
+     * @param ignoreLocalPublications True to ignore local publications.
      * @return Subscription instance of the created subscription.
      */
     @Override
     public <T extends Message> Subscription<T> createSubscription(
             final Class<T> messageType,
-            final String topic,
+            final String topicName,
+            final SubscriptionCallback<T> callback,
+            final int qosHistoryDepth,
+            final boolean ignoreLocalPublication) {  //TODO use it
+        QoSProfile qos = QoSProfile.SYSTEM_DEFAULT;
+        //TODO fix the depth.
+        return this.createSubscription(messageType, topicName, callback, qos, ignoreLocalPublication);
+    }
+
+    /**
+     * Create and return a Subscription. (Retro-compatibility)
+     *
+     * @param <T> Message definition.
+     * @param message Message Class
+     * @param topicName The topic to subscribe on.
+     * @param callback The user-defined callback function.
+     * @return Subscription instance of the created subscription.
+     */
+    @Override
+    public <T extends Message> Subscription<T> createSubscription(
+            final Class<T> messageType,
+            final String topicName,
             final SubscriptionCallback<T> callback) {
-        return this.createSubscription(messageType, topic, callback, QoSProfile.DEFAULT);
+        return this.createSubscription(messageType, topicName, callback, QoSProfile.DEFAULT, false);
+    }
+
+    /**
+     * Create a timer.
+     *
+     * @param period The time interval between triggers of the callback.
+     * @param unit 	The unit of time interval.
+     * @param callback The user-defined callback function.
+     * @return WallTimer instance of the created timer.
+     */
+    @Override
+    public WallTimer createWallTimer(final long period, final TimeUnit unit, final WallTimerCallback callback) {
+        long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
+        long timerHandle = nativeCreateTimerHandle(timerPeriodNS);
+
+        WallTimer timer = new NativeWallTimer(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
+        this.timers.add(timer);
+        return timer;
     }
 
     /**
@@ -588,7 +626,11 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @param message Message Class
      * @param service The service to subscribe on.
      * @return Client instance of the service.
-     * @throws Exception
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws NoSuchMethodException
      */
     @Override
     public <T extends MessageService> Client<T> createClient(
@@ -606,6 +648,11 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @param callback The user-defined callback function.
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Service instance of the service.
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws NoSuchMethodException
      */
     @Override
     public <T extends MessageService> Service<T> createService(
@@ -674,6 +721,11 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
      * @param service The service for this publisher to publish on.
      * @param callback The user-defined callback function.
      * @return Service instance of the service.
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws NoSuchMethodException
      */
     @Override
     public <T extends MessageService> Service<T> createService(
@@ -740,6 +792,11 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     }
 
     @Override
+    public <T> void setParameterIfNotSet(final String name, final T value) {
+        throw new NotImplementedException();
+    }
+
+    @Override
     public List<ParameterVariant<?>> getParameters(final List<String> names) {
         List<ParameterVariant<?>>  result = new ArrayList<ParameterVariant<?>>();
 
@@ -762,6 +819,31 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
         }
 
         return result;
+    }
+
+    @Override
+    public boolean getParameter(final String name, ParameterVariant<?> parameter) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public boolean getParameterOr(final String name, ParameterVariant<?> value, ParameterVariant<?> alternativeParameter) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public List<Class<?>> getParameterTypes(List<String> names) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public ListParametersResult listParameters(List<String> names, int depth) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public List<ParameterDescriptor> describeParameters(final List<String> names) {
+        throw new NotImplementedException();
     }
 
     @Override
@@ -942,16 +1024,6 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
         return this.services;
     }
 
-    @Override
-    public WallTimer createWallTimer(final long period, final TimeUnit unit, final WallTimerCallback callback) {
-        long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
-        long timerHandle = nativeCreateTimerHandle(timerPeriodNS);
-
-        WallTimer timer = new NativeWallTimer(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
-        this.timers.add(timer);
-        return timer;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -972,12 +1044,45 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
     }
 
     @Override
-    public String getNameSpace() {
-        return this.nameSpace;
-    }
-
-    @Override
     public void close() throws Exception {
         this.dispose();
     }
+
+
+    private boolean isInteger(String value) {
+        try {
+            Integer.parseInt(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isBoolean(String value) {
+        try {
+            Boolean.parseBoolean(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isDouble(String value) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isLong(String value) {
+        try {
+            Long.parseLong(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }
