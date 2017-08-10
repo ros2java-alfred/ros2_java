@@ -73,6 +73,7 @@ public class MessageGeometryTest extends AbstractMessageTest {
 
 
         AccelWithCovariance value = this.pubSubTest(msg);
+        assertNotNull(value);
     }
 
     @Test
@@ -84,6 +85,7 @@ public class MessageGeometryTest extends AbstractMessageTest {
         //TODO
 
         AccelWithCovarianceStamped value = this.pubSubTest(msg);
+        assertNotNull(value);
     }
 
     @Test
@@ -205,6 +207,7 @@ public class MessageGeometryTest extends AbstractMessageTest {
         //TODO
 
         Pose2D value = this.pubSubTest(msg);
+        assertNotNull(value);
     }
 
 }
