@@ -2,9 +2,9 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>rosidl_generator_java</name>
-  <version>0.0.0</version>
+  <version>0.0.2</version>
   <description>Generate the ROS interfaces in Java.</description>
-  <maintainer email="esteve@apache.org">Esteve Fernandez</maintainer>
+  <maintainer email="mick.gaillard@gmail.com">Mickael Gaillard</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
