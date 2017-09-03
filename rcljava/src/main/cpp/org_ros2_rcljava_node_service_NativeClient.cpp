@@ -29,6 +29,7 @@
 #include "rcljava_common/signatures.h"
 
 #include "rcljava/org_ros2_rcljava_node_service_NativeClient.h"
+#include "rcljava/utils.hpp"
 
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_service_NativeClient_nativeSendClientRequest(
   JNIEnv * env,
@@ -54,8 +55,9 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_service_NativeClient_nativeSen
   rcl_ret_t ret = rcl_send_request(client, request_msg, &sequence_number);
 
   if (ret != RCL_RET_OK) {
-    rcljava_throw_exception(
-      env, "java/lang/IllegalStateException",
-      "Failed to send request from a client: " + std::string(rcl_get_error_string_safe()));
+    std::string message("Failed to send request from a client: " +
+                        std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
+    throwException(env, message);
   }
 }

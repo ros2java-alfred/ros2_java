@@ -49,6 +49,7 @@ JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsRe
   if (ret != RCL_RET_OK) {
     std::string message("Failed to check timer ready: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 
@@ -73,6 +74,7 @@ JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsCa
   if (ret != RCL_RET_OK) {
     std::string message("Failed to check timer canceled: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 
@@ -101,6 +103,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeDispose(
   if (ret != RCL_RET_OK) {
     std::string message("Failed to destroy timer: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 }
@@ -124,6 +127,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeReset(
   if (ret != RCL_RET_OK) {
     std::string message("Failed to reset timer: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 }
@@ -147,6 +151,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeCancel(
   if (ret != RCL_RET_OK) {
     std::string message("Failed to cancel timer: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 }
@@ -171,6 +176,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeUnt
   if (ret != RCL_RET_OK) {
     std::string message("Failed to get time until next timer call: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
     return 0;
   }
@@ -198,6 +204,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeSin
   if (ret != RCL_RET_OK) {
     std::string message("Failed to get time until next timer call: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
     return 0;
   }
@@ -225,6 +232,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeGetTime
   if (ret != RCL_RET_OK) {
     std::string message("Failed to get timer period: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
     return 0;
   }
@@ -253,6 +261,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeSetTimer
   if (ret != RCL_RET_OK) {
     std::string message("Failed to set timer period: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 }
@@ -276,6 +285,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeCallTime
   if (ret != RCL_RET_OK) {
     std::string message("Failed to call timer: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 }

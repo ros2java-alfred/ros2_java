@@ -48,6 +48,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_topic_NativePublisher_nativePu
   if (ret != RCL_RET_OK) {
     std::string message("Failed to publish: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 }
@@ -68,6 +69,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_topic_NativePublisher_nativeDi
   if (ret != RCL_RET_OK) {
     std::string message("Failed to destroy publisher: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 }

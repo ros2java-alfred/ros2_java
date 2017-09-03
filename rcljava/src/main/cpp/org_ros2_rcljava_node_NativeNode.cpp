@@ -67,6 +67,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreatePublis
   if (ret != RCL_RET_OK) {
     std::string message("Failed to create publisher: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
 
     return -1;
@@ -108,6 +109,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateSubscr
   if (ret != RCL_RET_OK) {
     std::string message("Failed to create subscription: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
 
     return -1;
@@ -141,6 +143,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateClient
 //  if (ret != RCL_RET_OK || !is_available) {
 //    std::string message("Failed to connect to server: " +
 //        std::string(rcl_get_error_string_safe()));
+//        rcl_reset_error();
 //    throwException(env, message);
 //
 //    return -1;
@@ -160,6 +163,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateClient
   if (ret != RCL_RET_OK) {
     std::string message("Failed to create client: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
 
     return -1;
@@ -201,6 +205,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateServic
   if (ret != RCL_RET_OK) {
     std::string message("Failed to create service: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
 
     return -1;
@@ -223,6 +228,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateTimerH
   if (ret != RCL_RET_OK) {
     std::string message("Failed to create timer: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
     return 0;
   }
@@ -245,6 +251,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeDispose(
   if (ret != RCL_RET_OK) {
     std::string message("Failed finish node: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 }
@@ -282,6 +289,7 @@ JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountPublishe
   if (ret != RCL_RET_OK) {
     std::string message("Failed to count Publishers: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 
@@ -305,6 +313,7 @@ JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountSubscrib
   if (ret != RCL_RET_OK) {
     std::string message("Failed to count Publishers: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 
@@ -330,6 +339,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTop
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of topics: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 
@@ -339,6 +349,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTop
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of topics: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 
@@ -362,6 +373,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListSer
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of services: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 
@@ -371,6 +383,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListSer
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of service: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 
@@ -390,6 +403,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNam
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of nodes: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 
@@ -399,6 +413,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNam
   if (ret != RCL_RET_OK) {
     std::string message("Failed get list of nodes: " +
       std::string(rcl_get_error_string_safe()));
+    rcl_reset_error();
     throwException(env, message);
   }
 
