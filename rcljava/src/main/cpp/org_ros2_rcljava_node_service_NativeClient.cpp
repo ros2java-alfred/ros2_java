@@ -56,7 +56,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_service_NativeClient_nativeSen
 
   if (ret != RCL_RET_OK) {
     std::string message("Failed to send request from a client: " +
-                        std::string(rcl_get_error_string_safe()));
+      std::string(rcl_get_error_string_safe()));
     rcl_reset_error();
     throwException(env, message);
   }
