@@ -497,7 +497,7 @@ jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename)
 @#### Field is String array ####
 @[      if field.type.type == 'string']@
     jobject _jlist_@(field.name)_element = nullptr;
-    if (_ros_message->@(field.name).data[i].data != nullptr) {
+    if (_ros_message->@(field.name)[i].data != nullptr) {
       _jlist_@(field.name)_element = env->NewStringUTF(_ros_message->@(field.name)[i].data);
     }
 @[      elif field.type.type == 'bool']@
