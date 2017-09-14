@@ -18,16 +18,17 @@ find_package(rmw_implementation_cmake REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rcljava_common REQUIRED)
 
-include(CrossCompilingExtra)
-
 if(ANDROID)
   find_host_package(Java COMPONENTS Development REQUIRED)
 else()
   find_package(Java COMPONENTS Development REQUIRED)
   find_package(JNI REQUIRED)
 endif()
+
+include(CrossCompilingExtra)
 include(UseJava)
 
+# Windows flags
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra")
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -37,56 +38,67 @@ if(NOT WIN32)
   endif()
 endif()
 
+# Java version profile (<1.6 for old-android)
 set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
 # Get a list of typesupport implementations from valid rmw implementations.
 rosidl_generator_java_get_typesupports(_typesupport_impls)
-
 if("${_typesupport_impls} " STREQUAL " ")
   message(WARNING "No valid typesupport for Java generator. Java messages will not be generated.")
   return()
 endif()
 
-set(_output_path
-  "${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/${PROJECT_NAME}")
+# Set variables
+set(_output_path "${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/${PROJECT_NAME}")
 set(_generated_msg_java_files "")
+set(_generated_msg_cpp_ts_files "")
 #set(_generated_msg_cpp_files "")
 #set(_generated_msg_cpp_common_files "")
-set(_generated_msg_cpp_ts_files "")
 set(_generated_srv_java_files "")
+set(_generated_srv_cpp_ts_files "")
 
 foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
   get_filename_component(_parent_folder "${_idl_file}" DIRECTORY)
   get_filename_component(_parent_folder "${_parent_folder}" NAME)
   get_filename_component(_module_name "${_idl_file}" NAME_WE)
 
+  # Message case
   if("${_parent_folder} " STREQUAL "msg ")
+    # Add Java message source file
     list(APPEND _generated_msg_java_files
       "${_output_path}/${_parent_folder}/${_module_name}.java"
     )
 
+    # Add Cpp message source file (for all rmw supported)
     foreach(_typesupport_impl ${_typesupport_impls})
       list_append_unique(_generated_msg_cpp_ts_files
         "${_output_path}/${_parent_folder}/${_module_name}_s.ep.${_typesupport_impl}.cpp"
       )
       list(APPEND _type_support_by_generated_msg_cpp_files "${_typesupport_impl}")
     endforeach()
+
+  # Service case
   elseif("${_parent_folder} " STREQUAL "srv ")
+    # Add Java service source file
     list(APPEND _generated_srv_java_files
       "${_output_path}/${_parent_folder}/${_module_name}.java"
     )
 
+    # Add Cpp service source file (for all rmw supported)
     foreach(_typesupport_impl ${_typesupport_impls})
       list_append_unique(_generated_srv_cpp_ts_files
         "${_output_path}/${_parent_folder}/${_module_name}_s.ep.${_typesupport_impl}.cpp"
       )
       list(APPEND _type_support_by_generated_srv_cpp_files "${_typesupport_impl}")
     endforeach()
+
+  # Error case
   else()
     message(FATAL_ERROR "Interface file with unknown parent folder: ${_idl_file}")
   endif()
 endforeach()
 
+# Set dependencies
 set(_dependency_files "")
 set(_dependencies "")
 foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
