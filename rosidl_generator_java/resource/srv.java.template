@@ -30,7 +30,7 @@ public class @(type_name) implements MessageService {
 
     /** AutoLoader JNI library. */
     static {
-        RCLJavaProxy.loadLibrary("@(spec.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
+        RCLJavaProxy.loadLibrary("@(spec.pkg_name)_srv__@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
     }
 
     // NATIVES

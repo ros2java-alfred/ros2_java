@@ -39,7 +39,7 @@ public final class @(type_name) implements Message {
 
     /** AutoLoader JNI library. */
     static {
-        RCLJavaProxy.loadLibrary("@(spec.base_type.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
+        RCLJavaProxy.loadLibrary("@(spec.base_type.pkg_name)_msg__@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
     }
 
     // NATIVES

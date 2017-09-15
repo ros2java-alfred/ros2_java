@@ -52,8 +52,6 @@ endif()
 set(_output_path "${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/${PROJECT_NAME}")
 set(_generated_msg_java_files "")
 set(_generated_msg_cpp_ts_files "")
-#set(_generated_msg_cpp_files "")
-#set(_generated_msg_cpp_common_files "")
 set(_generated_srv_java_files "")
 set(_generated_srv_cpp_ts_files "")
 
@@ -187,47 +185,53 @@ foreach(generated_source_file ${generated_source_files})
 
   list(FIND generated_source_files ${generated_source_file} _file_index)
   list(GET type_support_by_generated_files ${_file_index} _typesupport_impl)
+
   find_package(${_typesupport_impl} REQUIRED)
   set(_generated_msg_cpp_common_file "${_full_folder}/${_base_msg_name}.cpp")
 
   set(_javaext_suffix "__javaext")
 
-  add_library(${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl} SHARED
+  set(_library_name
+    "${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl}"
+  )
+  string_camel_case_to_lower_case_underscore("${_library_name}" _library_name)
+
+  add_library("${_library_name}" SHARED
     "${generated_source_file}"
   )
 
-  set_target_properties(${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl} PROPERTIES
+  set_target_properties("${_library_name}" PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY "${_output_path}/${_parent_folder}"
     RUNTIME_OUTPUT_DIRECTORY "${_output_path}/${_parent_folder}"
   )
 
-  set_target_properties(${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl} PROPERTIES
+  set_target_properties("${_library_name}" PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_DEBUG "${_output_path}/${_parent_folder}"
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${_output_path}/${_parent_folder}"
   )
 
-  set_target_properties(${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl} PROPERTIES
+  set_target_properties("${_library_name}" PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_RELEASE "${_output_path}/${_parent_folder}"
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${_output_path}/${_parent_folder}"
   )
 
-  set_target_properties(${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl} PROPERTIES
+  set_target_properties("${_library_name}" PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_output_path}/${_parent_folder}"
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_output_path}/${_parent_folder}"
   )
 
-  set_target_properties(${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl} PROPERTIES
+  set_target_properties("${_library_name}" PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${_output_path}/${_parent_folder}"
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${_output_path}/${_parent_folder}"
   )
 
   add_dependencies(
-    ${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl}
+    "${_library_name}"
     ${rosidl_generate_interfaces_TARGET}__rosidl_generator_c
     ${rosidl_generate_interfaces_TARGET}${_target_suffix}
   )
@@ -238,12 +242,12 @@ foreach(generated_source_file ${generated_source_files})
   endif()
 
   target_link_libraries(
-    "${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl}"
+    "${_library_name}"
     "${PROJECT_NAME}__${_typesupport_impl}"
     "${PROJECT_NAME}__rosidl_typesupport_c"
   )
 
-  target_include_directories(${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl}
+  target_include_directories("${_library_name}"
     PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_c
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java
@@ -252,12 +256,12 @@ foreach(generated_source_file ${generated_source_files})
 
   foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
     ament_target_dependencies(
-      "${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl}"
+      "${_library_name}"
       "${_pkg_name}"
     )
   endforeach()
 
-  ament_target_dependencies(${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl}
+  ament_target_dependencies("${_library_name}"
     "rosidl_generator_c"
     "rosidl_generator_java"
     "rcljava_common"
@@ -265,19 +269,19 @@ foreach(generated_source_file ${generated_source_files})
     "${PROJECT_NAME}__rosidl_generator_c"
   )
 
-  list(APPEND _extension_dependencies ${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl})
+  list(APPEND _extension_dependencies "${_library_name}")
 
-  add_dependencies(${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl}
+  add_dependencies("${_library_name}"
     ${rosidl_generate_interfaces_TARGET}__${_typesupport_impl}
   )
 
   if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
-    install(TARGETS ${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl}
+    install(TARGETS "${_library_name}"
       ARCHIVE DESTINATION lib
       LIBRARY DESTINATION lib
     )
 
-    ament_export_libraries(${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl})
+    ament_export_libraries("${_library_name}")
   endif()
 
 endforeach()
@@ -314,7 +318,6 @@ add_dependencies("${PROJECT_NAME}_messages_jar" "${rosidl_generate_interfaces_TA
 if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
   set(_install_jar_dir "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}")
   if(NOT "${_generated_msg_java_files} " STREQUAL " " OR NOT "${_generated_srv_java_files} " STREQUAL " ")
-
     if(NOT "${_generated_msg_java_files} " STREQUAL " ")
       list(GET _generated_msg_java_files 0 _msg_file)
       get_filename_component(_msg_package_dir "${_msg_file}" DIRECTORY)
@@ -326,9 +329,38 @@ if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
       get_filename_component(_srv_package_dir "${_srv_file}" DIRECTORY)
       get_filename_component(_srv_package_dir "${_srv_package_dir}" DIRECTORY)
     endif()
-
     install_jar("${PROJECT_NAME}_messages_jar" "share/${PROJECT_NAME}/java")
     ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}_messages.jar")
     ament_java_package_hook(${PROJECT_NAME})
+  endif()
+endif()
+
+if(BUILD_TESTING AND rosidl_generate_interfaces_ADD_LINTER_TESTS)
+  if(
+    NOT _generated_msg_java_files STREQUAL "" OR
+    NOT _generated_msg_cpp_ts_files STREQUAL "" OR
+    NOT _generated_srv_java_files STREQUAL "" OR
+    NOT _generated_srv_cpp_ts_files STREQUAL ""
+  )
+    find_package(ament_cmake_cppcheck REQUIRED)
+    ament_cppcheck(
+      TESTNAME "cppcheck_rosidl_generated_java"
+      "${_output_path}")
+
+    find_package(ament_cmake_cpplint REQUIRED)
+    get_filename_component(_cpplint_root "${_output_path}" DIRECTORY)
+    ament_cpplint(
+      TESTNAME "cpplint_rosidl_generated_java"
+      # the generated code might contain longer lines for templated types
+      MAX_LINE_LENGTH 999
+      ROOT "${_cpplint_root}"
+      "${_output_path}")
+
+    find_package(ament_cmake_uncrustify REQUIRED)
+    ament_uncrustify(
+      TESTNAME "uncrustify_rosidl_generated_java"
+      # the generated code might contain longer lines for templated types
+      MAX_LINE_LENGTH 999
+      "${_output_path}")
   endif()
 endif()
