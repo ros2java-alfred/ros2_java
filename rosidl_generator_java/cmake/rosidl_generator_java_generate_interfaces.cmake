@@ -194,7 +194,7 @@ foreach(generated_source_file ${generated_source_files})
   set(_library_name
     "${_package_name}_${_parent_folder_name}_${_base_msg_name}__${_typesupport_impl}"
   )
-  string_camel_case_to_lower_case_underscore("${_library_name}" _library_name)
+  string(TOLOWER ${_library_name} _library_name)
 
   add_library("${_library_name}" SHARED
     "${generated_source_file}"
