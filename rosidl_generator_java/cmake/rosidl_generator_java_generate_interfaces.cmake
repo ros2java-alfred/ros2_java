@@ -18,6 +18,8 @@ find_package(rmw_implementation_cmake REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rcljava_common REQUIRED)
 
+include(CrossCompilingExtra)
+
 if(ANDROID)
   find_host_package(Java COMPONENTS Development REQUIRED)
 else()
@@ -25,7 +27,6 @@ else()
   find_package(JNI REQUIRED)
 endif()
 
-include(CrossCompilingExtra)
 include(UseJava)
 
 # Windows flags
