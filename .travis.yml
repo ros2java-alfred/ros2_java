@@ -45,7 +45,9 @@ matrix:
       services:
         - docker
     - os: osx
-      env: PYTHON_PATH="/usr/local/opt/python3/bin/python3.6"
+      env:
+        - PYTHON_PATH="/usr/local/opt/python3/bin/python3.6"
+        - TRAVIS_OS_NAME="osx"
       osx_image: xcode8.3
   allow_failures:
     - env: DOCKER_DIST="debian-stable"
