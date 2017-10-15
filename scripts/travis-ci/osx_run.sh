@@ -1,7 +1,7 @@
 # scripts/travis-ci/osx_run.sh
 #!/bin/sh
 
-set -ev
+set -e
 
 cd $ROS2WS
 . $ROS2WS/install_isolated/local_setup.sh
