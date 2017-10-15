@@ -32,11 +32,11 @@ cd $ROS2WS
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/d9259bbc708c5145255fbdeb25e65e19/raw/ros2_java_desktop.repos"
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/vcs import src < ros2_java_desktop.repos"
 
-# Patch for Java support.
-cd $ROS2WS/src/ros2/rosidl_typesupport && patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_java.diff
-
 # Sync with git trigger
 rm -rf $ROS2WS/src/ros2_java/ros2_java && cp -r $HOME_BUILD/ros2java-alfred/ros2_java  $ROS2WS/src/ros2_java/ros2_java
+
+# Patch for Java support.
+cd $ROS2WS/src/ros2/rosidl_typesupport && patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_java.diff
 
 echo "BUILD ROS2 WS..."
 cd $HOME_BUILD
