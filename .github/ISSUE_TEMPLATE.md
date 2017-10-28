@@ -42,3 +42,6 @@ For Bug report or feature requests, please fill out the relevant category below
 #### Implementation considerations
 <!-- Relevant information on how the feature could be implemented and pros and cons of the different solutions -->
 
+#### Implementation considerations
+<!-- Relevant information on how the feature could be implemented and pros and cons of the different solutions -->
+
