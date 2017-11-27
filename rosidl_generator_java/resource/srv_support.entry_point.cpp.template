@@ -17,7 +17,7 @@
 #include <jni.h>
 
 #include <@(spec.pkg_name)/@(subfolder)/@(module_name).h>
-#include <rosidl_generator_c/service_type_support.h>
+#include <rosidl_generator_c/service_type_support_struct.h>
 
 // JNI HEADER
 #ifdef __cplusplus
