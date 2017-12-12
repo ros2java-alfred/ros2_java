@@ -6,7 +6,7 @@ set -ev
 DOCKER_IMG="$DOCKER_REPO:$DOCKER_DIST"
 
 # Docker Hub authenticate.
-docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 docker pull $DOCKER_IMG
 
 # Make shared environment variables.
