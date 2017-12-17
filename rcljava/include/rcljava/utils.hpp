@@ -33,6 +33,22 @@ extern "C" {
 #endif
 
 /*
+ *
+ */
+void
+throwException(JNIEnv * env, std::string message)
+{
+  env->ExceptionDescribe();
+  env->ExceptionClear();
+
+  const char * class_name = "java/lang/IllegalStateException";
+  jclass exception_class = env->FindClass(class_name);
+  assert(exception_class != NULL);
+
+  env->ThrowNew(exception_class, message.c_str());
+}
+
+/*
  * Convert jstring to std::string.
  */
 std::string
@@ -67,10 +83,11 @@ char ** JniStringArray2StringArray(JNIEnv * env, jobjectArray stringArray)
 rosidl_message_type_support_t *
 jclass2MessageType(JNIEnv * env, jclass jmessage_class)
 {
-  jmethodID mid =
-    env->GetStaticMethodID(jmessage_class, "getTypeSupport", "()J");
+  jmethodID mid = env->GetStaticMethodID(jmessage_class, "getTypeSupport", "()J");
+  assert(mid != NULL);
 
   jlong jts = env->CallStaticLongMethod(jmessage_class, mid);
+  assert(jts != 0);
 
   rosidl_message_type_support_t * ts =
     reinterpret_cast<rosidl_message_type_support_t *>(jts);
@@ -81,63 +98,10 @@ jclass2MessageType(JNIEnv * env, jclass jmessage_class)
 /*
  *
  */
-void *
-jclass2Message(JNIEnv * env, jclass jmessage_class)
-{
-  jmethodID jfrom_mid = env->GetStaticMethodID(jmessage_class, "getFromJavaConverter", "()J");
-  jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, jfrom_mid);
-
-  using convert_from_java_signature = void * (*)(jobject, void *);
-  convert_from_java_signature convert_from_java =
-    reinterpret_cast<convert_from_java_signature>(jfrom_java_converter);
-
-  jmethodID jconstructor = env->GetMethodID(jmessage_class, "<init>", "()V");
-  jobject jmsg = env->NewObject(jmessage_class, jconstructor);
-
-  void * taken_msg = convert_from_java(jmsg, nullptr);
-  return taken_msg;
-}
-
-jobject
-jclass2JMessage(JNIEnv * env, jclass jmessage_class, void * taken_msg)
-{
-  jmethodID jto_mid = env->GetStaticMethodID(jmessage_class, "getToJavaConverter", "()J");
-  jlong jto_java_converter = env->CallStaticLongMethod(jmessage_class, jto_mid);
-
-  using convert_to_java_signature = jobject (*)(void *, jobject);
-  convert_to_java_signature convert_to_java =
-    reinterpret_cast<convert_to_java_signature>(jto_java_converter);
-
-  jobject jtaken_msg = convert_to_java(taken_msg, nullptr);
-  return jtaken_msg;
-}
-
-/*
- *
- */
-void *
-jobject2Message(JNIEnv * env, jobject jmessage)
-{
-  jclass jmessage_class = env->GetObjectClass(jmessage);
-  jmethodID mid = env->GetStaticMethodID(jmessage_class, "getFromJavaConverter", "()J");
-  jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, mid);
-
-  using convert_from_java_signature = void * (*)(jobject, void *);
-  convert_from_java_signature convert_from_java =
-    reinterpret_cast<convert_from_java_signature>(jfrom_java_converter);
-
-  void * raw_ros_message = convert_from_java(jmessage, nullptr);
-  return raw_ros_message;
-}
-
-/*
- *
- */
 rosidl_service_type_support_t *
 jclass2ServiceType(JNIEnv * env, jclass jmessage_class)
 {
-  jmethodID mid =
-    env->GetStaticMethodID(jmessage_class, "getServiceTypeSupport", "()J");
+  jmethodID mid = env->GetStaticMethodID(jmessage_class, "getServiceTypeSupport", "()J");
   assert(mid != NULL);
 
   jlong jts = env->CallStaticLongMethod(jmessage_class, mid);
@@ -152,28 +116,79 @@ jclass2ServiceType(JNIEnv * env, jclass jmessage_class)
 /*
  *
  */
-jlong
-instance2Handle(void * obj)
+void *
+jclass2Message(JNIEnv * env, jclass jmessage_class)
 {
-  jlong handler = reinterpret_cast<jlong>(obj);
+  jmethodID jfrom_mid = env->GetStaticMethodID(jmessage_class, "getFromJavaConverter", "()J");
+  assert(jfrom_mid != NULL);
 
-  assert(handler != 0);
+  jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, jfrom_mid);
+  assert(jfrom_java_converter != 0);
 
-  return handler;
+  jmethodID jconstructor = env->GetMethodID(jmessage_class, "<init>", "()V");
+  assert(jconstructor != NULL);
+
+  jobject jmsg = env->NewObject(jmessage_class, jconstructor);
+  assert(jmsg != NULL);
+
+  using convert_from_java_signature = void * (*)(jobject, void *);
+  convert_from_java_signature convert_from_java =
+    reinterpret_cast<convert_from_java_signature>(jfrom_java_converter);
+
+  void * taken_msg = convert_from_java(jmsg, nullptr);
+  if (taken_msg == NULL) {
+    throwException(env, "getFromJavaConverter");
+  }
+
+  return taken_msg;
+}
+
+jobject
+jclass2JMessage(JNIEnv * env, jclass jmessage_class, void * taken_msg)
+{
+  jmethodID jto_mid = env->GetStaticMethodID(jmessage_class, "getToJavaConverter", "()J");
+  assert(jto_mid != NULL);
+
+  jlong jto_java_converter = env->CallStaticLongMethod(jmessage_class, jto_mid);
+  assert(jto_java_converter != 0);
+
+  using convert_to_java_signature = jobject (*)(void *, jobject);
+  convert_to_java_signature convert_to_java =
+    reinterpret_cast<convert_to_java_signature>(jto_java_converter);
+
+  jobject jtaken_msg = convert_to_java(taken_msg, nullptr);
+  if (jtaken_msg == NULL) {
+    throwException(env, "getFromJavaConverter");
+  }
+
+  return jtaken_msg;
 }
 
 /*
  *
  */
-void
-throwException(JNIEnv * env, std::string message)
+void *
+jobject2Message(JNIEnv * env, jobject jmessage)
 {
-  const char * class_name = "java/lang/IllegalStateException";
-  jclass exception_class = env->FindClass(class_name);
+  jclass jmessage_class = env->GetObjectClass(jmessage);
+  assert(jmessage_class != NULL);
 
-  assert(exception_class != NULL);
+  jmethodID mid = env->GetStaticMethodID(jmessage_class, "getFromJavaConverter", "()J");
+  assert(mid != NULL);
 
-  env->ThrowNew(exception_class, message.c_str());
+  jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, mid);
+  assert(jfrom_java_converter != 0);
+
+  using convert_from_java_signature = void * (*)(jobject, void *);
+  convert_from_java_signature convert_from_java =
+    reinterpret_cast<convert_from_java_signature>(jfrom_java_converter);
+
+  void * raw_ros_message = convert_from_java(jmessage, nullptr);
+  if (raw_ros_message == NULL) {
+    throwException(env, "getFromJavaConverter");
+  }
+
+  return raw_ros_message;
 }
 
 /*
@@ -315,6 +330,18 @@ rmw_request_id_t * convert_rmw_request_id_from_java(JNIEnv * env, jobject jreque
   return request_id;
 }
 
+/*
+ *
+ */
+jlong
+instance2Handle(void * obj)
+{
+  jlong handler = reinterpret_cast<jlong>(obj);
+  assert(handler != 0);
+
+  return handler;
+}
+
 #ifdef __cplusplus
 }
 #endif
@@ -326,7 +353,10 @@ template<typename T>
 T *
 makeInstance()
 {
-  return static_cast<T *>(malloc(sizeof(T)));
+  T * obj = static_cast<T *>(malloc(sizeof(T)));
+  assert(obj != NULL);
+
+  return obj;
 }
 
 /*
@@ -337,7 +367,6 @@ T *
 handle2Instance(jlong handle)
 {
   T * obj = reinterpret_cast<T *>(handle);
-
   assert(obj != NULL);
 
   return obj;

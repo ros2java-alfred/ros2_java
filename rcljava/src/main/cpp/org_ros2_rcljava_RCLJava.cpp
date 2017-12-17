@@ -268,6 +268,9 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTake(
     handle2Instance<rcl_subscription_t>(subscription_handle);
 
   void * taken_msg = jclass2Message(env, jmessage_class);
+  if (env->ExceptionCheck()) {
+    return 0;
+  }
 
   rcl_ret_t ret = rcl_take(subscription, taken_msg, nullptr);
   if (ret != RCL_RET_OK && ret != RCL_RET_SUBSCRIPTION_TAKE_FAILED) {
@@ -275,6 +278,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTake(
       std::string(rcl_get_error_string_safe()));
     rcl_reset_error();
     throwException(env, message);
+    return 0;
   }
 
   if (ret != RCL_RET_SUBSCRIPTION_TAKE_FAILED) {

@@ -3,7 +3,6 @@ package org.ros2.rcljava;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +16,10 @@ public class MessageGeometryTest extends AbstractMessageTest {
     public final void testPubPoint32() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
-        Point32 msg = new Point32();
-        msg.setX(10f);
-        msg.setY(20f);
-        msg.setZ(30f);
+        Point32 msg = new Point32()
+                .setX(10f)
+                .setY(20f)
+                .setZ(30f);
 
         Point32 value = this.pubSubTest(msg);
         assertEquals(10f, value.getX(), 0.1f);
@@ -65,11 +64,14 @@ public class MessageGeometryTest extends AbstractMessageTest {
     }
 
     @Test
-    @Ignore //TODO Remove after fix.
+    //Ignore //TODO Remove after fix.
     public final void testPubAccelWithCovariance() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         AccelWithCovariance msg = new AccelWithCovariance();
+        for (int i = 0; i < 36; i++) {
+            msg.getCovariance().add(0D);
+        }
 
 
         AccelWithCovariance value = this.pubSubTest(msg);
@@ -77,12 +79,11 @@ public class MessageGeometryTest extends AbstractMessageTest {
     }
 
     @Test
-    @Ignore //TODO Remove after fix.
     public final void testPubAccelWithCovarianceStamped() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         AccelWithCovarianceStamped msg = new AccelWithCovarianceStamped();
-        //TODO
+        //msg.getAccel();
 
         AccelWithCovarianceStamped value = this.pubSubTest(msg);
         assertNotNull(value);

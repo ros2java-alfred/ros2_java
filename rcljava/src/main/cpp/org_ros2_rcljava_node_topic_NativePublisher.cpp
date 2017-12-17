@@ -43,6 +43,9 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_topic_NativePublisher_nativePu
   rcl_publisher_t * publisher = handle2Instance<rcl_publisher_t>(jpublisher_handle);
 
   void * raw_ros_message = jobject2Message(env, jmsg);
+  if (env->ExceptionCheck()) {
+    return;
+  }
 
   rcl_ret_t ret = rcl_publish(publisher, raw_ros_message);
   if (ret != RCL_RET_OK) {

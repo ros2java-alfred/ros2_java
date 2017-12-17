@@ -65,7 +65,6 @@ public class MessageSensorTest extends AbstractMessageTest {
     }
 
     @Test
-    @Ignore //TODO Remove after fix.
     public final void testPubImu() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
@@ -74,17 +73,11 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getLinearAcceleration().setY(2.0d);
         msg.getLinearAcceleration().setZ(4.0d);
 
-        // Fixed bug generate by message initialize.
-        msg.getAngularVelocityCovariance().addAll(Arrays.asList(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d));
-        msg.getLinearAccelerationCovariance().addAll(Arrays.asList(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d));
-        msg.getOrientationCovariance().addAll(Arrays.asList(0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d));
-
         Imu value = this.pubSubTest(msg);
         assertEquals(3.0d, value.getLinearAcceleration().getX(), 0.1d);
     }
 
     @Test
-    @Ignore //TODO Remove after fix.
     public final void testPubCameraInfo() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
@@ -95,9 +88,9 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setDistortionModel("distortion");
         msg.setHeight(40);
         msg.setWidth(50);
-        msg.getK().add(60d);
-        msg.getP().add(70d);
-        msg.getR().add(80d);
+        msg.getK().set(0, 60d);
+        msg.getP().set(0, 70d);
+        msg.getR().set(0, 80d);
         msg.getRoi().setDoRectify(true);
 
         CameraInfo value = this.pubSubTest(msg);
@@ -284,7 +277,6 @@ public class MessageSensorTest extends AbstractMessageTest {
     }
 
     @Test
-    @Ignore //TODO Remove after fix.
     public final void testPubMagneticField() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
@@ -292,7 +284,7 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getMagneticField().setX(10d);
         msg.getMagneticField().setY(20d);
         msg.getMagneticField().setZ(30d);
-        msg.getMagneticFieldCovariance().addAll(Arrays.asList(40d));
+        msg.getMagneticFieldCovariance().set(0, 40d);
 
         MagneticField value = this.pubSubTest(msg);
         assertEquals(10f, value.getMagneticField().getX(), 0.1f);
@@ -346,7 +338,6 @@ public class MessageSensorTest extends AbstractMessageTest {
     }
 
     @Test
-    @Ignore //TODO Remove after fix.
     public final void testPubNavSatFix() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
@@ -356,7 +347,7 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setLongitude(30d);
         msg.setStatus(new NavSatStatus()); //TODO Fix this bug !! need to use type of enum.
         msg.setPositionCovarianceType((byte)50);
-        msg.getPositionCovariance().add(60d);
+        msg.getPositionCovariance().set(0, 60d);
 
         NavSatFix value = this.pubSubTest(msg);
         assertEquals(10f, value.getAltitude(), 0.1f);

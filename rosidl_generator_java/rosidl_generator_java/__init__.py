@@ -85,6 +85,7 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
                 data = {
                     'constant_value_to_java': constant_value_to_java,
                     'value_to_java': value_to_java,
+                    'default_value': default_value,
                     'convert_camel_case_to_lower_case_underscore':
                     convert_camel_case_to_lower_case_underscore,
                     'convert_lower_case_underscore_to_camel_case':
@@ -128,6 +129,22 @@ def value_to_java(type_, value):
         java_value = primitive_value_to_java(type_, single_value)
         java_values.append(java_value)
     return '{%s}' % ', '.join(java_values)
+
+def default_value(type_):
+    assert type_.is_primitive_type()
+
+    if type_.type in [
+        'byte',
+        'char',
+        'int8', 'uint8',
+        'int16', 'uint16',
+        'int32', 'uint32',
+        'int64', 'uint64',
+        'float64',
+    ]:
+        return str(0)
+
+    return
 
 
 def primitive_value_to_java(type_, value):
@@ -185,31 +202,31 @@ def constant_value_to_java(type_, value):
 
 def get_builtin_java_type(type_, use_primitives=True):
     if type_ == 'bool':
-        return 'boolean' if use_primitives else 'Boolean'
+        return 'boolean' if use_primitives else 'java.lang.Boolean'
 
     if type_ == 'byte':
-        return 'byte' if use_primitives else 'Byte'
+        return 'byte' if use_primitives else 'java.lang.Byte'
 
     if type_ == 'char':
-        return 'char' if use_primitives else 'Character'
+        return 'char' if use_primitives else 'java.lang.Character'
 
     if type_ == 'float32':
-        return 'float' if use_primitives else 'Float'
+        return 'float' if use_primitives else 'java.lang.Float'
 
     if type_ == 'float64':
-        return 'double' if use_primitives else 'Double'
+        return 'double' if use_primitives else 'java.lang.Double'
 
     if type_ in ['int8', 'uint8']:
-        return 'byte' if use_primitives else 'Byte'
+        return 'byte' if use_primitives else 'java.lang.Byte'
 
     if type_ in ['int16', 'uint16']:
-        return 'short' if use_primitives else 'Short'
+        return 'short' if use_primitives else 'java.lang.Short'
 
     if type_ in ['int32', 'uint32']:
-        return 'int' if use_primitives else 'Integer'
+        return 'int' if use_primitives else 'java.lang.Integer'
 
     if type_ in ['int64', 'uint64']:
-        return 'long' if use_primitives else 'Long'
+        return 'long' if use_primitives else 'java.lang.Long'
 
     if type_ == 'string':
         return 'java.lang.String'

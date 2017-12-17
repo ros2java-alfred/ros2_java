@@ -45,7 +45,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_service_NativeClient_nativeSen
   assert(jrequest_to_java_converter_handle != 0);
   assert(jrequest_msg != nullptr);
 
-  rcl_client_t * client = reinterpret_cast<rcl_client_t *>(client_handle);
+  rcl_client_t * client = handle2Instance<rcl_client_t>(client_handle);
 
   convert_from_java_signature convert_from_java =
     reinterpret_cast<convert_from_java_signature>(jrequest_from_java_converter_handle);
