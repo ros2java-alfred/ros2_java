@@ -1034,8 +1034,11 @@ public class NativeNode implements Node, java.lang.AutoCloseable {
 
     @Override
     public Time getCurrentTime() {
-        //TODO (theos)
-        return null;
+        long lt = System.currentTimeMillis();
+        Time t = new Time();
+        t.setSec((int) (lt / 1e3));
+        t.setNanosec((int) ((lt % 1e3) * 1e6));
+        return t;
     }
 
     @Override
