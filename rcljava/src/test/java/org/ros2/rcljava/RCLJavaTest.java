@@ -13,29 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.log4j.BasicConfigurator;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
+
 import org.ros2.rcljava.exception.NotInitializedException;
 import org.ros2.rcljava.node.NativeNode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@FixMethodOrder(MethodSorters.JVM)
-public class RCLJavaTest {
+//@FixMethodOrder(MethodSorters.JVM)
+public class RCLJavaTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(RCLJavaTest.class);
 
-    @BeforeClass
-    public static void beforeClass() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
+    @Before
+    public void setUp() {
+        // Disable default setUp.
+    }
+
+    @After
+    public void tearDown() {
+        // Disable default tearDown.
     }
 
     @Test
@@ -46,12 +51,12 @@ public class RCLJavaTest {
 
         try {
             Assert.assertEquals(false, RCLJava.isInitialized());
-            RCLJava.rclJavaInit();
+            this.initRCLjava();
             Assert.assertEquals(true, RCLJava.isInitialized());
         } catch (Exception e) {
             test = false;
         } finally {
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         }
 
         Assert.assertTrue("failed to initialize rclJava", test);
@@ -64,8 +69,8 @@ public class RCLJavaTest {
         boolean test = true;
 
         try {
-            RCLJava.rclJavaInit();
-            RCLJava.shutdown();
+            this.initRCLjava();
+            this.releaseRCLjava();
         } catch (Exception e) {
             test = false;
         }
@@ -79,12 +84,12 @@ public class RCLJavaTest {
 
         boolean test = true;
 
-        RCLJava.rclJavaInit();
-        RCLJava.shutdown();
+        this.initRCLjava();
+        this.releaseRCLjava();
 
         try {
             RCLJava.rclJavaInit();
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         } catch (Exception e) {
             test = false;
         }
@@ -98,11 +103,11 @@ public class RCLJavaTest {
 
         boolean test = false;
 
-        RCLJava.rclJavaInit();
+        this.initRCLjava();
         RCLJava.shutdown();
 
         try {
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         } catch (Exception e) {
             test = true;
         }
@@ -117,7 +122,7 @@ public class RCLJavaTest {
         boolean test = true;
         NativeNode node = null;
 
-        RCLJava.rclJavaInit();
+        this.initRCLjava();
         try {
             node = (NativeNode)RCLJava.createNode("testNode");
             node.getName();
@@ -125,7 +130,7 @@ public class RCLJavaTest {
         } catch (Exception e) {
             test = false;
         } finally {
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
@@ -137,7 +142,7 @@ public class RCLJavaTest {
 
         boolean test = true;
 
-        RCLJava.rclJavaInit();
+        this.initRCLjava();
 
         try {
             test = RCLJava.ok();
@@ -148,10 +153,16 @@ public class RCLJavaTest {
         Assert.assertTrue("Expected Runtime error.", test);
 
         try {
-            RCLJava.shutdown();
-            assertEquals(false, RCLJava.ok());
+            this.releaseRCLjava();
+            test = RCLJava.ok();
+            // not really call...
+            assertEquals(false, test);
             test = false;
-        } catch (Exception e) {  }
+        } catch (NotInitializedException e) {
+            test = true;
+        } catch (Exception e) {
+            test = false;
+        }
         Assert.assertTrue("Expected Runtime error.", test);
     }
 

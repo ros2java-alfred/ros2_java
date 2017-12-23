@@ -12,14 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava;
 
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
-import org.junit.Ignore;
 import org.junit.Test;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,6 @@ import geometry_msgs.msg.Transform;
 import geometry_msgs.msg.Twist;
 import geometry_msgs.msg.Wrench;
 import sensor_msgs.msg.*;
-
 
 public class MessageSensorTest extends AbstractMessageTest {
     private static final Logger logger = LoggerFactory.getLogger(MessageSensorTest.class);

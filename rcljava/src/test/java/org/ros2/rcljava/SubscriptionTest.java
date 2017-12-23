@@ -19,32 +19,24 @@ package org.ros2.rcljava;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import org.apache.log4j.BasicConfigurator;
-import org.junit.BeforeClass;
 import org.junit.Test;
+
 import org.ros2.rcljava.node.NativeNode;
+import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import std_msgs.msg.String;
 
-import org.ros2.rcljava.node.topic.NativeSubscription;
-
-public class SubscriptionTest {
+public class SubscriptionTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(SubscriptionTest.class);
-
-    @BeforeClass
-    public static void beforeClass() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-    }
 
     @Test
     public final void testCreate() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
-        RCLJava.rclJavaInit();
         NativeNode node = (NativeNode) RCLJava.createNode("test_node");
         NativeSubscription<std_msgs.msg.String> subscription =
                 (NativeSubscription<String>) node.<std_msgs.msg.String>createSubscription(
@@ -59,6 +51,5 @@ public class SubscriptionTest {
 
         subscription.dispose();
         node.dispose();
-        RCLJava.shutdown();
     }
 }

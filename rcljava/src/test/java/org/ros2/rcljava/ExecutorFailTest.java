@@ -1,9 +1,25 @@
+/* Copyright 2017 Mickael Gaillard <mick.gaillard@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.ros2.rcljava;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
 import org.junit.Test;
+
 import org.ros2.rcljava.executor.SingleThreadedExecutor;
 import org.ros2.rcljava.executor.ThreadedExecutor;
 import org.ros2.rcljava.internal.message.Message;
@@ -12,27 +28,14 @@ import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.node.topic.NativePublisher;
 import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import std_msgs.msg.UInt32;
 
-public class ExecutorFailTest {
+public class ExecutorFailTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(ExecutorFailTest.class);
-
-    public class TestConsumer<T extends Message> implements SubscriptionCallback<T> {
-        private final RCLFuture<T> future;
-
-        TestConsumer(final RCLFuture<T> future) {
-            this.future = future;
-        }
-
-        public final void dispatch(final T msg) {
-            if (!this.future.isDone()) {
-                this.future.set(msg);
-            }
-        }
-    }
 
     public class TestConsumerFail<T extends Message> implements SubscriptionCallback<T> {
         private final RCLFuture<T> future;
@@ -58,7 +61,6 @@ public class ExecutorFailTest {
         boolean test = true;
 
         try {
-            RCLJava.rclJavaInit();
             ThreadedExecutor executor = new SingleThreadedExecutor();
 
             final Node publisherNode        = RCLJava.createNode("publisher_node");
@@ -111,8 +113,6 @@ public class ExecutorFailTest {
             publisherNode.dispose();
         } catch (Exception e) {
             test = false;
-        } finally {
-            RCLJava.shutdown();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);

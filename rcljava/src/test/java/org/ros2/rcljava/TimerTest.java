@@ -20,10 +20,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.ref.WeakReference;
@@ -34,10 +30,11 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.time.WallTimer;
 import org.ros2.rcljava.time.WallTimerCallback;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TimerTest {
+public class TimerTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(TimerTest.class);
 
     public static class TimerCallback implements WallTimerCallback {
@@ -63,30 +60,11 @@ public class TimerTest {
         }
     }
 
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
     @Test
     public final void testCreate() {
-        logger.debug(new Object() {
-        }.getClass().getEnclosingMethod().getName());
+        logger.debug(new Object() {}.getClass().getEnclosingMethod().getName());
 
         int max_iterations = 4;
-
-        RCLJava.rclJavaInit();
 
         Node node = RCLJava.createNode("test_node");
 
@@ -111,6 +89,5 @@ public class TimerTest {
 
         timer.dispose();
         node.dispose();
-        RCLJava.shutdown();
     }
 }

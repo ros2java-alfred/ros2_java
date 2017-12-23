@@ -1,3 +1,18 @@
+/* Copyright 2017 Mickael Gaillard <mick.gaillard@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.ros2.rcljava;
 
 import static org.junit.Assert.assertEquals;
@@ -8,11 +23,8 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.log4j.BasicConfigurator;
-
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.ros2.rcljava.internal.message.Message;
@@ -24,7 +36,7 @@ import org.ros2.rcljava.node.topic.SubscriptionCallback;
 
 import std_msgs.msg.Header;
 
-public abstract class AbstractMessageTest {
+public abstract class AbstractMessageTest extends AbstractRosTest {
 
     private final static String NODE_NAME       = "test_node";
     private final static String VALUE_FRAMEID   = "frameTest";
@@ -33,22 +45,16 @@ public abstract class AbstractMessageTest {
 
     protected Node node;
 
-    @BeforeClass
-    public static void beforeClass() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-    }
-
     @Before
     public void setUp() {
-        RCLJava.rclJavaInit();
+        super.setUp();
         this.node = RCLJava.createNode(NODE_NAME);
     }
 
     @After
     public void tearDown() {
         this.node.dispose();
-        RCLJava.shutdown();
+        super.tearDown();
     }
 
 

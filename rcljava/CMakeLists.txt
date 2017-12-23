@@ -220,6 +220,7 @@ if(BUILD_TESTING)
     PROPERTY "JAR_FILE")
 
   set(${PROJECT_NAME}_test_sources
+    "src/test/java/org/ros2/rcljava/AbstractRosTest.java"
     "src/test/java/org/ros2/rcljava/ExecutorTest.java"
     "src/test/java/org/ros2/rcljava/ExecutorFailTest.java"
     "src/test/java/org/ros2/rcljava/GraphNameTest.java"

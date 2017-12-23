@@ -13,31 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava;
 
-import org.apache.log4j.BasicConfigurator;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  */
-public class RmwTest {
+public class RmwTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(RmwTest.class);
 
+    @Before
+    public void setUp() {
+        // Disable default setUp.
+    }
 
-    @BeforeClass
-    public static void beforeClass() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
+    @After
+    public void tearDown() {
+        // Disable default tearDown.
     }
 
     @Test
@@ -48,8 +53,8 @@ public class RmwTest {
 
         try {
             RCLJava.setRMWImplementation("rmw_fastrtps_cpp");
-            RCLJava.rclJavaInit();
-            RCLJava.shutdown();
+            this.initRCLjava();
+            this.releaseRCLjava();
         } catch (Exception e) {
             test = false;
         } finally {
@@ -70,8 +75,8 @@ public class RmwTest {
 
         try {
             RCLJava.setRMWImplementation("rmw_opensplice_cpp");
-            RCLJava.rclJavaInit();
-            RCLJava.shutdown();
+            this.initRCLjava();
+            this.releaseRCLjava();
         } catch (Exception e) {
             test = false;
         } finally {
@@ -92,8 +97,8 @@ public class RmwTest {
 
         try {
             RCLJava.setRMWImplementation("rmw_connext_cpp");
-            RCLJava.rclJavaInit();
-            RCLJava.shutdown();
+            this.initRCLjava();
+            this.releaseRCLjava();
         } catch (Exception e) {
             test = false;
         } finally {
@@ -114,8 +119,8 @@ public class RmwTest {
 
         try {
             RCLJava.setRMWImplementation("rmw_connext_dynamic_cpp");
-            RCLJava.rclJavaInit();
-            RCLJava.shutdown();
+            this.initRCLjava();
+            this.releaseRCLjava();
         } catch (Exception e) {
             test = false;
         } finally {

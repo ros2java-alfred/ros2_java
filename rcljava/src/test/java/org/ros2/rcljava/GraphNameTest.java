@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.Topics;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GraphNameTest {
+public class GraphNameTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(GraphNameTest.class);
-
-    @BeforeClass
-    public static void beforeClass() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-    }
 
     @Test
     public final void testIsTopicName() {
@@ -163,7 +157,6 @@ public class GraphNameTest {
     @Test
     public final void testGetFullName() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
-        RCLJava.rclJavaInit();
 
         Node node = RCLJava.createNode("my_node");
         Assert.assertEquals("/ping",            GraphName.getFullName(node, "ping",     null));
@@ -185,7 +178,5 @@ public class GraphNameTest {
         Assert.assertEquals("/my_ns/my_subns/my_node",      GraphName.getFullName(node, "~",        null));
         Assert.assertEquals("/my_ns/my_subns/my_node/ping", GraphName.getFullName(node, "~/ping",   null));
         node.dispose();
-
-        RCLJava.shutdown();
     }
 }

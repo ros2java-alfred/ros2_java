@@ -24,7 +24,7 @@ mkdir -p $HOME_BUILD/ament_ws/src
 cd $HOME_BUILD/ament_ws
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos"
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/vcs import src < ament_java.repos"
-docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated"
+docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "src/ament/ament_tools/scripts/ament.py build --parallel --symlink-install --isolated"
 
 echo "INSTALL ROS2 WS..."
 mkdir -p $ROS2WS/src

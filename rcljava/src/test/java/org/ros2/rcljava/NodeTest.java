@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import org.apache.log4j.BasicConfigurator;
-
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
+import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.qos.QoSProfile;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,32 +41,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.internal.message.Message;
-import org.ros2.rcljava.namespace.GraphName;
-
-
-public class NodeTest {
+public class NodeTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(NodeTest.class);
 
-    public class TestConsumer<T extends Message> implements SubscriptionCallback<T> {
-        private final RCLFuture<T> future;
-
-        TestConsumer(final RCLFuture<T> future) {
-            this.future = future;
-        }
-
-        public final void dispatch(final T msg) {
-            if (!this.future.isDone()) {
-                this.future.set(msg);
-            }
-        }
+    @Before
+    public void setUp() {
+        // Disable default setUp.
     }
 
-    @BeforeClass
-    public static void beforeClass() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
+    @After
+    public void tearDown() {
+        // Disable default tearDown.
     }
 
     @Test
@@ -73,14 +61,14 @@ public class NodeTest {
         boolean test = true;
         Node node = null;
 
-        RCLJava.rclJavaInit();
+        this.initRCLjava();
         try {
             node = RCLJava.createNode("_test_node");
             node.dispose();
         } catch (Exception e) {
             test = false;
         } finally {
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
@@ -94,14 +82,14 @@ public class NodeTest {
         boolean test = true;
         Node node = null;
 
-        RCLJava.rclJavaInit();
+        this.initRCLjava();
         node = RCLJava.createNode("test_node");
         try {
             node.dispose();
         } catch (Exception e) {
             test = false;
         } finally {
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
@@ -117,14 +105,14 @@ public class NodeTest {
         String nodeName = null;
 
         try {
-            RCLJava.rclJavaInit();
+            this.initRCLjava();
             node = RCLJava.createNode("testNodeName");
             nodeName = node.getName();
             node.dispose();
         } catch (Exception e) {
             test = false;
         } finally {
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
@@ -135,7 +123,7 @@ public class NodeTest {
     public final void testPubSub() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
-        RCLJava.rclJavaInit();
+        this.initRCLjava();
         Node node = RCLJava.createNode("test_node");
         assertNotEquals(0, node.getNodeHandle());
 
@@ -160,7 +148,7 @@ public class NodeTest {
 
         subscription.dispose();
         node.dispose();
-        RCLJava.shutdown();
+        this.releaseRCLjava();
     }
 
     @Test
@@ -169,11 +157,12 @@ public class NodeTest {
 
         boolean test = true;
         Node node = null;
+
+        this.initRCLjava();
+
         Publisher<std_msgs.msg.String> pub = null;
 
-
         try {
-            RCLJava.rclJavaInit();
             node = RCLJava.createNode("testPublisher");
 //            RCLFuture<std_msgs.msg.String> future = new RCLFuture<std_msgs.msg.String>(new WeakReference<Node>(node));
             pub = node.<std_msgs.msg.String>createPublisher(
@@ -194,7 +183,7 @@ public class NodeTest {
         } catch (Exception e) {
             test = false;
         } finally {
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
@@ -207,6 +196,9 @@ public class NodeTest {
 
         boolean test = true;
         Node node = null;
+
+        this.initRCLjava();
+
         Subscription<std_msgs.msg.String> sub = null;
 
         SubscriptionCallback<std_msgs.msg.String> callback = new SubscriptionCallback<std_msgs.msg.String>() {
@@ -215,7 +207,6 @@ public class NodeTest {
         };
 
         try {
-            RCLJava.rclJavaInit();
             node = RCLJava.createNode("testSubscription");
             sub = node.<std_msgs.msg.String>createSubscription(
                     std_msgs.msg.String.class,
@@ -228,7 +219,7 @@ public class NodeTest {
         } catch (Exception e) {
             test = false;
         } finally {
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
@@ -246,7 +237,7 @@ public class NodeTest {
         final String topicPath = "/testChannel";
 
         try {
-            RCLJava.rclJavaInit();
+            this.initRCLjava();
             node = RCLJava.createNode("testPublisher");
 
             count = node.countPublishers(topicPath);
@@ -264,7 +255,7 @@ public class NodeTest {
         } catch (Exception e) {
             test = false;
         } finally {
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
@@ -285,7 +276,7 @@ public class NodeTest {
 //        };
 
         try {
-            RCLJava.rclJavaInit();
+            this.initRCLjava();
             node = RCLJava.createNode("testSubscription");
             count = node.countPublishers("testChannel");
             Assert.assertEquals("Bad result", 0, count);
@@ -303,7 +294,7 @@ public class NodeTest {
         } catch (Exception e) {
             test = false;
         } finally {
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
@@ -320,7 +311,7 @@ public class NodeTest {
         String fqnNode = null;
 
         try {
-            RCLJava.rclJavaInit();
+            this.initRCLjava();
             node = RCLJava.createNode("testSubscription");
             topics = node.getTopicNamesAndTypes();
             fqnNode = GraphName.getFullName(node.getNameSpace(), node.getName());
@@ -329,7 +320,7 @@ public class NodeTest {
         } catch (Exception e) {
             test = false;
         } finally {
-            RCLJava.shutdown();
+            this.releaseRCLjava();
         }
 
         int i = 0;

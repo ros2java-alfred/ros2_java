@@ -12,13 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.ros2.rcljava;
 
 import static org.junit.Assert.*;
 
-import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.ros2.rcljava.executor.MultiThreadedExecutor;
@@ -29,35 +28,14 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.node.topic.NativePublisher;
 import org.ros2.rcljava.node.topic.NativeSubscription;
-import org.ros2.rcljava.node.topic.SubscriptionCallback;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.ros2.rcljava.internal.message.Message;
+
 import std_msgs.msg.UInt32;
 
-public class ExecutorTest {
+public class ExecutorTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(ExecutorTest.class);
-
-
-    public class TestConsumer<T extends Message> implements SubscriptionCallback<T> {
-        private final RCLFuture<T> future;
-
-        TestConsumer(final RCLFuture<T> future) {
-            this.future = future;
-        }
-
-        public final void dispatch(final T msg) {
-            if (!this.future.isDone()) {
-                this.future.set(msg);
-            }
-        }
-    }
-
-    @BeforeClass
-    public static void beforeClass() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-    }
 
     @Test
     public final void testLinkMultipleProcess() throws Exception {
@@ -66,7 +44,6 @@ public class ExecutorTest {
         boolean test = true;
 
         try {
-            RCLJava.rclJavaInit();
             ThreadedExecutor executor = new MultiThreadedExecutor();
 
             final Node publisherNode        = RCLJava.createNode("publisher_node");
@@ -118,8 +95,6 @@ public class ExecutorTest {
             subscriptionNodeTwo.dispose();
         } catch (Exception e) {
             test = false;
-        } finally {
-            RCLJava.shutdown();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
@@ -132,7 +107,6 @@ public class ExecutorTest {
         boolean test = true;
 
         try {
-            RCLJava.rclJavaInit();
             ThreadedExecutor executor = new MultiThreadedExecutor();
 
             final Node publisherNode        = RCLJava.createNode("publisher_node");
@@ -185,8 +159,6 @@ public class ExecutorTest {
             subscriptionNodeTwo.dispose();
         } catch (Exception e) {
             test = false;
-        } finally {
-            RCLJava.shutdown();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
@@ -199,7 +171,6 @@ public class ExecutorTest {
         boolean test = true;
 
         try {
-            RCLJava.rclJavaInit();
             ThreadedExecutor executor = new SingleThreadedExecutor();
 
             final Node publisherNode        = RCLJava.createNode("publisher_node");
@@ -252,8 +223,6 @@ public class ExecutorTest {
             subscriptionNodeTwo.dispose();
         } catch (Exception e) {
             test = false;
-        } finally {
-            RCLJava.shutdown();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
@@ -266,7 +235,6 @@ public class ExecutorTest {
         boolean test = true;
 
         try {
-            RCLJava.rclJavaInit();
             ThreadedExecutor executor = new SingleThreadedExecutor();
 
             final Node publisherNode        = RCLJava.createNode("publisher_node");
@@ -318,8 +286,6 @@ public class ExecutorTest {
             subscriptionNodeTwo.dispose();
         } catch (Exception e) {
             test = false;
-        } finally {
-            RCLJava.shutdown();
         }
 
         Assert.assertTrue("Expected Runtime error.", test);
