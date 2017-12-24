@@ -14,7 +14,7 @@
  */
 
 /**
- * ROS2 Executor.
+ * ROS2 Executor Stack.
  *
  */
 package org.ros2.rcljava.executor;

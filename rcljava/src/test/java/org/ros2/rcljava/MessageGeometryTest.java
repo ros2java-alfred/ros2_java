@@ -23,7 +23,19 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import geometry_msgs.msg.*;
+import geometry_msgs.msg.Accel;
+import geometry_msgs.msg.AccelStamped;
+import geometry_msgs.msg.AccelWithCovariance;
+import geometry_msgs.msg.AccelWithCovarianceStamped;
+import geometry_msgs.msg.Inertia;
+import geometry_msgs.msg.InertiaStamped;
+import geometry_msgs.msg.Point;
+import geometry_msgs.msg.Point32;
+import geometry_msgs.msg.PointStamped;
+import geometry_msgs.msg.Polygon;
+import geometry_msgs.msg.PolygonStamped;
+import geometry_msgs.msg.Pose;
+import geometry_msgs.msg.Pose2D;
 
 public class MessageGeometryTest extends AbstractMessageTest {
     private static final Logger logger = LoggerFactory.getLogger(MessageGeometryTest.class);

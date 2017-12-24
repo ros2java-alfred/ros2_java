@@ -14,38 +14,42 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava;
+package org.ros2.rcljava.node.topic;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
+import org.ros2.rcljava.AbstractRosTest;
+import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.NativeNode;
-import org.ros2.rcljava.node.topic.NativePublisher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import std_msgs.msg.String;
 
-public class PublisherTest extends AbstractRosTest {
-    private static final Logger logger = LoggerFactory.getLogger(PublisherTest.class);
+public class SubscriptionTest extends AbstractRosTest {
+    private static final Logger logger = LoggerFactory.getLogger(SubscriptionTest.class);
 
     @Test
     public final void testCreate() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         NativeNode node = (NativeNode) RCLJava.createNode("test_node");
-        NativePublisher<std_msgs.msg.String> publisher = (NativePublisher<String>) node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
-                "test_topic");
+        NativeSubscription<std_msgs.msg.String> subscription =
+                (NativeSubscription<String>) node.<std_msgs.msg.String>createSubscription(
+            std_msgs.msg.String.class, "test_topic", new SubscriptionCallback<std_msgs.msg.String>() {
+                public void dispatch(final std_msgs.msg.String msg) {
+                }
+            });
 
-        assertEquals(node, publisher.getNode());
-        assertNotNull(publisher.getNode());
-        assertNotEquals(0, publisher.getPublisherHandle());
+        assertEquals(node.getNodeHandle(), subscription.getNode().getNodeHandle());
+        assertNotEquals(0, subscription.getNode().getNodeHandle());
+        assertNotEquals(0, subscription.getSubscriptionHandle());
 
-        publisher.dispose();
+        subscription.dispose();
         node.dispose();
     }
 }

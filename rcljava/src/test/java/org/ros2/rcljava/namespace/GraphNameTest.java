@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava;
+package org.ros2.rcljava.namespace;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.ros2.rcljava.namespace.GraphName;
+import org.ros2.rcljava.AbstractRosTest;
+import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.Topics;
 

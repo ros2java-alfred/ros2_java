@@ -13,23 +13,22 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava;
+package org.ros2.rcljava.time;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-
-import org.junit.Test;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
+import org.ros2.rcljava.AbstractRosTest;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RCLFuture;
-import org.ros2.rcljava.time.WallTimer;
-import org.ros2.rcljava.time.WallTimerCallback;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

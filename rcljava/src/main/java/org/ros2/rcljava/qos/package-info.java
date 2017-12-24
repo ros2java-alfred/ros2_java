@@ -1,5 +1,4 @@
-/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
- * Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
+/* Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +14,6 @@
  */
 
 /**
- * ROS2 Exceptions.
- *
+ * ROS2 Quality of Service Stack.
  */
-package org.ros2.rcljava.exception;
+package org.ros2.rcljava.qos;

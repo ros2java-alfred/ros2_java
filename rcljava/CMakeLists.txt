@@ -70,6 +70,8 @@ set(BUILTIN_COMMON_JARS NAMES "${CMAKE_BINARY_DIR}/../rosjava_common/rosjava_com
 # Bug in find_jar for Junit4 : https://sourceforge.net/p/rdkit/mailman/message/35301727/
 set(JUNIT_JAR "/usr/share/java/junit4.jar")
 
+#set(CMAKE_CURRENT_SOURCE_DIR "src/main/java/")
+
 set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/Log.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
@@ -221,34 +223,43 @@ if(BUILD_TESTING)
 
   set(${PROJECT_NAME}_test_sources
     "src/test/java/org/ros2/rcljava/AbstractRosTest.java"
-    "src/test/java/org/ros2/rcljava/ExecutorTest.java"
-    "src/test/java/org/ros2/rcljava/ExecutorFailTest.java"
-    "src/test/java/org/ros2/rcljava/GraphNameTest.java"
-    "src/test/java/org/ros2/rcljava/NodeTest.java"
     "src/test/java/org/ros2/rcljava/AbstractMessageTest.java"
+
+    "src/test/java/org/ros2/rcljava/executor/ExecutorTest.java"
+    "src/test/java/org/ros2/rcljava/executor/ExecutorFailTest.java"
+    "src/test/java/org/ros2/rcljava/namespace/GraphNameTest.java"
+    "src/test/java/org/ros2/rcljava/node/NodeTest.java"
+    "src/test/java/org/ros2/rcljava/node/topic/PublisherTest.java"
+    "src/test/java/org/ros2/rcljava/node/topic/SubscriptionTest.java"
+    "src/test/java/org/ros2/rcljava/node/service/ServiceTest.java"
+    "src/test/java/org/ros2/rcljava/time/TimerTest.java"
+
     "src/test/java/org/ros2/rcljava/MessageStdTest.java"
     "src/test/java/org/ros2/rcljava/MessageSensorTest.java"
-    "src/test/java/org/ros2/rcljava/PublisherTest.java"
+    "src/test/java/org/ros2/rcljava/MessageGeometryTest.java"
+
     "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
     "src/test/java/org/ros2/rcljava/RCLJavaFailTest.java"
     "src/test/java/org/ros2/rcljava/RmwTest.java"
-    "src/test/java/org/ros2/rcljava/SubscriptionTest.java"
-    "src/test/java/org/ros2/rcljava/TimerTest.java"
   )
 
   set(${PROJECT_NAME}_testsuites
-    "org.ros2.rcljava.ExecutorTest"
-    "org.ros2.rcljava.ExecutorFailTest"
-    "org.ros2.rcljava.GraphNameTest"
-    "org.ros2.rcljava.NodeTest"
+    "org.ros2.rcljava.executor.ExecutorTest"
+    "org.ros2.rcljava.executor.ExecutorFailTest"
+    "org.ros2.rcljava.namespace.GraphNameTest"
+    "org.ros2.rcljava.node.NodeTest"
+    "org.ros2.rcljava.node.topic.PublisherTest"
+    "org.ros2.rcljava.node.topic.SubscriptionTest"
+    "org.ros2.rcljava.node.service.ServiceTest"
+    "org.ros2.rcljava.time.TimerTest"
+
     "org.ros2.rcljava.MessageStdTest"
     "org.ros2.rcljava.MessageSensorTest"
-    "org.ros2.rcljava.PublisherTest"
+    "org.ros2.rcljava.MessageGeometryTest"
+
     "org.ros2.rcljava.RCLJavaTest"
     "org.ros2.rcljava.RCLJavaFailTest"
     "org.ros2.rcljava.RmwTest"
-    "org.ros2.rcljava.SubscriptionTest"
-    "org.ros2.rcljava.TimerTest"
   )
 
   set(_deps_library_paths "")
@@ -301,6 +312,30 @@ if(BUILD_TESTING)
       "${_deps_library_paths}"
     )
   endforeach()
+
+#  create_javadoc("${PROJECT_NAME}_docs"
+#    FILES "${${PROJECT_NAME}_sources}"
+#    SOURCEPATH "src/main/java/"
+#    CLASSPATH
+#    "${CMAKE_JAVA_INCLUDE_PATH}"
+#    "${rcljava_common_JARS}"
+#    "${rcljava_test_msgs_JARS}"
+#    "${std_msgs_JARS}"
+#    "${geometry_msgs_JARS}"
+#    "${sensor_msgs_JARS}"
+#    "${builtin_interfaces_JARS}"
+#    "${rcl_interfaces_JARS}"
+#    "${_${PROJECT_NAME}_jar_file}"
+#    "${_jar_file}"
+#    INSTALLPATH "docs/"
+#    WINDOWTITLE "ROS2 Java"
+#    DOCTITLE "<h1>ROS2 Java</h1>"
+#    AUTHOR TRUE
+#    USE TRUE
+#    VERSION TRUE
+#  )
+
+#  execute_process(COMMAND "javasphinx-apidoc -o ../docs/source/ --title='ROS2 for Java' src/main/java/")
 
 endif()
 

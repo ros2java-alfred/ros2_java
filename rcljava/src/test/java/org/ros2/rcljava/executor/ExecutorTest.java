@@ -13,17 +13,15 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava;
+package org.ros2.rcljava.executor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.ros2.rcljava.executor.MultiThreadedExecutor;
-import org.ros2.rcljava.executor.SingleThreadedExecutor;
-import org.ros2.rcljava.executor.ThreadedExecutor;
-
+import org.ros2.rcljava.AbstractRosTest;
+import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.node.topic.NativePublisher;

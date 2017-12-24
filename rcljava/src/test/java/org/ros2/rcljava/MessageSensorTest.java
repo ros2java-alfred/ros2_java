@@ -15,12 +15,13 @@
 
 package org.ros2.rcljava;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
 import org.junit.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,33 @@ import geometry_msgs.msg.Point32;
 import geometry_msgs.msg.Transform;
 import geometry_msgs.msg.Twist;
 import geometry_msgs.msg.Wrench;
-import sensor_msgs.msg.*;
+import sensor_msgs.msg.BatteryState;
+import sensor_msgs.msg.CameraInfo;
+import sensor_msgs.msg.ChannelFloat32;
+import sensor_msgs.msg.CompressedImage;
+import sensor_msgs.msg.FluidPressure;
+import sensor_msgs.msg.Illuminance;
+import sensor_msgs.msg.Image;
+import sensor_msgs.msg.Imu;
+import sensor_msgs.msg.JointState;
+import sensor_msgs.msg.Joy;
+import sensor_msgs.msg.JoyFeedback;
+import sensor_msgs.msg.JoyFeedbackArray;
+import sensor_msgs.msg.LaserEcho;
+import sensor_msgs.msg.LaserScan;
+import sensor_msgs.msg.MagneticField;
+import sensor_msgs.msg.MultiDOFJointState;
+import sensor_msgs.msg.MultiEchoLaserScan;
+import sensor_msgs.msg.NavSatFix;
+import sensor_msgs.msg.NavSatStatus;
+import sensor_msgs.msg.PointCloud;
+import sensor_msgs.msg.PointCloud2;
+import sensor_msgs.msg.PointField;
+import sensor_msgs.msg.Range;
+import sensor_msgs.msg.RegionOfInterest;
+import sensor_msgs.msg.RelativeHumidity;
+import sensor_msgs.msg.Temperature;
+import sensor_msgs.msg.TimeReference;
 
 public class MessageSensorTest extends AbstractMessageTest {
     private static final Logger logger = LoggerFactory.getLogger(MessageSensorTest.class);

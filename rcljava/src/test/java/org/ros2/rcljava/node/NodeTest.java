@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava;
+package org.ros2.rcljava.node;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.ros2.rcljava.AbstractRosTest;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.namespace.GraphName;
-import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RCLFuture;
-import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
+import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.qos.QoSProfile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
 
 public class NodeTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(NodeTest.class);
@@ -64,7 +64,7 @@ public class NodeTest extends AbstractRosTest {
         this.initRCLjava();
         try {
             node = RCLJava.createNode("_test_node");
-            node.dispose();
+            node.close();
         } catch (Exception e) {
             test = false;
         } finally {
@@ -85,7 +85,7 @@ public class NodeTest extends AbstractRosTest {
         this.initRCLjava();
         node = RCLJava.createNode("test_node");
         try {
-            node.dispose();
+            node.close();
         } catch (Exception e) {
             test = false;
         } finally {
@@ -108,7 +108,7 @@ public class NodeTest extends AbstractRosTest {
             this.initRCLjava();
             node = RCLJava.createNode("testNodeName");
             nodeName = node.getName();
-            node.dispose();
+            node.close();
         } catch (Exception e) {
             test = false;
         } finally {
@@ -147,7 +147,7 @@ public class NodeTest extends AbstractRosTest {
         assertEquals("Hello", value.getData());
 
         subscription.dispose();
-        node.dispose();
+        node.close();
         this.releaseRCLjava();
     }
 
@@ -179,7 +179,7 @@ public class NodeTest extends AbstractRosTest {
 //            }
 
             pub.dispose();
-            node.dispose();
+            node.close();
         } catch (Exception e) {
             test = false;
         } finally {
@@ -215,7 +215,7 @@ public class NodeTest extends AbstractRosTest {
                     QoSProfile.DEFAULT);
 
             sub.dispose();
-            node.dispose();
+            node.close();
         } catch (Exception e) {
             test = false;
         } finally {
@@ -251,7 +251,7 @@ public class NodeTest extends AbstractRosTest {
             Assert.assertEquals("Bad result", 1, count);
 
             pub.dispose();
-            node.dispose();
+            node.close();
         } catch (Exception e) {
             test = false;
         } finally {
@@ -290,7 +290,7 @@ public class NodeTest extends AbstractRosTest {
 //            Assert.assertEquals("Bad result", 1, count);
 //            sub.dispose();
             count = node.countPublishers("testChannel");
-            node.dispose();
+            node.close();
         } catch (Exception e) {
             test = false;
         } finally {
@@ -316,7 +316,7 @@ public class NodeTest extends AbstractRosTest {
             topics = node.getTopicNamesAndTypes();
             fqnNode = GraphName.getFullName(node.getNameSpace(), node.getName());
 
-            node.dispose();
+            node.close();
         } catch (Exception e) {
             test = false;
         } finally {

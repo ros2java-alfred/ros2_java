@@ -15,20 +15,38 @@
 
 package org.ros2.rcljava;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import std_msgs.msg.*;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import std_msgs.msg.Bool;
 import std_msgs.msg.Byte;
+import std_msgs.msg.Char;
+import std_msgs.msg.ColorRGBA;
+import std_msgs.msg.Empty;
+import std_msgs.msg.Float32;
+import std_msgs.msg.Float32MultiArray;
+import std_msgs.msg.Float64;
+import std_msgs.msg.Float64MultiArray;
+import std_msgs.msg.Header;
+import std_msgs.msg.Int16;
+import std_msgs.msg.Int32;
+import std_msgs.msg.Int64;
+import std_msgs.msg.Int8;
+import std_msgs.msg.MultiArrayDimension;
+import std_msgs.msg.MultiArrayLayout;
 import std_msgs.msg.String;
+import std_msgs.msg.UInt16;
+import std_msgs.msg.UInt32;
+import std_msgs.msg.UInt64;
+import std_msgs.msg.UInt8;
 
 public class MessageStdTest extends AbstractMessageTest {
     private static final Logger logger = LoggerFactory.getLogger(MessageStdTest.class);

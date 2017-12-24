@@ -210,6 +210,7 @@ public abstract class RCLJava {
      * Initialize the RCLJava API. If successful, a valid RMW implementation will
      *   be loaded and accessible, enabling the creating of ROS2 entities
      *   (@{link Node}s, @{link Publisher}s and @{link Subscription}s.
+     * @param args CLI arguments.
      */
     public static void rclJavaInit(final String args[]) {
         synchronized (RCLJava.class) {
@@ -296,7 +297,7 @@ public abstract class RCLJava {
     /**
      * Wait for once loop.
      *
-     * @param node
+     * @param node Node to spin once only.
      */
     @SuppressWarnings({ "resource", "unchecked" })
     public static void spinOnce(final Node node) {
@@ -450,7 +451,7 @@ public abstract class RCLJava {
 
     /**
      * Helper Spin.
-     * @param node
+     * @param node Node to spin.
      */
     public static void spin(final Node node) {
         while(RCLJava.ok()) {
@@ -461,7 +462,7 @@ public abstract class RCLJava {
     /**
      * Return true if rcl is currently initialized, otherwise false.
      *
-     * @see rcl_ok();
+     * @{link rcl_ok()}
      *
      * @return true if RCLJava hasn't been shut down, false otherwise.
      */

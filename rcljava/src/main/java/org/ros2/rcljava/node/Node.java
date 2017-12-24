@@ -45,7 +45,7 @@ import rcl_interfaces.msg.SetParametersResult;
  * ROS2 Client API.
  *
  */
-public interface Node {
+public interface Node extends java.lang.AutoCloseable {
 
     /**
      * Release all resource.

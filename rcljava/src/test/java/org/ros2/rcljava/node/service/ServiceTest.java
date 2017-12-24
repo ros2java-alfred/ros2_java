@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava;
+package org.ros2.rcljava.node.service;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.ros2.rcljava.AbstractRosTest;
+import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
-import org.ros2.rcljava.node.service.Client;
-import org.ros2.rcljava.node.service.RMWRequestId;
-import org.ros2.rcljava.node.service.Service;
-import org.ros2.rcljava.node.service.ServiceCallback;
 import org.ros2.rcljava.qos.QoSProfile;
 
 import org.slf4j.Logger;

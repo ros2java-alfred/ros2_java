@@ -16,9 +16,11 @@
 package org.ros2.rcljava;
 
 import org.apache.log4j.BasicConfigurator;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
@@ -63,7 +65,7 @@ public class AbstractRosTest {
     public class TestConsumer<T extends Message> implements SubscriptionCallback<T> {
         private final RCLFuture<T> future;
 
-        TestConsumer(final RCLFuture<T> future) {
+        public TestConsumer(final RCLFuture<T> future) {
             this.future = future;
         }
 

@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import org.ros2.rcljava.exception.NotInitializedException;
 import org.ros2.rcljava.node.NativeNode;
+import org.ros2.rcljava.node.Node;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +105,7 @@ public class RCLJavaTest extends AbstractRosTest {
         boolean test = false;
 
         this.initRCLjava();
-        RCLJava.shutdown();
+        this.releaseRCLjava();
 
         try {
             this.releaseRCLjava();
@@ -120,7 +121,7 @@ public class RCLJavaTest extends AbstractRosTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         boolean test = true;
-        NativeNode node = null;
+        Node node = null;
 
         this.initRCLjava();
         try {
@@ -164,40 +165,6 @@ public class RCLJavaTest extends AbstractRosTest {
             test = false;
         }
         Assert.assertTrue("Expected Runtime error.", test);
-    }
-
-    @Test
-    public void testNotInitializedException() {
-        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
-
-        boolean test = false;
-        NativeNode node = null;
-
-        try {
-            node = (NativeNode)RCLJava.createNode("testNode");
-            node.close();
-        } catch (NotInitializedException e) {
-            test = true;
-        } catch (ExceptionInInitializerError e) {
-            if (e.getCause() != null && e.getCause().getClass() == NotInitializedException.class) {
-                test = true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Assert.assertTrue("failed not initialized exception !", test);
-
-        try {
-            node = new NativeNode("testNode");
-            node.close();
-//        } catch (NoClassDefFoundError e) {
-//            test = true;
-        } catch (NotInitializedException e) {
-            test = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Assert.assertTrue("failed not initialized exception !", test);
     }
 
 }

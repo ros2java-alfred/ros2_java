@@ -66,7 +66,7 @@ import rcl_interfaces.msg.SetParametersResult;
  * This class serves as a bridge between ROS2's rcl_node_t and RCLJava.
  * A Node must be created via @{link RCLJava#createNode(String)}
  */
-public class NativeNode implements Node, java.lang.AutoCloseable {
+public class NativeNode implements Node {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeNode.class);
 
