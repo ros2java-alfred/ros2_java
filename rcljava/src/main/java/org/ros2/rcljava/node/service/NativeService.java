@@ -19,6 +19,7 @@ package org.ros2.rcljava.node.service;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.Node;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,9 +99,9 @@ public class NativeService<T extends MessageService> implements Service<T> {
 
     public void dispose() {
         NativeService.logger.debug("Destroy Service stack : " + this.serviceName);
-        
+
         if (this.ownerNode.getServices().contains(this)) {
-        	this.ownerNode.getServices().remove(this);
+            this.ownerNode.getServices().remove(this);
         }
     }
 

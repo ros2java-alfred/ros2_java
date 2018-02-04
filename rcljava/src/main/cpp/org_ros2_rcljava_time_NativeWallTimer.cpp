@@ -198,7 +198,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeSin
 
   assert(timer != NULL);
 
-  uint64_t elapsed_time;
+  int64_t elapsed_time;
   rcl_ret_t ret = rcl_timer_get_time_since_last_call(timer, &elapsed_time);
 
   if (ret != RCL_RET_OK) {
@@ -226,7 +226,7 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeGetTime
 
   assert(timer != NULL);
 
-  uint64_t timer_period;
+  int64_t timer_period;
   rcl_ret_t ret = rcl_timer_get_period(timer, &timer_period);
 
   if (ret != RCL_RET_OK) {
@@ -255,7 +255,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeSetTimer
 
   assert(timer != NULL);
 
-  uint64_t old_period;
+  int64_t old_period;
   rcl_ret_t ret = rcl_timer_exchange_period(timer, timer_period, &old_period);
 
   if (ret != RCL_RET_OK) {

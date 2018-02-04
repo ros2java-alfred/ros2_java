@@ -78,8 +78,8 @@ public class ParameterVariant<T> {
             } else
 
             if (List.class.equals(this.value.getClass())) {
-                p.setBytesValue((List<Byte>) this.value);
-                p.setType(ParameterType.PARAMETER_BYTES);
+                p.setByteArrayValue((List<Byte>) this.value);
+                p.setType(ParameterType.PARAMETER_BYTE_ARRAY);
             } else
 
             if (Double.class.equals(this.value.getClass())) {
@@ -119,10 +119,10 @@ public class ParameterVariant<T> {
                 parameter.getValue().getBoolValue());
         } else
 
-        if (ParameterType.PARAMETER_BYTES == parameter.getValue().getType()) {
+        if (ParameterType.PARAMETER_BYTE_ARRAY == parameter.getValue().getType()) {
             reuslt = new ParameterVariant<List<Byte>>(
                 parameter.getName(),
-                parameter.getValue().getBytesValue());
+                parameter.getValue().getByteArrayValue());
         } else
 
         if (ParameterType.PARAMETER_DOUBLE == parameter.getValue().getType()) {
