@@ -1,4 +1,4 @@
+#!/usr/bin/env sh
 # scripts/travis-ci/osx_success.sh
-#!/bin/sh
 
 set -ev

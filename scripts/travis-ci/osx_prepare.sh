@@ -1,5 +1,5 @@
+#!/usr/bin/env sh
 # scripts/travis-ci/osx_prepare.sh
-#!/bin/sh
 
 set -e
 

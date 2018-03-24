@@ -21,11 +21,11 @@ import sys
 
 from ament_package.templates import get_environment_hook_template_path
 from ament_package.templates import get_package_level_template_names
-from ament_package.templates import get_package_level_template_path
-from ament_package.templates import get_prefix_level_template_names
+#from ament_package.templates import get_package_level_template_path
+#from ament_package.templates import get_prefix_level_template_names
 from ament_package.templates import get_prefix_level_template_path
 
-import pkg_resources
+#import pkg_resources
 
 IS_WINDOWS = os.name == 'nt'
 
