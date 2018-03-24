@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 # scripts/travis-ci/osx_run.sh
 
 set -e

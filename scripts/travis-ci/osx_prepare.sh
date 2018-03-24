@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 # scripts/travis-ci/osx_prepare.sh
 
 set -e

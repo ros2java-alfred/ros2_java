@@ -53,7 +53,7 @@ public abstract class RCLJava {
     /**
      * The identifier of the currently active RMW implementation.
      */
-    private static volatile String rmwImplementation = null;
+    private static String rmwImplementation = null;
 
     /**
      * Flag to indicate if RCLJava has been fully initialized, with a valid RMW
@@ -169,7 +169,7 @@ public abstract class RCLJava {
                         StringBuilder msgLog = new StringBuilder();
                         for (String key : list) {
                             msgLog.append(key);
-                            msgLog.append("\n");
+                            msgLog.append('\n');
                         }
                         RCLJava.logger.debug("Native libraries Loaded: \n" + msgLog.toString());
                     }
@@ -511,11 +511,11 @@ public abstract class RCLJava {
     }
 
     /**
-     * Get identifier of the ROS2 middleware use.
+     * Get identifier of the ROS2 middle-ware use.
      *
      * <p>TODO rename to list of RMW available.</p>
      *
-     * @return Identifier string of ROS2 middleware.
+     * @return Identifier string of ROS2 middle-ware.
      */
     public static String getTypesupportIdentifier() {
         String typesupportIdentifier = RMW_TO_TYPESUPPORT.get(RCLJava.getRMWIdentifier());

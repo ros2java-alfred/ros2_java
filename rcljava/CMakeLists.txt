@@ -75,6 +75,7 @@ set(JUNIT_JAR "/usr/share/java/junit4.jar")
 set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/Log.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
+  "src/main/java/org/ros2/rcljava/ArgumentParser.java"
 
   "src/main/java/org/ros2/rcljava/internal/NativeUtils.java"
 

@@ -39,7 +39,7 @@ public class PublisherTest extends AbstractRosTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         NativeNode node = (NativeNode) RCLJava.createNode("test_node");
-        NativePublisher<std_msgs.msg.String> publisher = (NativePublisher<String>) node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
+        NativePublisher<String> publisher = (NativePublisher<String>) node.<String>createPublisher(String.class,
                 "test_topic");
 
         assertEquals(node, publisher.getNode());

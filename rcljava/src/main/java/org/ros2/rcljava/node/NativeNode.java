@@ -21,11 +21,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.ros2.rcljava.ArgumentParser;
 import org.ros2.rcljava.Log;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.exception.NotImplementedException;
@@ -70,13 +72,20 @@ public class NativeNode implements Node {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeNode.class);
 
+    private static final String ERROR_QOS       = "QOS can't be null";
+    private static final String ERROR_MSG       = "Message Type can't be null.";
+    private static final String ERROR_SRV       = "Service Type can't be null.";
+    private static final String ERROR_TOPIC_MSG = "Topic can't be null.";
+    private static final String ERROR_TOPIC_SRV = "Service name can't be null.";
+    private static final String ERROR_CALLBACK  = "Callback can't be null.";
+
     // Loading JNI library.
     static {
         RCLJava.loadLibrary("rcljava_node_NativeNode"); //__" + RCLJava.getRMWIdentifier());
     }
 
-    /** Domain ID */
-    private int domainId;
+//    /** Domain ID */
+//    private int domainId = 0;
 
     /** Name of the node */
     private String name;
@@ -118,7 +127,7 @@ public class NativeNode implements Node {
     /**
      *  List of parameters
      */
-    private final HashMap<String, ParameterVariant<?>> parameters;
+    private final Map<String, ParameterVariant<?>> parameters;
 
     /**
      * Parameter service.
@@ -134,68 +143,6 @@ public class NativeNode implements Node {
      * Log to ROS2.
      */
     private final Log logRos;
-
-    // Native call.
-    /**
-     * Create a ROS2 publisher (rcl_publisher_t) and return a pointer to
-     *     it as an integer.
-     *
-     * @param <T> The type of the messages that will be published by the
-     *     created @{link Publisher}.
-     * @param nodeHandle A pointer to the underlying ROS2 node structure.
-     * @param messageType The class of the messages that will be published by the
-     *     created @{link Publisher}.
-     * @param topic The topic to which the created @{link Publisher} will
-     *     publish messages.
-     * @param qosProfileHandle A pointer to the underlying ROS2 QoS profile
-     *     structure.
-     * @return A pointer to the underlying ROS2 publisher structure.
-     */
-    private static native <T extends Message> long nativeCreatePublisherHandle(
-            long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
-
-    /**
-     * Create a ROS2 subscription (rcl_subscription_t) and return a pointer to
-     *     it as an integer.
-     *
-     * @param <T> The type of the messages that will be received by the
-     *     created @{link Subscription}.
-     * @param nodeHandle A pointer to the underlying ROS2 node structure.
-     * @param messageType The class of the messages that will be received by the
-     *     created @{link Subscription}.
-     * @param topic The topic from which the created @{link Subscription} will
-     *     receive messages.
-     * @param qosProfileHandle A pointer to the underlying ROS2 QoS profile
-     *     structure.
-     * @return A pointer to the underlying ROS2 subscription structure.
-     */
-    private static native <T> long nativeCreateSubscriptionHandle(
-            long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
-
-    private static native <T> long nativeCreateClientHandle(
-            long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
-
-    private static native <T> long nativeCreateServiceHandle(
-            long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
-
-    private static native long nativeCreateTimerHandle(long timerPeriod); //TODO move to RCLJava
-
-    private static native void nativeDispose(long nodeHandle);
-
-    private static native String nativeGetName(long nodeHandle);
-
-    private static native int nativeCountPublishers(long nodeHandle, String topic);
-
-    private static native int nativeCountSubscribers(long nodeHandle, String topic);
-
-    private static native HashMap<String, List<String>> nativeGetListTopics(long nodeHandle, boolean noDemangle);
-
-    private static native HashMap<String, List<String>> nativeGetListServices(long nodeHandle);
-
-
-    private static native List<String> nativeGetNodeNames(long nodeHandle);
-
-//    private static native  ; //rcl_service_server_is_available
 
     /**
      * Constructor.
@@ -217,80 +164,31 @@ public class NativeNode implements Node {
     public NativeNode(final String namespace, final String defaultName, final String[] args) {
         NativeNode.logger.debug("Create Node stack...");
 
+        //TODO (Mickael) check if really needed !! (can be check by native load...)
         if (!RCLJava.isInitialized()) {
             throw new NotInitializedException();
         }
 
-        String prefix = namespace;
-        String nodeName = defaultName;
+        ArgumentParser argParser = new ArgumentParser(namespace, defaultName, args);
 
-        if (args != null && defaultName == null) {
-            for (String arg : args) {
-                if (arg.contains("=")) {
-                    String[] item = arg.split("=");
-                    if ("-node".equals(item[0]) && item[1] != null) {
-                        nodeName = item[1];
-                    }
+        this.name           = argParser.getName();
+        if (this.name==null || this.name.length() == 0) { throw new NullPointerException("Node name is needed !"); }
 
-                    if ("-prefix".equals(item[0]) && item[1] != null) {
-                        prefix = item[1];
-                    }
-                }
-            }
-        }
+        this.nameSpace      = argParser.getNameSpace();
+        this.parameters     = argParser.getParameters();
 
-        if (prefix == null) {
-            prefix = "";
-        }
-
-        if (nodeName==null || nodeName.length() == 0) throw new NullPointerException("Node name is needed !");
-
-        this.nameSpace      = prefix;
-        this.name           = nodeName;
+        // Initialize components.
         this.subscriptions  = new LinkedBlockingQueue<Subscription<?>>();
         this.publishers     = new LinkedBlockingQueue<Publisher<?>>();
         this.clients        = new LinkedBlockingQueue<Client<?>>();
         this.services       = new LinkedBlockingQueue<Service<? extends MessageService>>();
         this.timers         = new LinkedBlockingQueue<WallTimer>();
-        this.parameters     = new HashMap<String, ParameterVariant<?>>();
 
-        long nodeHandle = RCLJava.nativeCreateNodeHandle(this.name, this.nameSpace);
-        if (nodeHandle==0) throw new NullPointerException("Node Handle is not define !");
-        this.nodeHandle     = nodeHandle;
+        // Initialize native component.
+        this.nodeHandle = RCLJava.nativeCreateNodeHandle(this.name, this.nameSpace);
+        if (this.nodeHandle==0) { throw new NullPointerException("Node Handle is not define !"); }
 
         NativeNode.logger.debug("Created Node stack : " + GraphName.getFullName(this.nameSpace, this.name));
-
-        if (args != null) {
-            for (String arg : args) {
-                if (arg.contains("=")) {
-                    String[] item = arg.split("=");
-
-                    // Remove dash
-                    String keyRaw = item[0].trim();
-                    String key = (keyRaw.startsWith("-")) ? keyRaw.substring(1) : keyRaw;
-                    String val = item[1].trim();
-                    NativeNode.logger.debug("Parse argument : " + arg + "\t\t key : " + key + "\t\t value : "+ val );
-
-                    if (this.parameters.get(key) == null) {
-                        ParameterVariant<?> value = null;
-
-                        if (isLong(val)) {
-                            value = new ParameterVariant<Long>(key, Long.parseLong(val));
-                        } else if (isDouble(val)) {
-                            value = new ParameterVariant<Double>(key, Double.parseDouble(val));
-                        } else
-//                        if (isBoolean(val)) {
-//                            value = new ParameterVariant<Boolean>(key, Boolean.parseBoolean(val));
-//                        } else
-                        {
-                            value = new ParameterVariant<String>(key, val);
-                        }
-
-                        this.parameters.put(key, value);
-                    }
-                }
-            }
-        }
 
         GraphName.addNode(this);
         this.parameterService = new ParameterService(this);
@@ -355,9 +253,9 @@ public class NativeNode implements Node {
     }
 
     /**
-     * Get the namespace of the node.
+     * Get the name-space of the node.
      *
-     * @return The namespace of the node.
+     * @return The name-space of the node.
      */
     @Override
     public String getNameSpace() {
@@ -379,9 +277,9 @@ public class NativeNode implements Node {
             final String topicName,
             final QoSProfile qosProfile) {
 
-        if (messageType==null) throw new NullPointerException("Message Type can't be null.");
-        if (topicName==null) throw new NullPointerException("Topic can't be null.");
-        if (qosProfile==null) throw new NullPointerException("QOS can't be null;");
+        if (messageType == null) { throw new NullPointerException(ERROR_MSG); }
+        if (topicName   == null) { throw new NullPointerException(ERROR_TOPIC_MSG); }
+        if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
         String fqnTopic =  GraphName.getFullName(this, topicName, null);
         NativeNode.logger.debug("Create Publisher : " + fqnTopic);
@@ -412,6 +310,7 @@ public class NativeNode implements Node {
             final Class<T> message,
             final String topicName,
             final int qosHistoryDepth) {
+
         QoSProfile qos = QoSProfile.SYSTEM_DEFAULT;
         //TODO fix the depth.
         return this.createPublisher(message, topicName, qos);
@@ -451,10 +350,10 @@ public class NativeNode implements Node {
             final QoSProfile qosProfile,
             final boolean ignoreLocalPublication ) {  //TODO use it
 
-        if (messageType==null) throw new NullPointerException("Message Type can't be null.");
-        if (topicName==null) throw new NullPointerException("Topic can't be null.");
-        if (callback==null) throw new NullPointerException("Callback can't be null;");
-        if (qosProfile==null) throw new NullPointerException("QOS can't be null;");
+        if (messageType == null) { throw new NullPointerException(ERROR_MSG); }
+        if (topicName   == null) { throw new NullPointerException(ERROR_TOPIC_MSG); }
+        if (callback    == null) { throw new NullPointerException(ERROR_CALLBACK); }
+        if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
         String fqnTopic =  GraphName.getFullName(this, topicName, null);
         NativeNode.logger.debug("Create Subscription : " + fqnTopic);
@@ -507,6 +406,7 @@ public class NativeNode implements Node {
             final SubscriptionCallback<T> callback,
             final int qosHistoryDepth,
             final boolean ignoreLocalPublication) {  //TODO use it
+
         QoSProfile qos = QoSProfile.SYSTEM_DEFAULT;
         //TODO fix the depth.
         return this.createSubscription(messageType, topicName, callback, qos, ignoreLocalPublication);
@@ -526,6 +426,7 @@ public class NativeNode implements Node {
             final Class<T> messageType,
             final String topicName,
             final SubscriptionCallback<T> callback) {
+
         return this.createSubscription(messageType, topicName, callback, QoSProfile.DEFAULT, false);
     }
 
@@ -540,7 +441,7 @@ public class NativeNode implements Node {
     @Override
     public WallTimer createWallTimer(final long period, final TimeUnit unit, final WallTimerCallback callback) {
         long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
-        long timerHandle = nativeCreateTimerHandle(timerPeriodNS);
+        long timerHandle = NativeNode.nativeCreateTimerHandle(timerPeriodNS);
 
         WallTimer timer = new NativeWallTimer(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
         this.timers.add(timer);
@@ -568,9 +469,9 @@ public class NativeNode implements Node {
             final String serviceName,
             final QoSProfile qosProfile) {
 
-        if (serviceType==null) throw new NullPointerException("Service Type can't be null.");
-        if (serviceName==null) throw new NullPointerException("Service name can't be null.");
-        if (qosProfile==null) throw new NullPointerException("QOS can't be null;");
+        if (serviceType == null) { throw new NullPointerException(ERROR_SRV); }
+        if (serviceName == null) { throw new NullPointerException(ERROR_TOPIC_SRV); }
+        if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
         String fqnService =  GraphName.getFullName(this, serviceName, null);
         NativeNode.logger.debug("Create Client : " + fqnService);
@@ -673,10 +574,10 @@ public class NativeNode implements Node {
             final QoSProfile qosProfile
             ) {
 
-        if (serviceType==null) throw new NullPointerException("Service Type can't be null.");
-        if (serviceName==null) throw new NullPointerException("Service name can't be null.");
-        if (callback==null) throw new NullPointerException("Callback can't be null;");
-        if (qosProfile==null) throw new NullPointerException("QOS can't be null;");
+        if (serviceType == null) { throw new NullPointerException(ERROR_SRV); }
+        if (serviceName == null) { throw new NullPointerException(ERROR_TOPIC_SRV); }
+        if (callback    == null) { throw new NullPointerException(ERROR_CALLBACK); }
+        if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
         String fqnService =  GraphName.getFullName(this, serviceName, null);
         NativeNode.logger.debug("Create Service : " + fqnService);
@@ -931,7 +832,7 @@ public class NativeNode implements Node {
      * @return
      */
     @Override
-    public final long getNodeHandle() {
+    public long getNodeHandle() {
         return this.nodeHandle;
     }
 
@@ -1022,7 +923,7 @@ public class NativeNode implements Node {
      * @return All the @{link Publisher}s that were created by this instance.
      */
     @Override
-    public final Queue<Publisher<? extends Message>> getPublishers() {
+    public Queue<Publisher<? extends Message>> getPublishers() {
       return this.publishers;
     }
 
@@ -1031,7 +932,7 @@ public class NativeNode implements Node {
      * @return ArrayList of Clients
      */
     @Override
-    public final Queue<Client<? extends MessageService>> getClients() {
+    public Queue<Client<? extends MessageService>> getClients() {
         return this.clients;
     }
 
@@ -1040,7 +941,7 @@ public class NativeNode implements Node {
      * @return ArrayList of Services
      */
     @Override
-    public final Queue<Service<? extends MessageService>> getServices() {
+    public Queue<Service<? extends MessageService>> getServices() {
         return this.services;
     }
 
@@ -1048,7 +949,7 @@ public class NativeNode implements Node {
      * {@inheritDoc}
      */
     @Override
-    public final Queue<WallTimer> getWallTimers() {
+    public Queue<WallTimer> getWallTimers() {
         return this.timers;
     }
 
@@ -1071,41 +972,64 @@ public class NativeNode implements Node {
         this.dispose();
     }
 
+ // Native call.
+    /**
+     * Create a ROS2 publisher (rcl_publisher_t) and return a pointer to
+     *     it as an integer.
+     *
+     * @param <T> The type of the messages that will be published by the
+     *     created @{link Publisher}.
+     * @param nodeHandle A pointer to the underlying ROS2 node structure.
+     * @param messageType The class of the messages that will be published by the
+     *     created @{link Publisher}.
+     * @param topic The topic to which the created @{link Publisher} will
+     *     publish messages.
+     * @param qosProfileHandle A pointer to the underlying ROS2 QoS profile
+     *     structure.
+     * @return A pointer to the underlying ROS2 publisher structure.
+     */
+    public static native <T extends Message> long nativeCreatePublisherHandle(
+            long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
 
-    private boolean isInteger(String value) {
-        try {
-            Integer.parseInt(value);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+    /**
+     * Create a ROS2 subscription (rcl_subscription_t) and return a pointer to
+     *     it as an integer.
+     *
+     * @param <T> The type of the messages that will be received by the
+     *     created @{link Subscription}.
+     * @param nodeHandle A pointer to the underlying ROS2 node structure.
+     * @param messageType The class of the messages that will be received by the
+     *     created @{link Subscription}.
+     * @param topic The topic from which the created @{link Subscription} will
+     *     receive messages.
+     * @param qosProfileHandle A pointer to the underlying ROS2 QoS profile
+     *     structure.
+     * @return A pointer to the underlying ROS2 subscription structure.
+     */
+    public static native <T> long nativeCreateSubscriptionHandle(
+            long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
 
-    private boolean isBoolean(String value) {
-        try {
-            Boolean.parseBoolean(value);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+    public static native <T> long nativeCreateClientHandle(
+            long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
 
-    private boolean isDouble(String value) {
-        try {
-            Double.parseDouble(value);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+    public static native <T> long nativeCreateServiceHandle(
+            long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
 
-    private boolean isLong(String value) {
-        try {
-            Long.parseLong(value);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+    public static native long nativeCreateTimerHandle(long timerPeriod); //TODO move to RCLJava
 
+    public static native void nativeDispose(long nodeHandle);
+
+    public static native String nativeGetName(long nodeHandle);
+
+    public static native int nativeCountPublishers(long nodeHandle, String topic);
+
+    public static native int nativeCountSubscribers(long nodeHandle, String topic);
+
+    public static native HashMap<String, List<String>> nativeGetListTopics(long nodeHandle, boolean noDemangle);
+
+    public static native HashMap<String, List<String>> nativeGetListServices(long nodeHandle);
+
+    public static native List<String> nativeGetNodeNames(long nodeHandle);
+
+//    public static native  ; //rcl_service_server_is_available
 }

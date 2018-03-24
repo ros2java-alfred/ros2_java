@@ -27,9 +27,9 @@ import org.ros2.rcljava.internal.message.Message;
 public interface SubscriptionCallback<T extends Message> {
 
     /**
-       * Performs this operation on the given argument.
-       *
-       * @param message - the input argument
-       */
+      * Performs this operation on the given argument.
+      *
+      * @param message - the input argument
+      */
     void dispatch(T message);
 }

@@ -44,9 +44,9 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
         if (!this.nodes.contains(node)) {
             this.nodes.add(node);
 
-            if (notify) {
-
-            }
+//            if (notify) {
+//
+//            }
         }
     }
 

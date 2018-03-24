@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 # scripts/travis-ci/linux_success.sh
 
 set -ev

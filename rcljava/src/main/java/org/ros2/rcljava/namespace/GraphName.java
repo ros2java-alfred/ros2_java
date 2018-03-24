@@ -25,6 +25,14 @@ import org.ros2.rcljava.node.topic.Topics;
 
 public class GraphName {
 
+    private static final String EMPTY = "";
+    private static final String PRIVATE = "_";
+    private static final String SEPARATOR = "/";
+    private static final String RELATIVE = "~";
+    private static final String PARAMETER = "{}";
+    private static final String RELATIVE_TOPIC = RELATIVE + SEPARATOR;
+    private static final String FORMAT_TOPIC = "%s" + SEPARATOR + "%s";
+
     /**
      * All the @{link Node}s that have been created.
      */
@@ -53,8 +61,8 @@ public class GraphName {
         boolean result = topicName != null;
 
         if (result) {
-            topicName = topicName.replaceAll(Topics.SCHEME, "");
-            topicName = topicName.replaceAll(Service.SCHEME, "");
+            topicName = topicName.replaceAll(Topics.SCHEME, EMPTY);
+            topicName = topicName.replaceAll(Service.SCHEME, EMPTY);
         }
 
         return topicName;
@@ -66,18 +74,18 @@ public class GraphName {
 
         // Manage Name Space.
         if (ns == null || ns.length() == 0) {
-            ns = "";
-        } else if (!ns.startsWith("/")){
-            ns = String.format("/%s", ns);
+            ns = EMPTY;
+        } else if (!ns.startsWith(SEPARATOR)){
+            ns = String.format(FORMAT_TOPIC, EMPTY, ns);
         }
 
         // Absolute case
-        if (nodeName.startsWith("/")) {
+        if (nodeName.startsWith(SEPARATOR)) {
             result = nodeName;
         } else
 
         {
-            result = String.format("%s/%s", ns, nodeName);
+            result = String.format(FORMAT_TOPIC, ns, nodeName);
         }
 
         return result;
@@ -104,34 +112,34 @@ public class GraphName {
 
         // Manage Name Space.
         if (ns == null || ns.length() == 0) {
-            ns = "";
-        } else if (!ns.startsWith("/")){
-            ns = String.format("/%s", ns);
+            ns = EMPTY;
+        } else if (!ns.startsWith(SEPARATOR)){
+            ns = String.format(FORMAT_TOPIC, EMPTY, ns);
         }
 
-        if (nodeName.startsWith("/")) {
-            nodeName = nodeName.replaceFirst("/", "");
+        if (nodeName.startsWith(SEPARATOR)) {
+            nodeName = nodeName.replaceFirst(SEPARATOR, EMPTY);
         }
 
         // Absolute case
-        if (name.startsWith("/")) {
+        if (name.startsWith(SEPARATOR)) {
             result = name;
         } else
 
         // Relative case
-        if (name.startsWith("~/")) {
-            String relPath = name.replaceFirst("~/", "");
-            result = String.format("%s/%s/%s", ns, nodeName, relPath);
+        if (name.startsWith(RELATIVE_TOPIC)) {
+            String relPath = name.replaceFirst(RELATIVE_TOPIC, EMPTY);
+            result = String.format(FORMAT_TOPIC, String.format(FORMAT_TOPIC, ns, nodeName), relPath);
         } else
 
         // Node case
-        if (name.startsWith("~")) {
-            result = String.format("%s/%s", ns, nodeName);
+        if (name.startsWith(RELATIVE)) {
+            result = String.format(FORMAT_TOPIC, ns, nodeName);
         } else
 
-        // Name space path cas
+        // Name space path case
         {
-            result = String.format("%s/%s", ns, name);
+            result = String.format(FORMAT_TOPIC, ns, name);
         }
 
         return result;
@@ -155,12 +163,12 @@ public class GraphName {
                     topicName != null &&
                     topicName.length() > 0 &&
                     topicName.matches("^(?!.*(//|__|_/))[~A-Za-z/_{}][_A-Za-z0-9/{}]*$") &&
-                    !topicName.endsWith("_") &&
-                    !topicName.endsWith("/")
+                    !topicName.endsWith(PRIVATE) &&
+                    !topicName.endsWith(SEPARATOR)
             ;
 
-            if (result && topicName.startsWith("~") && topicName.length() > 1) {
-                result = topicName.startsWith("~/");
+            if (result && topicName.startsWith(RELATIVE) && topicName.length() > 1) {
+                result = topicName.startsWith(RELATIVE_TOPIC);
             }
         }
 
@@ -178,7 +186,7 @@ public class GraphName {
                 substitution != null &&
                 substitution.length() > 0 &&
                 substitution.matches("^[_A-Za-z_/][_A-Za-z0-9/]*$") &&
-                !substitution.endsWith("_");
+                !substitution.endsWith(PRIVATE);
 
         return result;
     }
@@ -195,11 +203,10 @@ public class GraphName {
         if (result) {
             String topicName = GraphName.removeSheme(fqn);
 
-            result =
-                    GraphName.isValidTopic(topicName) &&
-                    topicName.startsWith("/") &&
-                    !topicName.contains("~") &&
-                    !topicName.contains("{}");
+            result = GraphName.isValidTopic(topicName) &&
+                     topicName.startsWith(SEPARATOR) &&
+                     !topicName.contains(RELATIVE) &&
+                     !topicName.contains(PARAMETER);
         }
 
         return result;

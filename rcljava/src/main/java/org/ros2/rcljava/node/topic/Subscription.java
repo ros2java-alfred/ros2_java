@@ -24,6 +24,10 @@ public interface Subscription<T extends Message> {
      */
     void dispose();
 
+    /**
+     * Get CallBack object.
+     * @return CallBack instance.
+     */
     SubscriptionCallback<T> getCallback();
 
     /**
