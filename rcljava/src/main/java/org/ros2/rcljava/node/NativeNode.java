@@ -561,12 +561,12 @@ public class NativeNode implements Node {
      * @throws IllegalArgumentException
      * @throws NoSuchMethodException
      */
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends MessageService> Client<T> createClient(
             final Class<T> serviceType,
             final String serviceName,
-            final QoSProfile qosProfile) throws Exception {
-
+            final QoSProfile qosProfile) {
 
         if (serviceType==null) throw new NullPointerException("Service Type can't be null.");
         if (serviceName==null) throw new NullPointerException("Service name can't be null.");
@@ -577,23 +577,33 @@ public class NativeNode implements Node {
         Client<T> client = null;
 
         if (GraphName.isValidTopic(fqnService)) {
-            @SuppressWarnings("unchecked")
-            Class<? extends Message> requestType = (Class<? extends Message>)serviceType.getField("RequestType").get(null);
+            Class<? extends Message> requestType = null;
+            Method requestFromJavaConverterMethod = null, requestToJavaConverterMethod = null;
+            long requestFromJavaConverterHandle = 0L, requestToJavaConverterHandle = 0L;
 
-            Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-            long requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
+            Class<? extends Message> responseType = null;
+            Method responseFromJavaConverterMethod = null, responseToJavaConverterMethod = null;
+            long responseFromJavaConverterHandle = 0L, responseToJavaConverterHandle = 0L;
 
-            Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-            long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
+            try {
+                requestType = (Class<? extends Message>)serviceType.getField("RequestType").get(null);
 
-            @SuppressWarnings("unchecked")
-            Class<? extends Message> responseType = (Class<? extends Message>)serviceType.getField("ResponseType").get(null);
+                requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+                requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
 
-            Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-            long responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
+                requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+                requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
 
-            Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-            long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
+                responseType = (Class<? extends Message>)serviceType.getField("ResponseType").get(null);
+
+                responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+                responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
+
+                responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+                responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
 
             long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
             long clientHandle = NativeNode.nativeCreateClientHandle(
@@ -635,7 +645,7 @@ public class NativeNode implements Node {
     @Override
     public <T extends MessageService> Client<T> createClient(
             final Class<T> serviceType,
-            final String serviceName) throws Exception {
+            final String serviceName) {
         return this.createClient(serviceType, serviceName, QoSProfile.SERVICES_DEFAULT);
     }
 
@@ -654,13 +664,14 @@ public class NativeNode implements Node {
      * @throws IllegalArgumentException
      * @throws NoSuchMethodException
      */
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends MessageService> Service<T> createService(
             final Class<T> serviceType,
             final String serviceName,
             final ServiceCallback<?, ?> callback,
             final QoSProfile qosProfile
-            ) throws Exception {
+            ) {
 
         if (serviceType==null) throw new NullPointerException("Service Type can't be null.");
         if (serviceName==null) throw new NullPointerException("Service name can't be null.");
@@ -674,24 +685,33 @@ public class NativeNode implements Node {
         if (GraphName.isValidTopic(fqnService)) {
 //            long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service, qos);
 //            Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
+            Class<? extends Message> requestType = null;
+            Method requestFromJavaConverterMethod = null, requestToJavaConverterMethod = null;
+            long requestFromJavaConverterHandle = 0L, requestToJavaConverterHandle = 0L;
 
-            @SuppressWarnings("unchecked")
-            Class<? extends Message> requestType = (Class<? extends Message>)serviceType.getField("RequestType").get(null);
+            Class<? extends Message> responseType = null;
+            Method responseFromJavaConverterMethod = null, responseToJavaConverterMethod = null;
+            long responseFromJavaConverterHandle = 0L, responseToJavaConverterHandle = 0L;
 
-            Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-            long requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
+            try {
+                requestType = (Class<? extends Message>)serviceType.getField("RequestType").get(null);
 
-            Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-            long requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
+                requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+                requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
 
-            @SuppressWarnings("unchecked")
-            Class<? extends Message> responseType = (Class<? extends Message>)serviceType.getField("ResponseType").get(null);
+                requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+                requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
 
-            Method responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-            long responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
+                responseType = (Class<? extends Message>)serviceType.getField("ResponseType").get(null);
 
-            Method responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-            long responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
+                responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
+                responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
+
+                responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
+                responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
 
             long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
             long serviceHandle = NativeNode.nativeCreateServiceHandle(this.nodeHandle, serviceType, serviceName, qosProfileHandle);
@@ -731,7 +751,7 @@ public class NativeNode implements Node {
     public <T extends MessageService> Service<T> createService(
             final Class<T> serviceType,
             final String serviceName,
-            final ServiceCallback<?, ?> callback) throws Exception {
+            final ServiceCallback<?, ?> callback) {
 
         return this.createService(serviceType, serviceName, callback, QoSProfile.SERVICES_DEFAULT);
     }

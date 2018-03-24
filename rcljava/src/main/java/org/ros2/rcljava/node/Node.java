@@ -213,8 +213,7 @@ public interface Node extends java.lang.AutoCloseable {
     <T extends MessageService> Client<T> createClient(
             final Class<T> message,
             final String serviceName,
-            final QoSProfile qos)
-                    throws Exception;
+            final QoSProfile qos);
 
     /**
      * Create and return a Client. (Retro-compatibility)
@@ -226,8 +225,7 @@ public interface Node extends java.lang.AutoCloseable {
      */
     <T extends MessageService> Client<T> createClient(
             final Class<T> message,
-            final String serviceName)
-                    throws Exception ;
+            final String serviceName);
 
     /**
      * Create and return a Service.
@@ -243,8 +241,7 @@ public interface Node extends java.lang.AutoCloseable {
             final Class<T> serviceType,
             final String serviceName,
             final ServiceCallback<?, ?> callback,
-            final QoSProfile qos)
-                    throws Exception;
+            final QoSProfile qos);
 
     /**
      * Create and return a Service. (Retro-compatibility)
@@ -258,8 +255,7 @@ public interface Node extends java.lang.AutoCloseable {
     <T extends MessageService> Service<T> createService(
             final Class<T> serviceType,
             final String serviceName,
-            final ServiceCallback<?, ?> callback)
-                    throws Exception;
+            final ServiceCallback<?, ?> callback);
 
     /**
      *
