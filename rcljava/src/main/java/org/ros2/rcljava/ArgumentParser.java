@@ -30,7 +30,7 @@ public final class ArgumentParser {
     private String nodeName;
     private final Map<String, ParameterVariant<?>> parameters = new ConcurrentHashMap<String, ParameterVariant<?>>();
 
-    public ArgumentParser(final String namespace, final String defaultName, final String[] args) {
+    public ArgumentParser(final String namespace, final String defaultName, final String... args) {
         this.prefix = namespace;
         this.nodeName = defaultName;
 
@@ -59,7 +59,7 @@ public final class ArgumentParser {
         return this.parameters;
     }
 
-    private void parseNodeAndSpaceName(final String[] args) {
+    private void parseNodeAndSpaceName(final String... args) {
         for (final String arg : args) {
             if (arg.contains(ASSIGN)) {
                 final String[] item = arg.split(ASSIGN);
@@ -75,7 +75,7 @@ public final class ArgumentParser {
         }
     }
 
-    private void parseParameters(final String[] args) {
+    private void parseParameters(final String... args) {
         for (final String arg : args) {
             if (arg.contains(ASSIGN)) {
                 final String[] item = arg.split(ASSIGN);

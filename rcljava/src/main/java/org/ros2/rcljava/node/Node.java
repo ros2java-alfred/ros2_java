@@ -15,8 +15,8 @@
 
 package org.ros2.rcljava.node;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import org.ros2.rcljava.time.WallTimer;
@@ -47,7 +47,7 @@ public interface Node extends
         NodeServices,
         NodeTimers,
         NodeTopics,
-        java.lang.AutoCloseable {
+        AutoCloseable {
 
     /**
      * Get the name of the node.
@@ -67,10 +67,10 @@ public interface Node extends
      *
      * @return
      */
-    HashMap<String, List<String>> getServiceNamesAndTypes();
+    Map<String, List<String>> getServiceNamesAndTypes();
 
     @Deprecated
-    HashMap<String, List<String>> getTopicNamesAndTypes(boolean noDemangle);
+    Map<String, List<String>> getTopicNamesAndTypes(final boolean noDemangle);
 
     /**
      * This is typically only used by the rclcpp::graph_listener::GraphListener.
@@ -78,7 +78,7 @@ public interface Node extends
      */
     int countGraphUsers();
 
-    List<Byte> getParametersTypes(List<String> names);
+    List<Byte> getParametersTypes(final List<String> names);
 
     List<String> getParametersNames();
 

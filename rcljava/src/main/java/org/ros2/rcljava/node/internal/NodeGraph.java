@@ -27,7 +27,7 @@ public interface NodeGraph {
      * @param noDemangle if true, topic names and types are not demangled
      * @return Return a map of existing topic names to list of topic types.
      */
-    Map<String, List<String>> getTopicNamesAndTypes(boolean noDemangle);
+    Map<String, List<String>> getTopicNamesAndTypes(final boolean noDemangle);
 
     /**
      * A service is considered to exist when at least one service server or
@@ -96,6 +96,6 @@ public interface NodeGraph {
      * @throws EventNotRegisteredError if the given event was not acquired with
      *   get_graph_event().
      */
-    void waitForGraphChange(Object event, int timeout);
+    void waitForGraphChange(final Object event, final int timeout);
 
 }

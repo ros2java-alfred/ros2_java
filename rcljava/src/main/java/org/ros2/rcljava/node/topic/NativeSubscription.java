@@ -30,38 +30,14 @@ import org.slf4j.LoggerFactory;
  * @param <T> The type of the messages that this subscription will receive.
  */
 public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Message>
-        implements Subscription<T>, java.lang.AutoCloseable {
+        extends BaseSubscription<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeSubscription.class);
-
-    /**
-     * Node owner.
-     */
-    private final NativeNode ownerNode;
 
     /**
      * An integer that represents a pointer to the underlying ROS2 subscription structure (rcl_subsription_t).
      */
     private final long subscriptionHandle;
-
-    /**
-     * The class of the messages that this subscription may receive.
-     */
-    private final Class<T> messageType;
-
-    /**
-     * The topic to which this subscription is subscribed.
-     */
-    private final String topicName;
-
-    /**
-     * The callback function that will be triggered when a new message is
-     * received.
-     */
-    private final SubscriptionCallback<T> callback;
-
-    /** Quality of Service profile. */
-    private final QoSProfile qosProfile;
 
     // Native call.
     //private static native void nativeDispose(long nodeHandle, long publisherHandle);
@@ -88,30 +64,23 @@ public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Mess
             final String topic,
             final SubscriptionCallback<T> callback,
             final QoSProfile qosProfile) {
+        super(node, messageType, topic, callback, qosProfile);
 
-        if (node == null && subscriptionHandle == 0) {
-            throw new RuntimeException("Need to provide active node with handle object");
-        }
-
-        this.ownerNode = node;
+        if (subscriptionHandle == 0) { throw new RuntimeException("Need to provide active subscribtion with handle object"); }
         this.subscriptionHandle = subscriptionHandle;
-        this.messageType = messageType;
-        this.topicName = topic;
-        this.callback = callback;
-        this.qosProfile = qosProfile;
-
-        this.ownerNode.getSubscriptions().add(this);
     }
 
-    public final NativeNode getNode() {
-        return this.ownerNode;
-      }
+    @Override
+    public void dispose() {
+        NativeSubscription.logger.debug("Destroy Native Subscription of topic : " + this.getTopicName());
 
-    /**
-     * @return The callback function that this subscription will trigger when a message is received.
-     */
-    public final SubscriptionCallback<T> getCallback() {
-        return this.callback;
+        super.dispose();
+        // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
+    }
+
+    @Override
+    public final NativeNode getNode() {
+        return (NativeNode) super.getNode();
     }
 
     /**
@@ -119,42 +88,5 @@ public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Mess
      */
     public final long getSubscriptionHandle() {
         return this.subscriptionHandle;
-    }
-
-    /**
-     * @return The type of the messages that this subscription may receive.
-     */
-    public final Class<T> getMessageType() {
-        return this.messageType;
-    }
-
-    /**
-     * @return the topic that this subscription is subscribed on.
-     */
-    public final String getTopicName() {
-        return this.topicName;
-    }
-
-    /**
-     * Get QOS Profile
-     * @return
-     */
-    public final QoSProfile getQosProfile() {
-        return qosProfile;
-    }
-
-    @Override
-    public void dispose() {
-        NativeSubscription.logger.debug("Destroy Subscription of topic : " + this.topicName);
-
-        if (this.ownerNode.getSubscriptions().contains(this)) {
-            this.ownerNode.getSubscriptions().remove(this);
-        }
-        // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
-    }
-
-    @Override
-    public void close() throws Exception {
-        this.dispose();
     }
 }

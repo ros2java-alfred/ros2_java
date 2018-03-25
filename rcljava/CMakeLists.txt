@@ -73,18 +73,25 @@ set(JUNIT_JAR "/usr/share/java/junit4.jar")
 #set(CMAKE_CURRENT_SOURCE_DIR "src/main/java/")
 
 set(${PROJECT_NAME}_sources
-  "src/main/java/org/ros2/rcljava/Logger.java"
   "src/main/java/org/ros2/rcljava/RCLJava.java"
+  "src/main/java/org/ros2/rcljava/Logger.java"
   "src/main/java/org/ros2/rcljava/ArgumentParser.java"
 
   "src/main/java/org/ros2/rcljava/internal/NativeUtils.java"
 
   "src/main/java/org/ros2/rcljava/namespace/GraphName.java"
 
-  "src/main/java/org/ros2/rcljava/time/NativeWallTimer.java"
+  "src/main/java/org/ros2/rcljava/qos/policies/Durability.java"
+  "src/main/java/org/ros2/rcljava/qos/policies/History.java"
+  "src/main/java/org/ros2/rcljava/qos/policies/QoSPolicy.java"
+  "src/main/java/org/ros2/rcljava/qos/policies/Reliability.java"
+  "src/main/java/org/ros2/rcljava/qos/QoSProfile.java"
+
   "src/main/java/org/ros2/rcljava/time/WallTimer.java"
+  "src/main/java/org/ros2/rcljava/time/NativeWallTimer.java"
   "src/main/java/org/ros2/rcljava/time/WallTimerCallback.java"
 
+  # Node Stack Base
   "src/main/java/org/ros2/rcljava/node/internal/NodeClock.java"
   "src/main/java/org/ros2/rcljava/node/internal/NodeGraph.java"
   "src/main/java/org/ros2/rcljava/node/internal/NodeLogging.java"
@@ -92,10 +99,41 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/node/internal/NodeServices.java"
   "src/main/java/org/ros2/rcljava/node/internal/NodeTimers.java"
   "src/main/java/org/ros2/rcljava/node/internal/NodeTopics.java"
-
-  "src/main/java/org/ros2/rcljava/node/NativeNode.java"
-  "src/main/java/org/ros2/rcljava/node/BaseNode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
+  "src/main/java/org/ros2/rcljava/node/BaseNode.java"
+  # Node Implementation
+  "src/main/java/org/ros2/rcljava/node/NativeNode.java"
+  "src/main/java/org/ros2/rcljava/node/JavaNode.java"
+
+  "src/main/java/org/ros2/rcljava/node/topic/Topics.java"
+  # Topic Publisher Stack Base
+  "src/main/java/org/ros2/rcljava/node/topic/Publisher.java"
+  "src/main/java/org/ros2/rcljava/node/topic/BasePublisher.java"
+  # Topic Publisher Implementation
+  "src/main/java/org/ros2/rcljava/node/topic/NativePublisher.java"
+  "src/main/java/org/ros2/rcljava/node/topic/JavaPublisher.java"
+
+  # Topic Subscription Stack Base
+  "src/main/java/org/ros2/rcljava/node/topic/Subscription.java"
+  "src/main/java/org/ros2/rcljava/node/topic/SubscriptionCallback.java"
+  "src/main/java/org/ros2/rcljava/node/topic/BaseSubscription.java"
+  # Topic Publisher Implementation
+  "src/main/java/org/ros2/rcljava/node/topic/NativeSubscription.java"
+  "src/main/java/org/ros2/rcljava/node/topic/JavaSubscription.java"
+
+  "src/main/java/org/ros2/rcljava/node/service/Client.java"
+  "src/main/java/org/ros2/rcljava/node/service/NativeClient.java"
+  "src/main/java/org/ros2/rcljava/node/service/Service.java"
+  "src/main/java/org/ros2/rcljava/node/service/ServiceCallback.java"
+  "src/main/java/org/ros2/rcljava/node/service/NativeService.java"
+  "src/main/java/org/ros2/rcljava/node/service/RCLFuture.java"
+  "src/main/java/org/ros2/rcljava/node/service/RMWRequestId.java"
+
+  "src/main/java/org/ros2/rcljava/node/parameter/ParameterCallback.java"
+  "src/main/java/org/ros2/rcljava/node/parameter/ParameterEventCallback.java"
+  "src/main/java/org/ros2/rcljava/node/parameter/ParameterService.java"
+  "src/main/java/org/ros2/rcljava/node/parameter/ParameterVariant.java"
+  "src/main/java/org/ros2/rcljava/node/parameter/SyncParametersClient.java"
 
   "src/main/java/org/ros2/rcljava/executor/AnyExecutable.java"
   "src/main/java/org/ros2/rcljava/executor/BaseThreadedExecutor.java"
@@ -104,33 +142,6 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/executor/NativeExecutor.java"
   "src/main/java/org/ros2/rcljava/executor/SingleThreadedExecutor.java"
   "src/main/java/org/ros2/rcljava/executor/ThreadedExecutor.java"
-
-  "src/main/java/org/ros2/rcljava/qos/policies/Durability.java"
-  "src/main/java/org/ros2/rcljava/qos/policies/History.java"
-  "src/main/java/org/ros2/rcljava/qos/policies/QoSPolicy.java"
-  "src/main/java/org/ros2/rcljava/qos/policies/Reliability.java"
-  "src/main/java/org/ros2/rcljava/qos/QoSProfile.java"
-
-  "src/main/java/org/ros2/rcljava/node/topic/NativePublisher.java"
-  "src/main/java/org/ros2/rcljava/node/topic/NativeSubscription.java"
-  "src/main/java/org/ros2/rcljava/node/topic/Publisher.java"
-  "src/main/java/org/ros2/rcljava/node/topic/Subscription.java"
-  "src/main/java/org/ros2/rcljava/node/topic/SubscriptionCallback.java"
-  "src/main/java/org/ros2/rcljava/node/topic/Topics.java"
-
-  "src/main/java/org/ros2/rcljava/node/service/NativeClient.java"
-  "src/main/java/org/ros2/rcljava/node/service/NativeService.java"
-  "src/main/java/org/ros2/rcljava/node/service/Client.java"
-  "src/main/java/org/ros2/rcljava/node/service/RCLFuture.java"
-  "src/main/java/org/ros2/rcljava/node/service/RMWRequestId.java"
-  "src/main/java/org/ros2/rcljava/node/service/Service.java"
-  "src/main/java/org/ros2/rcljava/node/service/ServiceCallback.java"
-
-  "src/main/java/org/ros2/rcljava/node/parameter/ParameterCallback.java"
-  "src/main/java/org/ros2/rcljava/node/parameter/ParameterEventCallback.java"
-  "src/main/java/org/ros2/rcljava/node/parameter/ParameterService.java"
-  "src/main/java/org/ros2/rcljava/node/parameter/ParameterVariant.java"
-  "src/main/java/org/ros2/rcljava/node/parameter/SyncParametersClient.java"
 
   "src/main/java/org/ros2/rcljava/exception/ImplementationAlreadyImportedException.java"
   "src/main/java/org/ros2/rcljava/exception/InvalidRCLJAVAImplementation.java"

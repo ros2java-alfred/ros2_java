@@ -16,8 +16,10 @@
 package org.ros2.rcljava.node.topic;
 
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.qos.QoSProfile;
 
-public interface Publisher<T extends Message>  {
+public interface Publisher<T extends Message> extends AutoCloseable {
 
     /**
      * Safely destroy the underlying ROS2 publisher structure.
@@ -65,5 +67,17 @@ public interface Publisher<T extends Message>  {
      * @return The intra-process gid.
      */
     String getIntraProcessGid();
+
+    /**
+     * @return the messageType
+     */
+    Class<T> getMessageType();
+
+    /**
+     * @return the qosProfile
+     */
+    QoSProfile getQosProfile();
+
+    Node getNode();
 
 }

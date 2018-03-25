@@ -87,7 +87,7 @@ public abstract class RCLJava {
     /**
      * Initialize the underlying rcl layer.
      */
-    private static native void nativeRCLJavaInit(String args[]);
+    private static native void nativeRCLJavaInit(String... args);
 
     private static native void nativeShutdown();
 
@@ -165,9 +165,9 @@ public abstract class RCLJava {
                         RCLJava.logger.debug("Final Shutdown...");
 
                         // List loaded libraries.
-                        String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
-                        StringBuilder msgLog = new StringBuilder();
-                        for (String key : list) {
+                        final String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
+                        final StringBuilder msgLog = new StringBuilder();
+                        for (final String key : list) {
                             msgLog.append(key);
                             msgLog.append('\n');
                         }
@@ -185,10 +185,10 @@ public abstract class RCLJava {
      */
     private RCLJava() { }
 
-    private static String getRmwImplementationSuffix(String rmwImplementation) {
+    private static String getRmwImplementationSuffix(final String rmwImplementation) {
         String result = "__" + rmwImplementation;
 
-        if (result.equals("__rmw_fastrtps_cpp")) {
+        if ("__rmw_fastrtps_cpp".equals(result)) {
             result = "";
         }
 
@@ -196,9 +196,9 @@ public abstract class RCLJava {
     }
 
     private static void displayContext() {
-        String libpath = System.getProperty("java.library.path");
-        String arch    = System.getProperty("os.arch");
-        String os      = System.getProperty("os.name");
+        final String libpath = System.getProperty("java.library.path");
+        final String arch    = System.getProperty("os.arch");
+        final String os      = System.getProperty("os.name");
 
         RCLJava.logger.debug("Native Library OS : " + os);
         RCLJava.logger.debug("Native Library Archi : " + arch);
@@ -212,15 +212,15 @@ public abstract class RCLJava {
      *   (@{link Node}s, @{link Publisher}s and @{link Subscription}s.
      * @param args CLI arguments.
      */
-    public static void rclJavaInit(final String args[]) {
+    public static void rclJavaInit(final String... args) {
         synchronized (RCLJava.class) {
             if (!RCLJava.initialized) {
                 if (args != null) {
                     RCLJava.arguments = args;
 
-                    for (String arg : RCLJava.arguments) {
+                    for (final String arg : RCLJava.arguments) {
                         if (arg.contains("=")) {
-                            String[] keyVal = arg.split("=");
+                            final String[] keyVal = arg.split("=");
                             RCLJava.logger.debug("Args : " + keyVal[0] + "\t : " + keyVal[1]);
                         } else {
                             RCLJava.logger.debug("Args : " + arg);
@@ -247,7 +247,7 @@ public abstract class RCLJava {
                     RCLJava.initialized = true;
                 }
             } else {
-                NotInitializedException ex = new NotInitializedException("Cannot intialized twice !");
+                final NotInitializedException ex = new NotInitializedException("Cannot intialized twice !");
                 logger.error(ex.getMessage());
                 throw ex;
             }
@@ -259,10 +259,6 @@ public abstract class RCLJava {
      */
     public synchronized static boolean isInitialized() {
         return RCLJava.initialized;
-    }
-
-    public static void rclJavaInit() {
-        RCLJava.rclJavaInit(null);
     }
 
     /**
@@ -288,7 +284,7 @@ public abstract class RCLJava {
     public static Node createNode(final String namespace, final String defaultName) {
 
 //        String fullName = GraphName.getFullName(ns, nodeName);
-        Node node = new NativeNode(namespace, defaultName, RCLJava.arguments);
+        final Node node = new NativeNode(namespace, defaultName, RCLJava.arguments);
 
         return node;
     }
@@ -312,7 +308,7 @@ public abstract class RCLJava {
                 node.getServices().size() > 0 ||
                 node.getSubscriptions().size() > 0) {
 
-            long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
+            final long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
 
             RCLJava.nativeWaitSetInit(
                     waitSetHandle,
@@ -329,21 +325,21 @@ public abstract class RCLJava {
             RCLJava.nativeWaitSetClearClients(waitSetHandle);
 
             // Subscribe waiset components.
-            for (Subscription<?> subscription : node.getSubscriptions()) {
-                NativeSubscription<?> nativeSubscription = (NativeSubscription<?>) subscription;
+            for (final Subscription<?> subscription : node.getSubscriptions()) {
+                final NativeSubscription<?> nativeSubscription = (NativeSubscription<?>) subscription;
                 RCLJava.nativeWaitSetAddSubscription(waitSetHandle, nativeSubscription.getSubscriptionHandle());
             }
 
-            for (WallTimer timer : node.getWallTimers()) {
+            for (final WallTimer timer : node.getWallTimers()) {
                 RCLJava.nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
             }
 
-            for (Service<?> service : node.getServices()) {
+            for (final Service<?> service : node.getServices()) {
                 RCLJava.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
             }
 
-            for (Client<?> client : node.getClients()) {
-                NativeClient<?> nativeClient = (NativeClient<?>) client;
+            for (final Client<?> client : node.getClients()) {
+                final NativeClient<?> nativeClient = (NativeClient<?>) client;
                 RCLJava.nativeWaitSetAddClient(waitSetHandle, nativeClient.getClientHandle());
             }
 
@@ -352,12 +348,12 @@ public abstract class RCLJava {
             RCLJava.nativeWaitSetFini(waitSetHandle);
 
             // Take all components.
-            for (Subscription<? extends Message> subscription : node.getSubscriptions()) {
+            for (final Subscription<? extends Message> subscription : node.getSubscriptions()) {
 
-                Subscription<Message> safeSubscription = (Subscription<Message>) subscription;
-                NativeSubscription<Message> nativeSubscription = (NativeSubscription<Message>) subscription;
+                final Subscription<Message> safeSubscription = (Subscription<Message>) subscription;
+                final NativeSubscription<Message> nativeSubscription = (NativeSubscription<Message>) subscription;
 
-                Message message = RCLJava.nativeTake(
+                final Message message = RCLJava.nativeTake(
                         nativeSubscription.getSubscriptionHandle(),
                         nativeSubscription.getMessageType());
 
@@ -366,21 +362,21 @@ public abstract class RCLJava {
                 }
             }
 
-            for (WallTimer timer : node.getWallTimers()) {
+            for (final WallTimer timer : node.getWallTimers()) {
                 if (timer.isReady()) {
                     timer.callTimer();
                     timer.getCallback().tick();
                 }
             }
 
-            for (@SuppressWarnings("rawtypes") Service service : node.getServices()) {
-                long requestFromJavaConverterHandle  = service.getRequestFromJavaConverterHandle();
-                long requestToJavaConverterHandle    = service.getRequestToJavaConverterHandle();
-                long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
-                long responseToJavaConverterHandle   = service.getResponseToJavaConverterHandle();
+            for (@SuppressWarnings("rawtypes") final  Service service : node.getServices()) {
+                final long requestFromJavaConverterHandle  = service.getRequestFromJavaConverterHandle();
+                final long requestToJavaConverterHandle    = service.getRequestToJavaConverterHandle();
+                final long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
+                final long responseToJavaConverterHandle   = service.getResponseToJavaConverterHandle();
 
-                Class<?> requestType = service.getRequestType();
-                Class<?> responseType = service.getResponseType();
+                final Class<?> requestType = service.getRequestType();
+                final Class<?> responseType = service.getResponseType();
 
                 Message requestMessage = null;
                 Message responseMessage = null;
@@ -396,7 +392,7 @@ public abstract class RCLJava {
                     continue;
                 }
 
-                RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
+                final RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
                         service.getServiceHandle(),
                         requestFromJavaConverterHandle,
                         requestToJavaConverterHandle,
@@ -409,12 +405,12 @@ public abstract class RCLJava {
                 }
             }
 
-            for (Client<?> client : node.getClients()) {
-                NativeClient<?> nativeClient = (NativeClient<?>) client;
-                long responseFromJavaConverterHandle = nativeClient.getResponseFromJavaConverterHandle();
-                long responseToJavaConverterHandle = nativeClient.getResponseToJavaConverterHandle();
+            for (final Client<?> client : node.getClients()) {
+                final NativeClient<?> nativeClient = (NativeClient<?>) client;
+                final long responseFromJavaConverterHandle = nativeClient.getResponseFromJavaConverterHandle();
+                final long responseToJavaConverterHandle = nativeClient.getResponseToJavaConverterHandle();
 
-                Class<?> responseType = client.getResponseType();
+                final Class<?> responseType = client.getResponseType();
 
                 Message responseMessage = null;
 
@@ -428,7 +424,7 @@ public abstract class RCLJava {
                     continue;
                 }
 
-                RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeResponse(
+                final RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeResponse(
                         nativeClient.getClientHandle(),
                         responseFromJavaConverterHandle,
                         responseToJavaConverterHandle,
@@ -518,7 +514,7 @@ public abstract class RCLJava {
      * @return Identifier string of ROS2 middle-ware.
      */
     public static String getTypesupportIdentifier() {
-        String typesupportIdentifier = RMW_TO_TYPESUPPORT.get(RCLJava.getRMWIdentifier());
+        final String typesupportIdentifier = RMW_TO_TYPESUPPORT.get(RCLJava.getRMWIdentifier());
 
         return typesupportIdentifier;
     }
@@ -537,7 +533,7 @@ public abstract class RCLJava {
         synchronized(RCLJava.class) {
             if (rmwImplementation != null && !rmwImplementation.isEmpty()) {
                 if (!rmwImplementation.equals(RCLJava.rmwImplementation)) {
-                    String file = "rcljava_RCLJava"+ RCLJava.getRmwImplementationSuffix(rmwImplementation);
+                    final String file = "rcljava_RCLJava"+ RCLJava.getRmwImplementationSuffix(rmwImplementation);
                     RCLJava.logger.debug("Load native RMW file : lib" + file + ".so");
 
                     try {
@@ -583,7 +579,7 @@ public abstract class RCLJava {
      * Load RMW.
      */
     private static void autoLoadRmw() {
-        for (Map.Entry<String, String> entry : RMW_TO_TYPESUPPORT.entrySet()) {
+        for (final Map.Entry<String, String> entry : RMW_TO_TYPESUPPORT.entrySet()) {
             try {
                 RCLJava.logger.debug("Try to load native " + entry.getKey() + "...");
                 RCLJava.setRMWImplementation(entry.getKey());
@@ -604,14 +600,14 @@ public abstract class RCLJava {
      * @return
      */
     public static long convertQoSProfileToHandle(final QoSProfile qosProfile) {
-      int history = qosProfile.getHistory().getValue();
-      int depth = qosProfile.getDepth();
-      int reliability = qosProfile.getReliability().getValue();
-      int durability = qosProfile.getDurability().getValue();
-      boolean avoidRos = qosProfile.getAvoidRosNamespaceConventions();
+        final int history = qosProfile.getHistory().getValue();
+        final int depth = qosProfile.getDepth();
+        final int reliability = qosProfile.getReliability().getValue();
+        final int durability = qosProfile.getDurability().getValue();
+        final boolean avoidRos = qosProfile.getAvoidRosNamespaceConventions();
 
-      // RCLJava.logger.debug("Convert QosProfile...");
-      return RCLJava.nativeConvertQoSProfileToHandle(history, depth, reliability, durability, avoidRos);
+        // RCLJava.logger.debug("Convert QosProfile...");
+        return RCLJava.nativeConvertQoSProfileToHandle(history, depth, reliability, durability, avoidRos);
     }
 
     /**

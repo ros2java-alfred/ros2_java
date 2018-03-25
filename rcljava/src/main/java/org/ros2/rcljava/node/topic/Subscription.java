@@ -16,8 +16,10 @@
 package org.ros2.rcljava.node.topic;
 
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.qos.QoSProfile;
 
-public interface Subscription<T extends Message> {
+public interface Subscription<T extends Message> extends AutoCloseable {
 
     /**
      * Safely destroy the underlying ROS2 subscriber structure.
@@ -26,9 +28,14 @@ public interface Subscription<T extends Message> {
 
     /**
      * Get CallBack object.
-     * @return CallBack instance.
+     * @return The callback function that this subscription will trigger when a message is received.
      */
     SubscriptionCallback<T> getCallback();
+
+    /**
+     * @return The type of the messages that this subscription may receive.
+     */
+    Class<T> getMessageType();
 
     /**
      * Get the topic that this subscription is subscribed on.
@@ -36,4 +43,13 @@ public interface Subscription<T extends Message> {
      * @return The topic name.
      */
     String getTopicName();
+
+    /**
+     * Get QOS Profile
+     *
+     * @return
+     */
+    QoSProfile getQosProfile();
+
+    Node getNode();
 }

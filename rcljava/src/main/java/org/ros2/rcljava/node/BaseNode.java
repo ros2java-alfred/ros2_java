@@ -16,7 +16,6 @@
 package org.ros2.rcljava.node;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -116,7 +115,7 @@ public abstract class BaseNode implements Node {
 
     private ParameterCallback parameterCallback ;
 
-    public BaseNode(final String namespace, final String defaultName, final String[] args) {
+    public BaseNode(final String namespace, final String defaultName, final String... args) {
         BaseNode.logger.info("Create Node stack...");
 
         final ArgumentParser argParser = new ArgumentParser(namespace, defaultName, args);
@@ -140,6 +139,10 @@ public abstract class BaseNode implements Node {
     public void startParameterService() {
         this.parameterService = new ParameterService(this);
         this.rosLogger = new Logger(this);
+    }
+
+    public void onParamChange(final ParameterCallback parameterCallback) {
+        this.parameterCallback = parameterCallback;
     }
 
     /* (non-Javadoc)
@@ -462,15 +465,11 @@ public abstract class BaseNode implements Node {
 
     }
 
-    public void onParamChange(final ParameterCallback parameterCallback) {
-        this.parameterCallback = parameterCallback;
-    }
-
     /* (non-Javadoc)
      * @see org.ros2.rcljava.node.Node#getTopicNamesAndTypes()
      */
     @Override
-    public HashMap<String, List<String>> getTopicNamesAndTypes() {
+    public Map<String, List<String>> getTopicNamesAndTypes() {
         return this.getTopicNamesAndTypes(false);
     }
 
@@ -478,7 +477,7 @@ public abstract class BaseNode implements Node {
     * @see org.ros2.rcljava.node.Node#getServiceNamesAndTypes()
     */
     @Override
-    public HashMap<String, List<String>> getServiceNamesAndTypes() {
+    public Map<String, List<String>> getServiceNamesAndTypes() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -639,6 +638,7 @@ public abstract class BaseNode implements Node {
     /* (non-Javadoc)
      * @see org.ros2.rcljava.node.Node#getLoggerName()
      */
+    @Override
     public String getLoggerName() {
         return this.rosLogger.getName();
     }

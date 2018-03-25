@@ -58,6 +58,12 @@ public class NativeNode extends BaseNode {
         RCLJava.loadLibrary("rcljava_node_NativeNode"); //__" + RCLJava.getRMWIdentifier());
     }
 
+    /**
+     * An integer that represents a pointer to the underlying ROS2 node
+     * structure (rcl_node_t).
+     */
+    private final long nodeHandle;
+
     // Native call.
     private static native <T extends Message> long nativeCreatePublisherHandle(
             long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
@@ -89,11 +95,6 @@ public class NativeNode extends BaseNode {
 
 //    private static native  ; //rcl_service_server_is_available
 
-    /**
-     * An integer that represents a pointer to the underlying ROS2 node
-     * structure (rcl_node_t).
-     */
-    private final long nodeHandle;
 
     /**
      * Constructor.
@@ -101,7 +102,7 @@ public class NativeNode extends BaseNode {
      * @param defaultName name of node.
      */
     public NativeNode(final String defaultName) {
-        this(null, defaultName, null);
+        this(null, defaultName);
     }
 
     /**
@@ -112,7 +113,7 @@ public class NativeNode extends BaseNode {
      * @param namespace prefix path of node.
      * @param defaultName name of node.
      */
-    public NativeNode(final String namespace, final String defaultName, final String[] args) {
+    public NativeNode(final String namespace, final String defaultName, final String... args) {
         super(namespace, defaultName, args);
 
         // Initialize native component.

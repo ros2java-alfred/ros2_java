@@ -17,7 +17,6 @@
 package org.ros2.rcljava.node.topic;
 
 import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.qos.QoSProfile;
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> The type of the messages that this publisher will publish.
  */
-public class NativePublisher<T extends Message> implements Publisher<T>, java.lang.AutoCloseable {
+public class NativePublisher<T extends Message> extends BasePublisher<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(NativePublisher.class);
 
@@ -41,26 +40,10 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
     }
 
     /**
-     * Node owner.
-     */
-    private final NativeNode ownerNode;
-
-    /**
      * An integer that represents a pointer to the underlying ROS2 publisher
      * structure (rcl_publisher_t).
      */
     private final long publisherHandle;
-
-    /** Message Type. */
-    private final Class<T> messageType;
-
-    /**
-     * The topic to which this publisher will publish messages.
-     */
-    private final String topicName;
-
-    /** Quality of Service profile. */
-    private final QoSProfile qosProfile;
 
     // Native call.
     /**
@@ -86,57 +69,43 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
     /**
      * Constructor.
      *
+     * @param node Node instance associated.
      * @param publisherHandle A pointer to the underlying ROS2 publisher
      *     structure, as an integer. Must not be zero.
      * @param topic The topic to which this publisher will publish messages.
      * @param qosProfile Quality of Service profile.
      */
-    public NativePublisher(final NativeNode node, final long publisherHandle, final Class<T> messageType, final String topic, final QoSProfile qosProfile) {
-        if (node == null && publisherHandle == 0) {
-            throw new RuntimeException("Need to provide active node with handle object");
-        }
+    public NativePublisher(
+            final NativeNode node,
+            final long publisherHandle,
+            final Class<T> messageType,
+            final String topic,
+            final QoSProfile qosProfile) {
+        super(node, messageType, topic, qosProfile);
 
-        this.ownerNode = node;
+        NativePublisher.logger.debug("Create Native Publisher of topic : " + this.getTopicName());
+        if (publisherHandle == 0) { throw new RuntimeException("Need to provide active node with handle object"); }
         this.publisherHandle = publisherHandle;
-        this.messageType = messageType;
-        this.topicName = topic;
-        this.qosProfile = qosProfile;
-
-        this.ownerNode.getPublishers().add(this);
     }
 
-    /**
-     * Publish a message.
-     *
-     * @param message An instance of the &lt;T&gt; parameter.
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.node.topic.Publisher#dispose()
      */
     @Override
-    public void publish(final T message) {
-        NativePublisher.nativePublish(this.publisherHandle, message);
+    public void dispose() {
+        NativePublisher.logger.debug("Destroy Native Publisher of topic : " + this.getTopicName());
+
+        super.dispose();
+
+        NativePublisher.nativeDispose(this.getNode().getNodeHandle(), this.publisherHandle);
     }
 
-    /**
-     * Get message type.
-     * @return Class Type of message.
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.node.topic.Publisher#getNode()
      */
-    public final Class<T> getMsgType() {
-        return this.messageType;
-    }
-
-    /**
-     * Get topic name.
-     * @return Name of topic.
-     */
-    public final String getTopicName() {
-        return this.topicName;
-    }
-
-    /**
-     * Get node of publisher.
-     * @return Instance of owner node.
-     */
-    public final NativeNode getNode() {
-        return this.ownerNode;
+    @Override
+    public NativeNode getNode() {
+        return (NativeNode) super.getNode();
     }
 
     // TODO make protected for test only...
@@ -144,41 +113,12 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
         return this.publisherHandle;
     }
 
-    /**
-     * Safely destroy the underlying ROS2 publisher structure.
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.node.topic.Publisher#publish(org.ros2.rcljava.internal.message.Message)
      */
     @Override
-    public void dispose() {
-        NativePublisher.logger.debug("Destroy Publisher of topic : " + this.topicName);
-
-        if (this.ownerNode.getPublishers().contains(this)) {
-            this.ownerNode.getPublishers().remove(this);
-        }
-        NativePublisher.nativeDispose(this.ownerNode.getNodeHandle(), this.publisherHandle);
+    public void publish(final T message) {
+        NativePublisher.nativePublish(this.publisherHandle, message);
     }
 
-    @Override
-    public void close() throws Exception {
-        this.dispose();
-    }
-
-    @Override
-    public void doInterProcessPublish(final T message) {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public int getQueueSize() {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public String getGid() {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public String getIntraProcessGid() {
-        throw new NotImplementedException();
-    }
 }
