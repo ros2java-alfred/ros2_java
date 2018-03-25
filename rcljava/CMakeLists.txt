@@ -86,6 +86,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/time/WallTimerCallback.java"
 
   "src/main/java/org/ros2/rcljava/node/NativeNode.java"
+  "src/main/java/org/ros2/rcljava/node/BaseNode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
 
   "src/main/java/org/ros2/rcljava/executor/AnyExecutable.java"

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # scripts/travis-ci/linux_prepare.sh
 
 set -ev

@@ -1,4 +1,4 @@
-/* Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
+/* Copyright 2016-2018 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,13 +70,13 @@ public interface Node extends java.lang.AutoCloseable {
      * Create and return a Publisher.
      *
      * @param <T> Message definition.
-     * @param message Message class.
+     * @param messageType Message class.
      * @param topicName The topic for this publisher to publish on.
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Publisher instance of the created publisher.
      */
     <T extends Message> Publisher<T> createPublisher(
-            final Class<T> message,
+            final Class<T> messageType,
             final String topicName,
             final QoSProfile qos);
 
@@ -84,13 +84,13 @@ public interface Node extends java.lang.AutoCloseable {
      * Create and return a Publisher.
      *
      * @param <T> Message definition.
-     * @param message Message class.
+     * @param messageType Message class.
      * @param topicName The topic for this publisher to publish on.
      * @param qosHistoryDepth The depth of the publisher message queue.
      * @return Publisher instance of the created publisher.
      */
     <T extends Message> Publisher<T> createPublisher(
-            final Class<T> message,
+            final Class<T> messageType,
             final String topicName,
             final int qosHistoryDepth);
 
@@ -98,19 +98,19 @@ public interface Node extends java.lang.AutoCloseable {
      * Create and return a Publisher. (Retro-compatibility)
      *
      * @param <T> Message definition.
-     * @param message Message class.
+     * @param messageType Message class.
      * @param topicName The topic for this publisher to publish on.
      * @return Publisher instance of the created publisher.
      */
     <T extends Message> Publisher<T> createPublisher(
-            final Class<T> message,
+            final Class<T> messageType,
             final String topicName);
 
     /**
      * Create and return a Subscription.
      *
      * @param <T> Message definition.
-     * @param message Message Class
+     * @param messageType Message Class
      * @param topicName The topic to subscribe on.
      * @param callback The user-defined callback function.
      * @param qos The quality of service profile to pass on to the rmw implementation.
@@ -118,7 +118,7 @@ public interface Node extends java.lang.AutoCloseable {
      * @return Subscription instance of the created subscription.
      */
     <T extends Message> Subscription<T> createSubscription(
-            final Class<T> message,
+            final Class<T> messageType,
             final String topicName,
             final SubscriptionCallback<T> callback,
             final QoSProfile qos,
@@ -128,14 +128,14 @@ public interface Node extends java.lang.AutoCloseable {
      * Create and return a Subscription.
      *
      * @param <T> Message definition.
-     * @param message Message Class
+     * @param messageType Message Class
      * @param topicName The topic to subscribe on.
      * @param callback The user-defined callback function.
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Subscription instance of the created subscription.
      */
     <T extends Message> Subscription<T> createSubscription(
-            final Class<T> message,
+            final Class<T> messageType,
             final String topicName,
             final SubscriptionCallback<T> callback,
             final QoSProfile qos);
@@ -144,7 +144,7 @@ public interface Node extends java.lang.AutoCloseable {
      * Create and return a Subscription.
      *
      * @param <T> Message definition.
-     * @param message Message Class
+     * @param messageType Message Class
      * @param topicName The topic to subscribe on.
      * @param callback The user-defined callback function.
      * @param qosHistoryDepth The depth of the subscription's incoming message queue.
@@ -152,7 +152,7 @@ public interface Node extends java.lang.AutoCloseable {
      * @return Subscription instance of the created subscription.
      */
     <T extends Message> Subscription<T> createSubscription(
-            final Class<T> message,
+            final Class<T> messageType,
             final String topicName,
             final SubscriptionCallback<T> callback,
             final int qosHistoryDepth,
@@ -162,14 +162,14 @@ public interface Node extends java.lang.AutoCloseable {
      * Create and return a Subscription.
      *
      * @param <T> Message definition.
-     * @param message Message Class
+     * @param messageType Message Class
      * @param topicName The topic to subscribe on.
      * @param callback The user-defined callback function.
      * @param qosHistoryDepth The depth of the subscription's incoming message queue.
      * @return Subscription instance of the created subscription.
      */
     <T extends Message> Subscription<T> createSubscription(
-            final Class<T> message,
+            final Class<T> messageType,
             final String topicName,
             final SubscriptionCallback<T> callback,
             final int qosHistoryDepth);
@@ -178,13 +178,13 @@ public interface Node extends java.lang.AutoCloseable {
      * Create and return a Subscription. (Retro-compatibility)
      *
      * @param <T> Message definition.
-     * @param message Message Class
+     * @param messageType Message Class
      * @param topicName The topic to subscribe on.
      * @param callback The user-defined callback function.
      * @return Subscription instance of the created subscription.
      */
     <T extends Message> Subscription<T> createSubscription(
-            final Class<T> message,
+            final Class<T> messageType,
             final String topicName,
             final SubscriptionCallback<T> callback);
 
@@ -205,13 +205,13 @@ public interface Node extends java.lang.AutoCloseable {
      * Create and return a Client.
      *
      * @param <T> Message definition.
-     * @param message Message Class
+     * @param serviceType Message Class
      * @param serviceName The service to subscribe on.
      * @param qos The quality of service profile to pass on to the rmw implementation.
      * @return Client instance of the service.
      */
     <T extends MessageService> Client<T> createClient(
-            final Class<T> message,
+            final Class<T> serviceType,
             final String serviceName,
             final QoSProfile qos);
 
@@ -219,12 +219,12 @@ public interface Node extends java.lang.AutoCloseable {
      * Create and return a Client. (Retro-compatibility)
      *
      * @param <T> Message definition.
-     * @param message Message Class
+     * @param serviceType Message Class
      * @param serviceName The service to subscribe on.
      * @return Client instance of the service.
      */
     <T extends MessageService> Client<T> createClient(
-            final Class<T> message,
+            final Class<T> serviceType,
             final String serviceName);
 
     /**
