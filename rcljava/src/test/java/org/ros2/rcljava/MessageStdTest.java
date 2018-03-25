@@ -225,7 +225,7 @@ public class MessageStdTest extends AbstractMessageTest {
     public final void testPubString() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
-        String msg = new String();
+        String msg = new std_msgs.msg.String();
         msg.setData("Hello");
 
         String value = this.pubSubTest(msg);

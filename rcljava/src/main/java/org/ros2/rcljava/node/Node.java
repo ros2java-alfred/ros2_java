@@ -73,12 +73,6 @@ public interface Node extends
     HashMap<String, List<String>> getTopicNamesAndTypes(boolean noDemangle);
 
     /**
-     * Return the rcl_node_t node handle (non-const version).
-     * @return
-     */
-    long getNodeHandle();
-
-    /**
      * This is typically only used by the rclcpp::graph_listener::GraphListener.
      * Return the number of on loan graph events, see get_graph_event().
      */

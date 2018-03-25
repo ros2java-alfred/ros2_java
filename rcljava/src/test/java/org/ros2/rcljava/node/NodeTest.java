@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 
 public class NodeTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(NodeTest.class);
+    private static final String ERROR_RT = "Expected Runtime error.";
+    private static final String ERROR_BAD = "Bad result";
 
     @Before
     public void setUp() {
@@ -59,11 +61,11 @@ public class NodeTest extends AbstractRosTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         boolean test = true;
-        Node node = null;
+        NativeNode node = null;
 
         this.initRCLjava();
         try {
-            node = RCLJava.createNode("_test_node");
+            node = (NativeNode) RCLJava.createNode("_test_node");
             node.close();
         } catch (Exception e) {
             test = false;
@@ -71,7 +73,7 @@ public class NodeTest extends AbstractRosTest {
             this.releaseRCLjava();
         }
 
-        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertTrue(ERROR_RT, test);
         Assert.assertNotEquals(0, node.getNodeHandle());
     }
 
@@ -92,8 +94,8 @@ public class NodeTest extends AbstractRosTest {
             this.releaseRCLjava();
         }
 
-        Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", node, node);
+        Assert.assertTrue(ERROR_RT, test);
+        Assert.assertEquals(ERROR_BAD, node, node);
     }
 
     @Test
@@ -115,8 +117,8 @@ public class NodeTest extends AbstractRosTest {
             this.releaseRCLjava();
         }
 
-        Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", "testNodeName", nodeName);
+        Assert.assertTrue(ERROR_RT, test);
+        Assert.assertEquals(ERROR_BAD, "testNodeName", nodeName);
     }
 
     @Test
@@ -124,7 +126,7 @@ public class NodeTest extends AbstractRosTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         this.initRCLjava();
-        Node node = RCLJava.createNode("test_node");
+        NativeNode node = (NativeNode) RCLJava.createNode("test_node");
         assertNotEquals(0, node.getNodeHandle());
 
         Publisher<std_msgs.msg.String> publisher = node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
@@ -186,8 +188,8 @@ public class NodeTest extends AbstractRosTest {
             this.releaseRCLjava();
         }
 
-        Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertNotNull("Bad result", pub);
+        Assert.assertTrue(ERROR_RT, test);
+        Assert.assertNotNull(ERROR_BAD, pub);
     }
 
     @Test
@@ -222,8 +224,8 @@ public class NodeTest extends AbstractRosTest {
             this.releaseRCLjava();
         }
 
-        Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertNotNull("Bad result", sub);
+        Assert.assertTrue(ERROR_RT, test);
+        Assert.assertNotNull(ERROR_BAD, sub);
     }
 
     @Test
@@ -241,14 +243,14 @@ public class NodeTest extends AbstractRosTest {
             node = RCLJava.createNode("testPublisher");
 
             count = node.countPublishers(topicPath);
-            Assert.assertEquals("Bad result", 0, count);
+            Assert.assertEquals(ERROR_BAD, 0, count);
 
             pub = node.<std_msgs.msg.String>createPublisher(
                     std_msgs.msg.String.class,
                     topicPath,
                     QoSProfile.DEFAULT);
             count = node.countPublishers(topicPath);
-            Assert.assertEquals("Bad result", 1, count);
+            Assert.assertEquals(ERROR_BAD, 1, count);
 
             pub.dispose();
             node.close();
@@ -258,7 +260,7 @@ public class NodeTest extends AbstractRosTest {
             this.releaseRCLjava();
         }
 
-        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertTrue(ERROR_RT, test);
     }
 
     @Test
@@ -279,7 +281,7 @@ public class NodeTest extends AbstractRosTest {
             this.initRCLjava();
             node = RCLJava.createNode("testSubscription");
             count = node.countPublishers("testChannel");
-            Assert.assertEquals("Bad result", 0, count);
+            Assert.assertEquals(ERROR_BAD, 0, count);
             // TODO
 //            sub = node.<std_msgs.msg.String>createSubscription(
 //                    std_msgs.msg.String.class,
@@ -287,7 +289,7 @@ public class NodeTest extends AbstractRosTest {
 //                    callback,
 //                    QoSProfile.PROFILE_DEFAULT);
 //            count = node.countPublishers("testChannel");
-//            Assert.assertEquals("Bad result", 1, count);
+//            Assert.assertEquals(ERROR_BAD, 1, count);
 //            sub.dispose();
             count = node.countPublishers("testChannel");
             node.close();
@@ -297,8 +299,8 @@ public class NodeTest extends AbstractRosTest {
             this.releaseRCLjava();
         }
 
-        Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", 0, count);
+        Assert.assertTrue(ERROR_RT, test);
+        Assert.assertEquals(ERROR_BAD, 0, count);
     }
 
     @Test
@@ -330,8 +332,8 @@ public class NodeTest extends AbstractRosTest {
             }
         }
 
-        Assert.assertTrue("Expected Runtime error.", test);
-        Assert.assertEquals("Bad result", 1, i);
+        Assert.assertTrue(ERROR_RT, test);
+        Assert.assertEquals(ERROR_BAD, 1, i);
     }
 
     //TODO Test Parameters

@@ -131,6 +131,7 @@ public class NativeNode extends BaseNode {
     public void dispose() {
         super.dispose();
 
+        NativeNode.logger.debug("Destroy Native Node : " + GraphName.getFullName(this.nameSpace, this.name));
         NativeNode.nativeDispose(this.nodeHandle);
     }
 
@@ -178,7 +179,7 @@ public class NativeNode extends BaseNode {
         if (topicName   == null) { throw new NullPointerException(ERROR_TOPIC_MSG); }
         if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
-        String fqnTopic =  GraphName.getFullName(this, topicName, null);
+        final String fqnTopic =  GraphName.getFullName(this, topicName, null);
         NativeNode.logger.debug("Create Native Publisher : " + fqnTopic);
         Publisher<T> publisher = null;
 
@@ -217,8 +218,8 @@ public class NativeNode extends BaseNode {
         if (callback    == null) { throw new NullPointerException(ERROR_CALLBACK); }
         if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
-        String fqnTopic =  GraphName.getFullName(this, topicName, null);
-        NativeNode.logger.debug("Create Subscription : " + fqnTopic);
+        final String fqnTopic =  GraphName.getFullName(this, topicName, null);
+        NativeNode.logger.debug("Create Native Subscription : " + fqnTopic);
         Subscription<T> subscription = null;
 
         if (GraphName.isValidTopic(fqnTopic)) {
@@ -255,6 +256,7 @@ public class NativeNode extends BaseNode {
         long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
         long timerHandle = NativeNode.nativeCreateTimerHandle(timerPeriodNS);
 
+        NativeNode.logger.debug("Create Native WallTimer.");
         WallTimer timer = new NativeWallTimer(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
         this.getWallTimers().add(timer);
         return timer;
@@ -286,17 +288,21 @@ public class NativeNode extends BaseNode {
         if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
         String fqnService =  GraphName.getFullName(this, serviceName, null);
-        NativeNode.logger.debug("Create Client : " + fqnService);
+        NativeNode.logger.debug("Create Native Client : " + fqnService);
         Client<T> client = null;
 
         if (GraphName.isValidTopic(fqnService)) {
             Class<? extends Message> requestType = null;
-            Method requestFromJavaConverterMethod = null, requestToJavaConverterMethod = null;
-            long requestFromJavaConverterHandle = 0L, requestToJavaConverterHandle = 0L;
+            Method requestFromJavaConverterMethod = null;
+            Method requestToJavaConverterMethod = null;
+            long requestFromJavaConverterHandle = 0L;
+            long requestToJavaConverterHandle = 0L;
 
             Class<? extends Message> responseType = null;
-            Method responseFromJavaConverterMethod = null, responseToJavaConverterMethod = null;
-            long responseFromJavaConverterHandle = 0L, responseToJavaConverterHandle = 0L;
+            Method responseFromJavaConverterMethod = null;
+            Method responseToJavaConverterMethod = null;
+            long responseFromJavaConverterHandle = 0L;
+            long responseToJavaConverterHandle = 0L;
 
             try {
                 requestType = (Class<? extends Message>)serviceType.getField("RequestType").get(null);
@@ -372,19 +378,23 @@ public class NativeNode extends BaseNode {
         if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
         String fqnService =  GraphName.getFullName(this, serviceName, null);
-        NativeNode.logger.debug("Create Service : " + fqnService);
+        NativeNode.logger.debug("Create Native Service : " + fqnService);
         Service<T> service = null;
 
         if (GraphName.isValidTopic(fqnService)) {
 //            long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service, qos);
 //            Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
             Class<? extends Message> requestType = null;
-            Method requestFromJavaConverterMethod = null, requestToJavaConverterMethod = null;
-            long requestFromJavaConverterHandle = 0L, requestToJavaConverterHandle = 0L;
+            Method requestFromJavaConverterMethod = null;
+            Method requestToJavaConverterMethod = null;
+            long requestFromJavaConverterHandle = 0L;
+            long requestToJavaConverterHandle = 0L;
 
             Class<? extends Message> responseType = null;
-            Method responseFromJavaConverterMethod = null, responseToJavaConverterMethod = null;
-            long responseFromJavaConverterHandle = 0L, responseToJavaConverterHandle = 0L;
+            Method responseFromJavaConverterMethod = null;
+            Method responseToJavaConverterMethod = null;
+            long responseFromJavaConverterHandle = 0L;
+            long responseToJavaConverterHandle = 0L;
 
             try {
                 requestType = (Class<? extends Message>)serviceType.getField("RequestType").get(null);
@@ -450,16 +460,19 @@ public class NativeNode extends BaseNode {
 
     @Override
     public List<String> getNodeNames() {
+        NativeNode.logger.debug("Get Native Node Names.");
         return NativeNode.nativeGetNodeNames(this.nodeHandle);
     }
 
     @Override
     public int countPublishers(final String topic) {
+        NativeNode.logger.debug("Count Native Publisher.");
         return NativeNode.nativeCountPublishers(this.nodeHandle, topic);
     }
 
     @Override
     public int countSubscribers(final String topic) {
+        NativeNode.logger.debug("Count Native Subscribers.");
         return NativeNode.nativeCountSubscribers(this.nodeHandle, topic);
     }
 
@@ -468,7 +481,6 @@ public class NativeNode extends BaseNode {
      * Return the rcl_node_t node handle (non-const version).
      * @return
      */
-    @Override
     public long getNodeHandle() {
         return this.nodeHandle;
     }

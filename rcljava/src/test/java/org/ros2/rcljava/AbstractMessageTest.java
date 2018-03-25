@@ -60,7 +60,7 @@ public abstract class AbstractMessageTest extends AbstractRosTest {
 
     @Test
     public final void testCreate() {
-        assertNotEquals(0, this.node.getNodeHandle());
+        assertNotEquals(null, this.node);
     }
 
     @SuppressWarnings("unchecked")

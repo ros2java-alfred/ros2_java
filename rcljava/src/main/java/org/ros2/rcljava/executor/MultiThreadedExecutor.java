@@ -37,6 +37,7 @@ public final class MultiThreadedExecutor extends BaseThreadedExecutor {
      * Parameters constructor. See the default constructor for Executor.
      */
     public MultiThreadedExecutor(final int numberOfThreads) {
+        super();
         if (numberOfThreads == 0) {
             this.numberOfThreads = 1;
         } else {

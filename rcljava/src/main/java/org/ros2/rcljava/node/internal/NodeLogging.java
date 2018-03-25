@@ -15,17 +15,17 @@
 
 package org.ros2.rcljava.node.internal;
 
-import org.ros2.rcljava.Log;
+import org.ros2.rcljava.Logger;
 
 public interface NodeLogging {
 
     /**
      * @return Return the logger of the node.
      */
-    Log getLogger();
+    Logger getLogger();
 
-//    /**
-//     * @return Return the logger name associated with the node.
-//     */
-//    String getLoggerName();
+    /**
+     * @return Return the logger name associated with the node.
+     */
+    String getLoggerName();
 }

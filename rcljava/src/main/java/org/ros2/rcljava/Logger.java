@@ -1,5 +1,4 @@
-/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
- * Copyright 2016-2018 Mickael Gaillard <mick.gaillard@gmail.com>
+/* Copyright 2016-2018 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +23,16 @@ import org.ros2.rcljava.node.topic.Topics;
 //import java.io.PrintWriter;
 //import java.io.StringWriter;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import std_msgs.msg.String;
 
 /**
  * <i>Not define in ROS2. Copy of ROS1</i>
  *
  */
-public class Log {
+public class Logger {
 
-    private final Logger log;
+    private final org.slf4j.Logger log;
+    private final String name;
     private final Node defaultNode;
     private final Publisher<std_msgs.msg.String> publisher;
 
@@ -46,13 +43,45 @@ public class Log {
     private boolean isTraceEnabled;
     private boolean isWarnEnabled;
 
-    public Log(final Node defaultNode) {
+    /**
+     * Constructor of a dummy logger.
+     *
+     * This is used when logging is disabled: see `RCLCPP_LOGGING_ENABLED`.
+     * This cannot be called directly, see `rclcpp::get_logger` instead.
+     *
+     * @param defaultNode
+     */
+    public Logger(final Node defaultNode) {
+        this(defaultNode, null);
+    }
+
+    /**
+     * Constructor of a named logger.
+     *
+     * This cannot be called directly, see `rclcpp::get_logger` instead.
+     *
+     * @param defaultNode
+     * @param name
+     */
+    public Logger(final Node defaultNode, String name) {
+        this.name = name;
         this.defaultNode = defaultNode;
         this.publisher = this.defaultNode.createPublisher(std_msgs.msg.String.class, Topics.ROSOUT);
         this.log = LoggerFactory.getLogger(
                 GraphName.getFullName(
                         this.defaultNode.getNameSpace(),
                         this.defaultNode.getName()));
+    }
+
+    /**
+     * Get the name of this logger.
+     *
+     * @return the full name of the logger including any prefixes, or
+     *  `null` if this logger is invalid (e.g. because logging is
+     *   disabled).
+     */
+    public String getName() {
+        return this.name;
     }
 
 //    public Publisher<rosgraph_msgs.msg.Log> getPublisher() {
@@ -72,7 +101,7 @@ public class Log {
 //        logMessage.setLevel(level);
 //        logMessage.setName(this.defaultNode.getName());
 //        logMessage.setMsg(message.toString());
-        String logMessage = new String();
+        std_msgs.msg.String logMessage = new std_msgs.msg.String();
         logMessage.setData(message.toString());
         this.publisher.publish(logMessage);
     }

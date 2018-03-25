@@ -24,7 +24,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.ArgumentParser;
-import org.ros2.rcljava.Log;
+import org.ros2.rcljava.Logger;
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
@@ -41,7 +41,6 @@ import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.time.WallTimer;
 import org.ros2.rcljava.time.WallTimerCallback;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import builtin_interfaces.msg.Time;
@@ -57,7 +56,7 @@ import rcl_interfaces.msg.SetParametersResult;
  */
 public abstract class BaseNode implements Node {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseNode.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BaseNode.class);
 
     protected static final String ERROR_QOS       = "QOS can't be null";
     protected static final String ERROR_MSG       = "Message Type can't be null.";
@@ -113,12 +112,12 @@ public abstract class BaseNode implements Node {
     /**
      * Log to ROS2.
      */
-    private Log logRos;
+    private Logger rosLogger;
 
     private ParameterCallback parameterCallback ;
 
     public BaseNode(final String namespace, final String defaultName, final String[] args) {
-        BaseNode.logger.debug("Create Node stack...");
+        BaseNode.logger.info("Create Node stack...");
 
         ArgumentParser argParser = new ArgumentParser(namespace, defaultName, args);
 
@@ -140,7 +139,7 @@ public abstract class BaseNode implements Node {
 
     public void startParameterService() {
         this.parameterService = new ParameterService(this);
-        this.logRos = new Log(this);
+        this.rosLogger = new Logger(this);
     }
 
     /* (non-Javadoc)
@@ -156,7 +155,7 @@ public abstract class BaseNode implements Node {
      */
     @Override
     public void dispose() {
-        BaseNode.logger.debug("Destroy Node stack : " + this.name);
+        BaseNode.logger.info("Destroy Node stack : " + this.name);
         this.parameterService.dispose();
 
         Queue<Client<?>> tmpClients = new LinkedBlockingQueue<Client<?>>(this.clients);
@@ -200,15 +199,6 @@ public abstract class BaseNode implements Node {
     }
 
     /* (non-Javadoc)
-     * @see org.ros2.rcljava.node.Node#createPublisher(java.lang.Class, java.lang.String, org.ros2.rcljava.qos.QoSProfile)
-     */
-//    @Override
-//    public <T extends Message> Publisher<T> createPublisher(Class<T> messageType, String topicName, QoSProfile qos) {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
-
-    /* (non-Javadoc)
      * @see org.ros2.rcljava.node.Node#createPublisher(java.lang.Class, java.lang.String, int)
      */
     @Override
@@ -232,20 +222,6 @@ public abstract class BaseNode implements Node {
 
         return this.createPublisher(messageType, topicName, QoSProfile.DEFAULT);
     }
-
-    /* (non-Javadoc)
-      * @see org.ros2.rcljava.node.Node#createSubscription(java.lang.Class, java.lang.String, org.ros2.rcljava.node.topic.SubscriptionCallback, org.ros2.rcljava.qos.QoSProfile, boolean)
-    */
-//    @Override
-//    public <T extends Message> Subscription<T> createSubscription(
-//            final Class<T> messageType,
-//            final String topicName,
-//            final SubscriptionCallback<T> callback,
-//            final QoSProfile qos,
-//            final boolean ignoreLocalPublications) {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
 
     /* (non-Javadoc)
      * @see org.ros2.rcljava.node.Node#createSubscription(java.lang.Class, java.lang.String, org.ros2.rcljava.node.topic.SubscriptionCallback, org.ros2.rcljava.qos.QoSProfile)
@@ -311,18 +287,6 @@ public abstract class BaseNode implements Node {
     }
 
     /* (non-Javadoc)
-     * @see org.ros2.rcljava.node.Node#createClient(java.lang.Class, java.lang.String, org.ros2.rcljava.qos.QoSProfile)
-     */
-//    @Override
-//    public <T extends MessageService> Client<T> createClient(
-//            final Class<T> serviceType,
-//            final String serviceName,
-//            final QoSProfile qos) {
-//
-//        return null;
-//    }
-
-    /* (non-Javadoc)
      * @see org.ros2.rcljava.node.Node#createClient(java.lang.Class, java.lang.String)
      */
     @Override
@@ -332,19 +296,6 @@ public abstract class BaseNode implements Node {
 
         return this.createClient(serviceType, serviceName, QoSProfile.SERVICES_DEFAULT);
     }
-
-    /* (non-Javadoc)
-     * @see org.ros2.rcljava.node.Node#createService(java.lang.Class, java.lang.String, org.ros2.rcljava.node.service.ServiceCallback, org.ros2.rcljava.qos.QoSProfile)
-     */
-//    @Override
-//    public <T extends MessageService> Service<T> createService(
-//            final Class<T> serviceType,
-//            final String serviceName,
-//            final ServiceCallback<?, ?> callback,
-//            final QoSProfile qos) {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
 
     /* (non-Javadoc)
      * @see org.ros2.rcljava.node.Node#createService(java.lang.Class, java.lang.String, org.ros2.rcljava.node.service.ServiceCallback)
@@ -677,11 +628,18 @@ public abstract class BaseNode implements Node {
     }
 
     /* (non-Javadoc)
-     * @see org.ros2.rcljava.node.Node#getLog()
+     * @see org.ros2.rcljava.node.Node#getLogger()
      */
     @Override
-    public Log getLogger() {
-        return this.logRos;
+    public Logger getLogger() {
+        return this.rosLogger;
+    }
+
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.node.Node#getLoggerName()
+     */
+    public String getLoggerName() {
+        return this.rosLogger.getName();
     }
 
     /* (non-Javadoc)

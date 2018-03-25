@@ -27,6 +27,7 @@ public final class SingleThreadedExecutor extends BaseThreadedExecutor {
      * Default constructor. See the default constructor for Executor.
      */
     public SingleThreadedExecutor() {
+        super();
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
