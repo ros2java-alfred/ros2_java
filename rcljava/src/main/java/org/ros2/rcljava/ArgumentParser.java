@@ -28,7 +28,7 @@ public final class ArgumentParser {
 
     private String prefix;
     private String nodeName;
-    private Map<String, ParameterVariant<?>> parameters = new ConcurrentHashMap<String, ParameterVariant<?>>();
+    private final Map<String, ParameterVariant<?>> parameters = new ConcurrentHashMap<String, ParameterVariant<?>>();
 
     public ArgumentParser(final String namespace, final String defaultName, final String[] args) {
         this.prefix = namespace;
@@ -60,9 +60,9 @@ public final class ArgumentParser {
     }
 
     private void parseNodeAndSpaceName(final String[] args) {
-        for (String arg : args) {
+        for (final String arg : args) {
             if (arg.contains(ASSIGN)) {
-                String[] item = arg.split(ASSIGN);
+                final String[] item = arg.split(ASSIGN);
 
                 if (PARAM_NODE.equals(item[0]) && item[1] != null) {
                     this.nodeName = item[1];
@@ -76,14 +76,14 @@ public final class ArgumentParser {
     }
 
     private void parseParameters(final String[] args) {
-        for (String arg : args) {
+        for (final String arg : args) {
             if (arg.contains(ASSIGN)) {
-                String[] item = arg.split(ASSIGN);
+                final String[] item = arg.split(ASSIGN);
 
                 // Remove dash
-                String keyRaw = item[0].trim();
-                String key = (keyRaw.startsWith("-")) ? keyRaw.substring(1) : keyRaw;
-                String val = item[1].trim();
+                final String keyRaw = item[0].trim();
+                final String key = (keyRaw.startsWith("-")) ? keyRaw.substring(1) : keyRaw;
+                final String val = item[1].trim();
                 //TODO NativeNode.getLog().debug("Parse argument : " + arg + "\t\t key : " + key + "\t\t value : "+ val );
 
                 if (this.parameters.get(key) == null) {
@@ -108,7 +108,7 @@ public final class ArgumentParser {
         }
     }
 
-    private boolean isInteger(String value) {
+    private boolean isInteger(final String value) {
         boolean result = false;
 
         try {
@@ -119,7 +119,7 @@ public final class ArgumentParser {
         return result;
     }
 
-    private boolean isBoolean(String value) {
+    private boolean isBoolean(final String value) {
         boolean result = false;
 
         try {
@@ -130,7 +130,7 @@ public final class ArgumentParser {
         return result;
     }
 
-    private boolean isDouble(String value) {
+    private boolean isDouble(final String value) {
         boolean result = false;
 
         try {
@@ -141,7 +141,7 @@ public final class ArgumentParser {
         return result;
     }
 
-    private boolean isLong(String value) {
+    private boolean isLong(final String value) {
         boolean result = false;
 
         try {

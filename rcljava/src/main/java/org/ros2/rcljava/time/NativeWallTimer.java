@@ -98,7 +98,7 @@ public class NativeWallTimer implements WallTimer, java.lang.AutoCloseable {
     }
 
     public long getTimerPeriodNS() {
-        long timerPeriodNS = NativeWallTimer.nativeGetTimerPeriodNS(this.wallTimerHandle);
+        final long timerPeriodNS = NativeWallTimer.nativeGetTimerPeriodNS(this.wallTimerHandle);
         this.timerPeriodNS = timerPeriodNS;
         return this.timerPeriodNS;
     }
@@ -111,7 +111,7 @@ public class NativeWallTimer implements WallTimer, java.lang.AutoCloseable {
 
     @Override
     public void dispose() {
-        Node node = this.nodeReference.get();
+        final Node node = this.nodeReference.get();
         if (node != null) {
             NativeWallTimer.logger.debug("Destroy Timer of node : " + node.getName());
             NativeWallTimer.nativeDispose(this.wallTimerHandle);

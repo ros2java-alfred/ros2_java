@@ -35,12 +35,12 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     }
 
     @Override
-    public void addNode(Node node) {
+    public void addNode(final Node node) {
         this.addNode(node, false);
     }
 
     @Override
-    public void addNode(Node node, boolean notify) {
+    public void addNode(final Node node, final boolean notify) {
         if (!this.nodes.contains(node)) {
             this.nodes.add(node);
 
@@ -51,18 +51,18 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     }
 
     @Override
-    public void removeNode(Node node) {
+    public void removeNode(final Node node) {
         this.removeNode(node, false);
     }
 
     @Override
-    public void removeNode(Node node, boolean notify) {
+    public void removeNode(final Node node, final boolean notify) {
         if (this.nodes.contains(node)) {
             this.nodes.remove(node);
 
-            if (notify) {
-
-            }
+//            if (notify) {
+//
+//            }
         }
     }
 
@@ -76,7 +76,7 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     }
 
     @Override
-    public void spinOnce(long timeout) {
+    public void spinOnce(final long timeout) {
         final AnyExecutable anyExecutable = this.baseExecutor.getNextExecutable(timeout);
 
         if (anyExecutable != null) {
@@ -93,14 +93,14 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     }
 
     @Override
-    public void spinNodeOnce(Node node, long timeout) {
+    public void spinNodeOnce(final Node node, final long timeout) {
         this.addNode(node, false);
         this.spinOnce(timeout);
         this.removeNode(node, false);
     }
 
     @Override
-    public void spinNodeSome(Node node) {
+    public void spinNodeSome(final Node node) {
         this.addNode(node, false);
         this.spinSome();
         this.removeNode(node, false);

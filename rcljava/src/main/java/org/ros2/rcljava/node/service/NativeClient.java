@@ -120,7 +120,7 @@ public class NativeClient<T extends MessageService>
                       this.requestFromJavaConverterHandle,
                       this.requestToJavaConverterHandle,
                       request);
-              RCLFuture<V> future = new RCLFuture<V>(this.nodeReference);
+              final RCLFuture<V> future = new RCLFuture<V>(this.nodeReference);
               pendingRequests.put(sequenceNumber, future);
               return future;
             }
@@ -128,7 +128,7 @@ public class NativeClient<T extends MessageService>
 
     public final <V extends Message> void handleResponse(final RMWRequestId header,final V response) {
         synchronized(pendingRequests) {
-            long sequenceNumber = header.sequenceNumber;
+            final long sequenceNumber = header.sequenceNumber;
             @SuppressWarnings("unchecked")
             RCLFuture<V> future = (RCLFuture<V>) pendingRequests.remove(sequenceNumber);
             future.set(response);

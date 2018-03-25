@@ -38,16 +38,16 @@ public class NativeExecutor {
     private final BaseThreadedExecutor executor;
     private final MemoryStrategy memoryStrategy;
 
-    public NativeExecutor(BaseThreadedExecutor executor) {
+    public NativeExecutor(final BaseThreadedExecutor executor) {
         NativeExecutor.logger.debug("Create Native Executor.");
 
         this.executor = executor;
         this.memoryStrategy = new MemoryStrategy();
     }
 
-    public void getNextTimer(AnyExecutable anyExecutable) {
-        for (Node node : this.executor.nodes) {
-            for (WallTimer timer : node.getWallTimers()) {
+    public void getNextTimer(final AnyExecutable anyExecutable) {
+        for (final Node node : this.executor.nodes) {
+            for (final WallTimer timer : node.getWallTimers()) {
                 if (timer.isReady()) {
                     anyExecutable.timer = timer;
                     return;
@@ -60,7 +60,7 @@ public class NativeExecutor {
      *
      */
     @SuppressWarnings({ "resource" })
-    private void waitForWork(long timeout) {
+    private void waitForWork(final long timeout) {
 
         memoryStrategy.clearHandles();
 //        boolean hasInvalidNodes =
@@ -71,7 +71,7 @@ public class NativeExecutor {
         int clientsSize = 0;
         int servicesSize = 0;
 
-        for (Node node : this.executor.nodes) {
+        for (final Node node : this.executor.nodes) {
             subscriptionsSize   += node.getSubscriptions().size();
             timersSize          += node.getWallTimers().size();
             clientsSize         += node.getClients().size();
@@ -79,7 +79,7 @@ public class NativeExecutor {
         }
 
         if (subscriptionsSize > 0 || timersSize > 0 || clientsSize > 0 || servicesSize > 0) {
-            long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
+            final long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
 
             RCLJava.nativeWaitSetInit(
                     waitSetHandle,
@@ -96,24 +96,24 @@ public class NativeExecutor {
             RCLJava.nativeWaitSetClearClients(waitSetHandle);
 
 
-            for (Node node : this.executor.nodes) {
+            for (final Node node : this.executor.nodes) {
                 // Subscribe waiset components.
-                for (Subscription<?> subscription : node.getSubscriptions()) {
-                    NativeSubscription<?> nativeSubscription = (NativeSubscription<?>) subscription;
+                for (final Subscription<?> subscription : node.getSubscriptions()) {
+                    final NativeSubscription<?> nativeSubscription = (NativeSubscription<?>) subscription;
                     RCLJava.nativeWaitSetAddSubscription(waitSetHandle, nativeSubscription.getSubscriptionHandle());
                 }
 
-                for (WallTimer timer : node.getWallTimers()) {
+                for (final WallTimer timer : node.getWallTimers()) {
                     RCLJava.nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
                 }
 
-                for (Service<?> service : node.getServices()) {
+                for (final Service<?> service : node.getServices()) {
 
                     RCLJava.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
                 }
 
-                for (Client<?> client : node.getClients()) {
-                    NativeClient<?> nativeClient = (NativeClient<?>) client;
+                for (final Client<?> client : node.getClients()) {
+                    final NativeClient<?> nativeClient = (NativeClient<?>) client;
                     RCLJava.nativeWaitSetAddClient(waitSetHandle, nativeClient.getClientHandle());
                 }
             }
@@ -129,7 +129,7 @@ public class NativeExecutor {
      * @return
      */
     public AnyExecutable getNextReadyExecutable() {
-        AnyExecutable anyExecutable = this.memoryStrategy.instantiateNextExecutable();
+        final AnyExecutable anyExecutable = this.memoryStrategy.instantiateNextExecutable();
 
         // Check the timers to see if there are any that are ready, if so return
         this.getNextTimer(anyExecutable);
@@ -167,7 +167,7 @@ public class NativeExecutor {
      * @param timeout
      * @return
      */
-    public synchronized AnyExecutable getNextExecutable(long timeout) {
+    public synchronized AnyExecutable getNextExecutable(final long timeout) {
         AnyExecutable anyExecutable = this.getNextReadyExecutable();
 
         if (anyExecutable == null) {
@@ -220,8 +220,8 @@ public class NativeExecutor {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static void executeSubscription(final Subscription subscription) {
-        NativeSubscription<? extends Message> nativeSubscription = (NativeSubscription<?> ) subscription;
-        Message message = RCLJava.nativeTake(nativeSubscription.getSubscriptionHandle(), nativeSubscription.getMessageType());
+        final NativeSubscription<? extends Message> nativeSubscription = (NativeSubscription<?> ) subscription;
+        final Message message = RCLJava.nativeTake(nativeSubscription.getSubscriptionHandle(), nativeSubscription.getMessageType());
         if (message != null) {
             subscription.getCallback().dispatch(message);
         }
@@ -233,8 +233,8 @@ public class NativeExecutor {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static void executeService(final Service service) {
-        Class<?> requestType = service.getRequestType();
-        Class<?> responseType = service.getResponseType();
+        final Class<?> requestType = service.getRequestType();
+        final Class<?> responseType = service.getResponseType();
 
         Message requestMessage = null;
         Message responseMessage = null;
@@ -249,10 +249,10 @@ public class NativeExecutor {
         }
 
         if (requestMessage != null && responseMessage != null) {
-            long requestFromJavaConverterHandle = service.getRequestFromJavaConverterHandle();
-            long requestToJavaConverterHandle = service.getRequestToJavaConverterHandle();
-            long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
-            long responseToJavaConverterHandle = service.getResponseToJavaConverterHandle();
+            final long requestFromJavaConverterHandle = service.getRequestFromJavaConverterHandle();
+            final long requestToJavaConverterHandle = service.getRequestToJavaConverterHandle();
+            final long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
+            final long responseToJavaConverterHandle = service.getResponseToJavaConverterHandle();
 
             RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
                     service.getServiceHandle(),
@@ -273,7 +273,7 @@ public class NativeExecutor {
     }
 
     @SuppressWarnings("rawtypes")
-    private static void executeClient(Client client) {
+    private static void executeClient(final Client client) {
 
     }
 }

@@ -40,20 +40,20 @@ public class MemoryStrategy {
 
 
     public boolean collectEntities(final BlockingQueue<Node> nodes) {
-        for (Node node : nodes) {
-            for (Subscription<?> subscription : node.getSubscriptions()) {
+        for (final Node node : nodes) {
+            for (final Subscription<?> subscription : node.getSubscriptions()) {
                 this.subscriptionHandles.add(subscription);
             }
 
-            for (Service<?> service : node.getServices()) {
+            for (final Service<?> service : node.getServices()) {
                 this.serviceHandles.add(service);
             }
 
-            for (Client<?> client : node.getClients()) {
+            for (final Client<?> client : node.getClients()) {
                 this.clientHandles.add(client);
             }
 
-            for (WallTimer timer : node.getWallTimers()) {
+            for (final WallTimer timer : node.getWallTimers()) {
                 this.timerHandles.add(timer);
             }
         }
@@ -69,21 +69,21 @@ public class MemoryStrategy {
         return new AnyExecutable();
     }
 
-    public void getNextSubscription(AnyExecutable anyExecutable, BlockingQueue<Node> nodes) {
+    public void getNextSubscription(final AnyExecutable anyExecutable, final BlockingQueue<Node> nodes) {
         final Subscription<?> subscription = this.subscriptionHandles.poll();
         if (subscription != null) {
             anyExecutable.subscription = subscription;
         }
     }
 
-    public void getNextService(AnyExecutable anyExecutable, BlockingQueue<Node> nodes) {
+    public void getNextService(final AnyExecutable anyExecutable, final BlockingQueue<Node> nodes) {
         final Service<?> service = this.serviceHandles.poll();
         if (service != null) {
             anyExecutable.service = service;
         }
     }
 
-    public void getNextClient(AnyExecutable anyExecutable, BlockingQueue<Node> nodes) {
+    public void getNextClient(final AnyExecutable anyExecutable, final BlockingQueue<Node> nodes) {
         final Client<?> client = this.clientHandles.poll();
         if (client != null) {
             anyExecutable.client = client;

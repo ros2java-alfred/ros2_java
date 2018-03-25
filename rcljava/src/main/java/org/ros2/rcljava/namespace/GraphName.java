@@ -38,27 +38,27 @@ public class GraphName {
      */
     private static Queue<Node> nodes = new LinkedBlockingQueue<Node>();
 
-    public static void addNode(Node node) {
+    public static void addNode(final Node node) {
 //        if (initialized) {
         GraphName.nodes.add(node);
 //        }
     }
 
-    public static void removeNode(Node node) {
+    public static void removeNode(final Node node) {
 //        if (initialized) {
         GraphName.nodes.remove(node);
 //        }
     }
 
     public static void dispose() {
-        for (Node node : GraphName.nodes) {
+        for (final Node node : GraphName.nodes) {
             node.dispose();
         }
     }
 
     private static String removeSheme(final String url) {
         String topicName = url;
-        boolean result = topicName != null;
+        final boolean result = topicName != null;
 
         if (result) {
             topicName = topicName.replaceAll(Topics.SCHEME, EMPTY);
@@ -105,7 +105,7 @@ public class GraphName {
      * @param options
      * @return
      */
-    public static String getFullName(final Node node, final String name, List<String> options) {
+    public static String getFullName(final Node node, final String name, final List<String> options) {
         String result = name;
         String nodeName = node.getName();
         String ns = node.getNameSpace();
@@ -128,7 +128,7 @@ public class GraphName {
 
         // Relative case
         if (name.startsWith(RELATIVE_TOPIC)) {
-            String relPath = name.replaceFirst(RELATIVE_TOPIC, EMPTY);
+            final String relPath = name.replaceFirst(RELATIVE_TOPIC, EMPTY);
             result = String.format(FORMAT_TOPIC, String.format(FORMAT_TOPIC, ns, nodeName), relPath);
         } else
 
@@ -157,7 +157,7 @@ public class GraphName {
         boolean result = name != null;
 
         if (result) {
-            String topicName = GraphName.removeSheme(name);
+            final String topicName = GraphName.removeSheme(name);
 
             result =
                     topicName != null &&
@@ -201,7 +201,7 @@ public class GraphName {
         boolean result = fqn != null;
 
         if (result) {
-            String topicName = GraphName.removeSheme(fqn);
+            final String topicName = GraphName.removeSheme(fqn);
 
             result = GraphName.isValidTopic(topicName) &&
                      topicName.startsWith(SEPARATOR) &&

@@ -63,7 +63,7 @@ public class Logger {
      * @param defaultNode
      * @param name
      */
-    public Logger(final Node defaultNode, String name) {
+    public Logger(final Node defaultNode, final String name) {
         this.name = name;
         this.defaultNode = defaultNode;
         this.publisher = this.defaultNode.createPublisher(std_msgs.msg.String.class, Topics.ROSOUT);
@@ -95,13 +95,13 @@ public class Logger {
 //        this.publish(level, message.toString() + '\n' + stringWriter.toString());
 //    }
 
-    private void publish(byte level, Object message) {
+    private void publish(final byte level, final Object message) {
 //        rosgraph_msgs.msg.Log logMessage = new rosgraph_msgs.msg.Log();
 //        logMessage.getHeader().setStamp(this.defaultNode.getCurrentTime());
 //        logMessage.setLevel(level);
 //        logMessage.setName(this.defaultNode.getName());
 //        logMessage.setMsg(message.toString());
-        std_msgs.msg.String logMessage = new std_msgs.msg.String();
+        final std_msgs.msg.String logMessage = new std_msgs.msg.String();
         logMessage.setData(message.toString());
         this.publisher.publish(logMessage);
     }
@@ -130,7 +130,7 @@ public class Logger {
         return this.isWarnEnabled;
     }
 
-    public void trace(Object message) {
+    public void trace(final Object message) {
         this.log.trace(message.toString());
         if (this.isTraceEnabled() && this.publisher != null) {
             this.publish((byte)0, message);
@@ -138,7 +138,7 @@ public class Logger {
         }
     }
 
-    public void trace(Object message, Throwable t) {
+    public void trace(final Object message, final Throwable t) {
         this.log.trace(message.toString());
         if (this.isTraceEnabled() && this.publisher != null) {
             this.publish((byte)0, message);
@@ -146,7 +146,7 @@ public class Logger {
         }
     }
 
-    public void debug(Object message) {
+    public void debug(final Object message) {
         this.log.debug(message.toString());
         if (this.isDebugEnabled() && this.publisher != null) {
             this.publish((byte)0, message);
@@ -154,7 +154,7 @@ public class Logger {
         }
     }
 
-    public void debug(Object message, Throwable t) {
+    public void debug(final Object message, final Throwable t) {
         this.log.debug(message.toString());
         if (this.isDebugEnabled() && this.publisher != null) {
             this.publish((byte)0, message);
@@ -162,7 +162,7 @@ public class Logger {
         }
     }
 
-    public void info(Object message) {
+    public void info(final Object message) {
         this.log.info(message.toString());
         if (this.isInfoEnabled() && this.publisher != null) {
             this.publish((byte)0, message);
@@ -170,7 +170,7 @@ public class Logger {
         }
     }
 
-    public void info(Object message, Throwable t) {
+    public void info(final Object message, final Throwable t) {
         this.log.info(message.toString());
         if (this.isInfoEnabled() && this.publisher != null) {
             this.publish((byte)0, message);
@@ -178,7 +178,7 @@ public class Logger {
         }
     }
 
-    public void warn(Object message) {
+    public void warn(final Object message) {
         this.log.warn(message.toString());
         if (this.isWarnEnabled() && this.publisher != null) {
             this.publish((byte)0, message);
@@ -186,7 +186,7 @@ public class Logger {
         }
     }
 
-    public void warn(Object message, Throwable t) {
+    public void warn(final Object message, final Throwable t) {
         this.log.warn(message.toString());
         if (this.isWarnEnabled() && this.publisher != null) {
             this.publish((byte)0, message);
@@ -194,7 +194,7 @@ public class Logger {
         }
     }
 
-    public void error(Object message) {
+    public void error(final Object message) {
         this.log.error(message.toString());
         if (this.isErrorEnabled() && this.publisher != null) {
             this.publish((byte)0, message);
@@ -202,7 +202,7 @@ public class Logger {
         }
     }
 
-    public void error(Object message, Throwable t) {
+    public void error(final Object message, final Throwable t) {
         this.log.error(message.toString());
         if (this.isErrorEnabled() && this.publisher != null) {
             this.publish((byte)0, message);
@@ -210,7 +210,7 @@ public class Logger {
         }
     }
 
-    public void fatal(Object message) {
+    public void fatal(final Object message) {
         this.log.error(message.toString());
         if (this.isFatalEnabled() && this.publisher != null) {
             this.publish((byte)0, message);
@@ -218,7 +218,7 @@ public class Logger {
         }
     }
 
-    public void fatal(Object message, Throwable t) {
+    public void fatal(final Object message, final Throwable t) {
         this.log.error(message.toString());
         if (this.isFatalEnabled() && this.publisher != null) {
             this.publish((byte)0, message);

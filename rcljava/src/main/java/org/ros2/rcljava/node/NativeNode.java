@@ -184,8 +184,8 @@ public class NativeNode extends BaseNode {
         Publisher<T> publisher = null;
 
         if (GraphName.isValidTopic(fqnTopic)) {
-            long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-            long publisherHandle = NativeNode.nativeCreatePublisherHandle(this.nodeHandle, messageType, fqnTopic, qosProfileHandle);
+            final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+            final long publisherHandle = NativeNode.nativeCreatePublisherHandle(this.nodeHandle, messageType, fqnTopic, qosProfileHandle);
             RCLJava.disposeQoSProfile(qosProfileHandle);
 
             publisher = new NativePublisher<T>(this, publisherHandle, messageType, topicName, qosProfile);
@@ -223,8 +223,8 @@ public class NativeNode extends BaseNode {
         Subscription<T> subscription = null;
 
         if (GraphName.isValidTopic(fqnTopic)) {
-            long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-            long subscriptionHandle = NativeNode.nativeCreateSubscriptionHandle(this.nodeHandle, messageType, fqnTopic, qosProfileHandle);
+            final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+            final long subscriptionHandle = NativeNode.nativeCreateSubscriptionHandle(this.nodeHandle, messageType, fqnTopic, qosProfileHandle);
             RCLJava.disposeQoSProfile(qosProfileHandle);
 
             subscription = new NativeSubscription<T>(
@@ -253,11 +253,11 @@ public class NativeNode extends BaseNode {
             final TimeUnit unit,
             final WallTimerCallback callback) {
 
-        long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
-        long timerHandle = NativeNode.nativeCreateTimerHandle(timerPeriodNS);
+        final long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
+        final long timerHandle = NativeNode.nativeCreateTimerHandle(timerPeriodNS);
 
         NativeNode.logger.debug("Create Native WallTimer.");
-        WallTimer timer = new NativeWallTimer(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
+        final WallTimer timer = new NativeWallTimer(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
         this.getWallTimers().add(timer);
         return timer;
     }
@@ -287,7 +287,7 @@ public class NativeNode extends BaseNode {
         if (serviceName == null) { throw new NullPointerException(ERROR_TOPIC_SRV); }
         if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
-        String fqnService =  GraphName.getFullName(this, serviceName, null);
+        final String fqnService =  GraphName.getFullName(this, serviceName, null);
         NativeNode.logger.debug("Create Native Client : " + fqnService);
         Client<T> client = null;
 
@@ -324,7 +324,7 @@ public class NativeNode extends BaseNode {
                 // TODO: handle exception
             }
 
-            long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+            final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
             long clientHandle = NativeNode.nativeCreateClientHandle(
                     this.nodeHandle,
                     serviceType,
@@ -377,7 +377,7 @@ public class NativeNode extends BaseNode {
         if (callback    == null) { throw new NullPointerException(ERROR_CALLBACK); }
         if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
-        String fqnService =  GraphName.getFullName(this, serviceName, null);
+        final String fqnService =  GraphName.getFullName(this, serviceName, null);
         NativeNode.logger.debug("Create Native Service : " + fqnService);
         Service<T> service = null;
 
@@ -416,8 +416,8 @@ public class NativeNode extends BaseNode {
                 // TODO: handle exception
             }
 
-            long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-            long serviceHandle = NativeNode.nativeCreateServiceHandle(this.nodeHandle, serviceType, serviceName, qosProfileHandle);
+            final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+            final long serviceHandle = NativeNode.nativeCreateServiceHandle(this.nodeHandle, serviceType, serviceName, qosProfileHandle);
             RCLJava.disposeQoSProfile(qosProfileHandle);
 
             service = new NativeService<T>(this,
@@ -437,10 +437,10 @@ public class NativeNode extends BaseNode {
     }
 
     @Override
-    public HashMap<String, List<String>> getTopicNamesAndTypes(boolean noDemangle) {
-        HashMap<String, List<String>> topics =  NativeNode.nativeGetListTopics(this.nodeHandle, noDemangle);
+    public HashMap<String, List<String>> getTopicNamesAndTypes(final boolean noDemangle) {
+        final HashMap<String, List<String>> topics =  NativeNode.nativeGetListTopics(this.nodeHandle, noDemangle);
 
-        for (Entry<String, List<String>> entry : topics.entrySet()) {
+        for (final Entry<String, List<String>> entry : topics.entrySet()) {
             NativeNode.logger.debug("\t - Topics: " + entry.getKey() + "\t Value: " + entry.getValue());
         }
 
@@ -449,9 +449,9 @@ public class NativeNode extends BaseNode {
 
     @Override
     public HashMap<String, List<String>> getServiceNamesAndTypes() {
-        HashMap<String, List<String>> services =  NativeNode.nativeGetListServices(this.nodeHandle);
+        final HashMap<String, List<String>> services =  NativeNode.nativeGetListServices(this.nodeHandle);
 
-        for (Entry<String, List<String>> entry : services.entrySet()) {
+        for (final Entry<String, List<String>> entry : services.entrySet()) {
             NativeNode.logger.debug("\t - Service: " + entry.getKey() + "\t Value: " + entry.getValue());
         }
 

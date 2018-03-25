@@ -163,7 +163,7 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
     }
 
     @Override
-    public void doInterProcessPublish(T message) {
+    public void doInterProcessPublish(final T message) {
         throw new NotImplementedException();
     }
 

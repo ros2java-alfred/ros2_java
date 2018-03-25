@@ -31,7 +31,7 @@ public class ParameterVariant<T> {
     private final String name;
     private T value;
 
-    public ParameterVariant(String name, T value) {
+    public ParameterVariant(final String name, final T value) {
         this.name = name;
         this.value = value;
     }
@@ -46,7 +46,7 @@ public class ParameterVariant<T> {
     /**
      * @param value the value to set
      */
-    public void setValue(T value) {
+    public void setValue(final T value) {
         this.value = value;
     }
 
@@ -67,7 +67,7 @@ public class ParameterVariant<T> {
 
     @SuppressWarnings("unchecked")
     public ParameterValue toParameterValue() {
-        ParameterValue p = new ParameterValue();
+        final ParameterValue p = new ParameterValue();
 
         if (this.value == null) {
             p.setType(ParameterType.PARAMETER_NOT_SET);
@@ -102,7 +102,7 @@ public class ParameterVariant<T> {
     }
 
     public Parameter toParameter() {
-        Parameter result = new Parameter();
+        final Parameter result = new Parameter();
         result.setName(this.name);
         result.setValue(this.toParameterValue());
 

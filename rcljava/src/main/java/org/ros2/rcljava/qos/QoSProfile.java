@@ -25,73 +25,6 @@ import org.ros2.rcljava.qos.policies.Reliability;
  */
 public class QoSProfile {
 
-    /**
-     * History mode.
-     */
-    private final History history;
-
-    /**
-     * Depth.
-     */
-    private final int depth;
-
-    /**
-     * Reliability.
-     */
-    private final Reliability reliability;
-
-    /**
-     * Durability.
-     */
-    private final Durability durability;
-
-    /**
-     * If true, any ROS specific namespacing conventions will be circumvented.
-     *
-     * In the case of DDS and topics, for example, this means the typical
-     * ROS specific prefix of `rt` would not be applied as described here:
-     *
-     *   {@linkplain http://design.ros2.org/articles/topic_and_service_names.html#ros-specific-namespace-prefix}
-     *
-     * This might be useful when trying to directly connect a native DDS topic
-     * with a ROS 2 topic.
-     */
-    private final boolean avoidRosNamespaceConventions = false;
-
-    /**
-     * Constructor.
-     * @param history
-     * @param depth
-     * @param reliability
-     * @param durability
-     */
-    public QoSProfile(History history, int depth, Reliability reliability, Durability durability) {
-        this.history = history;
-        this.depth = depth;
-        this.reliability = reliability;
-        this.durability = durability;
-    }
-
-    public final History getHistory() {
-        return this.history;
-    }
-
-    public final int getDepth() {
-        return this.depth;
-    }
-
-    public final Reliability getReliability() {
-        return this.reliability;
-    }
-
-    public final Durability getDurability() {
-        return this.durability;
-    }
-
-    public final boolean getAvoidRosNamespaceConventions() {
-        return this.avoidRosNamespaceConventions;
-    }
-
     public static final int DEPTH_SYSTEM_DEFAULT = 0;
 
     public static final QoSProfile SENSOR_DATA = new QoSProfile(
@@ -138,4 +71,71 @@ public class QoSProfile {
             DEPTH_SYSTEM_DEFAULT,
             Reliability.SYSTEM_DEFAULT,
             Durability.SYSTEM_DEFAULT);
+
+    /**
+     * History mode.
+     */
+    private final History history;
+
+    /**
+     * Depth.
+     */
+    private final int depth;
+
+    /**
+     * Reliability.
+     */
+    private final Reliability reliability;
+
+    /**
+     * Durability.
+     */
+    private final Durability durability;
+
+    /**
+     * If true, any ROS specific namespacing conventions will be circumvented.
+     *
+     * In the case of DDS and topics, for example, this means the typical
+     * ROS specific prefix of `rt` would not be applied as described here:
+     *
+     *   {@linkplain http://design.ros2.org/articles/topic_and_service_names.html#ros-specific-namespace-prefix}
+     *
+     * This might be useful when trying to directly connect a native DDS topic
+     * with a ROS 2 topic.
+     */
+    private final boolean avoidRosNamespaceConventions = false;
+
+    /**
+     * Constructor.
+     * @param history
+     * @param depth
+     * @param reliability
+     * @param durability
+     */
+    public QoSProfile(final History history, final int depth, final Reliability reliability, final Durability durability) {
+        this.history = history;
+        this.depth = depth;
+        this.reliability = reliability;
+        this.durability = durability;
+    }
+
+    public final History getHistory() {
+        return this.history;
+    }
+
+    public final int getDepth() {
+        return this.depth;
+    }
+
+    public final Reliability getReliability() {
+        return this.reliability;
+    }
+
+    public final Durability getDurability() {
+        return this.durability;
+    }
+
+    public final boolean getAvoidRosNamespaceConventions() {
+        return this.avoidRosNamespaceConventions;
+    }
 }

@@ -119,7 +119,7 @@ public abstract class BaseNode implements Node {
     public BaseNode(final String namespace, final String defaultName, final String[] args) {
         BaseNode.logger.info("Create Node stack...");
 
-        ArgumentParser argParser = new ArgumentParser(namespace, defaultName, args);
+        final ArgumentParser argParser = new ArgumentParser(namespace, defaultName, args);
 
         this.name           = argParser.getName();
         if (this.name==null || this.name.length() == 0) { throw new NullPointerException("Node name is needed !"); }
@@ -158,23 +158,23 @@ public abstract class BaseNode implements Node {
         BaseNode.logger.info("Destroy Node stack : " + this.name);
         this.parameterService.dispose();
 
-        Queue<Client<?>> tmpClients = new LinkedBlockingQueue<Client<?>>(this.clients);
-        for (Client<?> client : tmpClients) {
+        final Queue<Client<?>> tmpClients = new LinkedBlockingQueue<Client<?>>(this.clients);
+        for (final Client<?> client : tmpClients) {
             client.dispose();
         }
 
-        Queue<Publisher<?>> tmpPublishers = new LinkedBlockingQueue<Publisher<?>>(this.publishers);
-        for (Publisher<?> publisher : tmpPublishers) {
+        final Queue<Publisher<?>> tmpPublishers = new LinkedBlockingQueue<Publisher<?>>(this.publishers);
+        for (final Publisher<?> publisher : tmpPublishers) {
             publisher.dispose();
         }
 
-        Queue<Service<?>> tmpServices = new LinkedBlockingQueue<Service<?>>(this.services);
-        for (Service<?> service : tmpServices) {
+        final Queue<Service<?>> tmpServices = new LinkedBlockingQueue<Service<?>>(this.services);
+        for (final Service<?> service : tmpServices) {
             service.dispose();
         }
 
-        Queue<Subscription<?>> tmpSubscribers = new LinkedBlockingQueue<Subscription<?>>(this.subscriptions);
-        for (Subscription<?> subscriber : tmpSubscribers) {
+        final Queue<Subscription<?>> tmpSubscribers = new LinkedBlockingQueue<Subscription<?>>(this.subscriptions);
+        for (final Subscription<?> subscriber : tmpSubscribers) {
             subscriber.dispose();
         }
 
@@ -207,7 +207,7 @@ public abstract class BaseNode implements Node {
             final String topicName,
             final int qosHistoryDepth) {
 
-        QoSProfile qos = QoSProfile.SYSTEM_DEFAULT;
+        final QoSProfile qos = QoSProfile.SYSTEM_DEFAULT;
         //TODO fix the depth.
         return this.createPublisher(messageType, topicName, qos);
     }
@@ -247,7 +247,7 @@ public abstract class BaseNode implements Node {
             final int qosHistoryDepth,
             final boolean ignoreLocalPublications) {
 
-        QoSProfile qos = QoSProfile.SYSTEM_DEFAULT;
+        final QoSProfile qos = QoSProfile.SYSTEM_DEFAULT;
         //TODO fix the depth.
         return this.createSubscription(messageType, topicName, callback, qos, ignoreLocalPublications);
     }
@@ -281,7 +281,7 @@ public abstract class BaseNode implements Node {
     * @see org.ros2.rcljava.node.Node#createWallTimer(long, java.util.concurrent.TimeUnit, org.ros2.rcljava.time.WallTimerCallback)
     */
     @Override
-    public WallTimer createWallTimer(long period, TimeUnit unit, WallTimerCallback callback) {
+    public WallTimer createWallTimer(final long period, final TimeUnit unit, final WallTimerCallback callback) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -316,12 +316,12 @@ public abstract class BaseNode implements Node {
     public List<SetParametersResult> setParameters(final List<ParameterVariant<?>> parameters) {
         final List<SetParametersResult> results = new ArrayList<SetParametersResult>();
 
-        ArrayList<ParameterVariant<?>> container = new ArrayList<ParameterVariant<?>>(1);
-        for (ParameterVariant<?> parameterVariantRequest : parameters) {
+        final ArrayList<ParameterVariant<?>> container = new ArrayList<ParameterVariant<?>>(1);
+        for (final ParameterVariant<?> parameterVariantRequest : parameters) {
             container.clear();
             container.add(parameterVariantRequest);
 
-            SetParametersResult result = this.setParametersAtomically(container);
+            final SetParametersResult result = this.setParametersAtomically(container);
             results.add(result);
         }
 
@@ -345,8 +345,8 @@ public abstract class BaseNode implements Node {
         }
 
         if (result.getSuccessful()){
-            for (ParameterVariant<?> paramVarReq : parameters) {
-                Parameter parameter = paramVarReq.toParameter();
+            for (final ParameterVariant<?> paramVarReq : parameters) {
+                final Parameter parameter = paramVarReq.toParameter();
 
                 if (!this.parameters.containsKey(paramVarReq.getName())) {
                     if (parameter.getValue().getType() != ParameterType.PARAMETER_NOT_SET) {
@@ -385,8 +385,9 @@ public abstract class BaseNode implements Node {
     public List<ParameterVariant<?>> getParameters(final List<String> names) {
         final List<ParameterVariant<?>>  result = new ArrayList<ParameterVariant<?>>();
 
-        for (String name : names) {
-            ParameterVariant<?> param = this.getParameter(name);
+        for (final String name : names) {
+            final ParameterVariant<?> param = this.getParameter(name);
+
             if (param != null) {
                 result.add(param);
             }
@@ -429,7 +430,7 @@ public abstract class BaseNode implements Node {
      * @see org.ros2.rcljava.node.Node#describeParameters(java.util.List)
      */
     @Override
-    public List<ParameterDescriptor> describeParameters(List<String> names) {
+    public List<ParameterDescriptor> describeParameters(final List<String> names) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -438,7 +439,7 @@ public abstract class BaseNode implements Node {
      * @see org.ros2.rcljava.node.Node#getParameterTypes(java.util.List)
      */
     @Override
-    public List<Class<?>> getParameterTypes(List<String> names) {
+    public List<Class<?>> getParameterTypes(final List<String> names) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -447,7 +448,7 @@ public abstract class BaseNode implements Node {
      * @see org.ros2.rcljava.node.Node#listParameters(java.util.List, int)
      */
     @Override
-    public ListParametersResult listParameters(List<String> names, int depth) {
+    public ListParametersResult listParameters(final List<String> names, int depth) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -456,12 +457,12 @@ public abstract class BaseNode implements Node {
     * @see org.ros2.rcljava.node.Node#registerParamChangeCallback(org.ros2.rcljava.node.topic.SubscriptionCallback)
     */
     @Override
-    public <T extends Message> void registerParamChangeCallback(SubscriptionCallback<T> callback) {
+    public <T extends Message> void registerParamChangeCallback(final SubscriptionCallback<T> callback) {
         // TODO Auto-generated method stub
 
     }
 
-    public void onParamChange(ParameterCallback parameterCallback) {
+    public void onParamChange(final ParameterCallback parameterCallback) {
         this.parameterCallback = parameterCallback;
     }
 
@@ -486,7 +487,7 @@ public abstract class BaseNode implements Node {
     * @see org.ros2.rcljava.node.Node#countPublishers(java.lang.String)
     */
     @Override
-    public int countPublishers(String topic) {
+    public int countPublishers(final String topic) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -495,7 +496,7 @@ public abstract class BaseNode implements Node {
     * @see org.ros2.rcljava.node.Node#countSubscribers(java.lang.String)
     */
     @Override
-    public int countSubscribers(String topic) {
+    public int countSubscribers(final String topic) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -513,7 +514,7 @@ public abstract class BaseNode implements Node {
     * @see org.ros2.rcljava.node.Node#waitForGraphChange(java.lang.Object, int)
     */
     @Override
-    public void waitForGraphChange(Object event, int timeout) {
+    public void waitForGraphChange(final Object event, final int timeout) {
         // TODO Auto-generated method stub
 
     }
@@ -570,7 +571,7 @@ public abstract class BaseNode implements Node {
     public List<Byte> getParametersTypes(final List<String> names) {
         final List<Byte> result = new ArrayList<Byte>();
 
-        for (String name : names) {
+        for (final String name : names) {
             if (this.parameters.containsKey(name)) {
                 result.add(this.parameters.get(name).toParameterValue().getType());
             }
@@ -647,8 +648,8 @@ public abstract class BaseNode implements Node {
      */
     @Override
     public Time getCurrentTime() {
-        long lt = System.currentTimeMillis();
-        Time t = new Time();
+        final long lt = System.currentTimeMillis();
+        final Time t = new Time();
         t.setSec((int) (lt / 1e3));
         t.setNanosec((int) ((lt % 1e3) * 1e6));
         return t;

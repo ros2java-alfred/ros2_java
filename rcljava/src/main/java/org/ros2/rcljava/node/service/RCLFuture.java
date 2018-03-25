@@ -27,10 +27,10 @@ import org.ros2.rcljava.executor.ThreadedExecutor;
 import org.ros2.rcljava.node.Node;
 
 public class RCLFuture<V> implements Future<V> {
-    private ThreadedExecutor executor = null;
+    private ThreadedExecutor executor;
     private WeakReference<Node> nodeReference;
-    private boolean done = false;
-    private V value = null;
+    private boolean done;
+    private V value;
 
     public RCLFuture(final WeakReference<Node> nodeReference) {
         this.nodeReference = nodeReference;
@@ -50,7 +50,7 @@ public class RCLFuture<V> implements Future<V> {
             if (this.executor != null) {
                 this.executor.spinOnce(0);
             } else {
-                Node node = nodeReference.get();
+                final Node node = nodeReference.get();
                 if (node == null) {
                     return null; // TODO(esteve) do something
                 }
@@ -69,7 +69,7 @@ public class RCLFuture<V> implements Future<V> {
 
         long endTime = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
 
-        long timeoutNS = TimeUnit.NANOSECONDS.convert(timeout, unit);
+        final long timeoutNS = TimeUnit.NANOSECONDS.convert(timeout, unit);
 
         if (timeoutNS > 0) {
             endTime += timeoutNS;
@@ -79,7 +79,7 @@ public class RCLFuture<V> implements Future<V> {
             if (this.executor != null) {
                 this.executor.spinOnce(0);
             } else {
-                Node node = nodeReference.get();
+                final Node node = nodeReference.get();
                 if (node == null) {
                     return null; // TODO(esteve) do something
                 }
@@ -91,7 +91,7 @@ public class RCLFuture<V> implements Future<V> {
                 return this.value;
             }
 
-            long now = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+            final long now = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
             if (now >= endTime) {
                 throw new TimeoutException();
             }

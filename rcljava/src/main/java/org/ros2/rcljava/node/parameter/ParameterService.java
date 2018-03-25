@@ -154,10 +154,10 @@ public class ParameterService {
                                 final GetParameters_Request request,
                                 final GetParameters_Response response) {
                             logger.debug("Replies to get Parameters.");
-                            List<ParameterValue> paramsResult = new ArrayList<ParameterValue>();
+                            final List<ParameterValue> paramsResult = new ArrayList<ParameterValue>();
 
-                            List<ParameterVariant<?>> paramsCurrent = ownerNode.getParameters(request.getNames());
-                            for (ParameterVariant<?> parameterVariant : paramsCurrent) {
+                            final List<ParameterVariant<?>> paramsCurrent = ownerNode.getParameters(request.getNames());
+                            for (final ParameterVariant<?> parameterVariant : paramsCurrent) {
                                 paramsResult.add(parameterVariant.toParameterValue());
                             }
 
@@ -205,11 +205,11 @@ public class ParameterService {
                                 final SetParameters_Response response) {
 
                             logger.debug("Replies to set Parameters.");
-                            List<ParameterVariant<?>> parameterVariants = new ArrayList<ParameterVariant<?>>();
-                            for (Parameter parameterVariant : request.getParameters()) {
+                            final List<ParameterVariant<?>> parameterVariants = new ArrayList<ParameterVariant<?>>();
+                            for (final Parameter parameterVariant : request.getParameters()) {
                                 parameterVariants.add(ParameterVariant.fromParameter(parameterVariant));
                             }
-                            List<SetParametersResult> result = ownerNode.setParameters(parameterVariants);
+                            final List<SetParametersResult> result = ownerNode.setParameters(parameterVariants);
                             response.setResults(result);
                         }
                     },
@@ -232,8 +232,8 @@ public class ParameterService {
                                 final SetParametersAtomically_Response response) {
 
                             logger.debug("Replies to set Parameters Atomically.");
-                            List<ParameterVariant<?>> parameterVariants = new ArrayList<ParameterVariant<?>>();
-                            for (Parameter parameterVariant : request.getParameters()) {
+                            final List<ParameterVariant<?>> parameterVariants = new ArrayList<ParameterVariant<?>>();
+                            for (final Parameter parameterVariant : request.getParameters()) {
                                 parameterVariants.add(ParameterVariant.fromParameter(parameterVariant));
                             }
                             response.setResult(ownerNode.setParametersAtomically(parameterVariants));
@@ -259,9 +259,9 @@ public class ParameterService {
 
                             logger.debug("Replies to describe Parameters. ! NOT IMPLEMENTED !");
 
-                            List<ParameterDescriptor> listDescritiorResult = new ArrayList<ParameterDescriptor>();
+                            final List<ParameterDescriptor> listDescritiorResult = new ArrayList<ParameterDescriptor>();
 
-                            ParameterDescriptor descriptor = new ParameterDescriptor();
+                            final ParameterDescriptor descriptor = new ParameterDescriptor();
 //                            descriptor.setName(arg0);
 //                            descriptor.setType(arg0);
                             listDescritiorResult.add(descriptor);
@@ -288,7 +288,7 @@ public class ParameterService {
                             final ListParameters_Response response) {
 
                         logger.debug("Replies to list of Parameters.");
-                        ListParametersResult listParamResult = new ListParametersResult();
+                        final ListParametersResult listParamResult = new ListParametersResult();
                         listParamResult.setNames(ownerNode.getParametersNames());
                         response.setResult(listParamResult);
 
