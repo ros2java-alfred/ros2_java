@@ -25,17 +25,22 @@ import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.time.WallTimer;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class serves as a bridge between ROS2's rcl_waitset_t and RCLJava.
  */
 public class NativeExecutor {
 
-    private BaseThreadedExecutor executor;
-    private MemoryStrategy memoryStrategy;
+    private static final Logger logger = LoggerFactory.getLogger(NativeExecutor.class);
+
+    private final BaseThreadedExecutor executor;
+    private final MemoryStrategy memoryStrategy;
 
     public NativeExecutor(BaseThreadedExecutor executor) {
+        NativeExecutor.logger.debug("Create Native Executor.");
+
         this.executor = executor;
         this.memoryStrategy = new MemoryStrategy();
     }

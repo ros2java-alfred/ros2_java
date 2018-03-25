@@ -85,6 +85,14 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/time/WallTimer.java"
   "src/main/java/org/ros2/rcljava/time/WallTimerCallback.java"
 
+  "src/main/java/org/ros2/rcljava/node/internal/NodeClock.java"
+  "src/main/java/org/ros2/rcljava/node/internal/NodeGraph.java"
+  "src/main/java/org/ros2/rcljava/node/internal/NodeLogging.java"
+  "src/main/java/org/ros2/rcljava/node/internal/NodeParameters.java"
+  "src/main/java/org/ros2/rcljava/node/internal/NodeServices.java"
+  "src/main/java/org/ros2/rcljava/node/internal/NodeTimers.java"
+  "src/main/java/org/ros2/rcljava/node/internal/NodeTopics.java"
+
   "src/main/java/org/ros2/rcljava/node/NativeNode.java"
   "src/main/java/org/ros2/rcljava/node/BaseNode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"

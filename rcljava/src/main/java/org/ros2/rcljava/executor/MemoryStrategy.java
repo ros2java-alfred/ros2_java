@@ -26,14 +26,10 @@ import org.ros2.rcljava.time.WallTimer;
 
 public class MemoryStrategy {
 
-    public ConcurrentLinkedQueue<Subscription<?>> subscriptionHandles = new ConcurrentLinkedQueue<Subscription<?>>();
-    public ConcurrentLinkedQueue<WallTimer> timerHandles = new ConcurrentLinkedQueue<WallTimer>();
-    public ConcurrentLinkedQueue<Service<?>> serviceHandles = new ConcurrentLinkedQueue<Service<?>>();
-    public ConcurrentLinkedQueue<Client<?>> clientHandles = new ConcurrentLinkedQueue<Client<?>>();
-
-    public MemoryStrategy() {
-
-    }
+    public final ConcurrentLinkedQueue<Subscription<?>> subscriptionHandles = new ConcurrentLinkedQueue<Subscription<?>>();
+    public final ConcurrentLinkedQueue<WallTimer> timerHandles = new ConcurrentLinkedQueue<WallTimer>();
+    public final ConcurrentLinkedQueue<Service<?>> serviceHandles = new ConcurrentLinkedQueue<Service<?>>();
+    public final ConcurrentLinkedQueue<Client<?>> clientHandles = new ConcurrentLinkedQueue<Client<?>>();
 
     public void clearHandles() {
         this.subscriptionHandles.clear();
@@ -74,21 +70,21 @@ public class MemoryStrategy {
     }
 
     public void getNextSubscription(AnyExecutable anyExecutable, BlockingQueue<Node> nodes) {
-        Subscription<?> subscription = this.subscriptionHandles.poll();
+        final Subscription<?> subscription = this.subscriptionHandles.poll();
         if (subscription != null) {
             anyExecutable.subscription = subscription;
         }
     }
 
     public void getNextService(AnyExecutable anyExecutable, BlockingQueue<Node> nodes) {
-        Service<?> service = this.serviceHandles.poll();
+        final Service<?> service = this.serviceHandles.poll();
         if (service != null) {
             anyExecutable.service = service;
         }
     }
 
     public void getNextClient(AnyExecutable anyExecutable, BlockingQueue<Node> nodes) {
-        Client<?> client = this.clientHandles.poll();
+        final Client<?> client = this.clientHandles.poll();
         if (client != null) {
             anyExecutable.client = client;
         }

@@ -114,7 +114,6 @@ public class SyncParametersClient {
                     String.format(ParameterService.TOPIC_DESCRIBEPARAMETERS, this.remoteNodeName),
                     profileParameter);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

@@ -1,5 +1,5 @@
 /* Copyright 2016 Esteve Fernandez <esteve@apache.org>
- * Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
+ * Copyright 2016-2018 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -307,7 +307,7 @@ public class NodeTest extends AbstractRosTest {
 
         boolean test = true;
         Node node = null;
-        HashMap<String, List<String>> topics = null;
+        Map<String, List<String>> topics = null;
         String fqnNode = null;
 
         try {

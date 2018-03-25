@@ -59,7 +59,7 @@ public class NativePublisher<T extends Message> implements Publisher<T>, java.la
      */
     private final String topicName;
 
-    /** Quality of Service profil. */
+    /** Quality of Service profile. */
     private final QoSProfile qosProfile;
 
     // Native call.

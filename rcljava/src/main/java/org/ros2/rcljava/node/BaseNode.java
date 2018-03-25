@@ -680,7 +680,7 @@ public abstract class BaseNode implements Node {
      * @see org.ros2.rcljava.node.Node#getLog()
      */
     @Override
-    public Log getLog() {
+    public Log getLogger() {
         return this.logRos;
     }
 
