@@ -28,11 +28,11 @@ public abstract class BaseWallTimer implements WallTimer {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseWallTimer.class);
 
-    private long timerPeriodNS;
-
     private final WeakReference<Node> nodeReference;
 
     private final WallTimerCallback callback;
+
+    private long timerPeriodNS;
 
     /**
      *
@@ -52,11 +52,17 @@ public abstract class BaseWallTimer implements WallTimer {
         this.timerPeriodNS = timerPeriodNS;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.AutoCloseable#close()
+     */
     @Override
     public void close() throws Exception {
         this.dispose();
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.WallTimer#dispose()
+     */
     @Override
     public void dispose() {
         final Node node = this.nodeReference.get();
@@ -65,18 +71,30 @@ public abstract class BaseWallTimer implements WallTimer {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.WallTimer#getCallback()
+     */
     public final WallTimerCallback getCallback() {
         return this.callback;
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.WallTimer#setTimerPeriodNS(long)
+     */
     public void setTimerPeriodNS(final long timerPeriodNS) {
         this.timerPeriodNS = timerPeriodNS;
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.WallTimer#getTimerPeriodNS()
+     */
     public long getTimerPeriodNS() {
         return this.timerPeriodNS;
     }
 
+    /**
+     * @return
+     */
     public Node getNode() {
         return this.nodeReference.get();
     }

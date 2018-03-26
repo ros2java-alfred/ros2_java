@@ -87,9 +87,13 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/qos/policies/Reliability.java"
   "src/main/java/org/ros2/rcljava/qos/QoSProfile.java"
 
+  # WallTimer Stack Base
   "src/main/java/org/ros2/rcljava/time/WallTimer.java"
-  "src/main/java/org/ros2/rcljava/time/NativeWallTimer.java"
   "src/main/java/org/ros2/rcljava/time/WallTimerCallback.java"
+  "src/main/java/org/ros2/rcljava/time/BaseWallTimer.java"
+  # WallTimer Implementation
+  "src/main/java/org/ros2/rcljava/time/NativeWallTimer.java"
+  "src/main/java/org/ros2/rcljava/time/JavaWallTimer.java"
 
   # Node Stack Base
   "src/main/java/org/ros2/rcljava/node/internal/NodeClock.java"
@@ -121,11 +125,21 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/node/topic/NativeSubscription.java"
   "src/main/java/org/ros2/rcljava/node/topic/JavaSubscription.java"
 
+  # Client Stack Base
   "src/main/java/org/ros2/rcljava/node/service/Client.java"
+  "src/main/java/org/ros2/rcljava/node/service/BaseClient.java"
+  # Client Implementation
   "src/main/java/org/ros2/rcljava/node/service/NativeClient.java"
+  "src/main/java/org/ros2/rcljava/node/service/JavaClient.java"
+
+  # Service Stack Base
   "src/main/java/org/ros2/rcljava/node/service/Service.java"
   "src/main/java/org/ros2/rcljava/node/service/ServiceCallback.java"
+  "src/main/java/org/ros2/rcljava/node/service/BaseService.java"
+  # Service Implementation
   "src/main/java/org/ros2/rcljava/node/service/NativeService.java"
+  "src/main/java/org/ros2/rcljava/node/service/JavaService.java"
+
   "src/main/java/org/ros2/rcljava/node/service/RCLFuture.java"
   "src/main/java/org/ros2/rcljava/node/service/RMWRequestId.java"
 

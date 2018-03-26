@@ -71,6 +71,9 @@ public class NativeWallTimer extends BaseWallTimer {
         this.wallTimerHandle = handle;
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.BaseWallTimer#dispose()
+     */
     @Override
     public void dispose() {
         super.dispose();
@@ -82,45 +85,78 @@ public class NativeWallTimer extends BaseWallTimer {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.WallTimer#timeSinceLastCall()
+     */
     public long timeSinceLastCall() {
         return NativeWallTimer.nativeTimeSinceLastCall(this.wallTimerHandle);
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.WallTimer#timeUntilNextCall()
+     */
     public long timeUntilNextCall() {
         return NativeWallTimer.nativeTimeUntilNextCall(this.wallTimerHandle);
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.WallTimer#reset()
+     */
     public void reset() {
         NativeWallTimer.nativeReset(this.wallTimerHandle);
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.WallTimer#cancel()
+     */
     public void cancel() {
         NativeWallTimer.nativeCancel(this.wallTimerHandle);
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.WallTimer#isCanceled()
+     */
     public boolean isCanceled() {
         return NativeWallTimer.nativeIsCanceled(this.wallTimerHandle);
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.WallTimer#isReady()
+     */
     public boolean isReady() {
         return NativeWallTimer.nativeIsReady(this.wallTimerHandle);
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.BaseWallTimer#setTimerPeriodNS(long)
+     */
+    @Override
     public void setTimerPeriodNS(final long timerPeriodNS) {
         NativeWallTimer.nativeSetTimerPeriodNS(this.wallTimerHandle, timerPeriodNS);
         super.setTimerPeriodNS(timerPeriodNS);
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.BaseWallTimer#getTimerPeriodNS()
+     */
+    @Override
     public long getTimerPeriodNS() {
         final long timerPeriodNS = NativeWallTimer.nativeGetTimerPeriodNS(this.wallTimerHandle);
         this.setTimerPeriodNS(timerPeriodNS);
         return super.getTimerPeriodNS();
     }
 
+    /**
+     * @return
+     */
     public long getHandle() {
         return this.wallTimerHandle;
     }
 
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.time.WallTimer#callTimer()
+     */
+    @Override
     public void callTimer() {
         NativeWallTimer.nativeCallTimer(this.wallTimerHandle);
     }
