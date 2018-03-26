@@ -21,7 +21,7 @@ import java.util.Vector;
 /**
  * Utility for load JNI.
  */
-public abstract class NativeUtils {
+public final class NativeUtils {
 
     private static java.lang.reflect.Field LIBRARIES;
 
@@ -35,6 +35,8 @@ public abstract class NativeUtils {
             e.printStackTrace();
         }
     }
+
+    private NativeUtils() { }
 
     @SuppressWarnings("unchecked")
     public static String[] getLoadedLibraries(final ClassLoader loader) {

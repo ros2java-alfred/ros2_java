@@ -23,7 +23,7 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.topic.Topics;
 
-public class GraphName {
+public final class GraphName {
 
     private static final String EMPTY = "";
     private static final String PRIVATE = "_";
@@ -37,6 +37,8 @@ public class GraphName {
      * All the @{link Node}s that have been created.
      */
     private static Queue<Node> nodes = new LinkedBlockingQueue<Node>();
+
+    private GraphName() {}
 
     public static void addNode(final Node node) {
 //        if (initialized) {
@@ -182,13 +184,10 @@ public class GraphName {
      * @return
      */
     public static boolean isValidSubstitution(final String substitution) {
-        boolean result =
-                substitution != null &&
-                substitution.length() > 0 &&
-                substitution.matches("^[_A-Za-z_/][_A-Za-z0-9/]*$") &&
-                !substitution.endsWith(PRIVATE);
-
-        return result;
+        return substitution != null &&
+               substitution.length() > 0 &&
+               substitution.matches("^[_A-Za-z_/][_A-Za-z0-9/]*$") &&
+               !substitution.endsWith(PRIVATE);
     }
 
     /**
