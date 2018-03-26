@@ -35,6 +35,7 @@ import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.time.NativeWallTimer;
 import org.ros2.rcljava.time.WallTimer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -332,7 +333,7 @@ public abstract class RCLJava {
                 RCLJava.nativeWaitSetAddSubscription(waitSetHandle, nativeSubscription.getSubscriptionHandle());
             }
 
-            for (final WallTimer timer : node.getWallTimers()) {
+            for (final NativeWallTimer timer : nativeNode.getNativeWallTimers()) {
                 RCLJava.nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
             }
 

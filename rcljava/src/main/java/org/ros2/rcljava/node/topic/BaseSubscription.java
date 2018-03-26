@@ -59,11 +59,9 @@ public abstract class BaseSubscription<T extends Message> implements Subscriptio
             final SubscriptionCallback<T> callback,
             final QoSProfile qosProfile) {
 
-        if (node == null) {
-            throw new RuntimeException("Need to provide active node with handle object");
-        }
-
+        if (node == null) { throw new RuntimeException("Need to provide active node with handle object"); }
         this.ownerNode = node;
+
         this.messageType = messageType;
         this.topicName = topic;
         this.callback = callback;

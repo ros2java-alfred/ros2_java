@@ -23,20 +23,15 @@ import org.ros2.rcljava.node.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NativeWallTimer implements WallTimer, java.lang.AutoCloseable {
+public class NativeWallTimer extends BaseWallTimer {
+
     private static final Logger logger = LoggerFactory.getLogger(NativeWallTimer.class);
 
     static {
         RCLJava.loadLibrary("rcljava_time_NativeWallTimer");
     }
 
-    private long timerPeriodNS;
-
-    private final WeakReference<Node> nodeReference;
-
     private final long wallTimerHandle;
-
-    private final WallTimerCallback callback;
 
     private static native boolean nativeIsReady(long handle);
 
@@ -56,16 +51,35 @@ public class NativeWallTimer implements WallTimer, java.lang.AutoCloseable {
 
     private static native long nativeCallTimer(long handle);
 
-    public NativeWallTimer(final WeakReference<Node> nodeReference, final long handle, final WallTimerCallback callback,
+    private static native void nativeDispose(long handle);
+
+    /**
+     *
+     * @param nodeReference
+     * @param handle
+     * @param callback
+     * @param timerPeriodNS
+     */
+    public NativeWallTimer(
+            final WeakReference<Node> nodeReference,
+            final long handle,
+            final WallTimerCallback callback,
             final long timerPeriodNS) {
-        this.nodeReference = nodeReference;
+        super(nodeReference, callback, timerPeriodNS);
+
+        if (handle == 0) { throw new RuntimeException("Need to provide active node with handle object"); }
         this.wallTimerHandle = handle;
-        this.callback = callback;
-        this.timerPeriodNS = timerPeriodNS;
     }
 
-    public final WallTimerCallback getCallback() {
-        return this.callback;
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        final Node node = this.getNode();
+        if (node != null) {
+            NativeWallTimer.logger.debug("Destroy Timer of node : " + node.getName());
+            NativeWallTimer.nativeDispose(this.wallTimerHandle);
+        }
     }
 
     public long timeSinceLastCall() {
@@ -94,36 +108,22 @@ public class NativeWallTimer implements WallTimer, java.lang.AutoCloseable {
 
     public void setTimerPeriodNS(final long timerPeriodNS) {
         NativeWallTimer.nativeSetTimerPeriodNS(this.wallTimerHandle, timerPeriodNS);
-        this.timerPeriodNS = timerPeriodNS;
+        super.setTimerPeriodNS(timerPeriodNS);
     }
 
     public long getTimerPeriodNS() {
         final long timerPeriodNS = NativeWallTimer.nativeGetTimerPeriodNS(this.wallTimerHandle);
-        this.timerPeriodNS = timerPeriodNS;
-        return this.timerPeriodNS;
+        this.setTimerPeriodNS(timerPeriodNS);
+        return super.getTimerPeriodNS();
     }
 
     public long getHandle() {
         return this.wallTimerHandle;
     }
 
-    private static native void nativeDispose(long handle);
-
-    @Override
-    public void dispose() {
-        final Node node = this.nodeReference.get();
-        if (node != null) {
-            NativeWallTimer.logger.debug("Destroy Timer of node : " + node.getName());
-            NativeWallTimer.nativeDispose(this.wallTimerHandle);
-        }
-    }
-
     public void callTimer() {
         NativeWallTimer.nativeCallTimer(this.wallTimerHandle);
     }
 
-    @Override
-    public void close() throws Exception {
-        this.dispose();
-    }
+
 }

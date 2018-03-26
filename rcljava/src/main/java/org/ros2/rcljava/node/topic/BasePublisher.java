@@ -49,12 +49,15 @@ public abstract class BasePublisher<T extends Message> implements Publisher<T> {
      * @param topic
      * @param qosProfile
      */
-    public BasePublisher(final Node node, final Class<T> messageType, final String topic, final QoSProfile qosProfile) {
-        if (node == null) {
-            throw new RuntimeException("Need to provide active node with handle object");
-        }
+    public BasePublisher(
+            final Node node,
+            final Class<T> messageType,
+            final String topic,
+            final QoSProfile qosProfile) {
 
+        if (node == null) { throw new RuntimeException("Need to provide active node with handle object"); }
         this.ownerNode = node;
+
         this.messageType = messageType;
         this.topicName = topic;
         this.qosProfile = qosProfile;

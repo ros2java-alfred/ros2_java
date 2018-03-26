@@ -71,7 +71,7 @@ public class TimerTest extends AbstractRosTest {
         TimerCallback timerCallback = new TimerCallback(future, max_iterations);
 
         WallTimer timer = node.createWallTimer(250, TimeUnit.MILLISECONDS, timerCallback);
-        assertNotEquals(0, timer.getHandle());
+        assertNotEquals(null, timer);
 
         while (RCLJava.ok() && !future.isDone()) {
             RCLJava.spinOnce(node);

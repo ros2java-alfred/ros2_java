@@ -15,7 +15,7 @@
 
 package org.ros2.rcljava.time;
 
-public interface WallTimer {
+public interface WallTimer extends AutoCloseable {
 
     long getTimerPeriodNS();
 
@@ -41,7 +41,5 @@ public interface WallTimer {
      * Safely destroy the underlying ROS2 publisher structure.
      */
     void dispose();
-
-    long getHandle();
 
 }

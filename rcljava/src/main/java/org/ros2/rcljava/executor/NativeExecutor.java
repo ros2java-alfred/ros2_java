@@ -112,7 +112,6 @@ public class NativeExecutor {
                 }
 
                 for (final NativeService<?> service : nativeNode.getNativeServices()) {
-
                     RCLJava.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
                 }
 
