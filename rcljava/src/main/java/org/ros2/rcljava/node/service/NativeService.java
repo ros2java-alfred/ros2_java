@@ -18,6 +18,7 @@ package org.ros2.rcljava.node.service;
 
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
 
 import org.slf4j.Logger;
@@ -28,24 +29,12 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> Service Type.
  */
-public class NativeService<T extends MessageService> implements Service<T> {
+public class NativeService<T extends MessageService> extends BaseService<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeService.class);
 
-    public static final String SCHEME = "rostopic://";
-
-    /** Name of the service */
-    private final String serviceName;
-
-    /** Node owner. */
-    private final Node ownerNode;
-
     /** Service Handler. */
     private final long serviceHandle;
-
-    private final Class<T> serviceType;
-
-    private final ServiceCallback<?, ?> callback;
 
     private final long requestFromJavaConverterHandle;
     private final long requestToJavaConverterHandle;
@@ -53,14 +42,19 @@ public class NativeService<T extends MessageService> implements Service<T> {
     private final long responseFromJavaConverterHandle;
     private final long responseToJavaConverterHandle;
 
-    private final Class<? extends Message> requestType;
-    private final Class<? extends Message> responseType;
-
     /**
-     * Constructor.
      *
-     * @param nodeHandle
+     * @param node
+     * @param serviceHandle
+     * @param serviceType
      * @param serviceName
+     * @param callback
+     * @param requestType
+     * @param responseType
+     * @param requestFromJavaConverterHandle
+     * @param requestToJavaConverterHandle
+     * @param responseFromJavaConverterHandle
+     * @param responseToJavaConverterHandle
      */
     public NativeService(
             final Node node,
@@ -74,78 +68,52 @@ public class NativeService<T extends MessageService> implements Service<T> {
             final long requestToJavaConverterHandle,
             final long responseFromJavaConverterHandle,
             final long responseToJavaConverterHandle) {
+        super(node, serviceType, serviceName, callback, requestType, responseType);
 
-        if (node == null && serviceHandle == 0) {
-            throw new RuntimeException("Need to provide active node with handle object");
-        }
+        NativeService.logger.debug("Init Native Service stack : " + serviceName);
 
-        NativeService.logger.debug("Init Service stack : " + serviceName);
-
-        this.ownerNode = node;
+        if (serviceHandle == 0) { throw new RuntimeException("Need to provide active service with handle object"); }
         this.serviceHandle = serviceHandle;
 
-        this.serviceType = serviceType;
-        this.serviceName = serviceName;
-        this.callback = callback;
-        this.requestType = requestType;
-        this.responseType = responseType;
         this.requestFromJavaConverterHandle = requestFromJavaConverterHandle;
         this.requestToJavaConverterHandle = requestToJavaConverterHandle;
         this.responseFromJavaConverterHandle = responseFromJavaConverterHandle;
         this.responseToJavaConverterHandle = responseToJavaConverterHandle;
-
-        this.ownerNode.getServices().add(this);
     }
 
     public void dispose() {
-        NativeService.logger.debug("Destroy Service stack : " + this.serviceName);
+        NativeService.logger.debug("Destroy Service stack : " + this.getServiceName());
 
-        if (this.ownerNode.getServices().contains(this)) {
-            this.ownerNode.getServices().remove(this);
-        }
+        super.dispose();
     }
 
-    public void sendResponse() {
+//    public void sendResponse() {
+//
+//    }
 
+    @Override
+    public NativeNode getNode() {
+        return (NativeNode) this.getNode();
     }
 
-    public String getServiceName() {
-        return this.serviceName;
-    }
-
-    public final ServiceCallback<?, ?> getCallback() {
-        return callback;
-    }
-
-    public final Class<T> getServiceType() {
-        return serviceType;
-    }
-
-    public final long getServiceHandle() {
+    public long getServiceHandle() {
         return this.serviceHandle;
     }
 
-    public final long getRequestFromJavaConverterHandle() {
+    public long getRequestFromJavaConverterHandle() {
         return this.requestFromJavaConverterHandle;
     }
 
-    public final long getRequestToJavaConverterHandle() {
+    public long getRequestToJavaConverterHandle() {
         return this.requestToJavaConverterHandle;
     }
 
-    public final long getResponseFromJavaConverterHandle() {
+    public long getResponseFromJavaConverterHandle() {
         return this.responseFromJavaConverterHandle;
     }
 
-    public final long getResponseToJavaConverterHandle() {
+    public long getResponseToJavaConverterHandle() {
         return this.responseToJavaConverterHandle;
     }
 
-    public final Class<? extends Message> getRequestType() {
-        return this.requestType;
-    }
-
-    public final Class<? extends Message> getResponseType() {
-        return this.responseType;
-    }
 }

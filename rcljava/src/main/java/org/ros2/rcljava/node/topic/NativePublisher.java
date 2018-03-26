@@ -36,7 +36,7 @@ public class NativePublisher<T extends Message> extends BasePublisher<T> {
     private static final Logger logger = LoggerFactory.getLogger(NativePublisher.class);
 
     static {
-        RCLJava.loadLibrary("rcljava_node_topic_NativePublisher"); //__" + RCLJava.getRMWIdentifier());
+        RCLJava.loadLibrary("rcljava_node_topic_NativePublisher");
     }
 
     /**
@@ -72,6 +72,7 @@ public class NativePublisher<T extends Message> extends BasePublisher<T> {
      * @param node Node instance associated.
      * @param publisherHandle A pointer to the underlying ROS2 publisher
      *     structure, as an integer. Must not be zero.
+     * @param messageType
      * @param topic The topic to which this publisher will publish messages.
      * @param qosProfile Quality of Service profile.
      */

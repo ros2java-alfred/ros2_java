@@ -42,6 +42,13 @@ public abstract class BasePublisher<T extends Message> implements Publisher<T> {
     /** Quality of Service profile. */
     private final QoSProfile qosProfile;
 
+    /**
+     *
+     * @param node
+     * @param messageType
+     * @param topic
+     * @param qosProfile
+     */
     public BasePublisher(final Node node, final Class<T> messageType, final String topic, final QoSProfile qosProfile) {
         if (node == null) {
             throw new RuntimeException("Need to provide active node with handle object");

@@ -13,6 +13,11 @@
     <rule ref="rulesets/java/basic.xml"></rule>
     <rule ref="rulesets/java/braces.xml"></rule>
     <rule ref="rulesets/java/codesize.xml"></rule>
+    <rule ref="rulesets/java/codesize.xml/ExcessiveParameterList">
+        <properties>
+            <property name="minimum" value="12" />
+        </properties>
+    </rule>
     <rule ref="rulesets/java/codesize.xml/TooManyMethods">
         <properties>
             <property name="maxmethods" value="30" />

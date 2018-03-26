@@ -20,7 +20,9 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Queue;
 import java.util.Map.Entry;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.RCLJava;
@@ -55,7 +57,7 @@ public class NativeNode extends BaseNode {
 
     // Loading JNI library.
     static {
-        RCLJava.loadLibrary("rcljava_node_NativeNode"); //__" + RCLJava.getRMWIdentifier());
+        RCLJava.loadLibrary("rcljava_node_NativeNode");
     }
 
     /**
@@ -457,6 +459,55 @@ public class NativeNode extends BaseNode {
         }
 
         return services;
+    }
+
+    public Queue<NativeSubscription<? extends Message>> getNativeSubscriptions() {
+        final Queue<NativeSubscription<? extends Message>> result = new LinkedBlockingDeque<NativeSubscription<? extends Message>>();
+
+        for (final Subscription<? extends Message> subscription : this.getSubscriptions()) {
+            result.add((NativeSubscription<? extends Message>)subscription);
+        }
+
+        return result;
+    }
+
+    public Queue<NativePublisher<? extends Message>> getNativePublishers() {
+        final Queue<NativePublisher<? extends Message>> result = new LinkedBlockingDeque<NativePublisher<? extends Message>>();
+
+        for (final Publisher<? extends Message> publisher : this.getPublishers()) {
+            result.add((NativePublisher<? extends Message>)publisher);
+        }
+
+        return result;
+    }
+
+    public Queue<NativeClient<? extends MessageService>> getNativeClients() {
+        final Queue<NativeClient<? extends MessageService>> result = new LinkedBlockingDeque<NativeClient<? extends MessageService>>();
+
+        for (final Client<? extends MessageService> client : this.getClients()) {
+            result.add((NativeClient<? extends MessageService>)client);
+        }
+
+        return result;
+    }
+
+    public Queue<NativeService<? extends MessageService>> getNativeServices() {
+        final Queue<NativeService<? extends MessageService>> result = new LinkedBlockingDeque<NativeService<? extends MessageService>>();
+
+        for (final Service<? extends MessageService> service : this.getServices()) {
+            result.add((NativeService<? extends MessageService>)service);
+        }
+
+        return result;
+    }
+
+    public Queue<NativeWallTimer> getNativeWallTimers() {
+        final Queue<NativeWallTimer> result = new LinkedBlockingDeque<NativeWallTimer>();
+
+        for (final WallTimer wallTimer : this.getWallTimers()) {
+            result.add((NativeWallTimer)wallTimer);
+        }
+        return result;
     }
 
     @Override

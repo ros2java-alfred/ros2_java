@@ -16,6 +16,7 @@
 
 package org.ros2.rcljava.node.topic;
 
+import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.qos.QoSProfile;
 
@@ -29,8 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> The type of the messages that this subscription will receive.
  */
-public class NativeSubscription<T extends org.ros2.rcljava.internal.message.Message>
-        extends BaseSubscription<T> {
+public class NativeSubscription<T extends Message> extends BaseSubscription<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeSubscription.class);
 

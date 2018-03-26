@@ -44,6 +44,14 @@ public abstract class BaseSubscription<T extends Message> implements Subscriptio
     /** Quality of Service profile. */
     private final QoSProfile qosProfile;
 
+    /**
+     *
+     * @param node
+     * @param messageType
+     * @param topic
+     * @param callback
+     * @param qosProfile
+     */
     public BaseSubscription(
             final Node node,
             final Class<T> messageType,

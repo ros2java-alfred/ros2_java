@@ -13,43 +13,38 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava.node.topic;
+package org.ros2.rcljava.node.service;
 
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
-import org.ros2.rcljava.node.JavaNode;
-import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.internal.service.MessageService;
+import org.ros2.rcljava.node.Node;
 
 /**
- * This class is JVM Subscription of RCLJava.
+ * This class is JVM Service of RCLJava.
  * <b>Actually not implemented !!!</b>
  */
-public class JavaSubscription<T extends Message> extends BaseSubscription<T> {
+public class JavaService<T extends MessageService> extends BaseService<T> {
 
     /**
      *
      * @param node
-     * @param messageType
-     * @param topic
+     * @param serviceType
+     * @param serviceName
      * @param callback
-     * @param qosProfile
+     * @param requestType
+     * @param responseType
      */
-    public JavaSubscription(
-            final JavaNode node,
-            final Class<T> messageType,
-            final String topic,
-            final SubscriptionCallback<T> callback,
-            final QoSProfile qosProfile) {
-        super(node, messageType, topic, callback, qosProfile);
+    public JavaService(
+            final Node node,
+            final Class<T> serviceType,
+            final String serviceName,
+            final ServiceCallback<?, ?> callback,
+            final Class<? extends Message> requestType,
+            final Class<? extends Message> responseType) {
+        super(node, serviceType, serviceName, callback, requestType, responseType);
 
         throw new NotImplementedException();
     }
 
-    /* (non-Javadoc)
-     * @see org.ros2.rcljava.node.topic.Subscription#getNode()
-     */
-    @Override
-    public JavaNode getNode() {
-        return (JavaNode) super.getNode();
-    }
 }

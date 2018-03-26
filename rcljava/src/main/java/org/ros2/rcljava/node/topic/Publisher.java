@@ -27,32 +27,10 @@ public interface Publisher<T extends Message> extends AutoCloseable {
     void dispose();
 
     /**
-     * Send a message to the topic for this publisher.
-     * This function is templated on the input message type, Message T.
-     *
-     * @param message An instance of the message to send.
-     */
-    void publish(final T message);
-
-    /**
      *
      * @param message An instance of the message to send.
      */
     void doInterProcessPublish(final T message);
-
-    /**
-     * Get the topic that this publisher publishes on.
-     *
-     * @return The topic name.
-     */
-    String getTopicName();
-
-    /**
-     * Get the queue size for this publisher.
-     *
-     * @return The queue size.
-     */
-    int getQueueSize();
 
     /**
      * Get the global identifier for this publisher (used in rmw and by DDS).
@@ -74,10 +52,36 @@ public interface Publisher<T extends Message> extends AutoCloseable {
     Class<T> getMessageType();
 
     /**
+     *
+     * @return
+     */
+    Node getNode();
+
+    /**
      * @return the qosProfile
      */
     QoSProfile getQosProfile();
 
-    Node getNode();
+    /**
+     * Get the queue size for this publisher.
+     *
+     * @return The queue size.
+     */
+    int getQueueSize();
+
+    /**
+     * Get the topic that this publisher publishes on.
+     *
+     * @return The topic name.
+     */
+    String getTopicName();
+
+    /**
+     * Send a message to the topic for this publisher.
+     * This function is templated on the input message type, Message T.
+     *
+     * @param message An instance of the message to send.
+     */
+    void publish(final T message);
 
 }

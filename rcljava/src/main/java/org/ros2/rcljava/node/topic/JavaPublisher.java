@@ -26,6 +26,13 @@ import org.ros2.rcljava.qos.QoSProfile;
  */
 public class JavaPublisher<T extends Message> extends BasePublisher<T> {
 
+    /**
+     *
+     * @param node
+     * @param messageType
+     * @param topic
+     * @param qosProfile
+     */
     public JavaPublisher(
             final JavaNode node,
             final Class<T> messageType,

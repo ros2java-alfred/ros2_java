@@ -17,13 +17,16 @@ package org.ros2.rcljava.executor;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.NativeClient;
+import org.ros2.rcljava.node.service.NativeService;
 import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.Subscription;
+import org.ros2.rcljava.time.NativeWallTimer;
 import org.ros2.rcljava.time.WallTimer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,24 +100,24 @@ public class NativeExecutor {
 
 
             for (final Node node : this.executor.nodes) {
+                final NativeNode nativeNode = (NativeNode) node;
+
                 // Subscribe waiset components.
-                for (final Subscription<?> subscription : node.getSubscriptions()) {
-                    final NativeSubscription<?> nativeSubscription = (NativeSubscription<?>) subscription;
-                    RCLJava.nativeWaitSetAddSubscription(waitSetHandle, nativeSubscription.getSubscriptionHandle());
+                for (final NativeSubscription<?> subscription : nativeNode.getNativeSubscriptions()) {
+                    RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
                 }
 
-                for (final WallTimer timer : node.getWallTimers()) {
+                for (final NativeWallTimer timer : nativeNode.getNativeWallTimers()) {
                     RCLJava.nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
                 }
 
-                for (final Service<?> service : node.getServices()) {
+                for (final NativeService<?> service : nativeNode.getNativeServices()) {
 
                     RCLJava.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
                 }
 
-                for (final Client<?> client : node.getClients()) {
-                    final NativeClient<?> nativeClient = (NativeClient<?>) client;
-                    RCLJava.nativeWaitSetAddClient(waitSetHandle, nativeClient.getClientHandle());
+                for (final NativeClient<?> client : nativeNode.getNativeClients()) {
+                    RCLJava.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
                 }
             }
 
@@ -233,14 +236,15 @@ public class NativeExecutor {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static void executeService(final Service service) {
+        final NativeService<?> nativeService = (NativeService<?>) service;
         final Class<?> requestType = service.getRequestType();
         final Class<?> responseType = service.getResponseType();
 
-        Message requestMessage = null;
+        Message requestMessage  = null;
         Message responseMessage = null;
 
         try {
-            requestMessage = (Message) requestType.newInstance();
+            requestMessage  = (Message) requestType.newInstance();
             responseMessage = (Message) responseType.newInstance();
         } catch (InstantiationException ie) {
             ie.printStackTrace();
@@ -249,13 +253,13 @@ public class NativeExecutor {
         }
 
         if (requestMessage != null && responseMessage != null) {
-            final long requestFromJavaConverterHandle = service.getRequestFromJavaConverterHandle();
-            final long requestToJavaConverterHandle = service.getRequestToJavaConverterHandle();
-            final long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
-            final long responseToJavaConverterHandle = service.getResponseToJavaConverterHandle();
+            final long requestFromJavaConverterHandle  = nativeService.getRequestFromJavaConverterHandle();
+            final long requestToJavaConverterHandle    = nativeService.getRequestToJavaConverterHandle();
+            final long responseFromJavaConverterHandle = nativeService.getResponseFromJavaConverterHandle();
+            final long responseToJavaConverterHandle   = nativeService.getResponseToJavaConverterHandle();
 
             RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
-                    service.getServiceHandle(),
+                    nativeService.getServiceHandle(),
                     requestFromJavaConverterHandle,
                     requestToJavaConverterHandle,
                     requestMessage);
@@ -263,7 +267,7 @@ public class NativeExecutor {
             if (rmwRequestId != null) {
                 service.getCallback().dispatch(rmwRequestId, requestMessage, responseMessage);
                 RCLJava.nativeSendServiceResponse(
-                        service.getServiceHandle(),
+                        nativeService.getServiceHandle(),
                         rmwRequestId,
                         responseFromJavaConverterHandle,
                         responseToJavaConverterHandle,

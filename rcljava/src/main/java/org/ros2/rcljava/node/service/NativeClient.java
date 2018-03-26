@@ -17,12 +17,9 @@
 package org.ros2.rcljava.node.service;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.Node;
@@ -32,13 +29,21 @@ import org.ros2.rcljava.node.Node;
  *
  * @param <T> Service Type.
  */
-public class NativeClient<T extends MessageService>
-        implements Client<T>, java.lang.AutoCloseable {
+public class NativeClient<T extends MessageService> extends BaseClient<T> {
 
     // Loading JNI library.
     static {
-        RCLJava.loadLibrary("rcljava_node_service_NativeClient"); //__" + RCLJava.getRMWIdentifier());
+        RCLJava.loadLibrary("rcljava_node_service_NativeClient");
     }
+
+    /** Client Handler. */
+    private final long clientHandle;
+
+    private final long requestFromJavaConverterHandle;
+    private final long requestToJavaConverterHandle;
+
+    private final long responseFromJavaConverterHandle;
+    private final long responseToJavaConverterHandle;
 
     private static native void nativeSendClientRequest(
             long clientHandle,
@@ -47,29 +52,18 @@ public class NativeClient<T extends MessageService>
             long requestToJavaConverterHandle,
             Object requestMessage);
 
-
-    private final WeakReference<Node> nodeReference;
-
-    /** Client Handler. */
-    private final long clientHandle;
-
-    private final Class<T> serviceType;
-    private final String serviceName;
-    private long sequenceNumber = 0;
-    private Map<Long, RCLFuture<?>> pendingRequests;
-
-    private long requestFromJavaConverterHandle = 0;
-    private long requestToJavaConverterHandle = 0;
-
-    private long responseFromJavaConverterHandle = 0;
-    private long responseToJavaConverterHandle = 0;
-
-    private final Class<? extends Message> requestType;
-    private final Class<? extends Message> responseType;
-
     /**
-     * Constructor.
      *
+     * @param nodeReference
+     * @param clientHandle
+     * @param serviceType
+     * @param serviceName
+     * @param requestType
+     * @param responseType
+     * @param requestFromJavaConverterHandle
+     * @param requestToJavaConverterHandle
+     * @param responseFromJavaConverterHandle
+     * @param responseToJavaConverterHandle
      */
     public NativeClient(
             final WeakReference<Node> nodeReference,
@@ -82,73 +76,33 @@ public class NativeClient<T extends MessageService>
             final long requestToJavaConverterHandle,
             final long responseFromJavaConverterHandle,
             final long responseToJavaConverterHandle) {
+        super(nodeReference, serviceType, serviceName, requestType, responseType);
 
-        if (nodeReference == null && clientHandle == 0) {
-            throw new RuntimeException("Need to provide active node with handle object");
-        }
-
-        this.nodeReference = nodeReference;
+        if (clientHandle == 0) { throw new RuntimeException("Need to provide active node with handle object"); }
         this.clientHandle = clientHandle;
 
-        this.serviceType = serviceType;
-        this.serviceName = serviceName;
-        this.requestType = requestType;
-        this.responseType = responseType;
         this.requestFromJavaConverterHandle = requestFromJavaConverterHandle;
         this.requestToJavaConverterHandle = requestToJavaConverterHandle;
         this.responseFromJavaConverterHandle = responseFromJavaConverterHandle;
         this.responseToJavaConverterHandle = responseToJavaConverterHandle;
-        this.pendingRequests = new HashMap<Long, RCLFuture<?>>();
-
-        this.nodeReference.get().getClients().add(this);
-    }
-
-    @Override
-    public void dispose() {
-        if (this.nodeReference.get().getClients().contains(this)) {
-            this.nodeReference.get().getClients().remove(this);
-        }
     }
 
     @Override
     public final <U extends Message, V extends Message> Future<V> sendRequest(final U request) {
-        synchronized(this.pendingRequests) {
-              this.sequenceNumber++;
+        synchronized(this.getPendingRequests()) {
+              this.incrementSequenceNumber();
+
               NativeClient.nativeSendClientRequest(
                       this.clientHandle,
-                      this.sequenceNumber,
+                      this.getSequenceNumber(),
                       this.requestFromJavaConverterHandle,
                       this.requestToJavaConverterHandle,
                       request);
-              final RCLFuture<V> future = new RCLFuture<V>(this.nodeReference);
-              pendingRequests.put(sequenceNumber, future);
+
+              final RCLFuture<V> future = new RCLFuture<V>(this.getNode());
+              getPendingRequests().put(this.getSequenceNumber(), future);
               return future;
             }
-    }
-
-    public final <V extends Message> void handleResponse(final RMWRequestId header,final V response) {
-        synchronized(pendingRequests) {
-            final long sequenceNumber = header.sequenceNumber;
-            @SuppressWarnings("unchecked")
-            RCLFuture<V> future = (RCLFuture<V>) pendingRequests.remove(sequenceNumber);
-            future.set(response);
-        }
-    }
-
-    public final Class<? extends Message> getRequestType() {
-        return this.requestType;
-    }
-
-    public final Class<? extends Message> getResponseType() {
-        return this.responseType;
-    }
-
-    public final String getServiceName() {
-        return this.serviceName;
-    }
-
-    public final Class<T> getServiceType() {
-        return this.serviceType;
     }
 
     public final long getClientHandle() {
@@ -169,16 +123,5 @@ public class NativeClient<T extends MessageService>
 
     public final long getResponseToJavaConverterHandle() {
         return this.responseToJavaConverterHandle;
-    }
-
-    public final boolean waitForService(final int i) {
-      //TODO
-        throw new NotImplementedException();
-//        return false;
-    }
-
-    @Override
-    public void close() throws Exception {
-        this.dispose();
     }
 }

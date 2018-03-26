@@ -29,6 +29,7 @@ import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.NativeClient;
+import org.ros2.rcljava.node.service.NativeService;
 import org.ros2.rcljava.node.service.RMWRequestId;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.topic.NativeSubscription;
@@ -303,10 +304,11 @@ public abstract class RCLJava {
             }
         }
 
+        final NativeNode nativeNode = (NativeNode) node;
         if (node.getClients().size() > 0 ||
-                node.getPublishers().size() > 0 ||
-                node.getServices().size() > 0 ||
-                node.getSubscriptions().size() > 0) {
+            node.getPublishers().size() > 0 ||
+            node.getServices().size() > 0 ||
+            node.getSubscriptions().size() > 0) {
 
             final long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
 
@@ -325,7 +327,7 @@ public abstract class RCLJava {
             RCLJava.nativeWaitSetClearClients(waitSetHandle);
 
             // Subscribe waiset components.
-            for (final Subscription<?> subscription : node.getSubscriptions()) {
+            for (final NativeSubscription<?> subscription : nativeNode.getNativeSubscriptions()) {
                 final NativeSubscription<?> nativeSubscription = (NativeSubscription<?>) subscription;
                 RCLJava.nativeWaitSetAddSubscription(waitSetHandle, nativeSubscription.getSubscriptionHandle());
             }
@@ -334,11 +336,11 @@ public abstract class RCLJava {
                 RCLJava.nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
             }
 
-            for (final Service<?> service : node.getServices()) {
+            for (final NativeService<?> service : nativeNode.getNativeServices()) {
                 RCLJava.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
             }
 
-            for (final Client<?> client : node.getClients()) {
+            for (final NativeClient<?> client : nativeNode.getNativeClients()) {
                 final NativeClient<?> nativeClient = (NativeClient<?>) client;
                 RCLJava.nativeWaitSetAddClient(waitSetHandle, nativeClient.getClientHandle());
             }
@@ -348,7 +350,7 @@ public abstract class RCLJava {
             RCLJava.nativeWaitSetFini(waitSetHandle);
 
             // Take all components.
-            for (final Subscription<? extends Message> subscription : node.getSubscriptions()) {
+            for (final NativeSubscription<? extends Message> subscription : nativeNode.getNativeSubscriptions()) {
 
                 final Subscription<Message> safeSubscription = (Subscription<Message>) subscription;
                 final NativeSubscription<Message> nativeSubscription = (NativeSubscription<Message>) subscription;
@@ -369,7 +371,7 @@ public abstract class RCLJava {
                 }
             }
 
-            for (@SuppressWarnings("rawtypes") final  Service service : node.getServices()) {
+            for (@SuppressWarnings("rawtypes") final NativeService service : nativeNode.getNativeServices()) {
                 final long requestFromJavaConverterHandle  = service.getRequestFromJavaConverterHandle();
                 final long requestToJavaConverterHandle    = service.getRequestToJavaConverterHandle();
                 final long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
@@ -405,7 +407,7 @@ public abstract class RCLJava {
                 }
             }
 
-            for (final Client<?> client : node.getClients()) {
+            for (final NativeClient<?> client : nativeNode.getNativeClients()) {
                 final NativeClient<?> nativeClient = (NativeClient<?>) client;
                 final long responseFromJavaConverterHandle = nativeClient.getResponseFromJavaConverterHandle();
                 final long responseToJavaConverterHandle = nativeClient.getResponseToJavaConverterHandle();
@@ -568,7 +570,7 @@ public abstract class RCLJava {
             }
 
             try {
-                System.loadLibrary(name);
+                System.loadLibrary(name);  //__" + RCLJava.getRMWIdentifier());
             } catch (UnsatisfiedLinkError e) {
                 RCLJava.logger.error("Native code library failed to load.", e);
             }

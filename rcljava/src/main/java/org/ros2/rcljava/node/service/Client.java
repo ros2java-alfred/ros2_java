@@ -20,7 +20,25 @@ import java.util.concurrent.Future;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
 
-public interface Client<T extends MessageService> {
+public interface Client<T extends MessageService> extends AutoCloseable {
+
+    /**
+     * Safely destroy the underlying ROS2 Client structure.
+     */
+    void dispose();
+
+    /**
+     *
+     * @return
+     */
+    Class<? extends Message> getResponseType();
+
+    /**
+     *
+     * @param rmwRequestId
+     * @param responseMessage
+     */
+    <U extends Message> void handleResponse(final RMWRequestId rmwRequestId, final U responseMessage);
 
     /**
      * Query Service.
@@ -30,14 +48,6 @@ public interface Client<T extends MessageService> {
      * @param request Request of the service.
      * @return Futur of Responce.
      */
-    <U extends Message, V extends Message> Future<V> sendRequest(U request);
+    <U extends Message, V extends Message> Future<V> sendRequest(final U request);
 
-    /**
-     * Safely destroy the underlying ROS2 Client structure.
-     */
-    void dispose();
-
-    Class<? extends Message> getResponseType();
-
-    <U extends Message> void handleResponse(RMWRequestId rmwRequestId, U responseMessage);
 }

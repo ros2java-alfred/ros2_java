@@ -17,29 +17,26 @@ package org.ros2.rcljava.node.service;
 
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
+import org.ros2.rcljava.node.Node;
 
-public interface Service<T extends MessageService> {
+public interface Service<T extends MessageService> extends AutoCloseable {
 
-    public static final String SCHEME = "rosservice://";
+    String SCHEME = "rosservice://";
 
     /**
      * Safely destroy the underlying ROS2 Service structure.
      */
     void dispose();
 
-    long getServiceHandle();
-
     ServiceCallback<?, ?> getCallback();
 
-    long getRequestFromJavaConverterHandle();
-
-    long getRequestToJavaConverterHandle();
-
-    long getResponseFromJavaConverterHandle();
-
-    long getResponseToJavaConverterHandle();
+    Node getNode();
 
     Class<? extends Message> getRequestType();
 
     Class<? extends Message> getResponseType();
+
+    String getServiceName();
+
+    Class<T> getServiceType();
 }
