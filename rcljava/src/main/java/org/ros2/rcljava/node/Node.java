@@ -50,18 +50,31 @@ public interface Node extends
         AutoCloseable {
 
     /**
-     * Get the name of the node.
-     *
      * @return Return the name of the node.
      */
     String getName();
 
     /**
-     * Get the namespace of the node.
-     *
      * @return Return the namespace of the node.
      */
     String getNameSpace();
+
+//    /**
+//     * @return Return Logger Name of the node.
+//     */
+//    String getLoggerName();
+//
+//    /**
+//     * @return Return the context of the node.
+//     */
+//    Context getContext();
+
+
+
+
+
+
+
 
     /**
      *

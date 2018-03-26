@@ -27,10 +27,12 @@ import org.ros2.rcljava.executor.ThreadedExecutor;
 import org.ros2.rcljava.node.Node;
 
 public class RCLFuture<V> implements Future<V> {
+
     private ThreadedExecutor executor;
     private WeakReference<Node> nodeReference;
     private boolean done;
     private V value;
+    private final Object lock = new Object();
 
     public RCLFuture(final WeakReference<Node> nodeReference) {
         this.nodeReference = nodeReference;
@@ -42,22 +44,27 @@ public class RCLFuture<V> implements Future<V> {
 
     @Override
     public final V get() throws InterruptedException, ExecutionException {
-        if(this.value != null) {
-            return this.value;
+        V result = null;
+
+        if(this.value == null) {
+            while (RCLJava.ok() && !this.isDone()) {
+                if (this.executor != null) {
+                    this.executor.spinOnce(0);
+                } else {
+                    final Node node = nodeReference.get();
+                    if (node == null) {
+                        break;
+                    } else {
+                        result = this.getValue();
+                    }
+                    RCLJava.spinOnce(node);
+                }
+            }
+        } else {
+            result = this.getValue();
         }
 
-        while (RCLJava.ok() && !this.isDone()) {
-            if (this.executor != null) {
-                this.executor.spinOnce(0);
-            } else {
-                final Node node = nodeReference.get();
-                if (node == null) {
-                    return null; // TODO(esteve) do something
-                }
-                RCLJava.spinOnce(node);
-            }
-        }
-        return this.value;
+        return result;
     }
 
     @Override
@@ -68,7 +75,6 @@ public class RCLFuture<V> implements Future<V> {
         }
 
         long endTime = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-
         final long timeoutNS = TimeUnit.NANOSECONDS.convert(timeout, unit);
 
         if (timeoutNS > 0) {
@@ -114,8 +120,16 @@ public class RCLFuture<V> implements Future<V> {
         return false;
     }
 
-    public final synchronized void set(final V value) {
-        this.value = value;
-        this.done = true;
+    public final void set(final V value) {
+        synchronized(this.lock) {
+            this.value = value;
+            this.done = true;
+        }
+    }
+
+    private V getValue() {
+        synchronized(this.lock) {
+            return this.value;
+        }
     }
 }

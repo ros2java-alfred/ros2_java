@@ -27,11 +27,9 @@ import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
-import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.NativeClient;
 import org.ros2.rcljava.node.service.NativeService;
 import org.ros2.rcljava.node.service.RMWRequestId;
-import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.qos.QoSProfile;
@@ -329,8 +327,7 @@ public abstract class RCLJava {
 
             // Subscribe waiset components.
             for (final NativeSubscription<?> subscription : nativeNode.getNativeSubscriptions()) {
-                final NativeSubscription<?> nativeSubscription = (NativeSubscription<?>) subscription;
-                RCLJava.nativeWaitSetAddSubscription(waitSetHandle, nativeSubscription.getSubscriptionHandle());
+                RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
             }
 
             for (final NativeWallTimer timer : nativeNode.getNativeWallTimers()) {
@@ -342,8 +339,7 @@ public abstract class RCLJava {
             }
 
             for (final NativeClient<?> client : nativeNode.getNativeClients()) {
-                final NativeClient<?> nativeClient = (NativeClient<?>) client;
-                RCLJava.nativeWaitSetAddClient(waitSetHandle, nativeClient.getClientHandle());
+                RCLJava.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
             }
 
             // Wait...

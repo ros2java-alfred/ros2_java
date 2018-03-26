@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import std_msgs.msg.String;
 
 public class PublisherTest extends AbstractRosTest {
+
     private static final Logger logger = LoggerFactory.getLogger(PublisherTest.class);
 
     @Test

@@ -50,6 +50,11 @@ public abstract class BaseWallTimer implements WallTimer {
 
         this.callback = callback;
         this.timerPeriodNS = timerPeriodNS;
+
+        final Node node = this.nodeReference.get();
+        if (node != null) {
+            node.getWallTimers().add(this);
+        }
     }
 
     /* (non-Javadoc)
@@ -68,6 +73,7 @@ public abstract class BaseWallTimer implements WallTimer {
         final Node node = this.nodeReference.get();
         if (node != null) {
             BaseWallTimer.logger.debug("Destroy Timer of node : " + node.getName());
+            node.getWallTimers().remove(this);
         }
     }
 

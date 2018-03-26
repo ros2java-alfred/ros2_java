@@ -27,12 +27,12 @@ import org.ros2.rcljava.time.WallTimer;
 public class AnyExecutable {
 
     // Only one of the following pointers will be set.
-    protected Subscription<?> subscription = null;
-    protected WallTimer timer = null;
-    protected Service<?> service = null;
-    protected Client<?> client = null;
+    protected Subscription<?> subscription;
+    protected WallTimer timer;
+    protected Service<?> service;
+    protected Client<?> client;
 
     // These are used to keep the scope on the containing items
-    protected Node node = null;
+    protected Node node;
 
 }

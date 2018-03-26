@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NodeTest extends AbstractRosTest {
+
     private static final Logger logger = LoggerFactory.getLogger(NodeTest.class);
     private static final String ERROR_RT = "Expected Runtime error.";
     private static final String ERROR_BAD = "Bad result";

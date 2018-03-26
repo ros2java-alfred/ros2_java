@@ -20,11 +20,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.ros2.rcljava.node.parameter.ParameterVariant;
 
+/**
+ * Argument Parser.
+ */
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public final class ArgumentParser {
 
+    private final static String EMPTY  = "";
     private final static String ASSIGN = "=";
-    private final static String PARAM_NODE = "-node";
-    private final static String PARAM_SPACE = "-prefix";
+    private final static String PARAM_PREFIX = "-";
+    private final static String PARAM_NODE = PARAM_PREFIX + "node";
+    private final static String PARAM_SPACE = PARAM_PREFIX + "prefix";
 
     private String prefix;
     private String nodeName;
@@ -39,7 +45,7 @@ public final class ArgumentParser {
         }
 
         if (this.prefix == null) {
-            this.prefix = "";
+            this.prefix = EMPTY;
         }
 
         if (args != null) {
@@ -75,6 +81,7 @@ public final class ArgumentParser {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void parseParameters(final String... args) {
         for (final String arg : args) {
             if (arg.contains(ASSIGN)) {
@@ -82,7 +89,7 @@ public final class ArgumentParser {
 
                 // Remove dash
                 final String keyRaw = item[0].trim();
-                final String key = (keyRaw.startsWith("-")) ? keyRaw.substring(1) : keyRaw;
+                final String key = (keyRaw.startsWith(PARAM_PREFIX)) ? keyRaw.substring(1) : keyRaw;
                 final String val = item[1].trim();
                 //TODO NativeNode.getLog().debug("Parse argument : " + arg + "\t\t key : " + key + "\t\t value : "+ val );
 
@@ -114,7 +121,9 @@ public final class ArgumentParser {
         try {
             Integer.parseInt(value);
             result = true;
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            // simply ignore
+        }
 
         return result;
     }
@@ -125,7 +134,9 @@ public final class ArgumentParser {
         try {
             Boolean.parseBoolean(value);
             result = true;
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            // simply ignore
+        }
 
         return result;
     }
@@ -136,7 +147,9 @@ public final class ArgumentParser {
         try {
             Double.parseDouble(value);
             result = true;
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            // simply ignore
+        }
 
         return result;
     }
@@ -147,7 +160,9 @@ public final class ArgumentParser {
         try {
             Long.parseLong(value);
             result = true;
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            // simply ignore
+        }
 
         return result;
     }

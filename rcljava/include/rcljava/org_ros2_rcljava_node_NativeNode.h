@@ -89,7 +89,7 @@ JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountSubscrib
 /*
  * Class:     org_ros2_rcljava_node_NativeNode
  * Method:    nativeGetListTopics
- * Signature: (JZ)Ljava/util/HashMap;
+ * Signature: (JZ)Ljava/util/Map;
  */
 JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTopics
   (JNIEnv *, jclass, jlong, jboolean);
@@ -97,7 +97,7 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTop
 /*
  * Class:     org_ros2_rcljava_node_NativeNode
  * Method:    nativeGetListServices
- * Signature: (J)Ljava/util/HashMap;
+ * Signature: (J)Ljava/util/Map;
  */
 JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListServices
   (JNIEnv *, jclass, jlong);

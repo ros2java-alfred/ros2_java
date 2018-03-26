@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TimerTest extends AbstractRosTest {
+
     private static final Logger logger = LoggerFactory.getLogger(TimerTest.class);
 
     public static class TimerCallback implements WallTimerCallback {
@@ -41,10 +42,10 @@ public class TimerTest extends AbstractRosTest {
         private int counter;
         private final int maxCount;
 
-        TimerCallback(final RCLFuture<Boolean> future, int maxCount) {
+        TimerCallback(final RCLFuture<Boolean> future, final int maxCount) {
             this.future = future;
-            this.counter = 0;
             this.maxCount = maxCount;
+            this.counter = 0;
         }
 
         public void tick() {
@@ -63,28 +64,28 @@ public class TimerTest extends AbstractRosTest {
     public final void testCreate() {
         logger.debug(new Object() {}.getClass().getEnclosingMethod().getName());
 
-        int max_iterations = 4;
+        final int max_iterations = 4;
 
-        Node node = RCLJava.createNode("test_node");
+        final Node node = RCLJava.createNode("test_node");
 
-        RCLFuture<Boolean> future = new RCLFuture<Boolean>(new WeakReference<Node>(node));
-        TimerCallback timerCallback = new TimerCallback(future, max_iterations);
+        final RCLFuture<Boolean> future = new RCLFuture<Boolean>(new WeakReference<Node>(node));
+        final TimerCallback timerCallback = new TimerCallback(future, max_iterations);
 
-        WallTimer timer = node.createWallTimer(250, TimeUnit.MILLISECONDS, timerCallback);
+        final WallTimer timer = node.createWallTimer(250, TimeUnit.MILLISECONDS, timerCallback);
         assertNotEquals(null, timer);
 
         while (RCLJava.ok() && !future.isDone()) {
             RCLJava.spinOnce(node);
         }
 
-        assertFalse(timer.isCanceled());
+        assertFalse("Time is cancel.", timer.isCanceled());
         timer.cancel();
 
-        assertEquals(TimeUnit.NANOSECONDS.convert(250, TimeUnit.MILLISECONDS), timer.getTimerPeriodNS());
-        assertFalse(timer.isReady());
-        assertTrue(timer.isCanceled());
+        assertEquals("Time period not good.", TimeUnit.NANOSECONDS.convert(250, TimeUnit.MILLISECONDS), timer.getTimerPeriodNS());
+        assertFalse("Time is ready.", timer.isReady());
+        assertTrue("Time is not cancel.", timer.isCanceled());
 
-        assertEquals(4, timerCallback.getCounter());
+        assertEquals("Bad count.", 4, timerCallback.getCounter());
 
         timer.dispose();
         node.dispose();

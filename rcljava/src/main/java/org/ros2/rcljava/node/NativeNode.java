@@ -20,6 +20,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Map.Entry;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -89,9 +90,9 @@ public class NativeNode extends BaseNode {
 
     private static native int nativeCountSubscribers(long nodeHandle, String topic);
 
-    private static native HashMap<String, List<String>> nativeGetListTopics(long nodeHandle, boolean noDemangle);
+    private static native Map<String, List<String>> nativeGetListTopics(long nodeHandle, boolean noDemangle);
 
-    private static native HashMap<String, List<String>> nativeGetListServices(long nodeHandle);
+    private static native Map<String, List<String>> nativeGetListServices(long nodeHandle);
 
     private static native List<String> nativeGetNodeNames(long nodeHandle);
 
@@ -260,9 +261,7 @@ public class NativeNode extends BaseNode {
         final long timerHandle = NativeNode.nativeCreateTimerHandle(timerPeriodNS);
 
         NativeNode.logger.debug("Create Native WallTimer.");
-        final WallTimer timer = new NativeWallTimer(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
-        this.getWallTimers().add(timer);
-        return timer;
+        return new NativeWallTimer(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
     }
 
     /**
@@ -440,8 +439,8 @@ public class NativeNode extends BaseNode {
     }
 
     @Override
-    public HashMap<String, List<String>> getTopicNamesAndTypes(final boolean noDemangle) {
-        final HashMap<String, List<String>> topics =  NativeNode.nativeGetListTopics(this.nodeHandle, noDemangle);
+    public Map<String, List<String>> getTopicNamesAndTypes(final boolean noDemangle) {
+        final Map<String, List<String>> topics =  NativeNode.nativeGetListTopics(this.nodeHandle, noDemangle);
 
         for (final Entry<String, List<String>> entry : topics.entrySet()) {
             NativeNode.logger.debug("\t - Topics: " + entry.getKey() + "\t Value: " + entry.getValue());
@@ -451,8 +450,8 @@ public class NativeNode extends BaseNode {
     }
 
     @Override
-    public HashMap<String, List<String>> getServiceNamesAndTypes() {
-        final HashMap<String, List<String>> services =  NativeNode.nativeGetListServices(this.nodeHandle);
+    public Map<String, List<String>> getServiceNamesAndTypes() {
+        final Map<String, List<String>> services =  NativeNode.nativeGetListServices(this.nodeHandle);
 
         for (final Entry<String, List<String>> entry : services.entrySet()) {
             NativeNode.logger.debug("\t - Service: " + entry.getKey() + "\t Value: " + entry.getValue());

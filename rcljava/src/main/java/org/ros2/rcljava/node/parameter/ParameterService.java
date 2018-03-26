@@ -105,6 +105,14 @@ public class ParameterService {
         }
     }
 
+    protected final Node getNode() {
+        return this.ownerNode;
+    }
+
+    protected final static Logger getLogger() {
+        return logger;
+    }
+
     public void notifyAddEvent(final ParameterEvent param) {
         if (this.eventparameterPublisher != null) {
             this.eventparameterPublisher.publish(param);
@@ -141,7 +149,7 @@ public class ParameterService {
     }
 
     private void loadGetParameter() {
-        final String fqnGetParameter =  GraphName.getFullName(this.ownerNode, TOPIC_GETPARAMETERS, null);
+        final String fqnGetParameter = GraphName.getFullName(this.ownerNode, TOPIC_GETPARAMETERS, null);
         if (GraphName.isValidTopic(fqnGetParameter)) {
             this.getParametersService = this.ownerNode.<GetParameters>createService(
                     GetParameters.class,
@@ -153,10 +161,13 @@ public class ParameterService {
                                 final RMWRequestId header,
                                 final GetParameters_Request request,
                                 final GetParameters_Response response) {
-                            logger.debug("Replies to get Parameters.");
-                            final List<ParameterValue> paramsResult = new ArrayList<ParameterValue>();
 
-                            final List<ParameterVariant<?>> paramsCurrent = ownerNode.getParameters(request.getNames());
+                            ParameterService.getLogger().debug("Replies to get Parameters.");
+
+                            final List<ParameterValue> paramsResult = new ArrayList<ParameterValue>();
+                            final List<ParameterVariant<?>> paramsCurrent =
+                                    ParameterService.this.getNode().getParameters(request.getNames());
+
                             for (final ParameterVariant<?> parameterVariant : paramsCurrent) {
                                 paramsResult.add(parameterVariant.toParameterValue());
                             }
@@ -181,9 +192,10 @@ public class ParameterService {
                                 final RMWRequestId header,
                                 final GetParameterTypes_Request request,
                                 final GetParameterTypes_Response response) {
-                            logger.debug("Replies to get Parameter Types !");
 
-                            response.setTypes(ownerNode.getParametersTypes(request.getNames()));
+                            ParameterService.getLogger().debug("Replies to get Parameter Types !");
+
+                            response.setTypes(ParameterService.this.getNode().getParametersTypes(request.getNames()));
                         }
                     },
                     this.qosProfile);
@@ -191,7 +203,7 @@ public class ParameterService {
     }
 
     private void loadSetParameters() {
-        final String fqnSetParameters =  GraphName.getFullName(this.ownerNode, TOPIC_SETPARAMETERS, null);
+        final String fqnSetParameters = GraphName.getFullName(this.ownerNode, TOPIC_SETPARAMETERS, null);
         if (GraphName.isValidTopic(fqnSetParameters)) {
             this.setParametersService = this.ownerNode.<SetParameters>createService(
                     SetParameters.class,
@@ -204,12 +216,16 @@ public class ParameterService {
                                 final SetParameters_Request request,
                                 final SetParameters_Response response) {
 
-                            logger.debug("Replies to set Parameters.");
+                            ParameterService.getLogger().debug("Replies to set Parameters.");
+
                             final List<ParameterVariant<?>> parameterVariants = new ArrayList<ParameterVariant<?>>();
                             for (final Parameter parameterVariant : request.getParameters()) {
                                 parameterVariants.add(ParameterVariant.fromParameter(parameterVariant));
                             }
-                            final List<SetParametersResult> result = ownerNode.setParameters(parameterVariants);
+
+                            final List<SetParametersResult> result =
+                                    ParameterService.this.getNode().setParameters(parameterVariants);
+
                             response.setResults(result);
                         }
                     },
@@ -218,7 +234,7 @@ public class ParameterService {
     }
 
     private void loadSetParametersAtomically() {
-        final String fqnSetParametersAtomically =  GraphName.getFullName(this.ownerNode, TOPIC_SETPARAMETERSATOMICALLY, null);
+        final String fqnSetParametersAtomically = GraphName.getFullName(this.ownerNode, TOPIC_SETPARAMETERSATOMICALLY, null);
         if (GraphName.isValidTopic(fqnSetParametersAtomically)) {
             this.setParametersAtomicallyService = this.ownerNode.<SetParametersAtomically>createService(
                     SetParametersAtomically.class,
@@ -231,12 +247,15 @@ public class ParameterService {
                                 final SetParametersAtomically_Request request,
                                 final SetParametersAtomically_Response response) {
 
-                            logger.debug("Replies to set Parameters Atomically.");
+                            ParameterService.getLogger().debug("Replies to set Parameters Atomically.");
+
                             final List<ParameterVariant<?>> parameterVariants = new ArrayList<ParameterVariant<?>>();
                             for (final Parameter parameterVariant : request.getParameters()) {
                                 parameterVariants.add(ParameterVariant.fromParameter(parameterVariant));
                             }
-                            response.setResult(ownerNode.setParametersAtomically(parameterVariants));
+
+                            response.setResult(
+                                    ParameterService.this.getNode().setParametersAtomically(parameterVariants));
                         }
                     },
                     this.qosProfile);
@@ -244,7 +263,7 @@ public class ParameterService {
     }
 
     private void loadDescribeParameters() {
-        final String fqnDescribeParameters =  GraphName.getFullName(this.ownerNode, TOPIC_DESCRIBEPARAMETERS, null);
+        final String fqnDescribeParameters = GraphName.getFullName(this.ownerNode, TOPIC_DESCRIBEPARAMETERS, null);
         if (GraphName.isValidTopic(fqnDescribeParameters)) {
             this.describeParametersService = this.ownerNode.<DescribeParameters>createService(
                     DescribeParameters.class,
@@ -257,10 +276,9 @@ public class ParameterService {
                                 final DescribeParameters_Request request,
                                 final DescribeParameters_Response response) {
 
-                            logger.debug("Replies to describe Parameters. ! NOT IMPLEMENTED !");
+                            ParameterService.getLogger().debug("Replies to describe Parameters. ! NOT IMPLEMENTED !");
 
                             final List<ParameterDescriptor> listDescritiorResult = new ArrayList<ParameterDescriptor>();
-
                             final ParameterDescriptor descriptor = new ParameterDescriptor();
 //                            descriptor.setName(arg0);
 //                            descriptor.setType(arg0);
@@ -274,7 +292,7 @@ public class ParameterService {
     }
 
     private void loadListParameters() {
-        final String fqnListParameters =  GraphName.getFullName(this.ownerNode, TOPIC_LISTPARAMETERS, null);
+        final String fqnListParameters = GraphName.getFullName(this.ownerNode, TOPIC_LISTPARAMETERS, null);
         if (GraphName.isValidTopic(fqnListParameters)) {
         this.listParametersService = this.ownerNode.<ListParameters>createService(
                 ListParameters.class,
@@ -287,9 +305,10 @@ public class ParameterService {
                             final ListParameters_Request request,
                             final ListParameters_Response response) {
 
-                        logger.debug("Replies to list of Parameters.");
+                        ParameterService.getLogger().debug("Replies to list of Parameters.");
+
                         final ListParametersResult listParamResult = new ListParametersResult();
-                        listParamResult.setNames(ownerNode.getParametersNames());
+                        listParamResult.setNames(ParameterService.this.getNode().getParametersNames());
                         response.setResult(listParamResult);
 
                     }
@@ -299,9 +318,13 @@ public class ParameterService {
     }
 
     private void loadParametersEvent() {
-        final String fqnParametersEvent =  GraphName.getFullName(this.ownerNode, Topics.PARAM_EVENT, null);
+        final String fqnParametersEvent = GraphName.getFullName(this.ownerNode, Topics.PARAM_EVENT, null);
         if (GraphName.isValidTopic(fqnParametersEvent)) {
-            this.eventparameterPublisher = this.ownerNode.createPublisher(ParameterEvent.class, fqnParametersEvent, QoSProfile.PARAMETER_EVENTS);
+            this.eventparameterPublisher =
+                    this.ownerNode.createPublisher(
+                            ParameterEvent.class,
+                            fqnParametersEvent,
+                            QoSProfile.PARAMETER_EVENTS);
         }
     }
 

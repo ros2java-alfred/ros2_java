@@ -31,6 +31,14 @@ public class ParameterVariant<T> {
     private final String name;
     private T value;
 
+    public static ParameterVariant<?> makeInstance(final String name, final ParameterValue parameterValue) {
+        final Parameter parameter = new Parameter();
+        parameter.setName(name);
+        parameter.setValue(parameterValue);
+
+        return ParameterVariant.fromParameter(parameter);
+    }
+
     public ParameterVariant(final String name, final T value) {
         this.name = name;
         this.value = value;
@@ -109,7 +117,7 @@ public class ParameterVariant<T> {
         return result;
     }
 
-    public static ParameterVariant<?> fromParameter(Parameter parameter) {
+    public static ParameterVariant<?> fromParameter(final Parameter parameter) {
 
         ParameterVariant<?> reuslt = null;
 

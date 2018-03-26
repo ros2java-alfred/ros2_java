@@ -116,7 +116,7 @@ public abstract class BaseNode implements Node {
     private ParameterCallback parameterCallback ;
 
     public BaseNode(final String namespace, final String defaultName, final String... args) {
-        BaseNode.logger.info("Create Node stack...");
+        BaseNode.logger.debug("Create Node stack...");
 
         final ArgumentParser argParser = new ArgumentParser(namespace, defaultName, args);
 
@@ -158,7 +158,7 @@ public abstract class BaseNode implements Node {
      */
     @Override
     public void dispose() {
-        BaseNode.logger.info("Destroy Node stack : " + this.name);
+        BaseNode.logger.debug("Destroy Node stack : " + this.name);
         this.parameterService.dispose();
 
         final Queue<Client<?>> tmpClients = new LinkedBlockingQueue<Client<?>>(this.clients);

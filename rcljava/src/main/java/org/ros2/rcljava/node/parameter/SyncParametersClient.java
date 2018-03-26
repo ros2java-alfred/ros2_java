@@ -64,6 +64,7 @@ public class SyncParametersClient {
 
     private final Node ownerNode;
     private final String remoteNodeName;
+
     private Client<GetParameters> getParametersClient;
     private Client<GetParameterTypes> getParameterTypesClient;
     private Client<SetParameters> setParametersClient;
@@ -97,22 +98,27 @@ public class SyncParametersClient {
                     GetParameters.class,
                     String.format(ParameterService.TOPIC_GETPARAMETERS, this.remoteNodeName),
                     profileParameter);
+
             this.getParameterTypesClient = this.ownerNode.<GetParameterTypes>createClient(
                     GetParameterTypes.class,
                     String.format(ParameterService.TOPIC_GETPARAMETERTYPES, this.remoteNodeName),
                     profileParameter);
+
             this.setParametersClient = this.ownerNode.<SetParameters>createClient(
                     SetParameters.class,
                     String.format(ParameterService.TOPIC_SETPARAMETERS, this.remoteNodeName),
                     profileParameter);
+
             this.listParametersClient = this.ownerNode.<ListParameters>createClient(
                     ListParameters.class,
                     String.format(ParameterService.TOPIC_LISTPARAMETERS, this.remoteNodeName),
                     profileParameter);
+
             this.describeParametersClient = this.ownerNode.<DescribeParameters>createClient(
                     DescribeParameters.class,
                     String.format(ParameterService.TOPIC_DESCRIBEPARAMETERS, this.remoteNodeName),
                     profileParameter);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -147,21 +153,16 @@ public class SyncParametersClient {
 
                 result = new ArrayList<ParameterVariant<?>>();
                 for (int i = 0; i < values.size(); i++) {
-                    final ParameterValue parameterValue = values.get(i);
+                    final ParameterVariant<?> parameterVariant = ParameterVariant.makeInstance(
+                            request.getNames().get(i),
+                            values.get(i));
 
-                    final Parameter parameter = new Parameter();
-                    parameter.setName(request.getNames().get(i));
-                    parameter.setValue(parameterValue);
-
-                    final ParameterVariant<?> parameterVariant = ParameterVariant.fromParameter(parameter);
                     result.add(parameterVariant);
                 }
 
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (ExecutionException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         } else {
