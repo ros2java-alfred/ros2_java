@@ -31,7 +31,11 @@
 #include "rcljava/org_ros2_rcljava_node_service_NativeClient.h"
 #include "rcljava/utils.hpp"
 
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_service_NativeClient_nativeSendClientRequest(
+/*
+ * nativeSendClientRequest
+ */
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_node_service_NativeClient_nativeSendClientRequest(
   JNIEnv * env,
   jclass,
   jlong client_handle,

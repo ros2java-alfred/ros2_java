@@ -34,7 +34,8 @@
 /**
  *
  */
-JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsReady(
+JNIEXPORT jboolean JNICALL
+Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsReady(
   JNIEnv * env,
   jclass,
   jlong wall_timer_handle)
@@ -59,7 +60,8 @@ JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsRe
 /**
  *
  */
-JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsCanceled(
+JNIEXPORT jboolean JNICALL
+Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsCanceled(
   JNIEnv * env,
   jclass,
   jlong wall_timer_handle)
@@ -84,7 +86,8 @@ JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsCa
 /**
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeDispose(
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_time_NativeWallTimer_nativeDispose(
   JNIEnv * env,
   jclass,
   jlong wall_timer_handle)
@@ -111,7 +114,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeDispose(
 /**
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeReset(
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_time_NativeWallTimer_nativeReset(
   JNIEnv * env,
   jclass,
   jlong wall_timer_handle)
@@ -135,7 +139,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeReset(
 /**
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeCancel(
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_time_NativeWallTimer_nativeCancel(
   JNIEnv * env,
   jclass,
   jlong wall_timer_handle)
@@ -159,7 +164,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeCancel(
 /**
  *
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeUntilNextCall(
+JNIEXPORT jlong JNICALL
+Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeUntilNextCall(
   JNIEnv * env,
   jclass,
   jlong wall_timer_handle)
@@ -187,7 +193,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeUnt
 /**
  *
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeSinceLastCall(
+JNIEXPORT jlong JNICALL
+Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeSinceLastCall(
   JNIEnv * env,
   jclass,
   jlong wall_timer_handle)
@@ -215,7 +222,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeSin
 /**
  *
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeGetTimerPeriodNS(
+JNIEXPORT jlong JNICALL
+Java_org_ros2_rcljava_time_NativeWallTimer_nativeGetTimerPeriodNS(
   JNIEnv * env,
   jclass,
   jlong wall_timer_handle)
@@ -243,7 +251,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeGetTime
 /**
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeSetTimerPeriodNS(
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_time_NativeWallTimer_nativeSetTimerPeriodNS(
   JNIEnv * env,
   jclass,
   jlong wall_timer_handle,
@@ -269,7 +278,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeSetTimer
 /**
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeCallTimer(
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_time_NativeWallTimer_nativeCallTimer(
   JNIEnv * env,
   jclass,
   jlong wall_timer_handle)

@@ -67,11 +67,6 @@ public class NativeNode extends BaseNode {
     private final long nodeHandle;
 
     // Native call.
-    private static native <T extends Message> long nativeCreatePublisherHandle(
-            long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
-
-    private static native <T> long nativeCreateSubscriptionHandle(
-            long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
 
     private static native <T> long nativeCreateClientHandle(
             long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
@@ -122,7 +117,10 @@ public class NativeNode extends BaseNode {
         this.nodeHandle = RCLJava.nativeCreateNodeHandle(this.name, this.nameSpace);
         if (this.nodeHandle==0) { throw new NullPointerException("Node Handle is not define !"); }
 
-        NativeNode.logger.debug("Created Native Node stack : " + GraphName.getFullName(this.nameSpace, this.name));
+        NativeNode.logger.debug(
+                String.format("Created Native Node : %s [0x%x]",
+                        GraphName.getFullName(this.nameSpace, this.name),
+                        this.nodeHandle));
 
         this.startParameterService();
     }
@@ -134,7 +132,10 @@ public class NativeNode extends BaseNode {
     public void dispose() {
         super.dispose();
 
-        NativeNode.logger.debug("Destroy Native Node : " + GraphName.getFullName(this.nameSpace, this.name));
+        NativeNode.logger.debug(
+                String.format("Destroy Native Node : %s [0x%x]",
+                        GraphName.getFullName(this.nameSpace, this.name),
+                        this.nodeHandle));
         NativeNode.nativeDispose(this.nodeHandle);
     }
 
@@ -183,18 +184,9 @@ public class NativeNode extends BaseNode {
         if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
         final String fqnTopic =  GraphName.getFullName(this, topicName, null);
-        NativeNode.logger.debug("Create Native Publisher : " + fqnTopic);
-        Publisher<T> publisher = null;
+        NativeNode.logger.debug("Initialize Native Publisher : " + fqnTopic);
 
-        if (GraphName.isValidTopic(fqnTopic)) {
-            final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-            final long publisherHandle = NativeNode.nativeCreatePublisherHandle(this.nodeHandle, messageType, fqnTopic, qosProfileHandle);
-            RCLJava.disposeQoSProfile(qosProfileHandle);
-
-            publisher = new NativePublisher<T>(this, publisherHandle, messageType, topicName, qosProfile);
-        }
-
-        return publisher;
+        return new NativePublisher<T>(this, messageType, topicName, qosProfile);
     }
 
     /**
@@ -222,24 +214,14 @@ public class NativeNode extends BaseNode {
         if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
         final String fqnTopic =  GraphName.getFullName(this, topicName, null);
-        NativeNode.logger.debug("Create Native Subscription : " + fqnTopic);
-        Subscription<T> subscription = null;
+        NativeNode.logger.debug("Initialize Native Subscription : " + fqnTopic);
 
-        if (GraphName.isValidTopic(fqnTopic)) {
-            final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-            final long subscriptionHandle = NativeNode.nativeCreateSubscriptionHandle(this.nodeHandle, messageType, fqnTopic, qosProfileHandle);
-            RCLJava.disposeQoSProfile(qosProfileHandle);
-
-            subscription = new NativeSubscription<T>(
+        return new NativeSubscription<T>(
                     this,
-                    subscriptionHandle,
                     messageType,
                     topicName,
                     callback,
                     qosProfile);
-        }
-
-        return subscription;
     }
 
     /**
@@ -259,7 +241,7 @@ public class NativeNode extends BaseNode {
         final long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
         final long timerHandle = NativeNode.nativeCreateTimerHandle(timerPeriodNS);
 
-        NativeNode.logger.debug("Create Native WallTimer.");
+        NativeNode.logger.debug("Initialize Native WallTimer.");
         return new NativeWallTimer(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
     }
 
@@ -288,7 +270,7 @@ public class NativeNode extends BaseNode {
         if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
         final String fqnService =  GraphName.getFullName(this, serviceName, null);
-        NativeNode.logger.debug("Create Native Client : " + fqnService);
+        NativeNode.logger.debug("Initialize Native Client : " + fqnService);
         Client<T> client = null;
 
         if (GraphName.isValidTopic(fqnService)) {
@@ -344,7 +326,7 @@ public class NativeNode extends BaseNode {
         if (qosProfile  == null) { throw new NullPointerException(ERROR_QOS); }
 
         final String fqnService =  GraphName.getFullName(this, serviceName, null);
-        NativeNode.logger.debug("Create Native Service : " + fqnService);
+        NativeNode.logger.debug("Initialize Native Service : " + fqnService);
         Service<T> service = null;
 
         if (GraphName.isValidTopic(fqnService)) {
@@ -444,19 +426,19 @@ public class NativeNode extends BaseNode {
 
     @Override
     public List<String> getNodeNames() {
-        NativeNode.logger.debug("Get Native Node Names.");
+        NativeNode.logger.debug("Get Native Node Names...");
         return NativeNode.nativeGetNodeNames(this.nodeHandle);
     }
 
     @Override
     public int countPublishers(final String topic) {
-        NativeNode.logger.debug("Count Native Publisher.");
+        NativeNode.logger.debug("Count Native Publisher...");
         return NativeNode.nativeCountPublishers(this.nodeHandle, topic);
     }
 
     @Override
     public int countSubscribers(final String topic) {
-        NativeNode.logger.debug("Count Native Subscribers.");
+        NativeNode.logger.debug("Count Native Subscribers...");
         return NativeNode.nativeCountSubscribers(this.nodeHandle, topic);
     }
 

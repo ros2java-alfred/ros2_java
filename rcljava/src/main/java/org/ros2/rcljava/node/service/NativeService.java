@@ -58,19 +58,36 @@ public class NativeService<T extends MessageService> extends BaseService<T> {
             final NativeServiceType<T> response) {
         super(node, serviceType, serviceName, callback, request.getType(), response.getType());
 
-        NativeService.logger.debug("Init Native Service stack : " + serviceName);
-
         if (serviceHandle == 0) { throw new RuntimeException("Need to provide active service with handle object"); }
         this.serviceHandle = serviceHandle;
 
         this.request = request;
         this.response = response;
+
+        NativeService.logger.debug(
+                String.format("Created Native Service Server : %s  [0x%x] (request : [0x%x]> <[0x%x]) (response : [0x%x]> <[0x%x])",
+                        this.getServiceName(),
+                        this.serviceHandle,
+                        this.request.getFromJavaConverterHandle(),
+                        this.request.getToJavaConverterHandle(),
+                        this.response.getFromJavaConverterHandle(),
+                        this.response.getToJavaConverterHandle()));
     }
 
+    @Override
     public void dispose() {
-        NativeService.logger.debug("Destroy Service stack : " + this.getServiceName());
-
         super.dispose();
+
+        NativeService.logger.debug(
+                String.format("Destroy Native Service Client : %s  [0x%x] (request : [0x%x]> <[0x%x]) (response : [0x%x]> <[0x%x])",
+                        this.getServiceName(),
+                        this.serviceHandle,
+                        this.request.getFromJavaConverterHandle(),
+                        this.request.getToJavaConverterHandle(),
+                        this.response.getFromJavaConverterHandle(),
+                        this.response.getToJavaConverterHandle()));
+
+//      NativeService.nativeDispose(this.getNode().getNodeHandle(), this.serviceHandle);
     }
 
 //    public void sendResponse() {

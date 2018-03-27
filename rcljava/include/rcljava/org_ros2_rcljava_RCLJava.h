@@ -22,13 +22,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /*
  * Class:     org_ros2_rcljava_RCLJava
  * Method:    nativeRCLJavaInit
  * Signature: ([Ljava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit
   (JNIEnv *, jclass, jobjectArray);
 
 /*
@@ -36,7 +36,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit
  * Method:    nativeCreateNodeHandle
  * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle
   (JNIEnv *, jclass, jstring, jstring);
 
 /*
@@ -44,7 +45,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle
  * Method:    nativeGetRMWIdentifier
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier
+JNIEXPORT jstring JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier
   (JNIEnv *, jclass);
 
 /*
@@ -52,7 +54,8 @@ JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier
  * Method:    nativeOk
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_RCLJava_nativeOk
+JNIEXPORT jboolean JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeOk
   (JNIEnv *, jclass);
 
 /*
@@ -60,7 +63,8 @@ JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_RCLJava_nativeOk
  * Method:    nativeGetZeroInitializedWaitSet
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWaitSet
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWaitSet
   (JNIEnv *, jclass);
 
 /*
@@ -68,7 +72,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetZeroInitializedWa
  * Method:    nativeWaitSetInit
  * Signature: (JIIIII)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetInit
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeWaitSetInit
   (JNIEnv *, jclass, jlong, jint, jint, jint, jint, jint);
 
 /*
@@ -76,7 +81,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetInit
  * Method:    nativeWaitSetClearSubscriptions
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearSubscriptions
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearSubscriptions
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -84,7 +90,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearSubscript
  * Method:    nativeWaitSetAddSubscription
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddSubscription
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddSubscription
   (JNIEnv *, jclass, jlong, jlong);
 
 /*
@@ -92,7 +99,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddSubscriptio
  * Method:    nativeWait
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWait
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeWait
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -100,7 +108,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWait
  * Method:    nativeTake
  * Signature: (JLjava/lang/Class;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTake
+JNIEXPORT jobject JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeTake
   (JNIEnv *, jclass, jlong, jclass);
 
 /*
@@ -108,7 +117,8 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTake
  * Method:    nativeShutdown
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeShutdown
   (JNIEnv *, jclass);
 
 /*
@@ -116,7 +126,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown
  * Method:    nativeWaitSetFini
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetFini
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeWaitSetFini
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -124,7 +135,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetFini
  * Method:    nativeGetNodeNames
  * Signature: ()Ljava/util/List;
  */
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetNodeNames
+JNIEXPORT jobject JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeGetNodeNames
   (JNIEnv *, jclass);
 
 
@@ -133,7 +145,8 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetNodeNames
  * Method:    nativeWaitSetClearServices
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearServices
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearServices
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -141,7 +154,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearServices
  * Method:    nativeWaitSetAddService
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddService
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddService
   (JNIEnv *, jclass, jlong, jlong);
 
 /*
@@ -149,7 +163,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddService
  * Method:    nativeWaitSetClearClients
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearClients
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearClients
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -157,7 +172,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearClients
  * Method:    nativeWaitSetAddClient
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddClient
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddClient
   (JNIEnv *, jclass, jlong, jlong);
 
 /*
@@ -165,7 +181,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddClient
  * Method:    nativeTakeRequest
  * Signature: (JJJLjava/lang/Object;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeRequest
+JNIEXPORT jobject JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeTakeRequest
   (JNIEnv *, jclass, jlong, jlong, jlong, jobject);
 
 /*
@@ -173,7 +190,8 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeRequest
  * Method:    nativeSendServiceResponse
  * Signature: (JLjava/lang/Object;JJLjava/lang/Object;)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeSendServiceResponse
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeSendServiceResponse
   (JNIEnv *, jclass, jlong, jobject, jlong, jlong, jobject);
 
 /*
@@ -181,7 +199,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeSendServiceResponse
  * Method:    nativeTakeResponse
  * Signature: (JJJLjava/lang/Object;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeResponse
+JNIEXPORT jobject JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeTakeResponse
   (JNIEnv *, jclass, jlong, jlong, jlong, jobject);
 
 /*
@@ -189,7 +208,8 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_RCLJava_nativeTakeResponse
  * Method:    nativeConvertQoSProfileToHandle
  * Signature: (IIIIZ)J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToHandle
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToHandle
   (JNIEnv *, jclass, jint, jint, jint, jint, jboolean);
 
 /*
@@ -197,7 +217,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToH
  * Method:    nativeDisposeQoSProfile
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -205,7 +226,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile
  * Method:    nativeWaitSetClearTimers
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearTimers
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearTimers
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -213,7 +235,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetClearTimers
  * Method:    nativeWaitSetAddTimer
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddTimer
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeWaitSetAddTimer
   (JNIEnv *, jclass, jlong, jlong);
 
 #ifdef __cplusplus

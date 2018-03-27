@@ -22,13 +22,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /*
  * Class:     org_ros2_rcljava_time_NativeWallTimer
  * Method:    nativeDispose
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeDispose
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_time_NativeWallTimer_nativeDispose
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -36,7 +36,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeDispose
  * Method:    nativeIsReady
  * Signature: (J)Z
  */
-JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsReady
+JNIEXPORT jboolean JNICALL
+  Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsReady
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -44,7 +45,8 @@ JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsRe
  * Method:    nativeIsCanceled
  * Signature: (J)Z
  */
-JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsCanceled
+JNIEXPORT jboolean JNICALL
+  Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsCanceled
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -52,7 +54,8 @@ JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeIsCa
  * Method:    nativeReset
  * Signature: (J)Z
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeReset
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_time_NativeWallTimer_nativeReset
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -60,7 +63,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeReset
  * Method:    nativeCancel
  * Signature: (J)Z
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeCancel
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_time_NativeWallTimer_nativeCancel
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -68,7 +72,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeCancel
  * Method:    nativeTimeUntilNextCall
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeUntilNextCall
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeUntilNextCall
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -76,7 +81,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeUnt
  * Method:    nativeTimeSinceLastCall
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeSinceLastCall
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeSinceLastCall
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -84,7 +90,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeTimeSin
  * Method:    nativeGetTimerPeriodNS
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeGetTimerPeriodNS
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_time_NativeWallTimer_nativeGetTimerPeriodNS
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -92,7 +99,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeGetTime
  * Method:    nativeSetTimerPeriodNS
  * Signature: (JJ)Z
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeSetTimerPeriodNS
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_time_NativeWallTimer_nativeSetTimerPeriodNS
   (JNIEnv *, jclass, jlong, jlong);
 
 /*
@@ -100,7 +108,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeSetTimer
  * Method:    nativeCallTimer
  * Signature: (J)Z
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_NativeWallTimer_nativeCallTimer
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_time_NativeWallTimer_nativeCallTimer
   (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus

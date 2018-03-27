@@ -61,7 +61,7 @@ public class BaseService<T extends MessageService> implements Service<T> {
             final Class<? extends Message> requestType,
             final Class<? extends Message> responseType) {
 
-        BaseService.logger.debug("Init Service stack : " + serviceName);
+        BaseService.logger.debug("Create Service Server stack : " + serviceName);
 
         if (node == null) { throw new RuntimeException("Need to provide active node with handle object"); }
         this.ownerNode = node;
@@ -88,7 +88,7 @@ public class BaseService<T extends MessageService> implements Service<T> {
      */
     @Override
     public void dispose() {
-        BaseService.logger.debug("Destroy Service stack : " + this.serviceName);
+        BaseService.logger.debug("Destroy Service Server stack : " + this.serviceName);
 
         if (this.ownerNode.getServices().contains(this)) {
             this.ownerNode.getServices().remove(this);

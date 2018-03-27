@@ -28,14 +28,14 @@
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
 
-#include "rcljava/org_ros2_rcljava_node_topic_NativePublisher.h"
+#include "rcljava/org_ros2_rcljava_node_topic_NativeSubscription.h"
 #include "rcljava/utils.hpp"
 
 /*
- * nativeCreatePublisherHandle
+ * nativeCreateSubscriptionHandle
  */
 JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_node_topic_NativePublisher_nativeCreatePublisherHandle(
+Java_org_ros2_rcljava_node_topic_NativeSubscription_nativeCreateSubscriptionHandle(
   JNIEnv * env,
   jclass,
   jlong jnode_handle,
@@ -47,23 +47,22 @@ Java_org_ros2_rcljava_node_topic_NativePublisher_nativeCreatePublisherHandle(
   rosidl_message_type_support_t * msg_type = jclass2MessageType(env, jmessage_class);
   std::string topic = jstring2String(env, jtopic);
 
-  rcl_publisher_t * publisher = makeInstance<rcl_publisher_t>();
-  *publisher = rcl_get_zero_initialized_publisher();
+  rcl_subscription_t * subscription = makeInstance<rcl_subscription_t>();
+  *subscription = rcl_get_zero_initialized_subscription();
 
-  rcl_publisher_options_t publisher_ops = rcl_publisher_get_default_options();
-
+  rcl_subscription_options_t subscription_ops = rcl_subscription_get_default_options();
   rmw_qos_profile_t * qos_profile = handle2Instance<rmw_qos_profile_t>(qos_profile_handle);
-  publisher_ops.qos = *qos_profile;
+  subscription_ops.qos = *qos_profile;
 
-  rcl_ret_t ret = rcl_publisher_init(
-    publisher,
+  rcl_ret_t ret = rcl_subscription_init(
+    subscription,
     node,
     msg_type,
     topic.c_str(),
-    &publisher_ops);
+    &subscription_ops);
 
   if (ret != RCL_RET_OK) {
-    std::string message("Failed to create publisher: " +
+    std::string message("Failed to create subscription: " +
       std::string(rcl_get_error_string_safe()));
     rcl_reset_error();
     throwException(env, message);
@@ -71,52 +70,26 @@ Java_org_ros2_rcljava_node_topic_NativePublisher_nativeCreatePublisherHandle(
     return -1;
   }
 
-  jlong publisher_handle = instance2Handle(publisher);
-  return publisher_handle;
-}
-
-/*
- * nativePublish
- */
-JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_node_topic_NativePublisher_nativePublish(
-  JNIEnv * env,
-  jclass,
-  jlong jpublisher_handle,
-  jobject jmsg)
-{
-  rcl_publisher_t * publisher = handle2Instance<rcl_publisher_t>(jpublisher_handle);
-
-  void * raw_ros_message = jobject2Message(env, jmsg);
-  if (env->ExceptionCheck()) {
-    return;
-  }
-
-  rcl_ret_t ret = rcl_publish(publisher, raw_ros_message);
-  if (ret != RCL_RET_OK) {
-    std::string message("Failed to publish: " +
-      std::string(rcl_get_error_string_safe()));
-    rcl_reset_error();
-    throwException(env, message);
-  }
+  jlong jsubscription = instance2Handle(subscription);
+  return jsubscription;
 }
 
 /*
  * nativeDispose
  */
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_node_topic_NativePublisher_nativeDispose(
+Java_org_ros2_rcljava_node_topic_NativeSubscription_nativeDispose(
   JNIEnv * env,
   jclass,
   jlong jnode_handle,
-  jlong jpublisher_handle)
+  jlong jsubscription_handle)
 {
   rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
-  rcl_publisher_t * publisher = handle2Instance<rcl_publisher_t>(jpublisher_handle);
+  rcl_subscription_t * subscription = handle2Instance<rcl_subscription_t>(jsubscription_handle);
 
-  rcl_ret_t ret = rcl_publisher_fini(publisher, node);
+  rcl_ret_t ret = rcl_subscription_fini(subscription, node);
   if (ret != RCL_RET_OK) {
-    std::string message("Failed to destroy publisher: " +
+    std::string message("Failed to destroy subscription: " +
       std::string(rcl_get_error_string_safe()));
     rcl_reset_error();
     throwException(env, message);

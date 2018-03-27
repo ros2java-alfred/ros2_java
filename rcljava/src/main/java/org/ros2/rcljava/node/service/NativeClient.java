@@ -23,6 +23,8 @@ import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is Native(rcl) Service Client of RCLJava.
@@ -30,6 +32,8 @@ import org.ros2.rcljava.node.Node;
  * @param <T> Service Type.
  */
 public class NativeClient<T extends MessageService> extends BaseClient<T> {
+
+    private static final Logger logger = LoggerFactory.getLogger(NativeClient.class);
 
     // Loading JNI library.
     static {
@@ -72,6 +76,31 @@ public class NativeClient<T extends MessageService> extends BaseClient<T> {
 
         this.request = request;
         this.response = response;
+
+        NativeClient.logger.debug(
+                String.format("Created Native Service Client : %s  [0x%x] (request : [0x%x]> <[0x%x]) (response : [0x%x]> <[0x%x])",
+                        this.getServiceName(),
+                        this.clientHandle,
+                        this.request.getFromJavaConverterHandle(),
+                        this.request.getToJavaConverterHandle(),
+                        this.response.getFromJavaConverterHandle(),
+                        this.response.getToJavaConverterHandle()));
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        NativeClient.logger.debug(
+                String.format("Destroy Native Service Client : %s  [0x%x] (request : [0x%x]> <[0x%x]) (response : [0x%x]> <[0x%x])",
+                        this.getServiceName(),
+                        this.clientHandle,
+                        this.request.getFromJavaConverterHandle(),
+                        this.request.getToJavaConverterHandle(),
+                        this.response.getFromJavaConverterHandle(),
+                        this.response.getToJavaConverterHandle()));
+
+//        NativeClient.nativeDispose(this.getNode().getNodeHandle(), this.clientHandle);
     }
 
     @Override

@@ -23,13 +23,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /*
  * Class:     org_ros2_rcljava_node_service_NativeClient
  * Method:    nativeSendClientRequest
  * Signature: (JJJJLjava/lang/Object;)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_service_NativeClient_nativeSendClientRequest
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_node_service_NativeClient_nativeSendClientRequest
   (JNIEnv *, jclass, jlong, jlong, jlong, jlong, jobject);
 
 #ifdef __cplusplus

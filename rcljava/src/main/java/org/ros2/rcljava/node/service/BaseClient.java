@@ -90,23 +90,25 @@ public abstract class BaseClient<T extends MessageService> implements Client<T> 
         }
     }
 
-    public final Class<? extends Message> getRequestType() {
+    @Override
+    public Class<? extends Message> getRequestType() {
         return this.requestType;
     }
 
-    public final Class<? extends Message> getResponseType() {
+    @Override
+    public Class<? extends Message> getResponseType() {
         return this.responseType;
     }
 
-    public final String getServiceName() {
+    public String getServiceName() {
         return this.serviceName;
     }
 
-    public final Class<T> getServiceType() {
+    public Class<T> getServiceType() {
         return this.serviceType;
     }
 
-    public final <V extends Message> void handleResponse(final RMWRequestId header,final V response) {
+    public <V extends Message> void handleResponse(final RMWRequestId header,final V response) {
         synchronized(pendingRequests) {
             final long sequenceNumber = header.sequenceNumber;
             @SuppressWarnings("unchecked")
@@ -115,7 +117,7 @@ public abstract class BaseClient<T extends MessageService> implements Client<T> 
         }
     }
 
-    public final boolean waitForService(final int i) {
+    public boolean waitForService(final int i) {
         //TODO
         throw new NotImplementedException();
 //          return false;

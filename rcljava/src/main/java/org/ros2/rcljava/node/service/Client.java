@@ -40,6 +40,12 @@ public interface Client<T extends MessageService> extends AutoCloseable {
 
     /**
      *
+     * @return
+     */
+    Class<? extends Message> getRequestType();
+
+    /**
+     *
      * @param rmwRequestId
      * @param responseMessage
      */

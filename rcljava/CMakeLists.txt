@@ -18,7 +18,6 @@ find_package(sensor_msgs)
 
 include(CrossCompilingExtra)
 
-
 if(ANDROID)
   # https://cmake.org/cmake/help/v3.0/module/FindJava.html?highlight=java
   find_host_package(Java 1.6 COMPONENTS Development)
@@ -171,7 +170,7 @@ if(typesupport_impls STREQUAL "")
   return()
 endif()
 
-set(_jni_classes "RCLJava;node_NativeNode;node_topic_NativePublisher;node_service_NativeClient;time_NativeWallTimer")
+set(_jni_classes "RCLJava;node_NativeNode;node_topic_NativePublisher;node_topic_NativeSubscription;node_service_NativeClient;time_NativeWallTimer")
 
 foreach(_jni_class ${_jni_classes})
   set(_target_name "${PROJECT_NAME}_${_jni_class}${target_suffix}")

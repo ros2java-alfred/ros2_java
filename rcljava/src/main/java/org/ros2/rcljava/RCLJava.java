@@ -202,8 +202,7 @@ public abstract class RCLJava {
 
         RCLJava.logger.debug("Native Library OS : " + os);
         RCLJava.logger.debug("Native Library Archi : " + arch);
-        RCLJava.logger.debug("Native Library path : \n" + libpath.replace(':', '\n'));
-
+        RCLJava.logger.debug("Native Library path : \n\t" + libpath.replace(":", "\n\t"));
     }
 
     /**
@@ -269,6 +268,7 @@ public abstract class RCLJava {
      *     structure.
      */
     public static Node createNode(final String defaultName) {
+        RCLJava.logger.debug("Initialize Node stack...");
         return RCLJava.createNode(null, defaultName);
     }
 
@@ -284,9 +284,7 @@ public abstract class RCLJava {
     public static Node createNode(final String namespace, final String defaultName) {
 
 //        String fullName = GraphName.getFullName(ns, nodeName);
-        final Node node = new NativeNode(namespace, defaultName, RCLJava.arguments);
-
-        return node;
+        return new NativeNode(namespace, defaultName, RCLJava.arguments);
     }
 
 

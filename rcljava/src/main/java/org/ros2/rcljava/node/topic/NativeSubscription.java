@@ -16,7 +16,9 @@
 
 package org.ros2.rcljava.node.topic;
 
+import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.qos.QoSProfile;
 
@@ -34,13 +36,29 @@ public class NativeSubscription<T extends Message> extends BaseSubscription<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeSubscription.class);
 
+ // Loading JNI library.
+    static {
+        RCLJava.loadLibrary("rcljava_node_topic_NativeSubscription");
+    }
+
     /**
      * An integer that represents a pointer to the underlying ROS2 subscription structure (rcl_subsription_t).
      */
     private final long subscriptionHandle;
 
     // Native call.
-    //private static native void nativeDispose(long nodeHandle, long publisherHandle);
+    private static native <T> long nativeCreateSubscriptionHandle(
+            long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
+
+    /**
+     * Destroy a ROS2 subscription (rcl_subscription_t).
+     *
+     * @param nodeHandle A pointer to the underlying ROS2 node structure that
+     *     created this subscription, as an integer. Must not be zero.
+     * @param subscriptionHandle A pointer to the underlying ROS2 subscription
+     *     structure, as an integer. Must not be zero.
+     */
+    private static native void nativeDispose(long nodeHandle, long subscriptionHandle);
 
     /**
      * Constructor.
@@ -53,29 +71,46 @@ public class NativeSubscription<T extends Message> extends BaseSubscription<T> {
      *     subscription will receive. We need this because of Java's type erasure,
      *     which doesn't allow us to use the generic parameter of
      *     @{link org.ros2.rcljava.Subscription} directly.
-     * @param topic The topic to which this subscription will be subscribed.
+     * @param topicName The topic to which this subscription will be subscribed.
      * @param callback The callback function that will be triggered when a new
      *     message is received.
      */
     public NativeSubscription(
             final NativeNode node,
-            final long subscriptionHandle,
             final Class<T> messageType,
-            final String topic,
+            final String topicName,
             final SubscriptionCallback<T> callback,
             final QoSProfile qosProfile) {
-        super(node, messageType, topic, callback, qosProfile);
+        super(node, messageType, topicName, callback, qosProfile);
 
-        if (subscriptionHandle == 0) { throw new RuntimeException("Need to provide active subscribtion with handle object"); }
-        this.subscriptionHandle = subscriptionHandle;
+        final String fqnTopic =  GraphName.getFullName(node, topicName, null);
+        if (!GraphName.isValidTopic(fqnTopic)) { throw new RuntimeException("Invalid topic name."); }
+
+        final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+        this.subscriptionHandle = NativeSubscription.nativeCreateSubscriptionHandle(
+                this.getNode().getNodeHandle(),
+                messageType,
+                fqnTopic,
+                qosProfileHandle);
+        RCLJava.disposeQoSProfile(qosProfileHandle);
+        if (this.subscriptionHandle == 0) { throw new RuntimeException("Need to provide active subscribtion with handle object"); }
+
+        NativeSubscription.logger.debug(
+                String.format("Created Native Subscription of topic : %s [0x%x]",
+                        this.getTopicName(),
+                        this.subscriptionHandle));
     }
 
     @Override
     public void dispose() {
-        NativeSubscription.logger.debug("Destroy Native Subscription of topic : " + this.getTopicName());
-
         super.dispose();
-        // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
+
+        NativeSubscription.logger.debug(
+                String.format("Destroy Native Subscription of topic : %s [0x%x]",
+                        this.getTopicName(),
+                        this.subscriptionHandle));
+
+        NativeSubscription.nativeDispose(this.getNode().getNodeHandle(), this.subscriptionHandle);
     }
 
     @Override

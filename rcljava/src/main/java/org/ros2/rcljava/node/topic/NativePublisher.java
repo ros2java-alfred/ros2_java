@@ -18,6 +18,7 @@ package org.ros2.rcljava.node.topic;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.qos.QoSProfile;
 
@@ -46,6 +47,9 @@ public class NativePublisher<T extends Message> extends BasePublisher<T> {
     private final long publisherHandle;
 
     // Native call.
+    private static native <T extends Message> long nativeCreatePublisherHandle(
+            long nodeHandle, Class<T> messageType, String topic, long qosProfileHandle);
+
     /**
      * Publish a message via the underlying ROS2 mechanisms.
      *
@@ -60,7 +64,7 @@ public class NativePublisher<T extends Message> extends BasePublisher<T> {
      * Destroy a ROS2 publisher (rcl_publisher_t).
      *
      * @param nodeHandle A pointer to the underlying ROS2 node structure that
-     *     created this subscription, as an integer. Must not be zero.
+     *     created this publisher, as an integer. Must not be zero.
      * @param publisherHandle A pointer to the underlying ROS2 publisher
      *     structure, as an integer. Must not be zero.
      */
@@ -73,20 +77,32 @@ public class NativePublisher<T extends Message> extends BasePublisher<T> {
      * @param publisherHandle A pointer to the underlying ROS2 publisher
      *     structure, as an integer. Must not be zero.
      * @param messageType
-     * @param topic The topic to which this publisher will publish messages.
+     * @param topicName The topic to which this publisher will publish messages.
      * @param qosProfile Quality of Service profile.
      */
     public NativePublisher(
             final NativeNode node,
-            final long publisherHandle,
             final Class<T> messageType,
-            final String topic,
+            final String topicName,
             final QoSProfile qosProfile) {
-        super(node, messageType, topic, qosProfile);
+        super(node, messageType, topicName, qosProfile);
 
-        NativePublisher.logger.debug("Create Native Publisher of topic : " + this.getTopicName());
-        if (publisherHandle == 0) { throw new RuntimeException("Need to provide active node with handle object"); }
-        this.publisherHandle = publisherHandle;
+        final String fqnTopic =  GraphName.getFullName(node, topicName, null);
+        if (!GraphName.isValidTopic(fqnTopic)) { throw new RuntimeException("Invalid topic name."); }
+
+        final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+        this.publisherHandle = NativePublisher.nativeCreatePublisherHandle(
+                this.getNode().getNodeHandle(),
+                messageType,
+                fqnTopic,
+                qosProfileHandle);
+        RCLJava.disposeQoSProfile(qosProfileHandle);
+        if (this.publisherHandle == 0) { throw new RuntimeException("Publisher Handle is not define !"); }
+
+        NativePublisher.logger.debug(
+                String.format("Created Native Publisher of topic : %s [0x%x]",
+                        this.getTopicName(),
+                        this.publisherHandle));
     }
 
     /* (non-Javadoc)
@@ -94,9 +110,12 @@ public class NativePublisher<T extends Message> extends BasePublisher<T> {
      */
     @Override
     public void dispose() {
-        NativePublisher.logger.debug("Destroy Native Publisher of topic : " + this.getTopicName());
-
         super.dispose();
+
+        NativePublisher.logger.debug(
+                String.format("Destroy Native Publisher of topic : %s [0x%x]",
+                        this.getTopicName(),
+                        this.publisherHandle));
 
         NativePublisher.nativeDispose(this.getNode().getNodeHandle(), this.publisherHandle);
     }
@@ -109,7 +128,9 @@ public class NativePublisher<T extends Message> extends BasePublisher<T> {
         return (NativeNode) super.getNode();
     }
 
-    // TODO make protected for test only...
+    /**
+     * @return The pointer to the underlying ROS2 publisher structure.
+     */
     public final long getPublisherHandle() {
         return this.publisherHandle;
     }
@@ -119,6 +140,11 @@ public class NativePublisher<T extends Message> extends BasePublisher<T> {
      */
     @Override
     public void publish(final T message) {
+//        NativePublisher.logger.debug(
+//                String.format("Publish on Native Publisher of topic : %s [0x%x]",
+//                        this.getTopicName(),
+//                        this.publisherHandle));
+
         NativePublisher.nativePublish(this.publisherHandle, message);
     }
 

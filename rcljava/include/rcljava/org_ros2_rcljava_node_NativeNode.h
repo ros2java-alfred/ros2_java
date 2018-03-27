@@ -24,26 +24,11 @@ extern "C" {
 #endif
 /*
  * Class:     org_ros2_rcljava_node_NativeNode
- * Method:    nativeCreatePublisherHandle
- * Signature: (JLjava/lang/Class;Ljava/lang/String;J)J
- */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreatePublisherHandle
-  (JNIEnv *, jclass, jlong, jclass, jstring, jlong);
-
-/*
- * Class:     org_ros2_rcljava_node_NativeNode
- * Method:    nativeCreateSubscriptionHandle
- * Signature: (JLjava/lang/Class;Ljava/lang/String;J)J
- */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateSubscriptionHandle
-  (JNIEnv *, jclass, jlong, jclass, jstring, jlong);
-
-/*
- * Class:     org_ros2_rcljava_node_NativeNode
  * Method:    nativeCreateClientHandle
  * Signature: (JLjava/lang/Class;Ljava/lang/String;J)J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateClientHandle
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_node_NativeNode_nativeCreateClientHandle
   (JNIEnv *, jclass, jlong, jclass, jstring, jlong);
 
 /*
@@ -51,7 +36,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateClient
  * Method:    nativeCreateServiceHandle
  * Signature: (JLjava/lang/Class;Ljava/lang/String;J;)J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateServiceHandle
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_node_NativeNode_nativeCreateServiceHandle
   (JNIEnv *, jclass, jlong, jclass, jstring, jlong);
 
 /*
@@ -59,7 +45,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateServic
  * Method:    nativeDispose
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeDispose
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_node_NativeNode_nativeDispose
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -67,7 +54,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeDispose
  * Method:    nativeGetName
  * Signature: (J)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetName
+JNIEXPORT jstring JNICALL
+  Java_org_ros2_rcljava_node_NativeNode_nativeGetName
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -75,7 +63,8 @@ JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetName
  * Method:    nativeCountPublishers
  * Signature: (JLjava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountPublishers
+JNIEXPORT jint JNICALL
+  Java_org_ros2_rcljava_node_NativeNode_nativeCountPublishers
   (JNIEnv *, jclass, jlong, jstring);
 
 /*
@@ -83,7 +72,8 @@ JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountPublishe
  * Method:    nativeCountSubscribers
  * Signature: (JLjava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountSubscribers
+JNIEXPORT jint JNICALL
+  Java_org_ros2_rcljava_node_NativeNode_nativeCountSubscribers
   (JNIEnv *, jclass, jlong, jstring);
 
 /*
@@ -91,7 +81,8 @@ JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountSubscrib
  * Method:    nativeGetListTopics
  * Signature: (JZ)Ljava/util/Map;
  */
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTopics
+JNIEXPORT jobject JNICALL
+  Java_org_ros2_rcljava_node_NativeNode_nativeGetListTopics
   (JNIEnv *, jclass, jlong, jboolean);
 
 /*
@@ -99,7 +90,8 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTop
  * Method:    nativeGetListServices
  * Signature: (J)Ljava/util/Map;
  */
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListServices
+JNIEXPORT jobject JNICALL
+  Java_org_ros2_rcljava_node_NativeNode_nativeGetListServices
   (JNIEnv *, jclass, jlong);
 
 
@@ -108,7 +100,8 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListSer
  * Method:    nativeGetNodeNames
  * Signature: (J)Ljava/util/List;
  */
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNames
+JNIEXPORT jobject JNICALL
+  Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNames
   (JNIEnv *, jclass, jlong);
 
 /*
@@ -116,7 +109,8 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNam
  * Method:    nativeCreateTimerHandle
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateTimerHandle
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_node_NativeNode_nativeCreateTimerHandle
   (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus

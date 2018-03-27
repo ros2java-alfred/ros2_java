@@ -35,94 +35,10 @@
 #include "rcljava/utils.hpp"
 
 /*
- * nativeCreatePublisherHandle
- */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreatePublisherHandle(
-  JNIEnv * env,
-  jclass,
-  jlong jnode_handle,
-  jclass jmessage_class,
-  jstring jtopic,
-  jlong qos_profile_handle)
-{
-  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
-  rosidl_message_type_support_t * msg_type = jclass2MessageType(env, jmessage_class);
-  std::string topic = jstring2String(env, jtopic);
-
-  rcl_publisher_t * publisher = makeInstance<rcl_publisher_t>();
-  *publisher = rcl_get_zero_initialized_publisher();
-
-  rcl_publisher_options_t publisher_ops = rcl_publisher_get_default_options();
-
-  rmw_qos_profile_t * qos_profile = handle2Instance<rmw_qos_profile_t>(qos_profile_handle);
-  publisher_ops.qos = *qos_profile;
-
-  rcl_ret_t ret = rcl_publisher_init(
-    publisher,
-    node,
-    msg_type,
-    topic.c_str(),
-    &publisher_ops);
-
-  if (ret != RCL_RET_OK) {
-    std::string message("Failed to create publisher: " +
-      std::string(rcl_get_error_string_safe()));
-    rcl_reset_error();
-    throwException(env, message);
-
-    return -1;
-  }
-
-  jlong publisher_handle = instance2Handle(publisher);
-  return publisher_handle;
-}
-
-/*
- * nativeCreateSubscriptionHandle
- */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateSubscriptionHandle(
-  JNIEnv * env,
-  jclass,
-  jlong jnode_handle,
-  jclass jmessage_class,
-  jstring jtopic,
-  jlong qos_profile_handle)
-{
-  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
-  rosidl_message_type_support_t * msg_type = jclass2MessageType(env, jmessage_class);
-  std::string topic = jstring2String(env, jtopic);
-
-  rcl_subscription_t * subscription = makeInstance<rcl_subscription_t>();
-  *subscription = rcl_get_zero_initialized_subscription();
-
-  rcl_subscription_options_t subscription_ops = rcl_subscription_get_default_options();
-  rmw_qos_profile_t * qos_profile = handle2Instance<rmw_qos_profile_t>(qos_profile_handle);
-  subscription_ops.qos = *qos_profile;
-
-  rcl_ret_t ret = rcl_subscription_init(
-    subscription,
-    node,
-    msg_type,
-    topic.c_str(),
-    &subscription_ops);
-
-  if (ret != RCL_RET_OK) {
-    std::string message("Failed to create subscription: " +
-      std::string(rcl_get_error_string_safe()));
-    rcl_reset_error();
-    throwException(env, message);
-
-    return -1;
-  }
-
-  jlong jsubscription = instance2Handle(subscription);
-  return jsubscription;
-}
-
-/*
  * nativeCreateClientHandle
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateClientHandle(
+JNIEXPORT jlong JNICALL
+Java_org_ros2_rcljava_node_NativeNode_nativeCreateClientHandle(
   JNIEnv * env,
   jclass,
   jlong jnode_handle,
@@ -176,7 +92,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateClient
 /*
  * nativeCreateServiceHandle
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateServiceHandle(
+JNIEXPORT jlong JNICALL
+Java_org_ros2_rcljava_node_NativeNode_nativeCreateServiceHandle(
   JNIEnv * env,
   jclass,
   jlong jnode_handle,
@@ -215,7 +132,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateServic
   return jservice;
 }
 
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateTimerHandle(
+JNIEXPORT jlong JNICALL
+Java_org_ros2_rcljava_node_NativeNode_nativeCreateTimerHandle(
   JNIEnv * env,
   jclass,
   jlong timer_period)
@@ -240,7 +158,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCreateTimerH
 /*
  *
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeDispose(
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_node_NativeNode_nativeDispose(
   JNIEnv * env,
   jclass,
   jlong jnode_handle)
@@ -259,7 +178,8 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeDispose(
 /*
  *
  */
-JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetName(
+JNIEXPORT jstring JNICALL
+Java_org_ros2_rcljava_node_NativeNode_nativeGetName(
   JNIEnv * env,
   jclass,
   jlong jnode_handle)
@@ -275,7 +195,8 @@ JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetName(
 /*
  *
  */
-JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountPublishers(
+JNIEXPORT jint JNICALL
+Java_org_ros2_rcljava_node_NativeNode_nativeCountPublishers(
   JNIEnv * env,
   jclass,
   jlong jnode_handle,
@@ -299,7 +220,8 @@ JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountPublishe
 /*
  *
  */
-JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountSubscribers(
+JNIEXPORT jint JNICALL
+Java_org_ros2_rcljava_node_NativeNode_nativeCountSubscribers(
   JNIEnv * env,
   jclass,
   jlong jnode_handle,
@@ -320,7 +242,8 @@ JNIEXPORT jint JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeCountSubscrib
   return count;
 }
 
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTopics(
+JNIEXPORT jobject JNICALL
+Java_org_ros2_rcljava_node_NativeNode_nativeGetListTopics(
   JNIEnv * env,
   jclass,
   jlong jnode_handle,
@@ -356,7 +279,8 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListTop
   return topics;
 }
 
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListServices(
+JNIEXPORT jobject JNICALL
+Java_org_ros2_rcljava_node_NativeNode_nativeGetListServices(
   JNIEnv * env,
   jclass,
   jlong jnode_handle)
@@ -390,7 +314,8 @@ JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetListSer
   return services;
 }
 
-JNIEXPORT jobject JNICALL Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNames(
+JNIEXPORT jobject JNICALL
+Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNames(
   JNIEnv * env,
   jclass,
   jlong jnode_handle)
