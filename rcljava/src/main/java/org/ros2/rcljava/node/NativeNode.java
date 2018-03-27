@@ -17,8 +17,6 @@
 package org.ros2.rcljava.node;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -33,6 +31,7 @@ import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.NativeClient;
 import org.ros2.rcljava.node.service.NativeService;
+import org.ros2.rcljava.node.service.NativeServiceType;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceCallback;
 import org.ros2.rcljava.node.topic.NativePublisher;
@@ -278,7 +277,6 @@ public class NativeNode extends BaseNode {
      * @throws IllegalArgumentException
      * @throws NoSuchMethodException
      */
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends MessageService> Client<T> createClient(
             final Class<T> serviceType,
@@ -294,40 +292,11 @@ public class NativeNode extends BaseNode {
         Client<T> client = null;
 
         if (GraphName.isValidTopic(fqnService)) {
-            Class<? extends Message> requestType = null;
-            Method requestFromJavaConverterMethod = null;
-            Method requestToJavaConverterMethod = null;
-            long requestFromJavaConverterHandle = 0L;
-            long requestToJavaConverterHandle = 0L;
-
-            Class<? extends Message> responseType = null;
-            Method responseFromJavaConverterMethod = null;
-            Method responseToJavaConverterMethod = null;
-            long responseFromJavaConverterHandle = 0L;
-            long responseToJavaConverterHandle = 0L;
-
-            try {
-                requestType = (Class<? extends Message>)serviceType.getField("RequestType").get(null);
-
-                requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-                requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
-
-                requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-                requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
-
-                responseType = (Class<? extends Message>)serviceType.getField("ResponseType").get(null);
-
-                responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-                responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
-
-                responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-                responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
+            final NativeServiceType<T> request = new NativeServiceType<T>(serviceType, "RequestType");
+            final NativeServiceType<T> response = new NativeServiceType<T>(serviceType, "ResponseType");
 
             final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-            long clientHandle = NativeNode.nativeCreateClientHandle(
+            final long clientHandle = NativeNode.nativeCreateClientHandle(
                     this.nodeHandle,
                     serviceType,
                     fqnService,
@@ -339,12 +308,8 @@ public class NativeNode extends BaseNode {
                     clientHandle,
                     serviceType,
                     serviceName,
-                    requestType,
-                    responseType,
-                    requestFromJavaConverterHandle,
-                    requestToJavaConverterHandle,
-                    responseFromJavaConverterHandle,
-                    responseToJavaConverterHandle);
+                    request,
+                    response);
         }
 
         return client;
@@ -365,7 +330,6 @@ public class NativeNode extends BaseNode {
      * @throws IllegalArgumentException
      * @throws NoSuchMethodException
      */
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends MessageService> Service<T> createService(
             final Class<T> serviceType,
@@ -384,42 +348,15 @@ public class NativeNode extends BaseNode {
         Service<T> service = null;
 
         if (GraphName.isValidTopic(fqnService)) {
-//            long serviceHandle = Node.nativeCreateServiceHandle(this.nodeHandle, message, service, qos);
-//            Service<T> srv = new Service<T>(this.nodeHandle, serviceHandle, service);
-            Class<? extends Message> requestType = null;
-            Method requestFromJavaConverterMethod = null;
-            Method requestToJavaConverterMethod = null;
-            long requestFromJavaConverterHandle = 0L;
-            long requestToJavaConverterHandle = 0L;
-
-            Class<? extends Message> responseType = null;
-            Method responseFromJavaConverterMethod = null;
-            Method responseToJavaConverterMethod = null;
-            long responseFromJavaConverterHandle = 0L;
-            long responseToJavaConverterHandle = 0L;
-
-            try {
-                requestType = (Class<? extends Message>)serviceType.getField("RequestType").get(null);
-
-                requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-                requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
-
-                requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-                requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
-
-                responseType = (Class<? extends Message>)serviceType.getField("ResponseType").get(null);
-
-                responseFromJavaConverterMethod = responseType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
-                responseFromJavaConverterHandle = (Long)responseFromJavaConverterMethod.invoke(null, (Object []) null);
-
-                responseToJavaConverterMethod = responseType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
-                responseToJavaConverterHandle = (Long)responseToJavaConverterMethod.invoke(null, (Object []) null);
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
+            final NativeServiceType<T> request = new NativeServiceType<T>(serviceType, "RequestType");
+            final NativeServiceType<T> response = new NativeServiceType<T>(serviceType, "ResponseType");
 
             final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-            final long serviceHandle = NativeNode.nativeCreateServiceHandle(this.nodeHandle, serviceType, serviceName, qosProfileHandle);
+            final long serviceHandle = NativeNode.nativeCreateServiceHandle(
+                    this.nodeHandle,
+                    serviceType,
+                    serviceName,
+                    qosProfileHandle);
             RCLJava.disposeQoSProfile(qosProfileHandle);
 
             service = new NativeService<T>(this,
@@ -427,12 +364,8 @@ public class NativeNode extends BaseNode {
                     serviceType,
                     fqnService,
                     callback,
-                    requestType,
-                    responseType,
-                    requestFromJavaConverterHandle,
-                    requestToJavaConverterHandle,
-                    responseFromJavaConverterHandle,
-                    responseToJavaConverterHandle);
+                    request,
+                    response);
         }
 
         return service;

@@ -21,8 +21,10 @@ import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.Node;
 
 /**
- * This class is JVM Service of RCLJava.
+ * This class is JVM Service Server of RCLJava.
  * <b>Actually not implemented !!!</b>
+ *
+ * @param <T> Service Type.
  */
 public class JavaService<T extends MessageService> extends BaseService<T> {
 

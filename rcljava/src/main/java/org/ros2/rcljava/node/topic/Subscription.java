@@ -38,18 +38,20 @@ public interface Subscription<T extends Message> extends AutoCloseable {
     Class<T> getMessageType();
 
     /**
-     * Get the topic that this subscription is subscribed on.
-     *
-     * @return The topic name.
+     * @return Return owner Node of the subscription.
      */
-    String getTopicName();
+    Node getNode();
 
     /**
-     * Get QOS Profile
-     *
-     * @return
+     * @return Return QOS Profile of the subscription.
      */
     QoSProfile getQosProfile();
 
-    Node getNode();
+    /**
+     * Get the topic that this subscription is subscribed on.
+     *
+     * @return Return topic name of the subscription.
+     */
+    String getTopicName();
+
 }

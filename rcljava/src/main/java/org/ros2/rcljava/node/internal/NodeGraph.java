@@ -18,6 +18,9 @@ package org.ros2.rcljava.node.internal;
 import java.util.Map;
 import java.util.List;
 
+/**
+ * Interface of Node Graph stack.
+ */
 public interface NodeGraph {
 
     /**

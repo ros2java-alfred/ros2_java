@@ -52,8 +52,7 @@ public interface Publisher<T extends Message> extends AutoCloseable {
     Class<T> getMessageType();
 
     /**
-     *
-     * @return
+     * @return Return owner Node.
      */
     Node getNode();
 

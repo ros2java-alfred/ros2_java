@@ -252,15 +252,10 @@ public class NativeExecutor {
         }
 
         if (requestMessage != null && responseMessage != null) {
-            final long requestFromJavaConverterHandle  = nativeService.getRequestFromJavaConverterHandle();
-            final long requestToJavaConverterHandle    = nativeService.getRequestToJavaConverterHandle();
-            final long responseFromJavaConverterHandle = nativeService.getResponseFromJavaConverterHandle();
-            final long responseToJavaConverterHandle   = nativeService.getResponseToJavaConverterHandle();
-
             RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
                     nativeService.getServiceHandle(),
-                    requestFromJavaConverterHandle,
-                    requestToJavaConverterHandle,
+                    nativeService.getRequest().getFromJavaConverterHandle(),
+                    nativeService.getRequest().getToJavaConverterHandle(),
                     requestMessage);
 
             if (rmwRequestId != null) {
@@ -268,8 +263,8 @@ public class NativeExecutor {
                 RCLJava.nativeSendServiceResponse(
                         nativeService.getServiceHandle(),
                         rmwRequestId,
-                        responseFromJavaConverterHandle,
-                        responseToJavaConverterHandle,
+                        nativeService.getResponse().getFromJavaConverterHandle(),
+                        nativeService.getResponse().getToJavaConverterHandle(),
                         responseMessage);
             }
         }

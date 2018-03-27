@@ -25,6 +25,9 @@ import rcl_interfaces.msg.ListParametersResult;
 import rcl_interfaces.msg.ParameterDescriptor;
 import rcl_interfaces.msg.SetParametersResult;
 
+/**
+ * Interface of Node Parameters stack.
+ */
 public interface NodeParameters {
 
     /**

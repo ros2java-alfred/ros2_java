@@ -19,6 +19,11 @@ import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.Node;
 
+/**
+ * Interface of Service Server.
+ *
+ * @param <T> Service Type.
+ */
 public interface Service<T extends MessageService> extends AutoCloseable {
 
     String SCHEME = "rosservice://";
@@ -30,6 +35,9 @@ public interface Service<T extends MessageService> extends AutoCloseable {
 
     ServiceCallback<?, ?> getCallback();
 
+    /**
+     * @return Return owner Node.
+     */
     Node getNode();
 
     Class<? extends Message> getRequestType();

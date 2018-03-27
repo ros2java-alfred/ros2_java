@@ -20,6 +20,11 @@ import java.util.concurrent.Future;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
 
+/**
+ * Interface of Service Client.
+ *
+ * @param <T> Service Type.
+ */
 public interface Client<T extends MessageService> extends AutoCloseable {
 
     /**

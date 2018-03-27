@@ -369,11 +369,6 @@ public abstract class RCLJava {
             }
 
             for (@SuppressWarnings("rawtypes") final NativeService service : nativeNode.getNativeServices()) {
-                final long requestFromJavaConverterHandle  = service.getRequestFromJavaConverterHandle();
-                final long requestToJavaConverterHandle    = service.getRequestToJavaConverterHandle();
-                final long responseFromJavaConverterHandle = service.getResponseFromJavaConverterHandle();
-                final long responseToJavaConverterHandle   = service.getResponseToJavaConverterHandle();
-
                 final Class<?> requestType = service.getRequestType();
                 final Class<?> responseType = service.getResponseType();
 
@@ -393,26 +388,25 @@ public abstract class RCLJava {
 
                 final RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
                         service.getServiceHandle(),
-                        requestFromJavaConverterHandle,
-                        requestToJavaConverterHandle,
+                        service.getRequest().getFromJavaConverterHandle(),
+                        service.getRequest().getToJavaConverterHandle(),
                         requestMessage);
 
                 if (rmwRequestId != null) {
                     service.getCallback().dispatch(rmwRequestId, requestMessage, responseMessage);
-                    RCLJava.nativeSendServiceResponse(service.getServiceHandle(), rmwRequestId, responseFromJavaConverterHandle,
-                            responseToJavaConverterHandle, responseMessage);
+                    RCLJava.nativeSendServiceResponse(
+                            service.getServiceHandle(),
+                            rmwRequestId,
+                            service.getResponse().getFromJavaConverterHandle(),
+                            service.getResponse().getToJavaConverterHandle(),
+                            responseMessage);
                 }
             }
 
             for (final NativeClient<?> client : nativeNode.getNativeClients()) {
-                final NativeClient<?> nativeClient = (NativeClient<?>) client;
-                final long responseFromJavaConverterHandle = nativeClient.getResponseFromJavaConverterHandle();
-                final long responseToJavaConverterHandle = nativeClient.getResponseToJavaConverterHandle();
-
-                final Class<?> responseType = client.getResponseType();
+                final Class<?> responseType = client.getResponse().getType();
 
                 Message responseMessage = null;
-
                 try {
                     responseMessage = (Message)responseType.newInstance();
                 } catch (InstantiationException ie) {
@@ -424,9 +418,9 @@ public abstract class RCLJava {
                 }
 
                 final RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeResponse(
-                        nativeClient.getClientHandle(),
-                        responseFromJavaConverterHandle,
-                        responseToJavaConverterHandle,
+                        client.getClientHandle(),
+                        client.getResponse().getFromJavaConverterHandle(),
+                        client.getResponse().getToJavaConverterHandle(),
                         responseMessage);
 
 

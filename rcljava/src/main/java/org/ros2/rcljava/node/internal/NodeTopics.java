@@ -21,6 +21,9 @@ import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.qos.QoSProfile;
 
+/**
+ * Interface of Node Topics stack.
+ */
 public interface NodeTopics {
 
     /**

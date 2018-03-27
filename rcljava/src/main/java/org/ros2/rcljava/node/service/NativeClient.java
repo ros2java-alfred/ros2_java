@@ -25,7 +25,7 @@ import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.Node;
 
 /**
- * Service Client.
+ * This class is Native(rcl) Service Client of RCLJava.
  *
  * @param <T> Service Type.
  */
@@ -39,11 +39,8 @@ public class NativeClient<T extends MessageService> extends BaseClient<T> {
     /** Client Handler. */
     private final long clientHandle;
 
-    private final long requestFromJavaConverterHandle;
-    private final long requestToJavaConverterHandle;
-
-    private final long responseFromJavaConverterHandle;
-    private final long responseToJavaConverterHandle;
+    private final NativeServiceType<T> request;
+    private final NativeServiceType<T> response;
 
     private static native void nativeSendClientRequest(
             long clientHandle,
@@ -58,45 +55,35 @@ public class NativeClient<T extends MessageService> extends BaseClient<T> {
      * @param clientHandle
      * @param serviceType
      * @param serviceName
-     * @param requestType
-     * @param responseType
-     * @param requestFromJavaConverterHandle
-     * @param requestToJavaConverterHandle
-     * @param responseFromJavaConverterHandle
-     * @param responseToJavaConverterHandle
+     * @param request
+     * @param response
      */
     public NativeClient(
             final WeakReference<Node> nodeReference,
             final long clientHandle,
             final Class<T> serviceType,
             final String serviceName,
-            final Class<? extends Message> requestType,
-            final Class<? extends Message> responseType,
-            final long requestFromJavaConverterHandle,
-            final long requestToJavaConverterHandle,
-            final long responseFromJavaConverterHandle,
-            final long responseToJavaConverterHandle) {
-        super(nodeReference, serviceType, serviceName, requestType, responseType);
+            final NativeServiceType<T> request,
+            final NativeServiceType<T> response) {
+        super(nodeReference, serviceType, serviceName, request.getType(), response.getType());
 
         if (clientHandle == 0) { throw new RuntimeException("Need to provide active node with handle object"); }
         this.clientHandle = clientHandle;
 
-        this.requestFromJavaConverterHandle = requestFromJavaConverterHandle;
-        this.requestToJavaConverterHandle = requestToJavaConverterHandle;
-        this.responseFromJavaConverterHandle = responseFromJavaConverterHandle;
-        this.responseToJavaConverterHandle = responseToJavaConverterHandle;
+        this.request = request;
+        this.response = response;
     }
 
     @Override
-    public final <U extends Message, V extends Message> Future<V> sendRequest(final U request) {
+    public <U extends Message, V extends Message> Future<V> sendRequest(final U request) {
         synchronized(this.getPendingRequests()) {
               this.incrementSequenceNumber();
 
               NativeClient.nativeSendClientRequest(
                       this.clientHandle,
                       this.getSequenceNumber(),
-                      this.requestFromJavaConverterHandle,
-                      this.requestToJavaConverterHandle,
+                      this.request.getFromJavaConverterHandle(),
+                      this.request.getToJavaConverterHandle(),
                       request);
 
               final RCLFuture<V> future = new RCLFuture<V>(this.getNode());
@@ -105,23 +92,15 @@ public class NativeClient<T extends MessageService> extends BaseClient<T> {
             }
     }
 
-    public final long getClientHandle() {
+    public long getClientHandle() {
         return this.clientHandle;
     }
 
-    public final long getRequestFromJavaConverterHandle() {
-        return this.requestFromJavaConverterHandle;
+    public NativeServiceType<T> getRequest() {
+        return this.request;
     }
 
-    public final long getRequestToJavaConverterHandle() {
-        return this.requestToJavaConverterHandle;
-    }
-
-    public final long getResponseFromJavaConverterHandle() {
-        return this.responseFromJavaConverterHandle;
-    }
-
-    public final long getResponseToJavaConverterHandle() {
-        return this.responseToJavaConverterHandle;
+    public NativeServiceType<T> getResponse() {
+        return this.response;
     }
 }

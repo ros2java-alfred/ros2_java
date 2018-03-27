@@ -125,6 +125,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/node/topic/NativeSubscription.java"
   "src/main/java/org/ros2/rcljava/node/topic/JavaSubscription.java"
 
+  "src/main/java/org/ros2/rcljava/node/service/NativeServiceType.java"
   # Client Stack Base
   "src/main/java/org/ros2/rcljava/node/service/Client.java"
   "src/main/java/org/ros2/rcljava/node/service/BaseClient.java"

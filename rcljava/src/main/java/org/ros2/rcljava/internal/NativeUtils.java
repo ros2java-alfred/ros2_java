@@ -16,14 +16,16 @@
 
 package org.ros2.rcljava.internal;
 
-import java.util.Vector;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility for load JNI.
  */
 public final class NativeUtils {
 
-    private static java.lang.reflect.Field LIBRARIES;
+    private static Field LIBRARIES;
 
     static {
         try {
@@ -40,10 +42,10 @@ public final class NativeUtils {
 
     @SuppressWarnings("unchecked")
     public static String[] getLoadedLibraries(final ClassLoader loader) {
-        Vector<String> libraries = new Vector<String>();
+        List<String> libraries = new ArrayList<String>();
 
         try {
-            libraries = (Vector<String>) LIBRARIES.get(loader);
+            libraries = (List<String>) LIBRARIES.get(loader);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

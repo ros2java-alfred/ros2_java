@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  *
  */
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public class RmwTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(RmwTest.class);
 

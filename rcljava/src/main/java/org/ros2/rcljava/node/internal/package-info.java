@@ -13,4 +13,7 @@
  * limitations under the License.
  */
 
+/**
+ * Interfaces of Node.
+ */
 package org.ros2.rcljava.node.internal;

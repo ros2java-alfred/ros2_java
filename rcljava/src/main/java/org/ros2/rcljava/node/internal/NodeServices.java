@@ -21,6 +21,9 @@ import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceCallback;
 import org.ros2.rcljava.qos.QoSProfile;
 
+/**
+ * Interface of Node Services stack.
+ */
 public interface NodeServices {
 
     /**

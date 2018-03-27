@@ -15,6 +15,9 @@
 
 package org.ros2.rcljava.node.internal;
 
+/**
+ * Interface of Node Clock stack.
+ */
 public interface NodeClock {
 
 //    /**

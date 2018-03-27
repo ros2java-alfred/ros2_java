@@ -16,7 +16,6 @@
 
 package org.ros2.rcljava.node.service;
 
-import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
@@ -25,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Service Server.
+ * This class is Native(rcl) Service Server of RCLJava.
  *
  * @param <T> Service Type.
  */
@@ -36,11 +35,8 @@ public class NativeService<T extends MessageService> extends BaseService<T> {
     /** Service Handler. */
     private final long serviceHandle;
 
-    private final long requestFromJavaConverterHandle;
-    private final long requestToJavaConverterHandle;
-
-    private final long responseFromJavaConverterHandle;
-    private final long responseToJavaConverterHandle;
+    private final NativeServiceType<T> request;
+    private final NativeServiceType<T> response;
 
     /**
      *
@@ -49,12 +45,8 @@ public class NativeService<T extends MessageService> extends BaseService<T> {
      * @param serviceType
      * @param serviceName
      * @param callback
-     * @param requestType
-     * @param responseType
-     * @param requestFromJavaConverterHandle
-     * @param requestToJavaConverterHandle
-     * @param responseFromJavaConverterHandle
-     * @param responseToJavaConverterHandle
+     * @param request
+     * @param response
      */
     public NativeService(
             final Node node,
@@ -62,23 +54,17 @@ public class NativeService<T extends MessageService> extends BaseService<T> {
             final Class<T> serviceType,
             final String serviceName,
             final ServiceCallback<?, ?> callback,
-            final Class<? extends Message> requestType,
-            final Class<? extends Message> responseType,
-            final long requestFromJavaConverterHandle,
-            final long requestToJavaConverterHandle,
-            final long responseFromJavaConverterHandle,
-            final long responseToJavaConverterHandle) {
-        super(node, serviceType, serviceName, callback, requestType, responseType);
+            final NativeServiceType<T> request,
+            final NativeServiceType<T> response) {
+        super(node, serviceType, serviceName, callback, request.getType(), response.getType());
 
         NativeService.logger.debug("Init Native Service stack : " + serviceName);
 
         if (serviceHandle == 0) { throw new RuntimeException("Need to provide active service with handle object"); }
         this.serviceHandle = serviceHandle;
 
-        this.requestFromJavaConverterHandle = requestFromJavaConverterHandle;
-        this.requestToJavaConverterHandle = requestToJavaConverterHandle;
-        this.responseFromJavaConverterHandle = responseFromJavaConverterHandle;
-        this.responseToJavaConverterHandle = responseToJavaConverterHandle;
+        this.request = request;
+        this.response = response;
     }
 
     public void dispose() {
@@ -100,20 +86,12 @@ public class NativeService<T extends MessageService> extends BaseService<T> {
         return this.serviceHandle;
     }
 
-    public long getRequestFromJavaConverterHandle() {
-        return this.requestFromJavaConverterHandle;
+    public NativeServiceType<T> getRequest() {
+        return this.request;
     }
 
-    public long getRequestToJavaConverterHandle() {
-        return this.requestToJavaConverterHandle;
-    }
-
-    public long getResponseFromJavaConverterHandle() {
-        return this.responseFromJavaConverterHandle;
-    }
-
-    public long getResponseToJavaConverterHandle() {
-        return this.responseToJavaConverterHandle;
+    public NativeServiceType<T> getResponse() {
+        return this.response;
     }
 
 }

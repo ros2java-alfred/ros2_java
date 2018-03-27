@@ -17,6 +17,9 @@ package org.ros2.rcljava.node.internal;
 
 import org.ros2.rcljava.Logger;
 
+/**
+ * Interface of Node Logging stack.
+ */
 public interface NodeLogging {
 
     /**
