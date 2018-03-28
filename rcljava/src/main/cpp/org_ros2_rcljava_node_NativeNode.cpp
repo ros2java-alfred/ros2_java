@@ -35,61 +35,6 @@
 #include "rcljava/utils.hpp"
 
 /*
- * nativeCreateClientHandle
- */
-JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_node_NativeNode_nativeCreateClientHandle(
-  JNIEnv * env,
-  jclass,
-  jlong jnode_handle,
-  jclass jservice_class,
-  jstring jservice_topic,
-  jlong qos_profile_handle)
-{
-  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
-  rosidl_service_type_support_t * msg_type = jclass2ServiceType(env, jservice_class);
-  std::string service_topic = jstring2String(env, jservice_topic);
-
-  rcl_client_t * client = makeInstance<rcl_client_t>();
-  *client = rcl_get_zero_initialized_client();
-
-//  bool is_available = false;
-//  rcl_ret_t ret = rcl_service_server_is_available(node, client, &is_available);
-//  printf("===> is available\n");
-//  if (ret != RCL_RET_OK || !is_available) {
-//    std::string message("Failed to connect to server: " +
-//        std::string(rcl_get_error_string_safe()));
-//        rcl_reset_error();
-//    throwException(env, message);
-//
-//    return -1;
-//  }
-
-  rcl_client_options_t client_ops = rcl_client_get_default_options();
-  rmw_qos_profile_t * qos_profile = reinterpret_cast<rmw_qos_profile_t *>(qos_profile_handle);
-  client_ops.qos = *qos_profile;
-
-  rcl_ret_t ret = rcl_client_init(
-    client,
-    node,
-    msg_type,
-    service_topic.c_str(),
-    &client_ops);
-
-  if (ret != RCL_RET_OK) {
-    std::string message("Failed to create client: " +
-      std::string(rcl_get_error_string_safe()));
-    rcl_reset_error();
-    throwException(env, message);
-
-    return -1;
-  }
-
-  jlong jclient = instance2Handle(client);
-  return jclient;
-}
-
-/*
  * nativeCreateServiceHandle
  */
 JNIEXPORT jlong JNICALL
