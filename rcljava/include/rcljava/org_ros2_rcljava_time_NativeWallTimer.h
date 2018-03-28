@@ -24,6 +24,15 @@ extern "C" {
 #endif
 /*
  * Class:     org_ros2_rcljava_time_NativeWallTimer
+ * Method:    nativeCreateTimerHandle
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_time_NativeWallTimer_nativeCreateTimerHandle
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_time_NativeWallTimer
  * Method:    nativeDispose
  * Signature: (J)V
  */

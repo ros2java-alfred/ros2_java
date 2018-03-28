@@ -68,13 +68,9 @@ public class NativeNode extends BaseNode {
 
     // Native call.
 
-    private static native <T> long nativeCreateClientHandle(
-            long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
 
     private static native <T> long nativeCreateServiceHandle(
             long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
-
-    private static native long nativeCreateTimerHandle(long timerPeriod); //TODO move to RCLJava
 
     private static native void nativeDispose(long nodeHandle);
 
@@ -239,10 +235,9 @@ public class NativeNode extends BaseNode {
             final WallTimerCallback callback) {
 
         final long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
-        final long timerHandle = NativeNode.nativeCreateTimerHandle(timerPeriodNS);
 
         NativeNode.logger.debug("Initialize Native WallTimer.");
-        return new NativeWallTimer(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
+        return new NativeWallTimer(new WeakReference<Node>(this), callback, timerPeriodNS);
     }
 
     /**
@@ -271,30 +266,17 @@ public class NativeNode extends BaseNode {
 
         final String fqnService =  GraphName.getFullName(this, serviceName, null);
         NativeNode.logger.debug("Initialize Native Client : " + fqnService);
-        Client<T> client = null;
 
-        if (GraphName.isValidTopic(fqnService)) {
-            final NativeServiceType<T> request = new NativeServiceType<T>(serviceType, "RequestType");
-            final NativeServiceType<T> response = new NativeServiceType<T>(serviceType, "ResponseType");
+        final NativeServiceType<T> request = new NativeServiceType<T>(serviceType, "RequestType");
+        final NativeServiceType<T> response = new NativeServiceType<T>(serviceType, "ResponseType");
 
-            final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-            final long clientHandle = NativeNode.nativeCreateClientHandle(
-                    this.nodeHandle,
-                    serviceType,
-                    fqnService,
-                    qosProfileHandle);
-            RCLJava.disposeQoSProfile(qosProfileHandle);
-
-            client = new NativeClient<T>(
-                    new WeakReference<Node>(this),
-                    clientHandle,
-                    serviceType,
-                    serviceName,
-                    request,
-                    response);
-        }
-
-        return client;
+        return new NativeClient<T>(
+                this,
+                serviceType,
+                serviceName,
+                request,
+                response,
+                qosProfile);
     }
 
     /**

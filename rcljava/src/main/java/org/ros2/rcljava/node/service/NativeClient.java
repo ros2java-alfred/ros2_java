@@ -22,7 +22,10 @@ import java.util.concurrent.Future;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
+import org.ros2.rcljava.namespace.GraphName;
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.qos.QoSProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +49,11 @@ public class NativeClient<T extends MessageService> extends BaseClient<T> {
     private final NativeServiceType<T> request;
     private final NativeServiceType<T> response;
 
+    private static native <T> long nativeCreateClientHandle(
+            long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
+
+    private static native void nativeDispose(long nodeHandle, long clientHandle);
+
     private static native void nativeSendClientRequest(
             long clientHandle,
             long sequenceNumber,
@@ -61,18 +69,28 @@ public class NativeClient<T extends MessageService> extends BaseClient<T> {
      * @param serviceName
      * @param request
      * @param response
+     * @param qosProfile
      */
     public NativeClient(
-            final WeakReference<Node> nodeReference,
-            final long clientHandle,
+            final NativeNode nodeReference,
             final Class<T> serviceType,
             final String serviceName,
             final NativeServiceType<T> request,
-            final NativeServiceType<T> response) {
-        super(nodeReference, serviceType, serviceName, request.getType(), response.getType());
+            final NativeServiceType<T> response,
+            final QoSProfile qosProfile) {
+        super(nodeReference, serviceType, serviceName, request.getType(), response.getType(), qosProfile);
 
-        if (clientHandle == 0) { throw new RuntimeException("Need to provide active node with handle object"); }
-        this.clientHandle = clientHandle;
+        final String fqnService =  GraphName.getFullName(nodeReference, serviceName, null);
+        if (!GraphName.isValidTopic(fqnService)) { throw new RuntimeException("Invalid topic name."); }
+
+        final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+        this.clientHandle = NativeClient.nativeCreateClientHandle(
+                nodeReference.getNodeHandle(),
+                serviceType,
+                fqnService,
+                qosProfileHandle);
+        RCLJava.disposeQoSProfile(qosProfileHandle);
+        if (this.clientHandle == 0) { throw new RuntimeException("Need to provide active node with handle object"); }
 
         this.request = request;
         this.response = response;
@@ -100,7 +118,15 @@ public class NativeClient<T extends MessageService> extends BaseClient<T> {
                         this.response.getFromJavaConverterHandle(),
                         this.response.getToJavaConverterHandle()));
 
-//        NativeClient.nativeDispose(this.getNode().getNodeHandle(), this.clientHandle);
+        NativeClient.nativeDispose(this.getNode().getNodeHandle(), this.clientHandle);
+    }
+
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.node.topic.Publisher#getNode()
+     */
+    @Override
+    public NativeNode getNode() {
+        return (NativeNode) super.getNode();
     }
 
     @Override
@@ -115,7 +141,7 @@ public class NativeClient<T extends MessageService> extends BaseClient<T> {
                       this.request.getToJavaConverterHandle(),
                       request);
 
-              final RCLFuture<V> future = new RCLFuture<V>(this.getNode());
+              final RCLFuture<V> future = new RCLFuture<V>(new WeakReference<Node>(this.getNode()));
               getPendingRequests().put(this.getSequenceNumber(), future);
               return future;
             }

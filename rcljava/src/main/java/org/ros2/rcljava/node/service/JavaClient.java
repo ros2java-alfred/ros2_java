@@ -15,13 +15,13 @@
 
 package org.ros2.rcljava.node.service;
 
-import java.lang.ref.WeakReference;
 import java.util.concurrent.Future;
 
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.qos.QoSProfile;
 
 /**
  * This class is JVM Service Client of RCLJava.
@@ -40,12 +40,13 @@ public class JavaClient<T extends MessageService> extends BaseClient<T> {
      * @param responseType
      */
     public JavaClient(
-            final WeakReference<Node> nodeReference,
+            final Node nodeReference,
             final Class<T> serviceType,
             final String serviceName,
             final Class<? extends Message> requestType,
-            final Class<? extends Message> responseType) {
-        super(nodeReference, serviceType, serviceName, requestType, responseType);
+            final Class<? extends Message> responseType,
+            final QoSProfile qosProfile) {
+        super(nodeReference, serviceType, serviceName, requestType, responseType, qosProfile);
 
         throw new NotImplementedException();
     }

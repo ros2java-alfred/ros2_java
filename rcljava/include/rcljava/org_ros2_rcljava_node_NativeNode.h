@@ -24,15 +24,6 @@ extern "C" {
 #endif
 /*
  * Class:     org_ros2_rcljava_node_NativeNode
- * Method:    nativeCreateClientHandle
- * Signature: (JLjava/lang/Class;Ljava/lang/String;J)J
- */
-JNIEXPORT jlong JNICALL
-  Java_org_ros2_rcljava_node_NativeNode_nativeCreateClientHandle
-  (JNIEnv *, jclass, jlong, jclass, jstring, jlong);
-
-/*
- * Class:     org_ros2_rcljava_node_NativeNode
  * Method:    nativeCreateServiceHandle
  * Signature: (JLjava/lang/Class;Ljava/lang/String;J;)J
  */
@@ -102,15 +93,6 @@ JNIEXPORT jobject JNICALL
  */
 JNIEXPORT jobject JNICALL
   Java_org_ros2_rcljava_node_NativeNode_nativeGetNodeNames
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     org_ros2_rcljava_node_NativeNode
- * Method:    nativeCreateTimerHandle
- * Signature: (J)J
- */
-JNIEXPORT jlong JNICALL
-  Java_org_ros2_rcljava_node_NativeNode_nativeCreateTimerHandle
   (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus

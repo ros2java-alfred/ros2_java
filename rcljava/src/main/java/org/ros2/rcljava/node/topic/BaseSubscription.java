@@ -63,10 +63,11 @@ public abstract class BaseSubscription<T extends Message> implements Subscriptio
         this.ownerNode = node;
 
         this.messageType = messageType;
-        this.topicName = topic;
-        this.callback = callback;
-        this.qosProfile = qosProfile;
+        this.topicName   = topic;
+        this.callback    = callback;
+        this.qosProfile  = qosProfile;
 
+        BaseSubscription.logger.debug("Create Publisher of topic : " + this.topicName);
         this.ownerNode.getSubscriptions().add(this);
     }
 

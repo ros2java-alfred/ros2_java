@@ -15,7 +15,6 @@
 
 package org.ros2.rcljava.node.service;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +22,7 @@ import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.node.Node;
-
+import org.ros2.rcljava.qos.QoSProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,10 +35,11 @@ public abstract class BaseClient<T extends MessageService> implements Client<T> 
 
     private static final Logger logger = LoggerFactory.getLogger(BaseClient.class);
 
-    private final WeakReference<Node> nodeReference;
+    private final Node ownerNode;
 
     private final Class<T> serviceType;
     private final String serviceName;
+    private final QoSProfile qosProfile;
     private final Map<Long, RCLFuture<?>> pendingRequests;
 
     private final Class<? extends Message> requestType;
@@ -49,31 +49,33 @@ public abstract class BaseClient<T extends MessageService> implements Client<T> 
 
     /**
      *
-     * @param nodeReference
+     * @param ownerNode
      * @param serviceType
      * @param serviceName
      * @param requestType
      * @param responseType
      */
     public BaseClient(
-            final WeakReference<Node> nodeReference,
+            final Node ownerNode,
             final Class<T> serviceType,
             final String serviceName,
             final Class<? extends Message> requestType,
-            final Class<? extends Message> responseType) {
+            final Class<? extends Message> responseType,
+            final QoSProfile qosProfile) {
 
-        if (nodeReference == null) { throw new RuntimeException("Need to provide active node with handle object"); }
-        this.nodeReference = nodeReference;
+        if (ownerNode == null) { throw new RuntimeException("Need to provide active node with handle object"); }
+        this.ownerNode = ownerNode;
 
         this.serviceType = serviceType;
         this.serviceName = serviceName;
+        this.qosProfile  = qosProfile;
         this.requestType = requestType;
         this.responseType = responseType;
 
         this.pendingRequests = new HashMap<Long, RCLFuture<?>>();
 
         BaseClient.logger.debug("Create Client of topic : " + this.serviceName);
-        this.nodeReference.get().getClients().add(this);
+        this.ownerNode.getClients().add(this);
     }
 
     @Override
@@ -85,8 +87,8 @@ public abstract class BaseClient<T extends MessageService> implements Client<T> 
     public void dispose() {
         BaseClient.logger.debug("Destroy Client of topic : " + this.serviceName);
 
-        if (this.nodeReference.get().getClients().contains(this)) {
-            this.nodeReference.get().getClients().remove(this);
+        if (this.ownerNode.getClients().contains(this)) {
+            this.ownerNode.getClients().remove(this);
         }
     }
 
@@ -123,8 +125,15 @@ public abstract class BaseClient<T extends MessageService> implements Client<T> 
 //          return false;
     }
 
-    public WeakReference<Node> getNode() {
-        return this.nodeReference;
+    public Node getNode() {
+        return this.ownerNode;
+    }
+    /* (non-Javadoc)
+     * @see org.ros2.rcljava.node.topic.Publisher#getQosProfile()
+     */
+//    @Override
+    public QoSProfile getQosProfile() {
+        return this.qosProfile;
     }
 
     public long getSequenceNumber() {

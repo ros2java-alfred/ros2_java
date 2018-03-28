@@ -33,6 +33,8 @@ public class NativeWallTimer extends BaseWallTimer {
 
     private final long wallTimerHandle;
 
+    private static native long nativeCreateTimerHandle(long timerPeriod);
+
     private static native boolean nativeIsReady(long handle);
 
     private static native boolean nativeIsCanceled(long handle);
@@ -62,13 +64,12 @@ public class NativeWallTimer extends BaseWallTimer {
      */
     public NativeWallTimer(
             final WeakReference<Node> nodeReference,
-            final long handle,
             final WallTimerCallback callback,
             final long timerPeriodNS) {
         super(nodeReference, callback, timerPeriodNS);
 
-        if (handle == 0) { throw new RuntimeException("Need to provide active node with handle object"); }
-        this.wallTimerHandle = handle;
+        this.wallTimerHandle = NativeWallTimer.nativeCreateTimerHandle(timerPeriodNS);
+        if (this.wallTimerHandle == 0) { throw new RuntimeException("Need to provide active node with handle object"); }
     }
 
     /* (non-Javadoc)
@@ -81,8 +82,8 @@ public class NativeWallTimer extends BaseWallTimer {
         final Node node = this.getNode();
         if (node != null) {
             NativeWallTimer.logger.debug("Destroy Timer of node : " + node.getName());
-            NativeWallTimer.nativeDispose(this.wallTimerHandle);
         }
+        NativeWallTimer.nativeDispose(this.wallTimerHandle);
     }
 
     /* (non-Javadoc)

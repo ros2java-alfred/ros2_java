@@ -132,29 +132,6 @@ Java_org_ros2_rcljava_node_NativeNode_nativeCreateServiceHandle(
   return jservice;
 }
 
-JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_node_NativeNode_nativeCreateTimerHandle(
-  JNIEnv * env,
-  jclass,
-  jlong timer_period)
-{
-  rcl_timer_t * timer = makeInstance<rcl_timer_t>();
-  *timer = rcl_get_zero_initialized_timer();
-
-  rcl_ret_t ret = rcl_timer_init(timer, timer_period, NULL, rcl_get_default_allocator());
-
-  if (ret != RCL_RET_OK) {
-    std::string message("Failed to create timer: " +
-      std::string(rcl_get_error_string_safe()));
-    rcl_reset_error();
-    throwException(env, message);
-    return 0;
-  }
-
-  jlong jtimer = instance2Handle(timer);
-  return jtimer;
-}
-
 /*
  *
  */

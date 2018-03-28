@@ -25,6 +25,15 @@ extern "C" {
 #endif
 /*
  * Class:     org_ros2_rcljava_node_service_NativeClient
+ * Method:    nativeCreateClientHandle
+ * Signature: (JLjava/lang/Class;Ljava/lang/String;J)J
+ */
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_node_service_NativeClient_nativeCreateClientHandle
+  (JNIEnv *, jclass, jlong, jclass, jstring, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_node_service_NativeClient
  * Method:    nativeSendClientRequest
  * Signature: (JJJJLjava/lang/Object;)V
  */
@@ -32,6 +41,14 @@ JNIEXPORT void JNICALL
   Java_org_ros2_rcljava_node_service_NativeClient_nativeSendClientRequest
   (JNIEnv *, jclass, jlong, jlong, jlong, jlong, jobject);
 
+/*
+ * Class:     org_ros2_rcljava_node_service_NativeClient
+ * Method:    nativeDispose
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL
+  Java_org_ros2_rcljava_node_service_NativeClient_nativeDispose
+  (JNIEnv *, jclass, jlong, jlong);
 #ifdef __cplusplus
 }
 #endif

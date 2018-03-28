@@ -59,8 +59,8 @@ public abstract class BasePublisher<T extends Message> implements Publisher<T> {
         this.ownerNode = node;
 
         this.messageType = messageType;
-        this.topicName = topic;
-        this.qosProfile = qosProfile;
+        this.topicName   = topic;
+        this.qosProfile  = qosProfile;
 
         BasePublisher.logger.debug("Create Publisher of topic : " + this.topicName);
         this.ownerNode.getPublishers().add(this);
