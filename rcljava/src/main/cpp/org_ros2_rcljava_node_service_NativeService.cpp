@@ -1,5 +1,4 @@
-// Copyright 2016 Esteve Fernandez <esteve@apache.org>
-// Copyright 2016-2018 Mickael Gaillard <mick.gaillard@gmail.com>
+// Copyright 2018 Mickael Gaillard <mick.gaillard@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,54 +14,54 @@
 
 #include <jni.h>
 
-#include <string>
-#include <cstdlib>
 #include <cassert>
-#include <cstdio>
+#include <cstdlib>
+#include <string>
 
 #include "rmw/rmw.h"
 #include "rcl/error_handling.h"
 #include "rcl/rcl.h"
 #include "rcl/node.h"
+#include "rosidl_generator_c/message_type_support_struct.h"
 
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
 
-#include "rcljava/org_ros2_rcljava_node_topic_NativeSubscription.h"
+#include "rcljava/org_ros2_rcljava_node_service_NativeService.h"
 #include "rcljava/utils.hpp"
 
 /*
- * nativeCreateSubscriptionHandle
+ * nativeCreateServiceHandle
  */
 JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_node_topic_NativeSubscription_nativeCreateSubscriptionHandle(
+Java_org_ros2_rcljava_node_service_NativeService_nativeCreateServiceHandle(
   JNIEnv * env,
   jclass,
   jlong jnode_handle,
-  jclass jmessage_class,
-  jstring jtopic,
+  jclass jservice_class,
+  jstring jservice_topic,
   jlong qos_profile_handle)
 {
   rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
-  rosidl_message_type_support_t * msg_type = jclass2MessageType(env, jmessage_class);
-  std::string topic = jstring2String(env, jtopic);
+  rosidl_service_type_support_t * msg_type = jclass2ServiceType(env, jservice_class);
+  std::string service_topic = jstring2String(env, jservice_topic);
 
-  rcl_subscription_t * subscription = makeInstance<rcl_subscription_t>();
-  *subscription = rcl_get_zero_initialized_subscription();
+  rcl_service_t * service = makeInstance<rcl_service_t>();
+  *service = rcl_get_zero_initialized_service();
 
-  rcl_subscription_options_t subscription_ops = rcl_subscription_get_default_options();
+  rcl_service_options_t service_ops = rcl_service_get_default_options();
   rmw_qos_profile_t * qos_profile = handle2Instance<rmw_qos_profile_t>(qos_profile_handle);
-  subscription_ops.qos = *qos_profile;
+  service_ops.qos = *qos_profile;
 
-  rcl_ret_t ret = rcl_subscription_init(
-    subscription,
+  rcl_ret_t ret = rcl_service_init(
+    service,
     node,
     msg_type,
-    topic.c_str(),
-    &subscription_ops);
+    service_topic.c_str(),
+    &service_ops);
 
   if (ret != RCL_RET_OK) {
-    std::string message("Failed to create subscription: " +
+    std::string message("Failed to create service: " +
       std::string(rcl_get_error_string_safe()));
     rcl_reset_error();
     throwException(env, message);
@@ -70,26 +69,26 @@ Java_org_ros2_rcljava_node_topic_NativeSubscription_nativeCreateSubscriptionHand
     return -1;
   }
 
-  jlong jsubscription = instance2Handle(subscription);
-  return jsubscription;
+  jlong jservice = instance2Handle(service);
+  return jservice;
 }
 
 /*
  * nativeDispose
  */
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_node_topic_NativeSubscription_nativeDispose(
+Java_org_ros2_rcljava_node_service_NativeService_nativeDispose(
   JNIEnv * env,
   jclass,
   jlong jnode_handle,
-  jlong jsubscription_handle)
+  jlong jservice_handle)
 {
   rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
-  rcl_subscription_t * subscription = handle2Instance<rcl_subscription_t>(jsubscription_handle);
+  rcl_service_t * service = handle2Instance<rcl_service_t>(jservice_handle);
 
-  rcl_ret_t ret = rcl_subscription_fini(subscription, node);
+  rcl_ret_t ret = rcl_service_fini(service, node);
   if (ret != RCL_RET_OK) {
-    std::string message("Failed to destroy subscription: " +
+    std::string message("Failed to destroy service: " +
       std::string(rcl_get_error_string_safe()));
     rcl_reset_error();
     throwException(env, message);

@@ -1,5 +1,5 @@
 // Copyright 2016-2017 Esteve Fernandez <esteve@apache.org>
-// Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
+// Copyright 2016-2018 Mickael Gaillard <mick.gaillard@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,46 +35,38 @@
 #include "rcljava/utils.hpp"
 
 /*
- * nativeCreateServiceHandle
+ *
  */
 JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_node_NativeNode_nativeCreateServiceHandle(
+Java_org_ros2_rcljava_node_NativeNode_nativeCreateNodeHandle(
   JNIEnv * env,
   jclass,
-  jlong jnode_handle,
-  jclass jservice_class,
-  jstring jservice_topic,
-  jlong qos_profile_handle)
+  jstring jnode_name,
+  jstring jspace_name)
 {
-  rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
-  rosidl_service_type_support_t * msg_type = jclass2ServiceType(env, jservice_class);
-  std::string service_topic = jstring2String(env, jservice_topic);
+  std::string node_name = jstring2String(env, jnode_name);
+  std::string space_name("");
+  if (jspace_name != nullptr) {
+    space_name = jstring2String(env, jspace_name);
+  }
 
-  rcl_service_t * service = makeInstance<rcl_service_t>();
-  *service = rcl_get_zero_initialized_service();
+  rcl_node_t * node = makeInstance<rcl_node_t>();
+  *node = rcl_get_zero_initialized_node();
 
-  rcl_service_options_t service_ops = rcl_service_get_default_options();
-  rmw_qos_profile_t * qos_profile = handle2Instance<rmw_qos_profile_t>(qos_profile_handle);
-  service_ops.qos = *qos_profile;
+  rcl_node_options_t default_options = rcl_node_get_default_options();
 
-  rcl_ret_t ret = rcl_service_init(
-    service,
-    node,
-    msg_type,
-    service_topic.c_str(),
-    &service_ops);
-
+  rcl_ret_t ret = rcl_node_init(node, node_name.c_str(), space_name.c_str(), &default_options);
   if (ret != RCL_RET_OK) {
-    std::string message("Failed to create service: " +
+    std::string message("Failed to create node: " +
       std::string(rcl_get_error_string_safe()));
     rcl_reset_error();
     throwException(env, message);
 
-    return -1;
+    return 0;
   }
 
-  jlong jservice = instance2Handle(service);
-  return jservice;
+  jlong node_handle = instance2Handle(node);
+  return node_handle;
 }
 
 /*

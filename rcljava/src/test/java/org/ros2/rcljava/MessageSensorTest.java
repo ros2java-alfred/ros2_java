@@ -15,12 +15,10 @@
 
 package org.ros2.rcljava;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +59,7 @@ public class MessageSensorTest extends AbstractMessageTest {
     private static final Logger logger = LoggerFactory.getLogger(MessageSensorTest.class);
 
     @Test
-    public final void testPubBatteryState() throws Exception {
+    public final void testPubBatteryState() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final BatteryState msg = new BatteryState();
@@ -79,20 +77,20 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setVoltage(11.8f);
 
         final BatteryState value = this.pubSubTest(msg);
-        assertEquals(2000.0f, value.getCapacity(), 0.1f);
+        Assert.assertEquals(2000.0f, value.getCapacity(), 0.1f);
 
-        assertEquals(100.0f, value.getCharge(), 0.1f);
-        assertEquals(2.0f, value.getCurrent(), 0.1f);
-        assertEquals(2000.5f, value.getDesignCapacity(), 0.1f);
-//        assertEquals(2000.0f, value.getCapacity(), 0.1f);
-//        assertEquals(2000.0f, value.getCapacity(), 0.1f);
-//        assertEquals(2000.0f, value.getCapacity(), 0.1f);
-//        assertEquals(2000.0f, value.getCapacity(), 0.1f);
-//        assertEquals(2000.0f, value.getCapacity(), 0.1f);
+        Assert.assertEquals(100.0f, value.getCharge(), 0.1f);
+        Assert.assertEquals(2.0f, value.getCurrent(), 0.1f);
+        Assert.assertEquals(2000.5f, value.getDesignCapacity(), 0.1f);
+//        Assert.assertEquals(2000.0f, value.getCapacity(), 0.1f);
+//        Assert.assertEquals(2000.0f, value.getCapacity(), 0.1f);
+//        Assert.assertEquals(2000.0f, value.getCapacity(), 0.1f);
+//        Assert.assertEquals(2000.0f, value.getCapacity(), 0.1f);
+//        Assert.assertEquals(2000.0f, value.getCapacity(), 0.1f);
     }
 
     @Test
-    public final void testPubImu() throws Exception {
+    public final void testPubImu() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Imu msg = new Imu();
@@ -101,11 +99,11 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getLinearAcceleration().setZ(4.0d);
 
         final Imu value = this.pubSubTest(msg);
-        assertEquals(3.0d, value.getLinearAcceleration().getX(), 0.1d);
+        Assert.assertEquals(3.0d, value.getLinearAcceleration().getX(), 0.1d);
     }
 
     @Test
-    public final void testPubCameraInfo() throws Exception {
+    public final void testPubCameraInfo() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final CameraInfo msg = new CameraInfo();
@@ -121,20 +119,20 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getRoi().setDoRectify(true);
 
         final CameraInfo value = this.pubSubTest(msg);
-        assertEquals(10, value.getBinningX());
-        assertEquals(20, value.getBinningY());
-        assertEquals(30d, value.getD().get(0), 0.1d);
-        assertEquals("distortion", value.getDistortionModel());
-        assertEquals(40, value.getHeight());
-        assertEquals(50, value.getWidth());
-        assertEquals(60d, value.getK().get(0), 0.1d);
-        assertEquals(70d, value.getP().get(0), 0.1d);
-        assertEquals(80d, value.getR().get(0), 0.1d);
-        assertTrue(value.getRoi().getDoRectify());
+        Assert.assertEquals(10, value.getBinningX());
+        Assert.assertEquals(20, value.getBinningY());
+        Assert.assertEquals(30d, value.getD().get(0), 0.1d);
+        Assert.assertEquals("distortion", value.getDistortionModel());
+        Assert.assertEquals(40, value.getHeight());
+        Assert.assertEquals(50, value.getWidth());
+        Assert.assertEquals(60d, value.getK().get(0), 0.1d);
+        Assert.assertEquals(70d, value.getP().get(0), 0.1d);
+        Assert.assertEquals(80d, value.getR().get(0), 0.1d);
+        Assert.assertTrue(value.getRoi().getDoRectify());
     }
 
     @Test
-    public final void testPubChannelFloat32() throws Exception {
+    public final void testPubChannelFloat32() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final ChannelFloat32 msg = new ChannelFloat32();
@@ -142,12 +140,12 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setValues(Arrays.asList(5f));
 
         final ChannelFloat32 value = this.pubSubTest(msg);
-        assertEquals("key", value.getName());
-        assertEquals(5f, value.getValues().get(0), 0.1f);
+        Assert.assertEquals("key", value.getName());
+        Assert.assertEquals(5f, value.getValues().get(0), 0.1f);
     }
 
     @Test
-    public final void testPubCompressedImage() throws Exception {
+    public final void testPubCompressedImage() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final CompressedImage msg = new CompressedImage();
@@ -155,12 +153,12 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getData().add((byte) 10);
 
         final CompressedImage value = this.pubSubTest(msg);
-        assertEquals("format", value.getFormat());
-        assertEquals((byte) 10, (byte)value.getData().get(0));
+        Assert.assertEquals("format", value.getFormat());
+        Assert.assertEquals((byte) 10, (byte)value.getData().get(0));
     }
 
     @Test
-    public final void testPubFluidPressure() throws Exception {
+    public final void testPubFluidPressure() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final FluidPressure msg = new FluidPressure();
@@ -168,12 +166,12 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setVariance(20.0d);
 
         final FluidPressure value = this.pubSubTest(msg);
-        assertEquals(10.0d, value.getFluidPressure(), 0.1d);
-        assertEquals(20.0d, value.getVariance(), 0.1d);
+        Assert.assertEquals(10.0d, value.getFluidPressure(), 0.1d);
+        Assert.assertEquals(20.0d, value.getVariance(), 0.1d);
     }
 
     @Test
-    public final void testPubIlluminance() throws Exception {
+    public final void testPubIlluminance() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Illuminance msg = new Illuminance();
@@ -181,12 +179,12 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setVariance(20d);
 
         final Illuminance value = this.pubSubTest(msg);
-        assertEquals(10d, value.getIlluminance(), 0.1d);
-        assertEquals(20d, value.getVariance(), 0.1d);
+        Assert.assertEquals(10d, value.getIlluminance(), 0.1d);
+        Assert.assertEquals(20d, value.getVariance(), 0.1d);
     }
 
     @Test
-    public final void testPubImage() throws Exception {
+    public final void testPubImage() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Image msg = new Image();
@@ -198,16 +196,16 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setWidth(50);
 
         final Image value = this.pubSubTest(msg);
-        assertEquals((byte)10, (byte)value.getData().get(0));
-        assertEquals("encodingTest", value.getEncoding());
-        assertEquals(20, value.getHeight());
-        assertEquals((byte)30, (byte)value.getIsBigendian());
-        assertEquals(40, value.getStep());
-        assertEquals(50, value.getWidth());
+        Assert.assertEquals((byte)10, (byte)value.getData().get(0));
+        Assert.assertEquals("encodingTest", value.getEncoding());
+        Assert.assertEquals(20, value.getHeight());
+        Assert.assertEquals((byte)30, (byte)value.getIsBigendian());
+        Assert.assertEquals(40, value.getStep());
+        Assert.assertEquals(50, value.getWidth());
     }
 
     @Test
-    public final void testPubJointState() throws Exception {
+    public final void testPubJointState() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final JointState msg = new JointState();
@@ -217,14 +215,14 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getVelocity().add(30d);
 
         final JointState value = this.pubSubTest(msg);
-        assertEquals(10d, value.getEffort().get(0), 0.1d);
-        assertEquals("name", value.getName().get(0));
-        assertEquals(20d, value.getPosition().get(0), 0.1d);
-        assertEquals(30d, value.getVelocity().get(0), 0.1d);
+        Assert.assertEquals(10d, value.getEffort().get(0), 0.1d);
+        Assert.assertEquals("name", value.getName().get(0));
+        Assert.assertEquals(20d, value.getPosition().get(0), 0.1d);
+        Assert.assertEquals(30d, value.getVelocity().get(0), 0.1d);
     }
 
     @Test
-    public final void testPubJoy() throws Exception {
+    public final void testPubJoy() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Joy msg = new Joy();
@@ -232,14 +230,14 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getButtons().add(10);
 
         final Joy value = this.pubSubTest(msg);
-        assertEquals(2f, value.getAxes().get(0), 0.1f);
-        assertEquals(4f, value.getAxes().get(1), 0.1f);
-        assertEquals(6f, value.getAxes().get(2), 0.1f);
-        assertEquals((Integer)10, value.getButtons().get(0));
+        Assert.assertEquals(2f, value.getAxes().get(0), 0.1f);
+        Assert.assertEquals(4f, value.getAxes().get(1), 0.1f);
+        Assert.assertEquals(6f, value.getAxes().get(2), 0.1f);
+        Assert.assertEquals((Integer)10, value.getButtons().get(0));
     }
 
     @Test
-    public final void testPubJoyFeedback() throws Exception {
+    public final void testPubJoyFeedback() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final JoyFeedback msg = new JoyFeedback();
@@ -248,36 +246,36 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setType((byte)30);
 
         final JoyFeedback value = this.pubSubTest(msg);
-        assertEquals((byte)10, value.getId());
-        assertEquals(20f, value.getIntensity(), 0.1f);
-        assertEquals((byte)30, value.getType());
+        Assert.assertEquals((byte)10, value.getId());
+        Assert.assertEquals(20f, value.getIntensity(), 0.1f);
+        Assert.assertEquals((byte)30, value.getType());
     }
 
     @Test
-    public final void testPubJoyFeedbackArray() throws Exception {
+    public final void testPubJoyFeedbackArray() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final JoyFeedbackArray msg = new JoyFeedbackArray();
         msg.getArray().add(new JoyFeedback());
 
         final JoyFeedbackArray value = this.pubSubTest(msg);
-        assertNotNull(value.getArray().get(0));
+        Assert.assertNotNull(value.getArray().get(0));
     }
 
     @Test
-    public final void testPubLaserEcho() throws Exception {
+    public final void testPubLaserEcho() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final LaserEcho msg = new LaserEcho();
         msg.getEchoes().addAll(Arrays.asList(21.0f, 12.0f));
 
         final LaserEcho value = this.pubSubTest(msg);
-        assertEquals(21.0f, value.getEchoes().get(0), 0.1f);
-        assertEquals(12.0f, value.getEchoes().get(1), 0.1f);
+        Assert.assertEquals(21.0f, value.getEchoes().get(0), 0.1f);
+        Assert.assertEquals(12.0f, value.getEchoes().get(1), 0.1f);
     }
 
     @Test
-    public final void testPubLaserScan() throws Exception {
+    public final void testPubLaserScan() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final LaserScan msg = new LaserScan();
@@ -292,19 +290,19 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setTimeIncrement(90f);
 
         final LaserScan value = this.pubSubTest(msg);
-        assertEquals(10f, value.getAngleIncrement(), 0.1f);
-        assertEquals(20f, value.getAngleMax(), 0.1f);
-        assertEquals(30f, value.getAngleMin(), 0.1f);
-        assertEquals(40f, value.getIntensities().get(0), 0.1f);
-        assertEquals(50f, value.getRangeMax(), 0.1f);
-        assertEquals(60f, value.getRangeMin(), 0.1f);
-        assertEquals(70f, value.getRanges().get(0), 0.1f);
-        assertEquals(80f, value.getScanTime(), 0.1f);
-        assertEquals(90f, value.getTimeIncrement(), 0.1f);
+        Assert.assertEquals(10f, value.getAngleIncrement(), 0.1f);
+        Assert.assertEquals(20f, value.getAngleMax(), 0.1f);
+        Assert.assertEquals(30f, value.getAngleMin(), 0.1f);
+        Assert.assertEquals(40f, value.getIntensities().get(0), 0.1f);
+        Assert.assertEquals(50f, value.getRangeMax(), 0.1f);
+        Assert.assertEquals(60f, value.getRangeMin(), 0.1f);
+        Assert.assertEquals(70f, value.getRanges().get(0), 0.1f);
+        Assert.assertEquals(80f, value.getScanTime(), 0.1f);
+        Assert.assertEquals(90f, value.getTimeIncrement(), 0.1f);
     }
 
     @Test
-    public final void testPubMagneticField() throws Exception {
+    public final void testPubMagneticField() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final MagneticField msg = new MagneticField();
@@ -314,14 +312,14 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getMagneticFieldCovariance().set(0, 40d);
 
         final MagneticField value = this.pubSubTest(msg);
-        assertEquals(10f, value.getMagneticField().getX(), 0.1f);
-        assertEquals(20f, value.getMagneticField().getY(), 0.1f);
-        assertEquals(30f, value.getMagneticField().getZ(), 0.1f);
-        assertEquals(40f, value.getMagneticFieldCovariance().get(0), 0.1f);
+        Assert.assertEquals(10f, value.getMagneticField().getX(), 0.1f);
+        Assert.assertEquals(20f, value.getMagneticField().getY(), 0.1f);
+        Assert.assertEquals(30f, value.getMagneticField().getZ(), 0.1f);
+        Assert.assertEquals(40f, value.getMagneticFieldCovariance().get(0), 0.1f);
     }
 
     @Test
-    public final void testPubMultiDOFJointState() throws Exception {
+    public final void testPubMultiDOFJointState() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final MultiDOFJointState msg = new MultiDOFJointState();
@@ -331,14 +329,14 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getWrench().add(new Wrench());
 
         final MultiDOFJointState value = this.pubSubTest(msg);
-        assertNotNull(value.getJointNames().get(0));
-        assertNotNull(value.getTransforms().get(0));
-        assertNotNull(value.getTwist().get(0));
-        assertNotNull(value.getWrench().get(0));
+        Assert.assertNotNull(value.getJointNames().get(0));
+        Assert.assertNotNull(value.getTransforms().get(0));
+        Assert.assertNotNull(value.getTwist().get(0));
+        Assert.assertNotNull(value.getWrench().get(0));
     }
 
     @Test
-    public final void testPubMultiEchoLaserScan() throws Exception {
+    public final void testPubMultiEchoLaserScan() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final MultiEchoLaserScan msg = new MultiEchoLaserScan();
@@ -353,19 +351,19 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setTimeIncrement(90f);
 
         final MultiEchoLaserScan value = this.pubSubTest(msg);
-        assertEquals(10f, value.getAngleIncrement(), 0.1f);
-        assertEquals(20f, value.getAngleMax(), 0.1f);
-        assertEquals(30f, value.getAngleMin(), 0.1f);
-//        assertEquals(40f, value.getIntensities().get(0), 0.1f);
-        assertEquals(50f, value.getRangeMax(), 0.1f);
-        assertEquals(60f, value.getRangeMin(), 0.1f);
-//        assertEquals(70f, value.getRanges().get(0), 0.1f);
-        assertEquals(80f, value.getScanTime(), 0.1f);
-        assertEquals(90f, value.getTimeIncrement(), 0.1f);
+        Assert.assertEquals(10f, value.getAngleIncrement(), 0.1f);
+        Assert.assertEquals(20f, value.getAngleMax(), 0.1f);
+        Assert.assertEquals(30f, value.getAngleMin(), 0.1f);
+//        Assert.assertEquals(40f, value.getIntensities().get(0), 0.1f);
+        Assert.assertEquals(50f, value.getRangeMax(), 0.1f);
+        Assert.assertEquals(60f, value.getRangeMin(), 0.1f);
+//        Assert.assertEquals(70f, value.getRanges().get(0), 0.1f);
+        Assert.assertEquals(80f, value.getScanTime(), 0.1f);
+        Assert.assertEquals(90f, value.getTimeIncrement(), 0.1f);
     }
 
     @Test
-    public final void testPubNavSatFix() throws Exception {
+    public final void testPubNavSatFix() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final NavSatFix msg = new NavSatFix();
@@ -377,16 +375,16 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getPositionCovariance().set(0, 60d);
 
         final NavSatFix value = this.pubSubTest(msg);
-        assertEquals(10f, value.getAltitude(), 0.1f);
-        assertEquals(20f, value.getLatitude(), 0.1f);
-        assertEquals(30f, value.getLongitude(), 0.1f);
-//        assertEquals(40f, value.getStatus(), 0.1f);
-        assertEquals((byte)50f, value.getPositionCovarianceType(), 0.1f);
-        assertEquals(60f, value.getPositionCovariance().get(0), 0.1f);
+        Assert.assertEquals(10f, value.getAltitude(), 0.1f);
+        Assert.assertEquals(20f, value.getLatitude(), 0.1f);
+        Assert.assertEquals(30f, value.getLongitude(), 0.1f);
+//        Assert.assertEquals(40f, value.getStatus(), 0.1f);
+        Assert.assertEquals((byte)50f, value.getPositionCovarianceType(), 0.1f);
+        Assert.assertEquals(60f, value.getPositionCovariance().get(0), 0.1f);
     }
 
     @Test
-    public final void testPubNavSatStatus() throws Exception {
+    public final void testPubNavSatStatus() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final NavSatStatus msg = new NavSatStatus();
@@ -394,12 +392,12 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setStatus((byte)20);
 
         final NavSatStatus value = this.pubSubTest(msg);
-        assertEquals((short)10, value.getService());
-        assertEquals((byte)20, value.getStatus());
+        Assert.assertEquals((short)10, value.getService());
+        Assert.assertEquals((byte)20, value.getStatus());
     }
 
     @Test
-    public final void testPubPointCloud() throws Exception {
+    public final void testPubPointCloud() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final PointCloud msg = new PointCloud();
@@ -407,12 +405,12 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getPoints().add(new Point32());
 
         final PointCloud value = this.pubSubTest(msg);
-        assertNotNull(value.getChannels().get(0));
-        assertNotNull(value.getPoints().get(0));
+        Assert.assertNotNull(value.getChannels().get(0));
+        Assert.assertNotNull(value.getPoints().get(0));
     }
 
     @Test
-    public final void testPubPointCloud2() throws Exception {
+    public final void testPubPointCloud2() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final PointCloud2 msg = new PointCloud2();
@@ -426,18 +424,18 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setWidth(50);
 
         final PointCloud2 value = this.pubSubTest(msg);
-        assertEquals((byte)10, (byte)value.getData().get(0));
-        assertNotNull(value.getFields().get(0));
-        assertEquals(20, value.getHeight());
-        assertTrue(value.getIsBigendian());
-        assertTrue(value.getIsDense());
-        assertEquals(30, value.getPointStep());
-        assertEquals(40, value.getRowStep());
-        assertEquals(50, value.getWidth());
+        Assert.assertEquals((byte)10, (byte)value.getData().get(0));
+        Assert.assertNotNull(value.getFields().get(0));
+        Assert.assertEquals(20, value.getHeight());
+        Assert.assertTrue(value.getIsBigendian());
+        Assert.assertTrue(value.getIsDense());
+        Assert.assertEquals(30, value.getPointStep());
+        Assert.assertEquals(40, value.getRowStep());
+        Assert.assertEquals(50, value.getWidth());
     }
 
     @Test
-    public final void testPubPointField() throws Exception {
+    public final void testPubPointField() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final PointField msg = new PointField();
@@ -447,14 +445,14 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setOffset(40);
 
         final PointField value = this.pubSubTest(msg);
-        assertEquals(10, value.getCount());
-        assertEquals(20, value.getDatatype());
-        assertEquals("name", value.getName());
-        assertEquals(40, value.getOffset());
+        Assert.assertEquals(10, value.getCount());
+        Assert.assertEquals(20, value.getDatatype());
+        Assert.assertEquals("name", value.getName());
+        Assert.assertEquals(40, value.getOffset());
     }
 
     @Test
-    public final void testPubRange() throws Exception {
+    public final void testPubRange() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Range msg = new Range();
@@ -465,15 +463,15 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setRange(50f);
 
         final Range value = this.pubSubTest(msg);
-        assertEquals(10f, value.getFieldOfView(), 0.1f);
-        assertEquals(20f, value.getMaxRange(), 0.1f);
-        assertEquals(30f, value.getMinRange(), 0.1f);
-        assertEquals((byte)40, value.getRadiationType(), 0.1f);
-        assertEquals(50f, value.getRange(), 0.1f);
+        Assert.assertEquals(10f, value.getFieldOfView(), 0.1f);
+        Assert.assertEquals(20f, value.getMaxRange(), 0.1f);
+        Assert.assertEquals(30f, value.getMinRange(), 0.1f);
+        Assert.assertEquals((byte)40, value.getRadiationType(), 0.1f);
+        Assert.assertEquals(50f, value.getRange(), 0.1f);
     }
 
     @Test
-    public final void testPubRegionOfInterest() throws Exception {
+    public final void testPubRegionOfInterest() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final RegionOfInterest msg = new RegionOfInterest();
@@ -484,15 +482,15 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setYOffset(50);
 
         final RegionOfInterest value = this.pubSubTest(msg);
-        assertEquals(true, value.getDoRectify());
-        assertEquals(20, value.getHeight());
-        assertEquals(30, value.getWidth());
-        assertEquals(40, value.getXOffset());
-        assertEquals(50, value.getYOffset());
+        Assert.assertEquals(true, value.getDoRectify());
+        Assert.assertEquals(20, value.getHeight());
+        Assert.assertEquals(30, value.getWidth());
+        Assert.assertEquals(40, value.getXOffset());
+        Assert.assertEquals(50, value.getYOffset());
     }
 
     @Test
-    public final void testPubRelativeHumidity() throws Exception {
+    public final void testPubRelativeHumidity() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final RelativeHumidity msg = new RelativeHumidity();
@@ -500,12 +498,12 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setVariance(20d);
 
         final RelativeHumidity value = this.pubSubTest(msg);
-        assertEquals(10f, value.getRelativeHumidity(), 0.1f);
-        assertEquals(20f, value.getVariance(), 0.1f);
+        Assert.assertEquals(10f, value.getRelativeHumidity(), 0.1f);
+        Assert.assertEquals(20f, value.getVariance(), 0.1f);
     }
 
     @Test
-    public final void testPubTemperature() throws Exception {
+    public final void testPubTemperature() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Temperature msg = new Temperature();
@@ -513,12 +511,12 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.setVariance(20d);
 
         final Temperature value = this.pubSubTest(msg);
-        assertEquals(10f, value.getTemperature(), 0.1f);
-        assertEquals(20f, value.getVariance(), 0.1f);
+        Assert.assertEquals(10f, value.getTemperature(), 0.1f);
+        Assert.assertEquals(20f, value.getVariance(), 0.1f);
     }
 
     @Test
-    public final void testPubTimeReference() throws Exception {
+    public final void testPubTimeReference() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final TimeReference msg = new TimeReference();
@@ -527,8 +525,8 @@ public class MessageSensorTest extends AbstractMessageTest {
         msg.getTimeRef().setNanosec(30);
 
         final TimeReference value = this.pubSubTest(msg);
-        assertEquals("source", value.getSource());
-        assertEquals(20, value.getTimeRef().getSec());
-        assertEquals(30, value.getTimeRef().getNanosec());
+        Assert.assertEquals("source", value.getSource());
+        Assert.assertEquals(20, value.getTimeRef().getSec());
+        Assert.assertEquals(30, value.getTimeRef().getNanosec());
     }
 }

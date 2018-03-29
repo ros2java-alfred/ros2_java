@@ -121,7 +121,7 @@ public final class ArgumentParser {
         try {
             Integer.parseInt(value);
             result = true;
-        } catch (Exception e) {
+        } catch (Exception ignore) {
             // simply ignore
         }
 
@@ -134,7 +134,7 @@ public final class ArgumentParser {
         try {
             Boolean.parseBoolean(value);
             result = true;
-        } catch (Exception e) {
+        } catch (Exception ignore) {
             // simply ignore
         }
 
@@ -147,7 +147,7 @@ public final class ArgumentParser {
         try {
             Double.parseDouble(value);
             result = true;
-        } catch (Exception e) {
+        } catch (Exception ignore) {
             // simply ignore
         }
 
@@ -160,7 +160,7 @@ public final class ArgumentParser {
         try {
             Long.parseLong(value);
             result = true;
-        } catch (Exception e) {
+        } catch (Exception ignore) {
             // simply ignore
         }
 

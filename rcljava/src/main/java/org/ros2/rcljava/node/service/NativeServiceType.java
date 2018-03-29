@@ -22,22 +22,37 @@ import org.ros2.rcljava.internal.service.MessageService;
 
 public class NativeServiceType<T extends MessageService> {
 
+    public enum ServiceDirection {
+        REQUEST("RequestType"),
+        RESPONSE("ResponseType");
+
+        private final String method;
+
+        private ServiceDirection(final String method) {
+            this.method = method;
+        }
+
+        public String getMethod() {
+            return this.method;
+        }
+    }
+
     private Class<? extends Message> requestType;
 
     private long requestFromJavaConverterHandle;
     private long requestToJavaConverterHandle;
 
     @SuppressWarnings({ "unchecked", "PMD.EmptyCatchBlock" })
-    public NativeServiceType(final Class<T> serviceType, final String directionType) {
+    public NativeServiceType(final Class<T> serviceType, final ServiceDirection direction) {
         try {
-            this.requestType = (Class<? extends Message>)serviceType.getField(directionType).get(null);
+            this.requestType = (Class<? extends Message>)serviceType.getField(direction.getMethod()).get(null);
 
             final Method requestFromJavaConverterMethod = requestType.getDeclaredMethod("getFromJavaConverter", (Class<?> []) null);
             this.requestFromJavaConverterHandle = (Long)requestFromJavaConverterMethod.invoke(null, (Object []) null);
 
             final Method requestToJavaConverterMethod = requestType.getDeclaredMethod("getToJavaConverter", (Class<?> []) null);
             this.requestToJavaConverterHandle = (Long)requestToJavaConverterMethod.invoke(null, (Object []) null);
-        } catch (Exception e) {
+        } catch (Exception ignore) {
             // simply ignore
         }
     }

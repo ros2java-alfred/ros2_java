@@ -1,5 +1,5 @@
 // Copyright 2017 Esteve Fernandez <esteve@apache.org>
-// Copyright 2017 Mickael Gaillard <mick.gaillard@gmail.com>
+// Copyright 2017-2018 Mickael Gaillard <mick.gaillard@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * Class:     org_ros2_rcljava_time_NativeWallTimer
  * Method:    nativeCreateTimerHandle

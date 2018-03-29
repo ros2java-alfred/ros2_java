@@ -1,5 +1,5 @@
 // Copyright 2016-2017 Esteve Fernandez <esteve@apache.org>
-// Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
+// Copyright 2016-2018 Mickael Gaillard <mick.gaillard@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,14 +22,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * Class:     org_ros2_rcljava_node_NativeNode
- * Method:    nativeCreateServiceHandle
- * Signature: (JLjava/lang/Class;Ljava/lang/String;J;)J
+ * Method:    nativeCreateNodeHandle
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-  Java_org_ros2_rcljava_node_NativeNode_nativeCreateServiceHandle
-  (JNIEnv *, jclass, jlong, jclass, jstring, jlong);
+  Java_org_ros2_rcljava_node_NativeNode_nativeCreateNodeHandle
+  (JNIEnv *, jclass, jstring, jstring);
 
 /*
  * Class:     org_ros2_rcljava_node_NativeNode

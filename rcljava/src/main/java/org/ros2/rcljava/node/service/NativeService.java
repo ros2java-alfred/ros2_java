@@ -16,10 +16,11 @@
 
 package org.ros2.rcljava.node.service;
 
+import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.internal.service.MessageService;
+import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.NativeNode;
-import org.ros2.rcljava.node.Node;
-
+import org.ros2.rcljava.qos.QoSProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,11 +33,21 @@ public class NativeService<T extends MessageService> extends BaseService<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeService.class);
 
+ // Loading JNI library.
+    static {
+        RCLJava.loadLibrary("rcljava_node_service_NativeService");
+    }
+
     /** Service Handler. */
     private final long serviceHandle;
 
     private final NativeServiceType<T> request;
     private final NativeServiceType<T> response;
+
+    private static native <T> long nativeCreateServiceHandle(
+            long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
+
+    private static native void nativeDispose(long nodeHandle, long serviceHandle);
 
     /**
      *
@@ -49,17 +60,26 @@ public class NativeService<T extends MessageService> extends BaseService<T> {
      * @param response
      */
     public NativeService(
-            final Node node,
-            final long serviceHandle,
+            final NativeNode nodeReference,
             final Class<T> serviceType,
             final String serviceName,
             final ServiceCallback<?, ?> callback,
             final NativeServiceType<T> request,
-            final NativeServiceType<T> response) {
-        super(node, serviceType, serviceName, callback, request.getType(), response.getType());
+            final NativeServiceType<T> response,
+            final QoSProfile qosProfile) {
+        super(nodeReference, serviceType, serviceName, callback, request.getType(), response.getType());
 
-        if (serviceHandle == 0) { throw new RuntimeException("Need to provide active service with handle object"); }
-        this.serviceHandle = serviceHandle;
+        final String fqnService =  GraphName.getFullName(nodeReference, serviceName, null);
+        if (!GraphName.isValidTopic(fqnService)) { throw new RuntimeException("Invalid topic name."); }
+
+        final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
+        this.serviceHandle = NativeService.nativeCreateServiceHandle(
+                nodeReference.getNodeHandle(),
+                serviceType,
+                fqnService,
+                qosProfileHandle);
+        RCLJava.disposeQoSProfile(qosProfileHandle);
+        if (this.serviceHandle == 0) { throw new RuntimeException("Need to provide active service with handle object"); }
 
         this.request = request;
         this.response = response;
@@ -87,7 +107,7 @@ public class NativeService<T extends MessageService> extends BaseService<T> {
                         this.response.getFromJavaConverterHandle(),
                         this.response.getToJavaConverterHandle()));
 
-//      NativeService.nativeDispose(this.getNode().getNodeHandle(), this.serviceHandle);
+      NativeService.nativeDispose(this.getNode().getNodeHandle(), this.serviceHandle);
     }
 
 //    public void sendResponse() {
@@ -96,7 +116,7 @@ public class NativeService<T extends MessageService> extends BaseService<T> {
 
     @Override
     public NativeNode getNode() {
-        return (NativeNode) this.getNode();
+        return (NativeNode) super.getNode();
     }
 
     public long getServiceHandle() {

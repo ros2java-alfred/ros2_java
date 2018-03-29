@@ -15,15 +15,12 @@
 
 package org.ros2.rcljava;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,21 +57,23 @@ public abstract class AbstractMessageTest extends AbstractRosTest {
 
     @Test
     public final void testCreate() {
-        assertNotEquals(null, this.node);
+        Assert.assertNotEquals(null, this.node);
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Message> Header headerInit(T msg) {
+    private <T extends Message> Header headerInit(final T msg) {
         Header header = null;
-        Class<T> msgClass = (Class<T>) msg.getClass();
+        final Class<T> msgClass = (Class<T>) msg.getClass();
 
         try {
-            Method methodToFind = msgClass.getMethod("getHeader", (Class<?>[]) null);
+            final Method methodToFind = msgClass.getMethod("getHeader", (Class<?>[]) null);
             if (methodToFind != null) {
                 header = (Header) methodToFind.invoke(msg);
                 headerInit(header);
             }
-        } catch (Exception e) { /* Bypass just a test !*/ }
+        } catch (Exception ignore) {
+
+        }
 
         if (header != null) {
             header.setFrameId(VALUE_FRAMEID);
@@ -85,21 +84,21 @@ public abstract class AbstractMessageTest extends AbstractRosTest {
         return header;
     }
 
-    private void headerTest(Header msg) {
-        assertEquals(VALUE_FRAMEID, msg.getFrameId());
-        assertEquals(VALUE_TIME_SEC, msg.getStamp().getSec());
-        assertEquals(VALUE_TIME_NANOSEC, msg.getStamp().getNanosec());
+    private void headerTest(final Header msg) {
+        Assert.assertEquals(VALUE_FRAMEID, msg.getFrameId());
+        Assert.assertEquals(VALUE_TIME_SEC, msg.getStamp().getSec());
+        Assert.assertEquals(VALUE_TIME_NANOSEC, msg.getStamp().getNanosec());
     }
 
     @SuppressWarnings("unchecked")
-    protected <T extends Message> T pubSubTest(T msg) throws InterruptedException, ExecutionException {
-        Class<T> msgClass = (Class<T>) msg.getClass();
-        Publisher<T> publisher = this.node.createPublisher(msgClass, "test_topic");
+    protected <T extends Message> T pubSubTest(final T msg) throws InterruptedException, ExecutionException {
+        final Class<T> msgClass = (Class<T>) msg.getClass();
+        final Publisher<T> publisher = this.node.createPublisher(msgClass, "test_topic");
 
-        Header header = this.headerInit(msg);
+        final Header header = this.headerInit(msg);
 
-        RCLFuture<T> future = new RCLFuture<T>(new WeakReference<Node>(this.node));
-        Subscription<T> subscription = this.node.createSubscription(
+        final RCLFuture<T> future = new RCLFuture<T>(new WeakReference<Node>(this.node));
+        final Subscription<T> subscription = this.node.createSubscription(
                 msgClass, "test_topic", new TestConsumer<T>(future));
 
         while (RCLJava.ok() && !future.isDone()) {
@@ -107,12 +106,12 @@ public abstract class AbstractMessageTest extends AbstractRosTest {
             RCLJava.spinOnce(this.node);
         }
 
-        T value = future.get();
+        final T value = future.get();
 
         publisher.dispose();
         subscription.dispose();
 
-        assertNotNull(value);
+        Assert.assertNotNull(value);
 
         if (header != null) {
             this.headerTest(header);

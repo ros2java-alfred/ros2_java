@@ -32,6 +32,7 @@ import org.ros2.rcljava.node.service.Client;
 import org.ros2.rcljava.node.service.NativeClient;
 import org.ros2.rcljava.node.service.NativeService;
 import org.ros2.rcljava.node.service.NativeServiceType;
+import org.ros2.rcljava.node.service.NativeServiceType.ServiceDirection;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceCallback;
 import org.ros2.rcljava.node.topic.NativePublisher;
@@ -68,9 +69,14 @@ public class NativeNode extends BaseNode {
 
     // Native call.
 
-
-    private static native <T> long nativeCreateServiceHandle(
-            long nodeHandle, Class<T> cls, String serviceName, long qosProfileHandle);
+    /**
+     * Create a ROS2 node (rcl_node_t) and return a pointer to it as an integer.
+     *
+     * @param nodeName The name that will identify this node in a ROS2 graph.
+     * @param spaceName The name-space that will identify this node in a ROS2 graph.
+     * @return A pointer to the underlying ROS2 node structure.
+     */
+    private static native long nativeCreateNodeHandle(String nodeName, String spaceName);
 
     private static native void nativeDispose(long nodeHandle);
 
@@ -110,7 +116,7 @@ public class NativeNode extends BaseNode {
         super(namespace, defaultName, args);
 
         // Initialize native component.
-        this.nodeHandle = RCLJava.nativeCreateNodeHandle(this.name, this.nameSpace);
+        this.nodeHandle = NativeNode.nativeCreateNodeHandle(this.name, this.nameSpace);
         if (this.nodeHandle==0) { throw new NullPointerException("Node Handle is not define !"); }
 
         NativeNode.logger.debug(
@@ -267,8 +273,8 @@ public class NativeNode extends BaseNode {
         final String fqnService =  GraphName.getFullName(this, serviceName, null);
         NativeNode.logger.debug("Initialize Native Client : " + fqnService);
 
-        final NativeServiceType<T> request = new NativeServiceType<T>(serviceType, "RequestType");
-        final NativeServiceType<T> response = new NativeServiceType<T>(serviceType, "ResponseType");
+        final NativeServiceType<T> request = new NativeServiceType<T>(serviceType, ServiceDirection.REQUEST);
+        final NativeServiceType<T> response = new NativeServiceType<T>(serviceType, ServiceDirection.RESPONSE);
 
         return new NativeClient<T>(
                 this,
@@ -309,30 +315,18 @@ public class NativeNode extends BaseNode {
 
         final String fqnService =  GraphName.getFullName(this, serviceName, null);
         NativeNode.logger.debug("Initialize Native Service : " + fqnService);
-        Service<T> service = null;
 
-        if (GraphName.isValidTopic(fqnService)) {
-            final NativeServiceType<T> request = new NativeServiceType<T>(serviceType, "RequestType");
-            final NativeServiceType<T> response = new NativeServiceType<T>(serviceType, "ResponseType");
+        final NativeServiceType<T> request = new NativeServiceType<T>(serviceType, ServiceDirection.REQUEST);
+        final NativeServiceType<T> response = new NativeServiceType<T>(serviceType, ServiceDirection.RESPONSE);
 
-            final long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
-            final long serviceHandle = NativeNode.nativeCreateServiceHandle(
-                    this.nodeHandle,
+        return new NativeService<T>(
+                    this,
                     serviceType,
                     serviceName,
-                    qosProfileHandle);
-            RCLJava.disposeQoSProfile(qosProfileHandle);
-
-            service = new NativeService<T>(this,
-                    serviceHandle,
-                    serviceType,
-                    fqnService,
                     callback,
                     request,
-                    response);
-        }
-
-        return service;
+                    response,
+                    qosProfile);
     }
 
     @Override

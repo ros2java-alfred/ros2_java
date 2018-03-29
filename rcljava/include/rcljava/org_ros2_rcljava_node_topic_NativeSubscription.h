@@ -21,6 +21,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * Class:     org_ros2_rcljava_node_topic_NativeSubscription
  * Method:    nativeCreateSubscriptionHandle

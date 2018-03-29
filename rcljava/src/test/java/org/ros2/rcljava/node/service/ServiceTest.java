@@ -38,11 +38,16 @@ public class ServiceTest extends AbstractRosTest {
         Node node = null;
         Service<rcl_interfaces.srv.GetParameters> srv = null;
 
-        ServiceCallback<rcl_interfaces.srv.GetParameters_Request, rcl_interfaces.srv.GetParameters_Response> callback =
+        final ServiceCallback<rcl_interfaces.srv.GetParameters_Request, rcl_interfaces.srv.GetParameters_Response> callback =
                 new ServiceCallback<rcl_interfaces.srv.GetParameters_Request, rcl_interfaces.srv.GetParameters_Response>() {
             @Override
-            public void dispatch(RMWRequestId header, rcl_interfaces.srv.GetParameters_Request request, rcl_interfaces.srv.GetParameters_Response response) { }
-        };
+            public void dispatch(
+                    final RMWRequestId header,
+                    final rcl_interfaces.srv.GetParameters_Request request,
+                    final rcl_interfaces.srv.GetParameters_Response response) {
+
+                    }
+                };
 
         try {
             node = RCLJava.createNode("testSubscription");

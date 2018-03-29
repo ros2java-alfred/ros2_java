@@ -15,9 +15,9 @@
 
 package org.ros2.rcljava;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.util.concurrent.ExecutionException;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ public class MessageGeometryTest extends AbstractMessageTest {
     private static final Logger logger = LoggerFactory.getLogger(MessageGeometryTest.class);
 
     @Test
-    public final void testPubPoint32() throws Exception {
+    public final void testPubPoint32() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Point32 msg = new Point32()
@@ -50,13 +50,13 @@ public class MessageGeometryTest extends AbstractMessageTest {
                 .setZ(30f);
 
         final Point32 value = this.pubSubTest(msg);
-        assertEquals(10f, value.getX(), 0.1f);
-        assertEquals(20f, value.getY(), 0.1f);
-        assertEquals(30f, value.getZ(), 0.1f);
+        Assert.assertEquals(10f, value.getX(), 0.1f);
+        Assert.assertEquals(20f, value.getY(), 0.1f);
+        Assert.assertEquals(30f, value.getZ(), 0.1f);
     }
 
     @Test
-    public final void testPubAccel() throws Exception {
+    public final void testPubAccel() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Accel msg = new Accel();
@@ -68,16 +68,16 @@ public class MessageGeometryTest extends AbstractMessageTest {
         msg.getLinear().setZ(60);
 
         final Accel value = this.pubSubTest(msg);
-        assertEquals(10f, value.getAngular().getX(), 0.1f);
-        assertEquals(20f, value.getAngular().getY(), 0.1f);
-        assertEquals(30f, value.getAngular().getZ(), 0.1f);
-        assertEquals(40f, value.getLinear().getX(), 0.1f);
-        assertEquals(50f, value.getLinear().getY(), 0.1f);
-        assertEquals(60f, value.getLinear().getZ(), 0.1f);
+        Assert.assertEquals(10f, value.getAngular().getX(), 0.1f);
+        Assert.assertEquals(20f, value.getAngular().getY(), 0.1f);
+        Assert.assertEquals(30f, value.getAngular().getZ(), 0.1f);
+        Assert.assertEquals(40f, value.getLinear().getX(), 0.1f);
+        Assert.assertEquals(50f, value.getLinear().getY(), 0.1f);
+        Assert.assertEquals(60f, value.getLinear().getZ(), 0.1f);
     }
 
     @Test
-    public final void testPubAccelStamped() throws Exception {
+    public final void testPubAccelStamped() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final AccelStamped msg = new AccelStamped();
@@ -86,14 +86,14 @@ public class MessageGeometryTest extends AbstractMessageTest {
         msg.getAccel().getAngular().setZ(30d);
 
         final AccelStamped value = this.pubSubTest(msg);
-        assertEquals(10d, value.getAccel().getAngular().getX(), 0.1d);
-        assertEquals(20d, value.getAccel().getAngular().getY(), 0.1d);
-        assertEquals(30d, value.getAccel().getAngular().getZ(), 0.1d);
+        Assert.assertEquals(10d, value.getAccel().getAngular().getX(), 0.1d);
+        Assert.assertEquals(20d, value.getAccel().getAngular().getY(), 0.1d);
+        Assert.assertEquals(30d, value.getAccel().getAngular().getZ(), 0.1d);
     }
 
     @Test
     //Ignore //TODO Remove after fix.
-    public final void testPubAccelWithCovariance() throws Exception {
+    public final void testPubAccelWithCovariance() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final AccelWithCovariance msg = new AccelWithCovariance();
@@ -102,22 +102,22 @@ public class MessageGeometryTest extends AbstractMessageTest {
         }
 
         final AccelWithCovariance value = this.pubSubTest(msg);
-        assertNotNull(value);
+        Assert.assertNotNull(value);
     }
 
     @Test
-    public final void testPubAccelWithCovarianceStamped() throws Exception {
+    public final void testPubAccelWithCovarianceStamped() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final AccelWithCovarianceStamped msg = new AccelWithCovarianceStamped();
         //msg.getAccel();
 
         final AccelWithCovarianceStamped value = this.pubSubTest(msg);
-        assertNotNull(value);
+        Assert.assertNotNull(value);
     }
 
     @Test
-    public final void testPubInertia() throws Exception {
+    public final void testPubInertia() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Inertia msg = new Inertia();
@@ -133,31 +133,31 @@ public class MessageGeometryTest extends AbstractMessageTest {
         msg.setM(100.0d);
 
         final Inertia value = this.pubSubTest(msg);
-        assertEquals(10d, value.getCom().getX(), 0.1d);
-        assertEquals(20d, value.getCom().getY(), 0.1d);
-        assertEquals(30d, value.getCom().getZ(), 0.1d);
-        assertEquals(40d, value.getIxx(), 0.1d);
-        assertEquals(50d, value.getIxy(), 0.1d);
-        assertEquals(60d, value.getIxz(), 0.1d);
-        assertEquals(70d, value.getIyy(), 0.1d);
-        assertEquals(80d, value.getIyz(), 0.1d);
-        assertEquals(90d, value.getIzz(), 0.1d);
-        assertEquals(100.0d, value.getM(), 0.1d);
+        Assert.assertEquals(10d, value.getCom().getX(), 0.1d);
+        Assert.assertEquals(20d, value.getCom().getY(), 0.1d);
+        Assert.assertEquals(30d, value.getCom().getZ(), 0.1d);
+        Assert.assertEquals(40d, value.getIxx(), 0.1d);
+        Assert.assertEquals(50d, value.getIxy(), 0.1d);
+        Assert.assertEquals(60d, value.getIxz(), 0.1d);
+        Assert.assertEquals(70d, value.getIyy(), 0.1d);
+        Assert.assertEquals(80d, value.getIyz(), 0.1d);
+        Assert.assertEquals(90d, value.getIzz(), 0.1d);
+        Assert.assertEquals(100.0d, value.getM(), 0.1d);
     }
 
     @Test
-    public final void testPubInertiaStamped() throws Exception {
+    public final void testPubInertiaStamped() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final InertiaStamped msg = new InertiaStamped();
         msg.getInertia().setM(10.0d);
 
         final InertiaStamped value = this.pubSubTest(msg);
-        assertEquals(10.0d, value.getInertia().getM(), 0.1d);
+        Assert.assertEquals(10.0d, value.getInertia().getM(), 0.1d);
     }
 
     @Test
-    public final void testPubPoint() throws Exception {
+    public final void testPubPoint() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Point msg = new Point();
@@ -166,46 +166,46 @@ public class MessageGeometryTest extends AbstractMessageTest {
         msg.setZ(30.0d);
 
         final Point value = this.pubSubTest(msg);
-        assertEquals(10.0d, value.getX(), 0.1d);
-        assertEquals(20.0d, value.getY(), 0.1d);
-        assertEquals(30.0d, value.getZ(), 0.1d);
+        Assert.assertEquals(10.0d, value.getX(), 0.1d);
+        Assert.assertEquals(20.0d, value.getY(), 0.1d);
+        Assert.assertEquals(30.0d, value.getZ(), 0.1d);
     }
 
     @Test
-    public final void testPubPointStamped() throws Exception {
+    public final void testPubPointStamped() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final PointStamped msg = new PointStamped();
         msg.getPoint().setX(10);
 
         final PointStamped value = this.pubSubTest(msg);
-        assertEquals(10.0d, value.getPoint().getX(), 0.1d);
+        Assert.assertEquals(10.0d, value.getPoint().getX(), 0.1d);
     }
 
     @Test
-    public final void testPubPolygon() throws Exception {
+    public final void testPubPolygon() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Polygon msg = new Polygon();
         msg.getPoints().add(new Point32());
 
         final Polygon value = this.pubSubTest(msg);
-        assertNotNull(value.getPoints().get(0));
+        Assert.assertNotNull(value.getPoints().get(0));
     }
 
     @Test
-    public final void testPubPolygonStamped() throws Exception {
+    public final void testPubPolygonStamped() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final PolygonStamped msg = new PolygonStamped();
         msg.getPolygon().getPoints().add(new Point32());
 
         final PolygonStamped value = this.pubSubTest(msg);
-        assertNotNull(value.getPolygon().getPoints().get(0));
+        Assert.assertNotNull(value.getPolygon().getPoints().get(0));
     }
 
     @Test
-    public final void testPubPose() throws Exception {
+    public final void testPubPose() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Pose msg = new Pose();
@@ -218,24 +218,24 @@ public class MessageGeometryTest extends AbstractMessageTest {
         msg.getPosition().setZ(70.0d);
 
         final Pose value = this.pubSubTest(msg);
-        assertEquals(10.0d, value.getOrientation().getW(), 0.1d);
-        assertEquals(20.0d, value.getOrientation().getX(), 0.1d);
-        assertEquals(30.0d, value.getOrientation().getY(), 0.1d);
-        assertEquals(40.0d, value.getOrientation().getZ(), 0.1d);
-        assertEquals(50.0d, value.getPosition().getX(), 0.1d);
-        assertEquals(60.0d, value.getPosition().getY(), 0.1d);
-        assertEquals(70.0d, value.getPosition().getZ(), 0.1d);
+        Assert.assertEquals(10.0d, value.getOrientation().getW(), 0.1d);
+        Assert.assertEquals(20.0d, value.getOrientation().getX(), 0.1d);
+        Assert.assertEquals(30.0d, value.getOrientation().getY(), 0.1d);
+        Assert.assertEquals(40.0d, value.getOrientation().getZ(), 0.1d);
+        Assert.assertEquals(50.0d, value.getPosition().getX(), 0.1d);
+        Assert.assertEquals(60.0d, value.getPosition().getY(), 0.1d);
+        Assert.assertEquals(70.0d, value.getPosition().getZ(), 0.1d);
     }
 
     @Test
-    public final void testPubPose2D() throws Exception {
+    public final void testPubPose2D() throws InterruptedException, ExecutionException {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         final Pose2D msg = new Pose2D();
         //TODO
 
         final Pose2D value = this.pubSubTest(msg);
-        assertNotNull(value);
+        Assert.assertNotNull(value);
     }
 
 }

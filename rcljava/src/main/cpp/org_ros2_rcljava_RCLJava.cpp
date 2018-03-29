@@ -1,5 +1,5 @@
 // Copyright 2016-2017 Esteve Fernandez <esteve@apache.org>
-// Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
+// Copyright 2016-2018 Mickael Gaillard <mick.gaillard@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -105,42 +105,6 @@ Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier(
 
   return env->NewStringUTF(rmw_implementation_identifier);
 }
-
-/*
- *
- */
-JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(
-  JNIEnv * env,
-  jclass,
-  jstring jnode_name,
-  jstring jspace_name)
-{
-  std::string node_name = jstring2String(env, jnode_name);
-  std::string space_name("");
-  if (jspace_name != nullptr) {
-    space_name = jstring2String(env, jspace_name);
-  }
-
-  rcl_node_t * node = makeInstance<rcl_node_t>();
-  *node = rcl_get_zero_initialized_node();
-
-  rcl_node_options_t default_options = rcl_node_get_default_options();
-
-  rcl_ret_t ret = rcl_node_init(node, node_name.c_str(), space_name.c_str(), &default_options);
-  if (ret != RCL_RET_OK) {
-    std::string message("Failed to create node: " +
-      std::string(rcl_get_error_string_safe()));
-    rcl_reset_error();
-    throwException(env, message);
-
-    return 0;
-  }
-
-  jlong node_handle = instance2Handle(node);
-  return node_handle;
-}
-
 
 /*
  *

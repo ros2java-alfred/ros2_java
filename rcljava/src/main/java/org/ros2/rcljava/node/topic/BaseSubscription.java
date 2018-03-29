@@ -71,7 +71,6 @@ public abstract class BaseSubscription<T extends Message> implements Subscriptio
         this.ownerNode.getSubscriptions().add(this);
     }
 
-
     /* (non-Javadoc)
      * @see java.lang.AutoCloseable#close()
      */

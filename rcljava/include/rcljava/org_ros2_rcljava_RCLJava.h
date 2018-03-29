@@ -1,5 +1,5 @@
 // Copyright 2016-2017 Esteve Fernandez <esteve@apache.org>
-// Copyright 2016-2017 Mickael Gaillard <mick.gaillard@gmail.com>
+// Copyright 2016-2018 Mickael Gaillard <mick.gaillard@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * Class:     org_ros2_rcljava_RCLJava
  * Method:    nativeRCLJavaInit
@@ -30,15 +31,6 @@ extern "C" {
 JNIEXPORT void JNICALL
   Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit
   (JNIEnv *, jclass, jobjectArray);
-
-/*
- * Class:     org_ros2_rcljava_RCLJava
- * Method:    nativeCreateNodeHandle
- * Signature: (Ljava/lang/String;Ljava/lang/String;)J
- */
-JNIEXPORT jlong JNICALL
-  Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle
-  (JNIEnv *, jclass, jstring, jstring);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava

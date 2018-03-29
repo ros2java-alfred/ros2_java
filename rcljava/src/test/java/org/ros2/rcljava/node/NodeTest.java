@@ -16,13 +16,11 @@
 
 package org.ros2.rcljava.node;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -123,22 +121,22 @@ public class NodeTest extends AbstractRosTest {
     }
 
     @Test
-    public final void testPubSub() throws Exception {
+    public final void testPubSub() throws InterruptedException, ExecutionException, Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         this.initRCLjava();
-        NativeNode node = (NativeNode) RCLJava.createNode("test_node");
-        assertNotEquals(0, node.getNodeHandle());
+        final NativeNode node = (NativeNode) RCLJava.createNode("test_node");
+        Assert.assertNotEquals(0, node.getNodeHandle());
 
         Publisher<std_msgs.msg.String> publisher = node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
                 "test_topic");
 
-        RCLFuture<std_msgs.msg.String> future = new RCLFuture<std_msgs.msg.String>(new WeakReference<Node>(node));
+        final RCLFuture<std_msgs.msg.String> future = new RCLFuture<std_msgs.msg.String>(new WeakReference<Node>(node));
 
         Subscription<std_msgs.msg.String> subscription = node.<std_msgs.msg.String>createSubscription(
                 std_msgs.msg.String.class, "test_topic", new TestConsumer<std_msgs.msg.String>(future));
 
-        std_msgs.msg.String msg = new std_msgs.msg.String();
+        final std_msgs.msg.String msg = new std_msgs.msg.String();
         msg.setData("Hello");
 
         while (RCLJava.ok() && !future.isDone()) {
@@ -146,8 +144,8 @@ public class NodeTest extends AbstractRosTest {
             RCLJava.spinOnce(node);
         }
 
-        std_msgs.msg.String value = future.get();
-        assertEquals("Hello", value.getData());
+        final std_msgs.msg.String value = future.get();
+        Assert.assertEquals("Hello", value.getData());
 
         subscription.dispose();
         node.close();
@@ -204,9 +202,11 @@ public class NodeTest extends AbstractRosTest {
 
         Subscription<std_msgs.msg.String> sub = null;
 
-        SubscriptionCallback<std_msgs.msg.String> callback = new SubscriptionCallback<std_msgs.msg.String>() {
+        final SubscriptionCallback<std_msgs.msg.String> callback = new SubscriptionCallback<std_msgs.msg.String>() {
             @Override
-            public void dispatch(std_msgs.msg.String msg) { }
+            public void dispatch(final std_msgs.msg.String msg) {
+
+            }
         };
 
         try {
@@ -327,7 +327,7 @@ public class NodeTest extends AbstractRosTest {
         }
 
         int i = 0;
-        for (Entry<String, List<String>> topic : topics.entrySet()) {
+        for (final Entry<String, List<String>> topic : topics.entrySet()) {
             if (topic.getKey().startsWith(fqnNode)) {
                 ++i;
             }

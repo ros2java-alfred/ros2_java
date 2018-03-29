@@ -16,9 +16,7 @@
 
 package org.ros2.rcljava.node.topic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.ros2.rcljava.AbstractRosTest;
@@ -38,17 +36,20 @@ public class SubscriptionTest extends AbstractRosTest {
     public final void testCreate() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
-        NativeNode node = (NativeNode) RCLJava.createNode("test_node");
-        NativeSubscription<std_msgs.msg.String> subscription =
-                (NativeSubscription<String>) node.<std_msgs.msg.String>createSubscription(
-            std_msgs.msg.String.class, "test_topic", new SubscriptionCallback<std_msgs.msg.String>() {
-                public void dispatch(final std_msgs.msg.String msg) {
-                }
-            });
+        final NativeNode node = (NativeNode) RCLJava.createNode("test_node");
+        final NativeSubscription<String> subscription =
+                (NativeSubscription<String>) node.<String>createSubscription(
+                        String.class,
+                        "test_topic",
+                        new SubscriptionCallback<String>() {
+                            public void dispatch(final String msg) {
 
-        assertEquals(node.getNodeHandle(), subscription.getNode().getNodeHandle());
-        assertNotEquals(0, subscription.getNode().getNodeHandle());
-        assertNotEquals(0, subscription.getSubscriptionHandle());
+                            }
+                        });
+
+        Assert.assertEquals(node.getNodeHandle(), subscription.getNode().getNodeHandle());
+        Assert.assertNotEquals(0, subscription.getNode().getNodeHandle());
+        Assert.assertNotEquals(0, subscription.getSubscriptionHandle());
 
         subscription.dispose();
         node.dispose();

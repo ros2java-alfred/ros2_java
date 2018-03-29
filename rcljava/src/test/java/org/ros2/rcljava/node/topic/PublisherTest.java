@@ -16,10 +16,7 @@
 
 package org.ros2.rcljava.node.topic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.ros2.rcljava.AbstractRosTest;
@@ -39,13 +36,13 @@ public class PublisherTest extends AbstractRosTest {
     public final void testCreate() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
-        NativeNode node = (NativeNode) RCLJava.createNode("test_node");
-        NativePublisher<String> publisher = (NativePublisher<String>) node.<String>createPublisher(String.class,
+        final NativeNode node = (NativeNode) RCLJava.createNode("test_node");
+        final NativePublisher<String> publisher = (NativePublisher<String>) node.<String>createPublisher(String.class,
                 "test_topic");
 
-        assertEquals(node, publisher.getNode());
-        assertNotNull(publisher.getNode());
-        assertNotEquals(0, publisher.getPublisherHandle());
+        Assert.assertEquals(node, publisher.getNode());
+        Assert.assertNotNull(publisher.getNode());
+        Assert.assertNotEquals(0, publisher.getPublisherHandle());
 
         publisher.dispose();
         node.dispose();

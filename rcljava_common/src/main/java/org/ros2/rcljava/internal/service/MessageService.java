@@ -22,6 +22,6 @@ import org.ros2.rcljava.internal.message.Message;
  */
 public interface MessageService {
 
-    public Class<? extends Message> getRequestType();
-    public Class<? extends Message> getResponseType();
+    Class<? extends Message> getRequestType();
+    Class<? extends Message> getResponseType();
 }

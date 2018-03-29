@@ -61,7 +61,7 @@ public class ExecutorFailTest extends AbstractRosTest {
         boolean test = true;
 
         try {
-            ThreadedExecutor executor = new SingleThreadedExecutor();
+            final ThreadedExecutor executor = new SingleThreadedExecutor();
 
             final Node publisherNode        = RCLJava.createNode("publisher_node");
             final Node subscriptionNodeOne  = RCLJava.createNode("subscription_node_one");
@@ -86,18 +86,18 @@ public class ExecutorFailTest extends AbstractRosTest {
 
             executor.spin();
 
-            UInt32 msg = new UInt32();
+            final UInt32 msg = new UInt32();
             msg.setData(54321);
 
             while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
                 publisher.publish(msg);
             }
 
-            UInt32 valueOne = futureOne.get();
-            assertEquals(54321, valueOne.getData());
+            final UInt32 valueOne = futureOne.get();
+            Assert.assertEquals(54321, valueOne.getData());
 
-            UInt32 valueTwo = futureTwo.get();
-            assertEquals(54321, valueTwo.getData());
+            final UInt32 valueTwo = futureTwo.get();
+            Assert.assertEquals(54321, valueTwo.getData());
 
             executor.removeNode(subscriptionNodeTwo);
             executor.removeNode(subscriptionNodeOne);

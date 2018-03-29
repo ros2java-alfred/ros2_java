@@ -16,8 +16,6 @@
 
 package org.ros2.rcljava;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -157,7 +155,7 @@ public class RCLJavaTest extends AbstractRosTest {
             this.releaseRCLjava();
             test = RCLJava.ok();
             // not really call...
-            assertEquals(false, test);
+            Assert.assertEquals(false, test);
             test = false;
         } catch (NotInitializedException e) {
             test = true;
