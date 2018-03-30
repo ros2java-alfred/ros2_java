@@ -58,6 +58,8 @@ public interface NodeParameters {
      */
     List<ParameterVariant<?>> getParameters(final List<String> names);
 
+    List<String> getParametersNames();
+
     /**
      *
      * @param name
@@ -108,6 +110,7 @@ public interface NodeParameters {
      * @return
      */
     List<Class<?>> getParameterTypes(final List<String> names);
+    List<Byte>     getParametersTypes(final List<String> names);
 
     /**
      *

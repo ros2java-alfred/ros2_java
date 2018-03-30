@@ -24,12 +24,25 @@ import java.util.List;
 public interface NodeGraph {
 
     /**
+     * This is typically only used by the rclcpp::graph_listener::GraphListener.
+     * Return the number of on loan graph events, see get_graph_event().
+     */
+    int countGraphUsers();
+
+    /**
+     *
+     * @return
+     */
+    Map<String, List<String>> getServiceNamesAndTypes();
+
+    /**
      * A topic is considered to exist when at least one publisher or subscriber
      * exists for it, whether they be local or remote to this process.
      *
      * @param noDemangle if true, topic names and types are not demangled
      * @return Return a map of existing topic names to list of topic types.
      */
+    @Deprecated
     Map<String, List<String>> getTopicNamesAndTypes(final boolean noDemangle);
 
     /**

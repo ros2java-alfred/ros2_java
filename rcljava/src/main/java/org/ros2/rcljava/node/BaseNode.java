@@ -15,12 +15,12 @@
 
 package org.ros2.rcljava.node;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.ArgumentParser;
 import org.ros2.rcljava.Logger;
@@ -39,7 +39,6 @@ import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.time.WallTimer;
-import org.ros2.rcljava.time.WallTimerCallback;
 import org.slf4j.LoggerFactory;
 
 import builtin_interfaces.msg.Time;
@@ -189,8 +188,7 @@ public abstract class BaseNode implements Node {
     */
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.name;
     }
 
     /* (non-Javadoc)
@@ -278,15 +276,6 @@ public abstract class BaseNode implements Node {
             final SubscriptionCallback<T> callback) {
 
         return this.createSubscription(messageType, topicName, callback, QoSProfile.DEFAULT, false);
-    }
-
-    /* (non-Javadoc)
-    * @see org.ros2.rcljava.node.Node#createWallTimer(long, java.util.concurrent.TimeUnit, org.ros2.rcljava.time.WallTimerCallback)
-    */
-    @Override
-    public WallTimer createWallTimer(final long period, final TimeUnit unit, final WallTimerCallback callback) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     /* (non-Javadoc)
@@ -487,8 +476,15 @@ public abstract class BaseNode implements Node {
     */
     @Override
     public int countPublishers(final String topic) {
-        // TODO Auto-generated method stub
-        return 0;
+        int result = 0;
+
+        for (final Publisher<? extends Message> publisher : this.publishers) {
+            if (publisher.getTopicName().equals(topic)) {
+                ++result;
+            }
+        }
+
+        return result;
     }
 
     /* (non-Javadoc)
@@ -496,8 +492,15 @@ public abstract class BaseNode implements Node {
     */
     @Override
     public int countSubscribers(final String topic) {
-        // TODO Auto-generated method stub
-        return 0;
+        int result = 0;
+
+        for (final Subscription<? extends Message> subscription : this.subscriptions) {
+            if (subscription.getTopicName().equals(topic)) {
+                ++result;
+            }
+        }
+
+        return result;
     }
 
     /* (non-Javadoc)
@@ -516,15 +519,6 @@ public abstract class BaseNode implements Node {
     public void waitForGraphChange(final Object event, final int timeout) {
         // TODO Auto-generated method stub
 
-    }
-
-    /* (non-Javadoc)
-    * @see org.ros2.rcljava.node.Node#getNodeNames()
-    */
-    @Override
-    public List<String> getNodeNames() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     /* (non-Javadoc)
@@ -582,7 +576,6 @@ public abstract class BaseNode implements Node {
     /* (non-Javadoc)
      * @see org.ros2.rcljava.node.Node#getParametersNames()
      */
-    @Override
     public List<String> getParametersNames() {
         return new ArrayList<String>(this.parameters.keySet());
     }
@@ -647,12 +640,18 @@ public abstract class BaseNode implements Node {
      * @see org.ros2.rcljava.node.Node#getCurrentTime()
      */
     @Override
-    public Time getCurrentTime() {
+    public Time now() {
         final long lt = System.currentTimeMillis();
         final Time t = new Time();
         t.setSec((int) (lt / 1e3));
         t.setNanosec((int) ((lt % 1e3) * 1e6));
         return t;
+    }
+
+    @Override
+    public Clock getClock() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

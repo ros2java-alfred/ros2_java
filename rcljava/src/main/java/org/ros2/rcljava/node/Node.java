@@ -15,8 +15,8 @@
 
 package org.ros2.rcljava.node;
 
-import java.util.List;
-import java.util.Map;
+import java.time.Clock;
+import java.util.Collection;
 import java.util.Queue;
 
 import org.ros2.rcljava.time.WallTimer;
@@ -50,6 +50,11 @@ public interface Node extends
         AutoCloseable {
 
     /**
+     * Release all resource.
+     */
+    void dispose();
+
+    /**
      * @return Return the name of the node.
      */
     String getName();
@@ -60,40 +65,11 @@ public interface Node extends
     String getNameSpace();
 
 //    /**
-//     * @return Return Logger Name of the node.
-//     */
-//    String getLoggerName();
-//
-//    /**
 //     * @return Return the context of the node.
 //     */
 //    Context getContext();
 
-
-
-
-
-
-
-
-    /**
-     *
-     * @return
-     */
-    Map<String, List<String>> getServiceNamesAndTypes();
-
-    @Deprecated
-    Map<String, List<String>> getTopicNamesAndTypes(final boolean noDemangle);
-
-    /**
-     * This is typically only used by the rclcpp::graph_listener::GraphListener.
-     * Return the number of on loan graph events, see get_graph_event().
-     */
-    int countGraphUsers();
-
-    List<Byte> getParametersTypes(final List<String> names);
-
-    List<String> getParametersNames();
+//    List<String> getParametersNames();
 
     /**
      * @return All the @{link Subscription}s that were created by this instance.
@@ -122,10 +98,8 @@ public interface Node extends
      */
     Queue<WallTimer> getWallTimers();
 
-    Time getCurrentTime();
+    Time now();
 
-    /**
-     * Release all resource.
-     */
-    void dispose();
+    Clock getClock();
+
 }

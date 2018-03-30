@@ -17,6 +17,7 @@ package org.ros2.rcljava.node;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.exception.NotImplementedException;
 import org.ros2.rcljava.internal.message.Message;
@@ -28,6 +29,8 @@ import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.time.WallTimer;
+import org.ros2.rcljava.time.WallTimerCallback;
 
 /**
  * This class is JVM Node of RCLJava.
@@ -97,6 +100,18 @@ public class JavaNode extends BaseNode {
             final SubscriptionCallback<T> callback,
             final QoSProfile qos,
             final boolean ignoreLocalPublications) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<String> getNodeNames() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public WallTimer createWallTimer(final long period, final TimeUnit unit, final WallTimerCallback callback) {
         // TODO Auto-generated method stub
         return null;
     }
