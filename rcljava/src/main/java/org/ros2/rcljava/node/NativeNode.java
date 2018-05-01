@@ -74,9 +74,10 @@ public class NativeNode extends BaseNode {
      *
      * @param nodeName The name that will identify this node in a ROS2 graph.
      * @param spaceName The name-space that will identify this node in a ROS2 graph.
+     * @param args
      * @return A pointer to the underlying ROS2 node structure.
      */
-    private static native long nativeCreateNodeHandle(String nodeName, String spaceName);
+    private static native long nativeCreateNodeHandle(String nodeName, String spaceName, String[] varargs);
 
     private static native void nativeDispose(long nodeHandle);
 
@@ -116,7 +117,7 @@ public class NativeNode extends BaseNode {
         super(namespace, defaultName, args);
 
         // Initialize native component.
-        this.nodeHandle = NativeNode.nativeCreateNodeHandle(this.name, this.nameSpace);
+        this.nodeHandle = NativeNode.nativeCreateNodeHandle(this.name, this.nameSpace, args);
         if (this.nodeHandle==0) { throw new NullPointerException("Node Handle is not define !"); }
 
         NativeNode.logger.debug(

@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef RCLJAVA__UTILS_HPP_
+#define RCLJAVA__UTILS_HPP_
+
 #include <jni.h>
 
 #include <string>
@@ -24,12 +27,52 @@
 #include "rmw/types.h"
 #include "rosidl_generator_c/message_type_support_struct.h"
 
-#ifndef RCLJAVA__UTILS_HPP_
-#define RCLJAVA__UTILS_HPP_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+void
+throwException(JNIEnv * env, std::string message);
+
+void
+jniExceptionCheck(JNIEnv * env);
+
+std::string
+jstring2String(JNIEnv * env, jstring jsubject);
+
+char **
+JniStringArray2StringArray(JNIEnv * env, jobjectArray stringArray);
+
+rosidl_message_type_support_t *
+jclass2MessageType(JNIEnv * env, jclass jmessage_class);
+
+rosidl_service_type_support_t *
+jclass2ServiceType(JNIEnv * env, jclass jmessage_class);
+
+void *
+jclass2Message(JNIEnv * env, jclass jmessage_class);
+
+jobject
+jclass2JMessage(JNIEnv * env, jclass jmessage_class, void * taken_msg);
+
+void *
+jobject2Message(JNIEnv * env, jobject jmessage);
+
+jobject
+makeJTopics(JNIEnv * env, rcl_names_and_types_t * topic_names_and_types);
+
+jobject
+makeJNodes(JNIEnv * env, rcutils_string_array_t * nodes);
+
+jobject
+convert_rmw_request_id_to_java(JNIEnv * env, rmw_request_id_t * request_id);
+
+rmw_request_id_t *
+convert_rmw_request_id_from_java(JNIEnv * env, jobject jrequest_id);
+
+jlong
+instance2Handle(void * obj);
 
 /*
  *
@@ -45,6 +88,13 @@ throwException(JNIEnv * env, std::string message)
   assert(exception_class != NULL);
 
   env->ThrowNew(exception_class, message.c_str());
+}
+
+void jniExceptionCheck(JNIEnv * env)
+{
+  if (env->ExceptionCheck() == JNI_TRUE) {
+    throwException(env, "CallNativeObject");
+  }
 }
 
 /*
@@ -83,9 +133,11 @@ rosidl_message_type_support_t *
 jclass2MessageType(JNIEnv * env, jclass jmessage_class)
 {
   jmethodID mid = env->GetStaticMethodID(jmessage_class, "getTypeSupport", "()J");
+  jniExceptionCheck(env);
   assert(mid != NULL);
 
   jlong jts = env->CallStaticLongMethod(jmessage_class, mid);
+  jniExceptionCheck(env);
   assert(jts != 0);
 
   rosidl_message_type_support_t * ts =
@@ -101,9 +153,11 @@ rosidl_service_type_support_t *
 jclass2ServiceType(JNIEnv * env, jclass jmessage_class)
 {
   jmethodID mid = env->GetStaticMethodID(jmessage_class, "getServiceTypeSupport", "()J");
+  jniExceptionCheck(env);
   assert(mid != NULL);
 
   jlong jts = env->CallStaticLongMethod(jmessage_class, mid);
+  jniExceptionCheck(env);
   assert(jts != 0);
 
   rosidl_service_type_support_t * ts =
@@ -122,6 +176,7 @@ jclass2Message(JNIEnv * env, jclass jmessage_class)
   assert(jfrom_mid != NULL);
 
   jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, jfrom_mid);
+  jniExceptionCheck(env);
   assert(jfrom_java_converter != 0);
 
   jmethodID jconstructor = env->GetMethodID(jmessage_class, "<init>", "()V");
@@ -149,6 +204,7 @@ jclass2JMessage(JNIEnv * env, jclass jmessage_class, void * taken_msg)
   assert(jto_mid != NULL);
 
   jlong jto_java_converter = env->CallStaticLongMethod(jmessage_class, jto_mid);
+  jniExceptionCheck(env);
   assert(jto_java_converter != 0);
 
   using convert_to_java_signature = jobject (*)(void *, jobject);
@@ -176,6 +232,7 @@ jobject2Message(JNIEnv * env, jobject jmessage)
   assert(mid != NULL);
 
   jlong jfrom_java_converter = env->CallStaticLongMethod(jmessage_class, mid);
+  jniExceptionCheck(env);
   assert(jfrom_java_converter != 0);
 
   using convert_from_java_signature = void * (*)(jobject, void *);
@@ -217,11 +274,13 @@ makeJTopics(JNIEnv * env, rcl_names_and_types_t * topic_names_and_types)
     for (size_t j = 0; j < list_len; ++j) {
       env->CallObjectMethod(arrayList, add,
         env->NewStringUTF(topic_names_and_types->types[i].data[j]));
+      jniExceptionCheck(env);
     }
 
     env->CallObjectMethod(hashMap, put,
       env->NewStringUTF(topic_names_and_types->names.data[i]),
       arrayList);
+    jniExceptionCheck(env);
   }
 
   env->PopLocalFrame(hashMap);
@@ -244,6 +303,7 @@ makeJNodes(JNIEnv * env, rcutils_string_array_t * nodes)
   for (size_t i = 0; i < nodes->size; ++i) {
     env->CallObjectMethod(arrayList, add,
       env->NewStringUTF(nodes->data[i]));
+    jniExceptionCheck(env);
   }
 
   env->PopLocalFrame(arrayList);
@@ -344,6 +404,14 @@ instance2Handle(void * obj)
 #ifdef __cplusplus
 }
 #endif
+
+template<typename T>
+T *
+makeInstance();
+
+template<typename T>
+T *
+handle2Instance(jlong handle);
 
 /*
  *

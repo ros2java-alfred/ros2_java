@@ -54,11 +54,9 @@ Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit(
     argv = JniStringArray2StringArray(env, arg);
   }
 
-  rcl_allocator_t allocator = rcl_get_default_allocator();
-
-  rcl_ret_t ret = rcl_init(argc, argv, allocator);
+  rcl_ret_t ret = rcl_init(argc, argv, rcl_get_default_allocator());
   if (ret != RCL_RET_OK) {
-    std::string message("Failed to init: " +
+    std::string message("failed to initialize rmw implementation: " +
       std::string(rcl_get_error_string_safe()));
     rcl_reset_error();
     throwException(env, message);

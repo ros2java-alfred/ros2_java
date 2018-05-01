@@ -12,18 +12,26 @@ list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 include(CrossCompilingExtra)
 
 if(ANDROID)
-  find_host_package(Java COMPONENTS Development REQUIRED)
+  # https://cmake.org/cmake/help/v3.0/module/FindJava.html?highlight=java
+  find_host_package(Java 1.6 COMPONENTS Development REQUIRED)
 else()
-  find_package(Java COMPONENTS Development REQUIRED)
+  # https://cmake.org/cmake/help/v3.0/module/FindJava.html?highlight=java
+  find_package(Java 1.6 COMPONENTS Development REQUIRED)
+
+  # https://cmake.org/cmake/help/v3.0/module/FindJNI.html?highlight=jni
   find_package(JNI REQUIRED)
 endif()
+
+# https://cmake.org/cmake/help/v3.0/module/UseJava.html?highlight=java
 include(UseJava)
+include(JavaExtra)
+
+### Definitions ###
+set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 endif()
-
-set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
 set(${PROJECT_NAME}_java_sources
   "src/main/java/org/ros2/rcljava/common/RCLJavaProxy.java"

@@ -34,12 +34,16 @@ public class @(type_name) implements MessageService {
     }
 
     // NATIVES
-    public static native long getServiceTypeSupport();
+    private static native long nativeGetServiceTypeSupport();
 
     // INTERNALS COMPONENTS
     public static final Class<@(type_name)_Request> RequestType = @(type_name)_Request.class;
 
     public static final Class<@(type_name)_Response> ResponseType = @(type_name)_Response.class;
+
+    public static long getServiceTypeSupport() {
+        return @(type_name).nativeGetServiceTypeSupport();
+    }
 
     @@Override
     public Class<? extends Message> getRequestType() {

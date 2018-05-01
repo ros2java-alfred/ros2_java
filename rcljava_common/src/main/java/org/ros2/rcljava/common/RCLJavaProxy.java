@@ -30,40 +30,20 @@ public final class RCLJavaProxy {
     /**
      * Private constructor so this cannot be instantiated.
      */
-    private RCLJavaProxy() { }
+    private RCLJavaProxy() { super(); }
 
     /**
        * @return a pointer to the underlying typesupport via reflection.
        */
     public static String getTypesupportIdentifier() {
-        String result = null;
-        synchronized (lock) {
-            try {
-                final Class<?> cls = Class.forName("org.ros2.rcljava.RCLJava");
-                final Method meth = cls.getDeclaredMethod("getTypesupportIdentifier", (Class<?> []) null);
-                result = (String)meth.invoke(null);
-            } catch(Exception e) {
-                // Just return null if we can't find the typesupport identifier
-            }
-        }
-        return result;
+        return RCLJavaProxy.getMethodByReflexion("getTypesupportIdentifier");
     }
 
     /**
      * @return a pointer to the underlying typesupport via reflection.
      */
     public static String getRMWIdentifier() {
-        String result = null;
-        synchronized (lock) {
-            try {
-                final Class<?> cls = Class.forName("org.ros2.rcljava.RCLJava");
-                final Method meth = cls.getDeclaredMethod("getRMWIdentifier", (Class<?> []) null);
-                result = (String) meth.invoke(null);
-            } catch(Exception e) {
-                // Just return null if we can't find the RMW identifier
-            }
-        }
-        return result;
+        return RCLJavaProxy.getMethodByReflexion("getRMWIdentifier");
     }
 
     /**
@@ -79,5 +59,19 @@ public final class RCLJavaProxy {
                 // TODO(esteve): handle exception
             }
         }
+    }
+
+    private static String getMethodByReflexion(final String method) {
+        String result = null;
+        synchronized (lock) {
+            try {
+                final Class<?> cls = Class.forName("org.ros2.rcljava.RCLJava");
+                final Method meth = cls.getDeclaredMethod(method, (Class<?> []) null);
+                result = (String) meth.invoke(null);
+            } catch(Exception e) {
+                // Just return null if we can't find the RMW identifier
+            }
+        }
+        return result;
     }
 }

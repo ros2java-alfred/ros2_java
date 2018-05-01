@@ -42,7 +42,8 @@ Java_org_ros2_rcljava_node_NativeNode_nativeCreateNodeHandle(
   JNIEnv * env,
   jclass,
   jstring jnode_name,
-  jstring jspace_name)
+  jstring jspace_name,
+  jstring jvarargs[])
 {
   std::string node_name = jstring2String(env, jnode_name);
   std::string space_name("");

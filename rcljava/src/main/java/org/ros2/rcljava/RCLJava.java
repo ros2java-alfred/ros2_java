@@ -16,6 +16,7 @@
 
 package org.ros2.rcljava;
 
+import java.lang.management.ManagementFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -190,9 +191,27 @@ public abstract class RCLJava {
         final String arch    = System.getProperty("os.arch");
         final String os      = System.getProperty("os.name");
 
-        RCLJava.logger.debug("Native Library OS : " + os);
-        RCLJava.logger.debug("Native Library Archi : " + arch);
-        RCLJava.logger.debug("Native Library path : \n\t" + libpath.replace(":", "\n\t"));
+        final String pidAndHost = ManagementFactory.getRuntimeMXBean().getName();
+        final String pid = pidAndHost.substring(0, pidAndHost.indexOf('@'));
+        // For JAVA9 : long pid = ProcessHandle.current().getPid();
+
+        // Java Value
+        RCLJava.logger.debug(String.format("Process ID : %s", pid));
+        RCLJava.logger.debug(String.format("Java JVM : %s %s %s",
+                System.getProperty("java.vm.vendor"),
+                System.getProperty("java.vm.name"),
+                System.getProperty("java.vm.version")));
+        RCLJava.logger.debug(String.format("Java JVM %s : %s",
+                System.getProperty("java.vm.specification.name"),
+                System.getProperty("java.vm.specification.version")));
+        RCLJava.logger.debug(String.format("Java JRE %s : %s",
+                System.getProperty("java.specification.name"),
+                System.getProperty("java.specification.version")));
+
+        // Native Value
+        RCLJava.logger.debug(String.format("Native Library OS : %s", os));
+        RCLJava.logger.debug(String.format("Native Library Archi : %s", arch));
+        RCLJava.logger.debug(String.format("Native Library path : \n\t%s", libpath.replace(":", "\n\t")));
     }
 
     /**

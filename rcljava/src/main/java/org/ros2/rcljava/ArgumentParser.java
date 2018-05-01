@@ -34,6 +34,7 @@ public final class ArgumentParser {
 
     private String prefix;
     private String nodeName;
+    private Integer domainId;
     private final Map<String, ParameterVariant<?>> parameters = new ConcurrentHashMap<String, ParameterVariant<?>>();
 
     public ArgumentParser(final String namespace, final String defaultName, final String... args) {
@@ -48,6 +49,17 @@ public final class ArgumentParser {
             this.prefix = EMPTY;
         }
 
+        if (this.domainId == null) {
+            try {
+                this.domainId = Integer.getInteger(System.getenv("ROS_DOMAIN_ID"));
+                if (this.domainId == null) {
+                    this.domainId = 0;
+                }
+            } catch (Exception e) {
+                this.domainId = 0;
+            }
+        }
+
         if (args != null) {
             this.parseParameters(args);
         }
@@ -59,6 +71,10 @@ public final class ArgumentParser {
 
     public String getNameSpace() {
         return this.prefix;
+    }
+
+    public int getDomainId() {
+        return this.domainId;
     }
 
     public Map<String, ParameterVariant<?>> getParameters() {
@@ -166,4 +182,5 @@ public final class ArgumentParser {
 
         return result;
     }
+
 }

@@ -15,13 +15,24 @@
 include(CrossCompilingExtra)
 
 if(ANDROID)
-  find_host_package(Java COMPONENTS Development)
+  # https://cmake.org/cmake/help/v3.0/module/FindJava.html?highlight=java
+  find_host_package(Java 1.6 COMPONENTS Development REQUIRED)
 else()
-  find_package(Java COMPONENTS Development)
+  # https://cmake.org/cmake/help/v3.0/module/FindJava.html?highlight=java
+  find_package(Java 1.6 COMPONENTS Development REQUIRED)
+
+  # https://cmake.org/cmake/help/v3.0/module/FindJNI.html?highlight=jni
   find_package(JNI REQUIRED)
 endif()
 
+# https://cmake.org/cmake/help/v3.0/module/UseJava.html?highlight=java
 include(UseJava)
+
+### Definitions ###
+set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
+
+# Bug in find_jar for Junit4 : https://sourceforge.net/p/rdkit/mailman/message/35301727/
+set(JUNIT_JAR "/usr/share/java/junit4.jar")
 
 function(add_junit_tests TARGET_NAME)
 

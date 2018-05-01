@@ -15,8 +15,6 @@
 
 package org.ros2.rcljava.executor;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,7 +33,15 @@ import org.slf4j.LoggerFactory;
 import std_msgs.msg.UInt32;
 
 public class ExecutorFailTest extends AbstractRosTest {
-    private static final Logger logger = LoggerFactory.getLogger(ExecutorFailTest.class);
+
+    protected static final Logger logger = LoggerFactory.getLogger(ExecutorFailTest.class);
+
+    private static final String TOPIC_PUB = "publisher_node";
+    private static final String TOPIC_SUB1 = "subscription_node_one";
+    private static final String TOPIC_SUB2 = "subscription_node_two";
+    private static final String TEST_TOPIC_SINGLE = "test_topic_single";
+
+    private static final String ERROR_MSG = "Expected Runtime error.";
 
     public class TestConsumerFail<T extends Message> implements SubscriptionCallback<T> {
         private final RCLFuture<T> future;
@@ -55,7 +61,7 @@ public class ExecutorFailTest extends AbstractRosTest {
     }
 
     @Test
-    public final void testSeparateSingleProcessFail() throws Exception {
+    public final void testSeparateSingleProcessFail() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         boolean test = true;
@@ -63,22 +69,24 @@ public class ExecutorFailTest extends AbstractRosTest {
         try {
             final ThreadedExecutor executor = new SingleThreadedExecutor();
 
-            final Node publisherNode        = RCLJava.createNode("publisher_node");
-            final Node subscriptionNodeOne  = RCLJava.createNode("subscription_node_one");
-            final Node subscriptionNodeTwo  = RCLJava.createNode("subscription_node_two");
+            final Node publisherNode        = RCLJava.createNode(TOPIC_PUB);
+            final Node subscriptionNodeOne  = RCLJava.createNode(TOPIC_SUB1);
+            final Node subscriptionNodeTwo  = RCLJava.createNode(TOPIC_SUB2);
 
-            NativePublisher<UInt32> publisher = (NativePublisher<UInt32>) publisherNode.<UInt32>createPublisher(
-                    UInt32.class, "test_topic_single");
+            final NativePublisher<UInt32> publisher = (NativePublisher<UInt32>) publisherNode.<UInt32>createPublisher(
+                    UInt32.class, TEST_TOPIC_SINGLE);
 
             final RCLFuture<UInt32> futureOne = new RCLFuture<UInt32>(executor);
 
-            NativeSubscription<UInt32> subscriptionOne = (NativeSubscription<UInt32>) subscriptionNodeOne.<UInt32>createSubscription(
-                    UInt32.class, "test_topic_single", new TestConsumer<UInt32>(futureOne));
+            final NativeSubscription<UInt32> subscriptionOne =
+                    (NativeSubscription<UInt32>) subscriptionNodeOne.<UInt32>createSubscription(
+                            UInt32.class, TEST_TOPIC_SINGLE, new TestConsumer<UInt32>(futureOne));
 
             final RCLFuture<UInt32> futureTwo = new RCLFuture<UInt32>(executor);
 
-            NativeSubscription<UInt32> subscriptionTwo = (NativeSubscription<UInt32>) subscriptionNodeTwo.<UInt32>createSubscription(
-                    UInt32.class, "test_topic_single", new TestConsumerFail<UInt32>(futureTwo));
+            final NativeSubscription<UInt32> subscriptionTwo =
+                    (NativeSubscription<UInt32>) subscriptionNodeTwo.<UInt32>createSubscription(
+                            UInt32.class, TEST_TOPIC_SINGLE, new TestConsumerFail<UInt32>(futureTwo));
 
             executor.addNode(publisherNode);
             executor.addNode(subscriptionNodeOne);
@@ -115,6 +123,6 @@ public class ExecutorFailTest extends AbstractRosTest {
             test = false;
         }
 
-        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertTrue(ERROR_MSG, test);
     }
 }

@@ -16,30 +16,17 @@ find_package(builtin_interfaces REQUIRED)
 find_package(geometry_msgs)
 find_package(sensor_msgs)
 
-include(CrossCompilingExtra)
-
-if(ANDROID)
-  # https://cmake.org/cmake/help/v3.0/module/FindJava.html?highlight=java
-  find_host_package(Java 1.6 COMPONENTS Development)
-else()
-  # https://cmake.org/cmake/help/v3.0/module/FindJava.html?highlight=java
-  find_package(Java 1.6 COMPONENTS Development)
-
-  # https://cmake.org/cmake/help/v3.0/module/FindJNI.html?highlight=jni
-  find_package(JNI REQUIRED)
-endif()
-
-# https://cmake.org/cmake/help/v3.0/module/UseJava.html?highlight=java
-include(UseJava)
 include(JavaExtra)
 
 enable_testing()
 
-### Definitions ###
-set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 
 if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
 endif()
 
 include_directories(include)
@@ -65,9 +52,6 @@ set(SENSOR_MSGS_JARS "${CMAKE_BINARY_DIR}/../sensor_msgs/sensor_msgs.jar")
 set(BUILTIN_MSGS_JARS "${CMAKE_BINARY_DIR}/../builtin_interfaces/builtin_interfaces.jar")
 set(RCLINTERFACE_MSGS_JARS NAMES "${CMAKE_BINARY_DIR}/../rcl_interfaces/rcl_interfaces.jar")
 set(BUILTIN_COMMON_JARS NAMES "${CMAKE_BINARY_DIR}/../rosjava_common/rosjava_common.jar")
-
-# Bug in find_jar for Junit4 : https://sourceforge.net/p/rdkit/mailman/message/35301727/
-set(JUNIT_JAR "/usr/share/java/junit4.jar")
 
 #set(CMAKE_CURRENT_SOURCE_DIR "src/main/java/")
 
@@ -179,6 +163,7 @@ foreach(_jni_class ${_jni_classes})
     ${_target_name}
     SHARED
       src/main/cpp/org_ros2_rcljava_${_jni_class}.cpp
+#      src/main/cpp/utils.cpp
   )
 
   target_compile_definitions(
@@ -348,27 +333,27 @@ if(BUILD_TESTING)
     )
   endforeach()
 
-#  create_javadoc("${PROJECT_NAME}_docs"
-#    FILES "${${PROJECT_NAME}_sources}"
-#    SOURCEPATH "src/main/java/"
-#    CLASSPATH
-#    "${CMAKE_JAVA_INCLUDE_PATH}"
-#    "${rcljava_common_JARS}"
-#    "${rcljava_test_msgs_JARS}"
-#    "${std_msgs_JARS}"
-#    "${geometry_msgs_JARS}"
-#    "${sensor_msgs_JARS}"
-#    "${builtin_interfaces_JARS}"
-#    "${rcl_interfaces_JARS}"
-#    "${_${PROJECT_NAME}_jar_file}"
-#    "${_jar_file}"
-#    INSTALLPATH "docs/"
-#    WINDOWTITLE "ROS2 Java"
-#    DOCTITLE "<h1>ROS2 Java</h1>"
-#    AUTHOR TRUE
-#    USE TRUE
-#    VERSION TRUE
-#  )
+  create_javadoc("${PROJECT_NAME}_docs"
+    FILES "${${PROJECT_NAME}_sources}"
+    SOURCEPATH "src/main/java/"
+    CLASSPATH
+    "${CMAKE_JAVA_INCLUDE_PATH}"
+    "${rcljava_common_JARS}"
+    "${rcljava_test_msgs_JARS}"
+    "${std_msgs_JARS}"
+    "${geometry_msgs_JARS}"
+    "${sensor_msgs_JARS}"
+    "${builtin_interfaces_JARS}"
+    "${rcl_interfaces_JARS}"
+    "${_${PROJECT_NAME}_jar_file}"
+    "${_jar_file}"
+    INSTALLPATH "docs"
+    WINDOWTITLE "ROS2 Java"
+    DOCTITLE "<h1>ROS2 Java</h1>"
+    AUTHOR TRUE
+    USE TRUE
+    VERSION TRUE
+  )
 
 #  execute_process(COMMAND "javasphinx-apidoc -o ../docs/source/ --title='ROS2 for Java' src/main/java/")
 

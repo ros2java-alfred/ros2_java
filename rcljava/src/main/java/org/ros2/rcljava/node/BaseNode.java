@@ -72,6 +72,8 @@ public abstract class BaseNode implements Node {
     /** Name space of the node. */
     protected String nameSpace;
 
+    protected int domainId;
+
     /**
      * All the @{link Subscription}s that have been created through this instance.
      */
@@ -124,6 +126,7 @@ public abstract class BaseNode implements Node {
 
         this.nameSpace      = argParser.getNameSpace();
         this.parameters     = argParser.getParameters();
+        this.domainId       = argParser.getDomainId();
 
         // Initialize components.
         this.subscriptions  = new LinkedBlockingQueue<Subscription<?>>();
