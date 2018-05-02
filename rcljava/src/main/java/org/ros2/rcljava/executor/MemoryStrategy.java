@@ -38,7 +38,6 @@ public class MemoryStrategy {
         this.clientHandles.clear();
     }
 
-
     public boolean collectEntities(final BlockingQueue<Node> nodes) {
         for (final Node node : nodes) {
             for (final Subscription<?> subscription : node.getSubscriptions()) {

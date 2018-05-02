@@ -18,11 +18,16 @@ package org.ros2.rcljava.executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Pool-multiple-threaded executor implementation
  * This is the default executor created by {@link RCLJava::spin}.
  */
 public final class MultiThreadedExecutor extends BaseThreadedExecutor {
+
+    private static final Logger logger = LoggerFactory.getLogger(MultiThreadedExecutor.class);
 
     private int numberOfThreads;
 
@@ -38,6 +43,9 @@ public final class MultiThreadedExecutor extends BaseThreadedExecutor {
      */
     public MultiThreadedExecutor(final int numberOfThreads) {
         super();
+
+        logger.debug("Initialized Executor.");
+
         if (numberOfThreads == 0) {
             this.numberOfThreads = 1;
         } else {

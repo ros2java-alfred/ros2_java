@@ -17,17 +17,25 @@ package org.ros2.rcljava.executor;
 
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Single-threaded executor implementation
  * This is the default executor created by {@link RCLJava::spin}.
  */
 public final class SingleThreadedExecutor extends BaseThreadedExecutor {
 
+    private static final Logger logger = LoggerFactory.getLogger(SingleThreadedExecutor.class);
+
     /**
      * Default constructor. See the default constructor for Executor.
      */
     public SingleThreadedExecutor() {
         super();
+
+        logger.debug("Initialized Executor.");
+
         this.executorService = Executors.newSingleThreadExecutor();
     }
 

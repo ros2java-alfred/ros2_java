@@ -20,7 +20,6 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -121,19 +120,20 @@ public class NodeTest extends AbstractRosTest {
     }
 
     @Test
-    public final void testPubSub() throws InterruptedException, ExecutionException, Exception {
+    public final void testPubSub() throws Exception {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         this.initRCLjava();
         final NativeNode node = (NativeNode) RCLJava.createNode("test_node");
         Assert.assertNotEquals(0, node.getNodeHandle());
 
-        Publisher<std_msgs.msg.String> publisher = node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class,
+        final Publisher<std_msgs.msg.String> publisher = node.<std_msgs.msg.String>createPublisher(
+                std_msgs.msg.String.class,
                 "test_topic");
 
         final RCLFuture<std_msgs.msg.String> future = new RCLFuture<std_msgs.msg.String>(new WeakReference<Node>(node));
 
-        Subscription<std_msgs.msg.String> subscription = node.<std_msgs.msg.String>createSubscription(
+        final Subscription<std_msgs.msg.String> subscription = node.<std_msgs.msg.String>createSubscription(
                 std_msgs.msg.String.class, "test_topic", new TestConsumer<std_msgs.msg.String>(future));
 
         final std_msgs.msg.String msg = new std_msgs.msg.String();

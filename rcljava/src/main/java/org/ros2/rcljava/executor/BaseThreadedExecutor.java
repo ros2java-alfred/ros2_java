@@ -21,8 +21,12 @@ import java.util.concurrent.ExecutorService;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class BaseThreadedExecutor implements ThreadedExecutor {
+
+    private static final Logger logger = LoggerFactory.getLogger(BaseThreadedExecutor.class);
 
     protected final Object mutex = new Object();
     protected final NativeExecutor baseExecutor;
@@ -42,6 +46,7 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     @Override
     public void addNode(final Node node, final boolean notify) {
         if (!this.nodes.contains(node)) {
+            logger.debug("Add node : " + node.getName());
             this.nodes.add(node);
 
 //            if (notify) {
@@ -58,6 +63,7 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     @Override
     public void removeNode(final Node node, final boolean notify) {
         if (this.nodes.contains(node)) {
+            logger.debug("Remove node : " + node.getName());
             this.nodes.remove(node);
 
 //            if (notify) {
@@ -108,6 +114,8 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
 
     @Override
     public void run() {
+        logger.debug("Starting Executor.");
+
         while (RCLJava.ok()) {
             this.spinOnce(0);
         }
