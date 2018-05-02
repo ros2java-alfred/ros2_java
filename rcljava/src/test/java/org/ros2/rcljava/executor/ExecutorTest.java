@@ -15,6 +15,8 @@
 
 package org.ros2.rcljava.executor;
 
+import java.util.concurrent.ExecutionException;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,6 +48,67 @@ public class ExecutorTest extends AbstractRosTest {
     @Rule
     public Timeout globalTimeout = Timeout.seconds(30); // 30 seconds max per method tested
 
+    private Node publisherNode;
+    private NativePublisher<UInt32> publisher;
+    private UInt32 msg;
+
+    private Node subscriptionNodeOne;
+    private NativeSubscription<UInt32> subscriptionOne;
+    private RCLFuture<UInt32> futureOne;
+
+    private Node subscriptionNodeTwo;
+    private NativeSubscription<UInt32> subscriptionTwo;
+    private RCLFuture<UInt32> futureTwo;
+
+    private void processInit(final ThreadedExecutor executor, final String topic)
+            throws InterruptedException, ExecutionException {
+
+        this.publisherNode        = RCLJava.createNode(TOPIC_PUB);
+        this.subscriptionNodeOne  = RCLJava.createNode(TOPIC_SUB1);
+        this.subscriptionNodeTwo  = RCLJava.createNode(TOPIC_SUB2);
+
+        this.publisher = (NativePublisher<UInt32>)this.publisherNode.<UInt32>createPublisher(UInt32.class, topic);
+
+        this.futureOne = new RCLFuture<UInt32>(executor);
+        this.subscriptionOne = (NativeSubscription<UInt32>)this.subscriptionNodeOne.<UInt32>createSubscription(
+                UInt32.class, topic,
+                new TestConsumer<UInt32>(this.futureOne));
+
+        this.futureTwo = new RCLFuture<UInt32>(executor);
+        this.subscriptionTwo = (NativeSubscription<UInt32>)this.subscriptionNodeTwo.<UInt32>createSubscription(
+                UInt32.class, topic,
+                new TestConsumer<UInt32>(futureTwo));
+
+        this.msg = new UInt32();
+        this.msg.setData(54321);
+
+        executor.addNode(this.publisherNode);
+        executor.addNode(this.subscriptionNodeOne);
+        executor.addNode(this.subscriptionNodeTwo);
+    }
+
+    private void processResult(final ThreadedExecutor executor)
+            throws InterruptedException, ExecutionException {
+
+        final UInt32 valueOne = this.futureOne.get();
+        Assert.assertEquals(54321, valueOne.getData());
+
+        final UInt32 valueTwo = futureTwo.get();
+        Assert.assertEquals(54321, valueTwo.getData());
+
+        executor.removeNode(this.subscriptionNodeTwo);
+        executor.removeNode(this.subscriptionNodeOne);
+        executor.removeNode(this.publisherNode);
+        executor.cancel();
+
+        this.subscriptionTwo.dispose();
+        this.subscriptionOne.dispose();
+        this.publisher.dispose();
+
+        this.publisherNode.dispose();
+        this.subscriptionNodeOne.dispose();
+        this.subscriptionNodeTwo.dispose();
+    }
 
     @Test
     public final void testLinkMultipleProcess() {
@@ -55,56 +118,14 @@ public class ExecutorTest extends AbstractRosTest {
 
         try {
             final ThreadedExecutor executor = new MultiThreadedExecutor();
-
-            final Node publisherNode        = RCLJava.createNode(TOPIC_PUB);
-            final Node subscriptionNodeOne  = RCLJava.createNode(TOPIC_SUB1);
-            final Node subscriptionNodeTwo  = RCLJava.createNode(TOPIC_SUB2);
-
-            final NativePublisher<UInt32> publisher = (NativePublisher<UInt32>) publisherNode.<UInt32>createPublisher(
-                    UInt32.class, TEST_TOPIC_MULTI);
-
-            final RCLFuture<UInt32> futureOne = new RCLFuture<UInt32>(executor);
-
-            final NativeSubscription<UInt32> subscriptionOne =
-                    (NativeSubscription<UInt32>)subscriptionNodeOne.<UInt32>createSubscription(
-                            UInt32.class, TEST_TOPIC_MULTI, new TestConsumer<UInt32>(futureOne));
-
-            final RCLFuture<UInt32> futureTwo = new RCLFuture<UInt32>(executor);
-
-            final NativeSubscription<UInt32> subscriptionTwo =
-                    (NativeSubscription<UInt32>) subscriptionNodeTwo.<UInt32>createSubscription(
-                            UInt32.class, TEST_TOPIC_MULTI, new TestConsumer<UInt32>(futureTwo));
-
-            final UInt32 msg = new UInt32();
-            msg.setData(54321);
-
-            executor.addNode(publisherNode);
-            executor.addNode(subscriptionNodeOne);
-            executor.addNode(subscriptionNodeTwo);
+            this.processInit(executor, TEST_TOPIC_MULTI);
 
             while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
                 publisher.publish(msg);
                 executor.spinOnce(0);
             }
 
-            final UInt32 valueOne = futureOne.get();
-            Assert.assertEquals(54321, valueOne.getData());
-
-            final UInt32 valueTwo = futureTwo.get();
-            Assert.assertEquals(54321, valueTwo.getData());
-
-            executor.removeNode(subscriptionNodeTwo);
-            executor.removeNode(subscriptionNodeOne);
-            executor.removeNode(publisherNode);
-            executor.cancel();
-
-            subscriptionTwo.dispose();
-            subscriptionOne.dispose();
-            publisher.dispose();
-
-            publisherNode.dispose();
-            subscriptionNodeOne.dispose();
-            subscriptionNodeTwo.dispose();
+            this.processResult(executor);
         } catch (Exception e) {
             test = false;
         }
@@ -120,57 +141,14 @@ public class ExecutorTest extends AbstractRosTest {
 
         try {
             final ThreadedExecutor executor = new MultiThreadedExecutor();
-
-            final Node publisherNode        = RCLJava.createNode(TOPIC_PUB);
-            final Node subscriptionNodeOne  = RCLJava.createNode(TOPIC_SUB1);
-            final Node subscriptionNodeTwo  = RCLJava.createNode(TOPIC_SUB2);
-
-            final NativePublisher<UInt32> publisher = (NativePublisher<UInt32>) publisherNode.<UInt32>createPublisher(
-                    UInt32.class, TEST_TOPIC_MULTI);
-
-            final RCLFuture<UInt32> futureOne = new RCLFuture<UInt32>(executor);
-
-            final NativeSubscription<UInt32> subscriptionOne =
-                    (NativeSubscription<UInt32>) subscriptionNodeOne.<UInt32>createSubscription(
-                            UInt32.class, TEST_TOPIC_MULTI, new TestConsumer<UInt32>(futureOne));
-
-            final RCLFuture<UInt32> futureTwo = new RCLFuture<UInt32>(executor);
-
-            final NativeSubscription<UInt32> subscriptionTwo =
-                    (NativeSubscription<UInt32>) subscriptionNodeTwo.<UInt32>createSubscription(
-                            UInt32.class, TEST_TOPIC_MULTI, new TestConsumer<UInt32>(futureTwo));
-
-            final UInt32 msg = new UInt32();
-            msg.setData(54321);
-
-            executor.addNode(publisherNode);
-            executor.addNode(subscriptionNodeOne);
-            executor.addNode(subscriptionNodeTwo);
+            this.processInit(executor, TEST_TOPIC_MULTI);
 
             executor.spin();
-
             while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
                 publisher.publish(msg);
             }
 
-            final UInt32 valueOne = futureOne.get();
-            Assert.assertEquals(54321, valueOne.getData());
-
-            final UInt32 valueTwo = futureTwo.get();
-            Assert.assertEquals(54321, valueTwo.getData());
-
-            executor.removeNode(subscriptionNodeTwo);
-            executor.removeNode(subscriptionNodeOne);
-            executor.removeNode(publisherNode);
-            executor.cancel();
-
-            subscriptionTwo.dispose();
-            subscriptionOne.dispose();
-            publisher.dispose();
-
-            publisherNode.dispose();
-            subscriptionNodeOne.dispose();
-            subscriptionNodeTwo.dispose();
+            this.processResult(executor);
         } catch (Exception e) {
             test = false;
         }
@@ -186,57 +164,14 @@ public class ExecutorTest extends AbstractRosTest {
 
         try {
             final ThreadedExecutor executor = new SingleThreadedExecutor();
-
-            final Node publisherNode        = RCLJava.createNode(TOPIC_PUB);
-            final Node subscriptionNodeOne  = RCLJava.createNode(TOPIC_SUB1);
-            final Node subscriptionNodeTwo  = RCLJava.createNode(TOPIC_SUB2);
-
-            final NativePublisher<UInt32> publisher = (NativePublisher<UInt32>) publisherNode.<UInt32>createPublisher(
-                    UInt32.class, TEST_TOPIC_SINGLE);
-
-            final RCLFuture<UInt32> futureOne = new RCLFuture<UInt32>(executor);
-
-            final NativeSubscription<UInt32> subscriptionOne =
-                    (NativeSubscription<UInt32>) subscriptionNodeOne.<UInt32>createSubscription(
-                            UInt32.class, TEST_TOPIC_SINGLE, new TestConsumer<UInt32>(futureOne));
-
-            final RCLFuture<UInt32> futureTwo = new RCLFuture<UInt32>(executor);
-
-            final NativeSubscription<UInt32> subscriptionTwo =
-                    (NativeSubscription<UInt32>) subscriptionNodeTwo.<UInt32>createSubscription(
-                            UInt32.class, TEST_TOPIC_SINGLE, new TestConsumer<UInt32>(futureTwo));
-
-            final UInt32 msg = new UInt32();
-            msg.setData(54321);
-
-            executor.addNode(publisherNode);
-            executor.addNode(subscriptionNodeOne);
-            executor.addNode(subscriptionNodeTwo);
+            this.processInit(executor, TEST_TOPIC_SINGLE);
 
             executor.spin();
-
             while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
                 publisher.publish(msg);
             }
 
-            final UInt32 valueOne = futureOne.get();
-            Assert.assertEquals(54321, valueOne.getData());
-
-            final UInt32 valueTwo = futureTwo.get();
-            Assert.assertEquals(54321, valueTwo.getData());
-
-            executor.removeNode(subscriptionNodeTwo);
-            executor.removeNode(subscriptionNodeOne);
-            executor.removeNode(publisherNode);
-            executor.cancel();
-
-            subscriptionTwo.dispose();
-            subscriptionOne.dispose();
-            publisher.dispose();
-
-            publisherNode.dispose();
-            subscriptionNodeOne.dispose();
-            subscriptionNodeTwo.dispose();
+            this.processResult(executor);
         } catch (Exception e) {
             test = false;
         }
@@ -252,56 +187,14 @@ public class ExecutorTest extends AbstractRosTest {
 
         try {
             final ThreadedExecutor executor = new SingleThreadedExecutor();
-
-            final Node publisherNode        = RCLJava.createNode(TOPIC_PUB);
-            final Node subscriptionNodeOne  = RCLJava.createNode(TOPIC_SUB1);
-            final Node subscriptionNodeTwo  = RCLJava.createNode(TOPIC_SUB2);
-
-            final NativePublisher<UInt32> publisher = (NativePublisher<UInt32>) publisherNode.<UInt32>createPublisher(
-                    UInt32.class, TEST_TOPIC_SINGLE);
-
-            final RCLFuture<UInt32> futureOne = new RCLFuture<UInt32>(executor);
-
-            final NativeSubscription<UInt32> subscriptionOne =
-                    (NativeSubscription<UInt32>) subscriptionNodeOne.<UInt32>createSubscription(
-                            UInt32.class, TEST_TOPIC_SINGLE, new TestConsumer<UInt32>(futureOne));
-
-            final RCLFuture<UInt32> futureTwo = new RCLFuture<UInt32>(executor);
-
-            final NativeSubscription<UInt32> subscriptionTwo =
-                    (NativeSubscription<UInt32>) subscriptionNodeTwo.<UInt32>createSubscription(
-                            UInt32.class, TEST_TOPIC_SINGLE, new TestConsumer<UInt32>(futureTwo));
-
-            final UInt32 msg = new UInt32();
-            msg.setData(54321);
-
-            executor.addNode(publisherNode);
-            executor.addNode(subscriptionNodeOne);
-            executor.addNode(subscriptionNodeTwo);
+            this.processInit(executor, TEST_TOPIC_SINGLE);
 
             while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
                 publisher.publish(msg);
                 executor.spinOnce(0);
             }
 
-            final UInt32 valueOne = futureOne.get();
-            Assert.assertEquals(54321, valueOne.getData());
-
-            final UInt32 valueTwo = futureTwo.get();
-            Assert.assertEquals(54321, valueTwo.getData());
-
-            executor.removeNode(subscriptionNodeTwo);
-            executor.removeNode(subscriptionNodeOne);
-            executor.removeNode(publisherNode);
-            executor.cancel();
-
-            subscriptionTwo.dispose();
-            subscriptionOne.dispose();
-            publisher.dispose();
-
-            publisherNode.dispose();
-            subscriptionNodeOne.dispose();
-            subscriptionNodeTwo.dispose();
+            this.processResult(executor);
         } catch (Exception e) {
             test = false;
         }
