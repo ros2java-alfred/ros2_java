@@ -21,17 +21,17 @@ package org.ros2.rcljava.qos.policies;
  *
  */
 public enum Durability implements QoSPolicy {
-  SYSTEM_DEFAULT(0),
-  TRANSIENT_LOCAL(1),
-  VOLATILE(2);
+    SYSTEM_DEFAULT(0),
+    TRANSIENT_LOCAL(1),
+    VOLATILE(2);
 
-  private final int value;
+    private final int value;
 
-  Durability(final int value) {
-    this.value = value;
-  }
+    Durability(final int value) {
+        this.value = value;
+    }
 
-  public int getValue() {
-    return value;
-  }
+    public int getValue() {
+        return value;
+    }
 }

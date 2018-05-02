@@ -16,7 +16,6 @@
 package org.ros2.rcljava.node;
 
 import java.time.Clock;
-import java.util.Collection;
 import java.util.Queue;
 
 import org.ros2.rcljava.time.WallTimer;

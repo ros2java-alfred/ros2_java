@@ -30,7 +30,7 @@ public class InvalidRCLJAVAImplementation extends RuntimeException {
      *
      * @param cause Throwable instance of the cause.
      */
-    public InvalidRCLJAVAImplementation(Throwable cause) {
+    public InvalidRCLJAVAImplementation(final Throwable cause) {
         super("requested invalid rmw implementation", cause);
     }
 

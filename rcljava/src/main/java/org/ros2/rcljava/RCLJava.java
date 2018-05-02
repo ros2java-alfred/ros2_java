@@ -45,9 +45,7 @@ import org.slf4j.LoggerFactory;
  * <p>JNI call of ROS2 c client.</p>
  *
  */
-public abstract class RCLJava {
-
-    private static final String LOG_NAME = RCLJava.class.getName();
+public final class RCLJava {
 
     private static final Logger logger = LoggerFactory.getLogger(RCLJava.class);
 
@@ -152,7 +150,7 @@ public abstract class RCLJava {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 synchronized (RCLJava.class) {
-                    if (RCLJava.initialized) {
+                    if (RCLJava.isInitialized()) {
                         RCLJava.logger.debug("Final Shutdown...");
 
                         // List loaded libraries.
@@ -174,7 +172,7 @@ public abstract class RCLJava {
     /**
      * Private constructor so this cannot be instantiated.
      */
-    private RCLJava() { }
+    private RCLJava() { super(); }
 
     private static String getRmwImplementationSuffix(final String rmwImplementation) {
         String result = "__" + rmwImplementation;
@@ -305,7 +303,7 @@ public abstract class RCLJava {
     @SuppressWarnings({ "resource", "unchecked" })
     public static void spinOnce(final Node node) {
         synchronized (RCLJava.class) {
-            if (!RCLJava.initialized) {
+            if (!RCLJava.isInitialized()) {
                 throw new NotInitializedException();
             }
         }
@@ -464,7 +462,7 @@ public abstract class RCLJava {
      */
     public static boolean ok() {
         synchronized (RCLJava.class) {
-            if (!RCLJava.initialized) {
+            if (!RCLJava.isInitialized()) {
                 throw new NotInitializedException();
             }
         }
@@ -484,7 +482,7 @@ public abstract class RCLJava {
         RCLJava.logger.debug("Shutdown...");
 
         synchronized (RCLJava.class) {
-            if (!RCLJava.initialized) {
+            if (!RCLJava.isInitialized()) {
                 throw new NotInitializedException();
             }
 
@@ -498,7 +496,7 @@ public abstract class RCLJava {
      */
     public static String getRMWIdentifier() {
         synchronized (RCLJava.class) {
-            if (!RCLJava.initialized) {
+            if (!RCLJava.isInitialized()) {
                 throw new NotInitializedException();
             }
         }
@@ -514,9 +512,7 @@ public abstract class RCLJava {
      * @return Identifier string of ROS2 middle-ware.
      */
     public static String getTypesupportIdentifier() {
-        final String typesupportIdentifier = RMW_TO_TYPESUPPORT.get(RCLJava.getRMWIdentifier());
-
-        return typesupportIdentifier;
+        return RMW_TO_TYPESUPPORT.get(RCLJava.getRMWIdentifier());
     }
 
     /**

@@ -21,17 +21,17 @@ package org.ros2.rcljava.qos.policies;
  *
  */
 public enum Reliability implements QoSPolicy {
-  SYSTEM_DEFAULT(0),
-  RELIABLE(1),
-  BEST_EFFORT(2);
+    SYSTEM_DEFAULT(0),
+    RELIABLE(1),
+    BEST_EFFORT(2);
 
-  private final int value;
+    private final int value;
 
-  Reliability(final int value) {
-    this.value = value;
-  }
+    Reliability(final int value) {
+        this.value = value;
+    }
 
-  public int getValue() {
-    return value;
-  }
+    public int getValue() {
+        return value;
+    }
 }

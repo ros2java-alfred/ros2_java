@@ -21,17 +21,17 @@ package org.ros2.rcljava.qos.policies;
  *
  */
 public enum History implements QoSPolicy {
-  SYSTEM_DEFAULT(0),
-  KEEP_LAST(1),
-  KEEP_ALL(2);
+    SYSTEM_DEFAULT(0),
+    KEEP_LAST(1),
+    KEEP_ALL(2);
 
-  private final int value;
+    private final int value;
 
-  History(final int value) {
-    this.value = value;
-  }
+    History(final int value) {
+        this.value = value;
+    }
 
-  public int getValue() {
-    return value;
-  }
+    public int getValue() {
+        return value;
+    }
 }

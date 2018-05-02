@@ -105,7 +105,7 @@ public final class ArgumentParser {
 
                 // Remove dash
                 final String keyRaw = item[0].trim();
-                final String key = (keyRaw.startsWith(PARAM_PREFIX)) ? keyRaw.substring(1) : keyRaw;
+                final String key = keyRaw.startsWith(PARAM_PREFIX) ? keyRaw.substring(1) : keyRaw;
                 final String val = item[1].trim();
                 //TODO NativeNode.getLog().debug("Parse argument : " + arg + "\t\t key : " + key + "\t\t value : "+ val );
 

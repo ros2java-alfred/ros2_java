@@ -38,7 +38,7 @@ public class ImplementationAlreadyImportedException extends Exception {
      *
      * @param cause Throwable instance of the cause.
      */
-    public ImplementationAlreadyImportedException(Throwable cause) {
+    public ImplementationAlreadyImportedException(final Throwable cause) {
         super("rmw implementation already imported", cause);
     }
 

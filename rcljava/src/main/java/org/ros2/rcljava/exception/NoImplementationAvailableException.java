@@ -30,7 +30,7 @@ public class NoImplementationAvailableException extends Exception {
      *
      * @param cause Throwable instance of the cause.
      */
-    public NoImplementationAvailableException(Throwable cause) {
+    public NoImplementationAvailableException(final Throwable cause) {
         super("no rmw implementation with a Java extension available", cause);
     }
 }

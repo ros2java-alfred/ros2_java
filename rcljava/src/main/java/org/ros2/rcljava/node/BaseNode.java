@@ -426,8 +426,7 @@ public abstract class BaseNode implements Node {
      */
     @Override
     public List<ParameterDescriptor> describeParameters(final List<String> names) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new NotImplementedException();
     }
 
     /* (non-Javadoc)
@@ -435,17 +434,15 @@ public abstract class BaseNode implements Node {
      */
     @Override
     public List<Class<?>> getParameterTypes(final List<String> names) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new NotImplementedException();
     }
 
     /* (non-Javadoc)
      * @see org.ros2.rcljava.node.Node#listParameters(java.util.List, int)
      */
     @Override
-    public ListParametersResult listParameters(final List<String> names, int depth) {
-        // TODO Auto-generated method stub
-        return null;
+    public ListParametersResult listParameters(final List<String> names, final int depth) {
+        throw new NotImplementedException();
     }
 
     /* (non-Javadoc)
@@ -453,8 +450,7 @@ public abstract class BaseNode implements Node {
     */
     @Override
     public <T extends Message> void registerParamChangeCallback(final SubscriptionCallback<T> callback) {
-        // TODO Auto-generated method stub
-
+        throw new NotImplementedException();
     }
 
     /* (non-Javadoc)
@@ -470,8 +466,7 @@ public abstract class BaseNode implements Node {
     */
     @Override
     public Map<String, List<String>> getServiceNamesAndTypes() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new NotImplementedException();
     }
 
     /* (non-Javadoc)
@@ -538,8 +533,7 @@ public abstract class BaseNode implements Node {
     */
     @Override
     public void notifyGraphChange() {
-        // TODO Auto-generated method stub
-
+        throw new NotImplementedException();
     }
 
     /* (non-Javadoc)
@@ -547,8 +541,7 @@ public abstract class BaseNode implements Node {
     */
     @Override
     public void notifyShutdown() {
-        // TODO Auto-generated method stub
-
+        throw new NotImplementedException();
     }
 
     /* (non-Javadoc)
@@ -556,8 +549,7 @@ public abstract class BaseNode implements Node {
     */
     @Override
     public int countGraphUsers() {
-        // TODO Auto-generated method stub
-        return 0;
+        throw new NotImplementedException();
     }
 
     /* (non-Javadoc)
@@ -653,8 +645,7 @@ public abstract class BaseNode implements Node {
 
     @Override
     public Clock getClock() {
-        // TODO Auto-generated method stub
-        return null;
+        throw new NotImplementedException();
     }
 
 }

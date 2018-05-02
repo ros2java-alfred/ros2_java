@@ -252,7 +252,7 @@ public class NativeExecutor {
         }
 
         if (requestMessage != null && responseMessage != null) {
-            RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
+            final RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
                     nativeService.getServiceHandle(),
                     nativeService.getRequest().getFromJavaConverterHandle(),
                     nativeService.getRequest().getToJavaConverterHandle(),
@@ -270,6 +270,10 @@ public class NativeExecutor {
         }
     }
 
+    /**
+     * Execute Client from Memory.
+     * @param client to execute.
+     */
     @SuppressWarnings("rawtypes")
     private static void executeClient(final Client client) {
 

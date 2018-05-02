@@ -37,7 +37,7 @@ public class NotInitializedException extends RuntimeException {
      *
      * @param msg cause message.
      */
-    public NotInitializedException(String msg) {
+    public NotInitializedException(final String msg) {
         this(msg, null);
     }
 
@@ -47,7 +47,7 @@ public class NotInitializedException extends RuntimeException {
      * @param msg cause message.
      * @param cause Throwable instance of the cause.
      */
-    public NotInitializedException(String msg, Throwable cause) {
+    public NotInitializedException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 }

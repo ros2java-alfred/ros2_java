@@ -77,7 +77,7 @@ public class NativeNode extends BaseNode {
      * @param args
      * @return A pointer to the underlying ROS2 node structure.
      */
-    private static native long nativeCreateNodeHandle(String nodeName, String spaceName, String[] varargs);
+    private static native long nativeCreateNodeHandle(String nodeName, String spaceName, String... varargs);
 
     private static native void nativeDispose(long nodeHandle);
 

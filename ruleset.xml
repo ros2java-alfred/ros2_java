@@ -7,6 +7,7 @@
     <description>rules</description>
 
     <exclude-pattern>**/test/**</exclude-pattern>
+    <exclude-pattern>rcljava/src/test/java/org/ros2/rcljava/**</exclude-pattern>
 
     <!-- imports -->
     <rule ref="rulesets/java/basic.xml"></rule>
