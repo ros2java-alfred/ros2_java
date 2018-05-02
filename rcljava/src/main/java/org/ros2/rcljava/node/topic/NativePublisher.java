@@ -36,10 +36,6 @@ public class NativePublisher<T extends Message> extends BasePublisher<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(NativePublisher.class);
 
-    static {
-        RCLJava.loadLibrary("rcljava_node_topic_NativePublisher");
-    }
-
     /**
      * An integer that represents a pointer to the underlying ROS2 publisher
      * structure (rcl_publisher_t).

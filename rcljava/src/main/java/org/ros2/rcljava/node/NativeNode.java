@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
-import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
 import org.ros2.rcljava.namespace.GraphName;
@@ -55,11 +54,6 @@ import org.slf4j.LoggerFactory;
 public class NativeNode extends BaseNode {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeNode.class);
-
-    // Loading JNI library.
-    static {
-        RCLJava.loadLibrary("rcljava_node_NativeNode");
-    }
 
     /**
      * An integer that represents a pointer to the underlying ROS2 node

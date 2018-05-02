@@ -17,6 +17,7 @@ package org.ros2.rcljava.executor;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ExecutorService;
 
 import org.ros2.rcljava.RCLJava;
@@ -123,9 +124,19 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
 
     @Override
     public void cancel() {
-        if (!this.executorService.isShutdown()) {
-            this.executorService.shutdownNow();
+//        if (!this.executorService.isShutdown()) {
+//            this.executorService.shutdownNow();
+//        }
+
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
         }
+
     }
 
 }

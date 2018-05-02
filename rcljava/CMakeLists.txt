@@ -25,37 +25,32 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
 
+# Default Flags
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
 endif()
 
 include_directories(include)
 
-find_jar(JUNIT_JAR NAMES junit PATHS /usr/share/java VERSIONS 4)
-find_jar(LOG_JAR NAMES commons-logging PATHS /usr/share/java)
-find_jar(STD_MSGS_JARS NAMES std_msgs
-  PATHS "${CMAKE_BINARY_DIR}/../std_msgs/")
-find_jar(GEOMETRY_MSGS_JARS NAMES geometry_msgs
-  PATHS "${CMAKE_BINARY_DIR}/../geometry_msgs/")
-find_jar(SENSOR_MSGS_JARS NAMES sensor_msgs
-  PATHS "${CMAKE_BINARY_DIR}/../sensor_msgs/")
-find_jar(RCLINTERFACE_MSGS_JARS NAMES rcl_interfaces
-  PATHS "${CMAKE_BINARY_DIR}/../rcl_interfaces/")
-find_jar(BUILTIN_MSGS_JARS NAMES builtin_interfaces
-  PATHS "${CMAKE_BINARY_DIR}/../builtin_interfaces/")
-find_jar(BUILTIN_COMMON_JARS NAMES rosidl_generator_java
-  PATHS "${CMAKE_BINARY_DIR}/../rosjava_common/")
+find_jar(JUNIT_JAR              NAMES junit                   PATHS /usr/share/java VERSIONS 4)
+find_jar(LOG_JAR                NAMES commons-logging         PATHS /usr/share/java)
+find_jar(STD_MSGS_JARS          NAMES std_msgs                PATHS "${CMAKE_BINARY_DIR}/../std_msgs/")
+find_jar(GEOMETRY_MSGS_JARS     NAMES geometry_msgs           PATHS "${CMAKE_BINARY_DIR}/../geometry_msgs/")
+find_jar(SENSOR_MSGS_JARS       NAMES sensor_msgs             PATHS "${CMAKE_BINARY_DIR}/../sensor_msgs/")
+find_jar(RCLINTERFACE_MSGS_JARS NAMES rcl_interfaces          PATHS "${CMAKE_BINARY_DIR}/../rcl_interfaces/")
+find_jar(BUILTIN_MSGS_JARS      NAMES builtin_interfaces      PATHS "${CMAKE_BINARY_DIR}/../builtin_interfaces/")
+find_jar(BUILTIN_COMMON_JARS    NAMES rosidl_generator_java   PATHS "${CMAKE_BINARY_DIR}/../rosjava_common/")
 
-set(STD_MSGS_JARS "${CMAKE_BINARY_DIR}/../std_msgs/std_msgs.jar")
-set(GEOMETRY_MSGS_JARS "${CMAKE_BINARY_DIR}/../geometry_msgs/geometry_msgs.jar")
-set(SENSOR_MSGS_JARS "${CMAKE_BINARY_DIR}/../sensor_msgs/sensor_msgs.jar")
-set(BUILTIN_MSGS_JARS "${CMAKE_BINARY_DIR}/../builtin_interfaces/builtin_interfaces.jar")
-set(RCLINTERFACE_MSGS_JARS NAMES "${CMAKE_BINARY_DIR}/../rcl_interfaces/rcl_interfaces.jar")
-set(BUILTIN_COMMON_JARS NAMES "${CMAKE_BINARY_DIR}/../rosjava_common/rosjava_common.jar")
+set(STD_MSGS_JARS                 "${CMAKE_BINARY_DIR}/../std_msgs/std_msgs.jar")
+set(GEOMETRY_MSGS_JARS            "${CMAKE_BINARY_DIR}/../geometry_msgs/geometry_msgs.jar")
+set(SENSOR_MSGS_JARS              "${CMAKE_BINARY_DIR}/../sensor_msgs/sensor_msgs.jar")
+set(BUILTIN_MSGS_JARS             "${CMAKE_BINARY_DIR}/../builtin_interfaces/builtin_interfaces.jar")
+set(RCLINTERFACE_MSGS_JARS  NAMES "${CMAKE_BINARY_DIR}/../rcl_interfaces/rcl_interfaces.jar")
+set(BUILTIN_COMMON_JARS     NAMES "${CMAKE_BINARY_DIR}/../rosjava_common/rosjava_common.jar")
 
 #set(CMAKE_CURRENT_SOURCE_DIR "src/main/java/")
 
-set(${PROJECT_NAME}_sources
+set(${PROJECT_NAME}_sources_java
   "src/main/java/org/ros2/rcljava/RCLJava.java"
   "src/main/java/org/ros2/rcljava/Logger.java"
   "src/main/java/org/ros2/rcljava/ArgumentParser.java"
@@ -148,73 +143,85 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/exception/NotInitializedException.java"
 )
 
+set(${PROJECT_NAME}_sources_cpp
+  "src/main/cpp/org_ros2_rcljava_RCLJava.cpp"
+  "src/main/cpp/org_ros2_rcljava_node_NativeNode.cpp"
+  "src/main/cpp/org_ros2_rcljava_node_topic_NativePublisher.cpp"
+  "src/main/cpp/org_ros2_rcljava_node_topic_NativeSubscription.cpp"
+  "src/main/cpp/org_ros2_rcljava_node_service_NativeClient.cpp"
+  "src/main/cpp/org_ros2_rcljava_node_service_NativeService.cpp"
+  "src/main/cpp/org_ros2_rcljava_time_NativeWallTimer.cpp"
+  "src/main/cpp/utils.cpp"
+)
+
 get_rmw_typesupport(typesupport_impls "rmw_implementation" LANGUAGE "c")
 if(typesupport_impls STREQUAL "")
   message(STATUS "Skipping rcljava because no C typesupport library was found.")
   return()
 endif()
 
-set(_jni_classes "RCLJava;node_NativeNode;node_topic_NativePublisher;node_topic_NativeSubscription;node_service_NativeClient;node_service_NativeService;time_NativeWallTimer")
+###
+# Compile rcljava.so
+###
 
-foreach(_jni_class ${_jni_classes})
-  set(_target_name "${PROJECT_NAME}_${_jni_class}${target_suffix}")
+set(_target_name "${PROJECT_NAME}${target_suffix}")
 
-  add_library(
+add_library(
+  ${_target_name}
+  SHARED
+    "${${PROJECT_NAME}_sources_cpp}"
+)
+
+target_compile_definitions(
+  ${_target_name}
+  PRIVATE
+    "RMW_IMPLEMENTATION_SUFFIX=${target_suffix}"
+)
+
+if(WIN32)
+  set(_build_types ";_DEBUG;_MINSIZEREL;_RELEASE;_RELWITHDEBINFO")
+else()
+  set(_build_types "")
+endif()
+
+foreach(_build_type ${_build_types})
+  set_target_properties(
     ${_target_name}
-    SHARED
-      src/main/cpp/org_ros2_rcljava_${_jni_class}.cpp
-#      src/main/cpp/utils.cpp
+    PROPERTIES
+      LIBRARY_OUTPUT_DIRECTORY${_build_type} "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}"
+      RUNTIME_OUTPUT_DIRECTORY${_build_type} "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}"
   )
+endforeach()
 
-  target_compile_definitions(
-    ${_target_name}
-    PRIVATE
-      "RMW_IMPLEMENTATION_SUFFIX=${target_suffix}"
-  )
+ament_target_dependencies(${_target_name}
+  "rcl${target_suffix}"
+  "rcljava_common"
+  "rcl_interfaces"
+)
 
-  if(WIN32)
-    set(_build_types ";_DEBUG;_MINSIZEREL;_RELEASE;_RELWITHDEBINFO")
-  else()
-    set(_build_types "")
-  endif()
-
-  foreach(_build_type ${_build_types})
-    set_target_properties(
-      ${_target_name}
-      PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY${_build_type} "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}"
-        RUNTIME_OUTPUT_DIRECTORY${_build_type} "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}"
-    )
-  endforeach()
-
-  ament_target_dependencies(${_target_name}
-    "rcl${target_suffix}"
-    "rcljava_common"
-    "rcl_interfaces"
-  )
-
-  target_include_directories(
-    ${_target_name}
-    PUBLIC
-      ${JNI_INCLUDE_DIRS}
-  )
+target_include_directories(
+  ${_target_name}
+  PUBLIC
+    ${JNI_INCLUDE_DIRS}
+)
 
 #  if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
     ament_export_libraries(${_target_name})
 #  endif()
 
-  install(TARGETS ${_target_name}
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-  )
+install(TARGETS ${_target_name}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+)
 
-endforeach()
 
-#endmacro()
+###
+# Compile rcljava.jar
+###
 
 set(CMAKE_JAVA_INCLUDE_PATH "${BUILTIN_COMMON_JARS}:${BUILTIN_MSGS_JARS}:${LOG_JAR}")
 add_jar("${PROJECT_NAME}_jar"
-  "${${PROJECT_NAME}_sources}"
+  "${${PROJECT_NAME}_sources_java}"
   OUTPUT_NAME
   "${PROJECT_NAME}"
   INCLUDE_JARS
@@ -334,7 +341,7 @@ if(BUILD_TESTING)
   endforeach()
 
   create_javadoc("${PROJECT_NAME}_docs"
-    FILES "${${PROJECT_NAME}_sources}"
+    FILES "${${PROJECT_NAME}_sources_java}"
     SOURCEPATH "src/main/java/"
     CLASSPATH
     "${CMAKE_JAVA_INCLUDE_PATH}"

@@ -529,7 +529,7 @@ public final class RCLJava {
         synchronized(RCLJava.class) {
             if (rmwImplementation != null && !rmwImplementation.isEmpty()) {
                 if (!rmwImplementation.equals(RCLJava.rmwImplementation)) {
-                    final String file = "rcljava_RCLJava"+ RCLJava.getRmwImplementationSuffix(rmwImplementation);
+                    final String file = "rcljava"+ RCLJava.getRmwImplementationSuffix(rmwImplementation);
                     RCLJava.logger.debug("Load native RMW file : lib" + file + ".so");
 
                     try {

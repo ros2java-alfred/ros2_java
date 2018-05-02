@@ -36,11 +36,6 @@ public class NativeSubscription<T extends Message> extends BaseSubscription<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeSubscription.class);
 
- // Loading JNI library.
-    static {
-        RCLJava.loadLibrary("rcljava_node_topic_NativeSubscription");
-    }
-
     /**
      * An integer that represents a pointer to the underlying ROS2 subscription structure (rcl_subsription_t).
      */

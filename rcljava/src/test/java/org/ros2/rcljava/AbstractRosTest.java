@@ -42,11 +42,6 @@ public class AbstractRosTest {
     @After
     public void tearDown() {
         this.releaseRCLjava();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     protected void initRCLjava() {

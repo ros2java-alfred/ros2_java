@@ -17,7 +17,6 @@ package org.ros2.rcljava.time;
 
 import java.lang.ref.WeakReference;
 
-import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
 
 import org.slf4j.Logger;
@@ -26,10 +25,6 @@ import org.slf4j.LoggerFactory;
 public class NativeWallTimer extends BaseWallTimer {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeWallTimer.class);
-
-    static {
-        RCLJava.loadLibrary("rcljava_time_NativeWallTimer");
-    }
 
     private final long wallTimerHandle;
 

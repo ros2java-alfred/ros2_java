@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <jni.h>
+#include <rcljava/utils.hpp>
 
 #include <cassert>
 #include <cstdio>
@@ -29,7 +30,7 @@
 #include "rcljava_common/signatures.h"
 
 #include "rcljava/org_ros2_rcljava_time_NativeWallTimer.h"
-#include "rcljava/utils.hpp"
+
 
 JNIEXPORT jlong JNICALL
 Java_org_ros2_rcljava_time_NativeWallTimer_nativeCreateTimerHandle(

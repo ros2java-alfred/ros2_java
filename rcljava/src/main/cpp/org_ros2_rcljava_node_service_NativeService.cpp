@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <jni.h>
+#include <rcljava/utils.hpp>
 
 #include <cassert>
 #include <cstdlib>
@@ -28,7 +29,7 @@
 #include "rcljava_common/signatures.h"
 
 #include "rcljava/org_ros2_rcljava_node_service_NativeService.h"
-#include "rcljava/utils.hpp"
+
 
 /*
  * nativeCreateServiceHandle

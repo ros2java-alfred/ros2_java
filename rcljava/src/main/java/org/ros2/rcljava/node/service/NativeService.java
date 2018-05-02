@@ -33,11 +33,6 @@ public class NativeService<T extends MessageService> extends BaseService<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeService.class);
 
- // Loading JNI library.
-    static {
-        RCLJava.loadLibrary("rcljava_node_service_NativeService");
-    }
-
     /** Service Handler. */
     private final long serviceHandle;
 

@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <jni.h>
+#include <rcljava/utils.hpp>
 
 #include <string>
 #include <cstdlib>
@@ -29,7 +30,7 @@
 #include "rcljava_common/signatures.h"
 
 #include "rcljava/org_ros2_rcljava_node_topic_NativeSubscription.h"
-#include "rcljava/utils.hpp"
+
 
 /*
  * nativeCreateSubscriptionHandle
