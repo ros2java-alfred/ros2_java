@@ -15,7 +15,6 @@
 
 package org.ros2.rcljava.executor;
 
-import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
@@ -28,6 +27,7 @@ import org.ros2.rcljava.node.topic.NativeSubscription;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.time.NativeWallTimer;
 import org.ros2.rcljava.time.WallTimer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,14 +38,27 @@ public class NativeExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeExecutor.class);
 
+    /**
+     * An integer that represents a pointer to the underlying ROS2 waitset
+     * structure (rcl_waitset_t).
+     */
+    private long waitSetHandle;
+
     private final BaseThreadedExecutor executor;
     private final MemoryStrategy memoryStrategy;
 
     public NativeExecutor(final BaseThreadedExecutor executor) {
+        super();
         NativeExecutor.logger.debug("Create Native Executor.");
 
         this.executor = executor;
         this.memoryStrategy = new MemoryStrategy();
+
+//        this.waitSetHandle = NativeExecutor.nativeGetZeroInitializedWaitSet();
+    }
+
+    public void dispose() {
+//        NativeExecutor.nativeWaitSetFini(this.waitSetHandle);
     }
 
     public void getNextTimer(final AnyExecutable anyExecutable) {
@@ -61,19 +74,19 @@ public class NativeExecutor {
 
     /**
      *
+     * @param timeout in ms.
      */
-    @SuppressWarnings({ "resource" })
     private void waitForWork(final long timeout) {
+        this.memoryStrategy.clearHandles();
+        this.memoryStrategy.collectEntities(this.executor.nodes);
 
-        memoryStrategy.clearHandles();
-//        boolean hasInvalidNodes =
-        memoryStrategy.collectEntities(this.executor.nodes);
-
+     // Initialize Counter.
         int subscriptionsSize = 0;
         int timersSize = 0;
         int clientsSize = 0;
         int servicesSize = 0;
 
+        // Count topics.
         for (final Node node : this.executor.nodes) {
             subscriptionsSize   += node.getSubscriptions().size();
             timersSize          += node.getWallTimers().size();
@@ -81,11 +94,12 @@ public class NativeExecutor {
             servicesSize        += node.getServices().size();
         }
 
+        // If any topics exist.
         if (subscriptionsSize > 0 || timersSize > 0 || clientsSize > 0 || servicesSize > 0) {
-            final long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
+            this.waitSetHandle = NativeExecutor.nativeGetZeroInitializedWaitSet();
 
-            RCLJava.nativeWaitSetInit(
-                    waitSetHandle,
+            NativeExecutor.nativeWaitSetInit(
+                    this.waitSetHandle,
                     subscriptionsSize,
                     0,
                     timersSize,
@@ -93,10 +107,10 @@ public class NativeExecutor {
                     servicesSize);
 
             // Clean Waitset components.
-            RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
-            RCLJava.nativeWaitSetClearTimers(waitSetHandle);
-            RCLJava.nativeWaitSetClearServices(waitSetHandle);
-            RCLJava.nativeWaitSetClearClients(waitSetHandle);
+            NativeExecutor.nativeWaitSetClearSubscriptions(this.waitSetHandle);
+            NativeExecutor.nativeWaitSetClearTimers(this.waitSetHandle);
+            NativeExecutor.nativeWaitSetClearServices(this.waitSetHandle);
+            NativeExecutor.nativeWaitSetClearClients(this.waitSetHandle);
 
 
             for (final Node node : this.executor.nodes) {
@@ -104,25 +118,25 @@ public class NativeExecutor {
 
                 // Subscribe waiset components.
                 for (final NativeSubscription<?> subscription : nativeNode.getNativeSubscriptions()) {
-                    RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
+                    NativeExecutor.nativeWaitSetAddSubscription(this.waitSetHandle, subscription.getSubscriptionHandle());
                 }
 
                 for (final NativeWallTimer timer : nativeNode.getNativeWallTimers()) {
-                    RCLJava.nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
+                    NativeExecutor.nativeWaitSetAddTimer(this.waitSetHandle, timer.getHandle());
                 }
 
                 for (final NativeService<?> service : nativeNode.getNativeServices()) {
-                    RCLJava.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
+                    NativeExecutor.nativeWaitSetAddService(this.waitSetHandle, service.getServiceHandle());
                 }
 
                 for (final NativeClient<?> client : nativeNode.getNativeClients()) {
-                    RCLJava.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
+                    NativeExecutor.nativeWaitSetAddClient(this.waitSetHandle, client.getClientHandle());
                 }
             }
 
             // Wait...
-            RCLJava.nativeWait(waitSetHandle);
-            RCLJava.nativeWaitSetFini(waitSetHandle);
+            NativeExecutor.nativeWait(waitSetHandle, timeout);
+            NativeExecutor.nativeWaitSetFini(this.waitSetHandle);
         }
     }
 
@@ -223,7 +237,7 @@ public class NativeExecutor {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static void executeSubscription(final Subscription subscription) {
         final NativeSubscription<? extends Message> nativeSubscription = (NativeSubscription<?> ) subscription;
-        final Message message = RCLJava.nativeTake(nativeSubscription.getSubscriptionHandle(), nativeSubscription.getMessageType());
+        final Message message = NativeExecutor.nativeTake(nativeSubscription.getSubscriptionHandle(), nativeSubscription.getMessageType());
         if (message != null) {
             subscription.getCallback().dispatch(message);
         }
@@ -252,7 +266,7 @@ public class NativeExecutor {
         }
 
         if (requestMessage != null && responseMessage != null) {
-            final RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
+            final RMWRequestId rmwRequestId = (RMWRequestId) NativeExecutor.nativeTakeRequest(
                     nativeService.getServiceHandle(),
                     nativeService.getRequest().getFromJavaConverterHandle(),
                     nativeService.getRequest().getToJavaConverterHandle(),
@@ -260,7 +274,7 @@ public class NativeExecutor {
 
             if (rmwRequestId != null) {
                 service.getCallback().dispatch(rmwRequestId, requestMessage, responseMessage);
-                RCLJava.nativeSendServiceResponse(
+                NativeExecutor.nativeSendServiceResponse(
                         nativeService.getServiceHandle(),
                         rmwRequestId,
                         nativeService.getResponse().getFromJavaConverterHandle(),
@@ -278,4 +292,41 @@ public class NativeExecutor {
     private static void executeClient(final Client client) {
 
     }
+
+    public static native long nativeGetZeroInitializedWaitSet();
+    public static native void nativeWaitSetInit(
+            long waitSetHandle,
+            int numberOfSubscriptions,
+            int numberOfGuardConditions,
+            int numberOfTimers,
+            int numberOfClients,
+            int numberOfServices);
+    public static native void nativeWaitSetClearSubscriptions(long waitSetHandle);
+    public static native void nativeWaitSetAddSubscription(long waitSetHandle, long subscriptionHandle);
+    public static native void nativeWaitSetClearServices(long waitSetHandle);
+    public static native void nativeWaitSetAddService(long waitSetHandle, long serviceHandle);
+    public static native void nativeWaitSetClearTimers(long waitSetHandle);
+    public static native void nativeWaitSetAddTimer(long waitSetHandle, long timerHandle);
+    public static native void nativeWaitSetClearClients(long waitSetHandle);
+    public static native void nativeWaitSetAddClient(long waitSetHandle, long clientHandle);
+    public static native void nativeWait(long waitSetHandle, long timeout);
+    public static native void nativeWaitSetFini(long waitSetHandle);
+
+    public static native Message nativeTake(long SubscriptionHandle, Class<?> msgType);
+    public static native Object nativeTakeRequest(
+            long serviceHandle,
+            long requestFromJavaConverterHandle,
+            long requestToJavaConverterHandle,
+            Object requestMessage);
+    public static native void nativeSendServiceResponse(
+            long serviceHandle,
+            Object header,
+            long responseFromJavaConverterHandle,
+            long responseToJavaConverterHandle,
+            Object responseMessage);
+    public static native Object nativeTakeResponse(
+            long clientHandle,
+            long responseFromJavaConverterHandle,
+            long responseToJavaConverterHandle,
+            Object responseMessage);
 }

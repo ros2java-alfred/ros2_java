@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <jni.h>
+#include <rcljava/org_ros2_rcljava_node_topic_NativeSubscription.hpp>
 #include <rcljava/utils.hpp>
 
 #include <string>
@@ -28,9 +29,6 @@
 
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
-
-#include "rcljava/org_ros2_rcljava_node_topic_NativeSubscription.h"
-
 
 /*
  * nativeCreateSubscriptionHandle
@@ -89,6 +87,7 @@ Java_org_ros2_rcljava_node_topic_NativeSubscription_nativeDispose(
   rcl_subscription_t * subscription = handle2Instance<rcl_subscription_t>(jsubscription_handle);
 
   rcl_ret_t ret = rcl_subscription_fini(subscription, node);
+  free(subscription);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to destroy subscription: " +
       std::string(rcl_get_error_string_safe()));

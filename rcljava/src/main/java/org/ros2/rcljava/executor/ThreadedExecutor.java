@@ -96,4 +96,6 @@ public interface ThreadedExecutor extends Runnable {
 
     void cancel();
 
+    void awaitTermination();
+
 }

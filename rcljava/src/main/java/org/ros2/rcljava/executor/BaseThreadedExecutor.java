@@ -117,26 +117,29 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     public void run() {
         logger.debug("Starting Executor.");
 
-        while (RCLJava.ok()) {
+        while (RCLJava.ok() && !this.executorService.isTerminated()) {
             this.spinOnce(0);
         }
     }
 
     @Override
     public void cancel() {
-//        if (!this.executorService.isShutdown()) {
-//            this.executorService.shutdownNow();
-//        }
-
-        executorService.shutdown();
+        this.executorService.shutdown();
         try {
-            if (!executorService.awaitTermination(800, TimeUnit.MILLISECONDS)) {
-                executorService.shutdownNow();
+            if (!this.executorService.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                this.executorService.shutdownNow();
             }
         } catch (InterruptedException e) {
-            executorService.shutdownNow();
+            this.executorService.shutdownNow();
         }
 
     }
 
+    public void awaitTermination() {
+        try {
+            while (!this.executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES)) { }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

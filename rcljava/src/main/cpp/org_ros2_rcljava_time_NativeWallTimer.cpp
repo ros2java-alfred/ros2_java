@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <jni.h>
+#include <rcljava/org_ros2_rcljava_time_NativeWallTimer.hpp>
 #include <rcljava/utils.hpp>
 
 #include <cassert>
@@ -28,9 +29,6 @@
 
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
-
-#include "rcljava/org_ros2_rcljava_time_NativeWallTimer.h"
-
 
 JNIEXPORT jlong JNICALL
 Java_org_ros2_rcljava_time_NativeWallTimer_nativeCreateTimerHandle(
@@ -126,7 +124,7 @@ Java_org_ros2_rcljava_time_NativeWallTimer_nativeDispose(
   assert(timer != NULL);
 
   rcl_ret_t ret = rcl_timer_fini(timer);
-
+  free(timer);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to destroy timer: " +
       std::string(rcl_get_error_string_safe()));

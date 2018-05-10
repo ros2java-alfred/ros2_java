@@ -3,26 +3,14 @@ cmake_minimum_required(VERSION 3.5)
 project(rosidl_generator_java)
 
 find_package(ament_cmake REQUIRED)
-
 find_package(rcljava_common REQUIRED)
 
-include(CrossCompilingExtra)
+include(JavaExtra)
 
 ament_export_dependencies(ament_cmake)
 ament_export_dependencies(rosidl_cmake)
 
 ament_python_install_package(${PROJECT_NAME})
-
-if(ANDROID)
-  find_host_package(Java COMPONENTS Development REQUIRED)
-else()
-  find_package(Java COMPONENTS Development REQUIRED)
-  find_package(JNI REQUIRED)
-endif()
-include(UseJava)
-include(JavaExtra)
-
-set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
 set(rosidl_generator_java_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 

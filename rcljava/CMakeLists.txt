@@ -145,6 +145,7 @@ set(${PROJECT_NAME}_sources_java
 
 set(${PROJECT_NAME}_sources_cpp
   "src/main/cpp/org_ros2_rcljava_RCLJava.cpp"
+  "src/main/cpp/org_ros2_rcljava_executor_NativeExecutor.cpp"
   "src/main/cpp/org_ros2_rcljava_node_NativeNode.cpp"
   "src/main/cpp/org_ros2_rcljava_node_topic_NativePublisher.cpp"
   "src/main/cpp/org_ros2_rcljava_node_topic_NativeSubscription.cpp"
@@ -152,6 +153,47 @@ set(${PROJECT_NAME}_sources_cpp
   "src/main/cpp/org_ros2_rcljava_node_service_NativeService.cpp"
   "src/main/cpp/org_ros2_rcljava_time_NativeWallTimer.cpp"
   "src/main/cpp/utils.cpp"
+)
+
+set(${PROJECT_NAME}_test_sources
+  "src/test/java/org/ros2/rcljava/AbstractRosTest.java"
+  "src/test/java/org/ros2/rcljava/AbstractMessageTest.java"
+
+  "src/test/java/org/ros2/rcljava/executor/ExecutorTest.java"
+  "src/test/java/org/ros2/rcljava/executor/ExecutorFailTest.java"
+  "src/test/java/org/ros2/rcljava/namespace/GraphNameTest.java"
+  "src/test/java/org/ros2/rcljava/node/NodeTest.java"
+  "src/test/java/org/ros2/rcljava/node/topic/PublisherTest.java"
+  "src/test/java/org/ros2/rcljava/node/topic/SubscriptionTest.java"
+  "src/test/java/org/ros2/rcljava/node/service/ServiceTest.java"
+  "src/test/java/org/ros2/rcljava/time/TimerTest.java"
+
+  "src/test/java/org/ros2/rcljava/MessageStdTest.java"
+  "src/test/java/org/ros2/rcljava/MessageSensorTest.java"
+  "src/test/java/org/ros2/rcljava/MessageGeometryTest.java"
+
+  "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
+  "src/test/java/org/ros2/rcljava/RCLJavaFailTest.java"
+  "src/test/java/org/ros2/rcljava/RmwTest.java"
+)
+
+set(${PROJECT_NAME}_testsuites
+  "org.ros2.rcljava.executor.ExecutorTest"
+  "org.ros2.rcljava.executor.ExecutorFailTest"
+  "org.ros2.rcljava.namespace.GraphNameTest"
+  "org.ros2.rcljava.node.NodeTest"
+  "org.ros2.rcljava.node.topic.PublisherTest"
+  "org.ros2.rcljava.node.topic.SubscriptionTest"
+  "org.ros2.rcljava.node.service.ServiceTest"
+  "org.ros2.rcljava.time.TimerTest"
+
+  "org.ros2.rcljava.MessageStdTest"
+  "org.ros2.rcljava.MessageSensorTest"
+  "org.ros2.rcljava.MessageGeometryTest"
+
+  "org.ros2.rcljava.RCLJavaTest"
+  "org.ros2.rcljava.RCLJavaFailTest"
+  "org.ros2.rcljava.RmwTest"
 )
 
 get_rmw_typesupport(typesupport_impls "rmw_implementation" LANGUAGE "c")
@@ -247,47 +289,6 @@ if(BUILD_TESTING)
   get_property(_${PROJECT_NAME}_jar_file
     TARGET "${PROJECT_NAME}_jar"
     PROPERTY "JAR_FILE")
-
-  set(${PROJECT_NAME}_test_sources
-    "src/test/java/org/ros2/rcljava/AbstractRosTest.java"
-    "src/test/java/org/ros2/rcljava/AbstractMessageTest.java"
-
-    "src/test/java/org/ros2/rcljava/executor/ExecutorTest.java"
-    "src/test/java/org/ros2/rcljava/executor/ExecutorFailTest.java"
-    "src/test/java/org/ros2/rcljava/namespace/GraphNameTest.java"
-    "src/test/java/org/ros2/rcljava/node/NodeTest.java"
-    "src/test/java/org/ros2/rcljava/node/topic/PublisherTest.java"
-    "src/test/java/org/ros2/rcljava/node/topic/SubscriptionTest.java"
-    "src/test/java/org/ros2/rcljava/node/service/ServiceTest.java"
-    "src/test/java/org/ros2/rcljava/time/TimerTest.java"
-
-    "src/test/java/org/ros2/rcljava/MessageStdTest.java"
-    "src/test/java/org/ros2/rcljava/MessageSensorTest.java"
-    "src/test/java/org/ros2/rcljava/MessageGeometryTest.java"
-
-    "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
-    "src/test/java/org/ros2/rcljava/RCLJavaFailTest.java"
-    "src/test/java/org/ros2/rcljava/RmwTest.java"
-  )
-
-  set(${PROJECT_NAME}_testsuites
-    "org.ros2.rcljava.executor.ExecutorTest"
-    "org.ros2.rcljava.executor.ExecutorFailTest"
-    "org.ros2.rcljava.namespace.GraphNameTest"
-    "org.ros2.rcljava.node.NodeTest"
-    "org.ros2.rcljava.node.topic.PublisherTest"
-    "org.ros2.rcljava.node.topic.SubscriptionTest"
-    "org.ros2.rcljava.node.service.ServiceTest"
-    "org.ros2.rcljava.time.TimerTest"
-
-    "org.ros2.rcljava.MessageStdTest"
-    "org.ros2.rcljava.MessageSensorTest"
-    "org.ros2.rcljava.MessageGeometryTest"
-
-    "org.ros2.rcljava.RCLJavaTest"
-    "org.ros2.rcljava.RCLJavaFailTest"
-    "org.ros2.rcljava.RmwTest"
-  )
 
   set(_deps_library_paths "")
   foreach(_dep_lib ${rcljava_test_msgs_LIBRARIES})

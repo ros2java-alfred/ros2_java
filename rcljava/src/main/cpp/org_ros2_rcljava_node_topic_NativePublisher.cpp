@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <jni.h>
+#include <rcljava/org_ros2_rcljava_node_topic_NativePublisher.hpp>
 #include <rcljava/utils.hpp>
 
 #include <string>
@@ -28,9 +29,6 @@
 
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
-
-#include "rcljava/org_ros2_rcljava_node_topic_NativePublisher.h"
-
 
 /*
  * nativeCreatePublisherHandle
@@ -116,6 +114,7 @@ Java_org_ros2_rcljava_node_topic_NativePublisher_nativeDispose(
   rcl_publisher_t * publisher = handle2Instance<rcl_publisher_t>(jpublisher_handle);
 
   rcl_ret_t ret = rcl_publisher_fini(publisher, node);
+  free(publisher);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to destroy publisher: " +
       std::string(rcl_get_error_string_safe()));

@@ -23,6 +23,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
 import org.ros2.rcljava.exception.NotInitializedException;
+import org.ros2.rcljava.executor.NativeExecutor;
+import org.ros2.rcljava.executor.SingleThreadedExecutor;
 import org.ros2.rcljava.internal.NativeUtils;
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.namespace.GraphName;
@@ -105,41 +107,6 @@ public final class RCLJava {
     private static native String nativeGetRMWIdentifier();
 
     // Wait.h
-    public static native long nativeGetZeroInitializedWaitSet();
-    public static native void nativeWaitSetInit(
-            long waitSetHandle,
-            int numberOfSubscriptions,
-            int numberOfGuardConditions,
-            int numberOfTimers,
-            int numberOfClients,
-            int numberOfServices);
-    public static native void nativeWaitSetClearSubscriptions(long waitSetHandle);
-    public static native void nativeWaitSetAddSubscription(long waitSetHandle, long subscriptionHandle);
-    public static native void nativeWaitSetClearServices(long waitSetHandle);
-    public static native void nativeWaitSetAddService(long waitSetHandle, long serviceHandle);
-    public static native void nativeWaitSetClearTimers(long waitSetHandle);
-    public static native void nativeWaitSetAddTimer(long waitSetHandle, long timerHandle);
-    public static native void nativeWaitSetClearClients(long waitSetHandle);
-    public static native void nativeWaitSetAddClient(long waitSetHandle, long clientHandle);
-    public static native void nativeWait(long waitSetHandle);
-    public static native Message nativeTake(long SubscriptionHandle, Class<?> msgType);
-    public static native void nativeWaitSetFini(long waitSetHandle);
-    public static native Object nativeTakeRequest(
-            long serviceHandle,
-            long requestFromJavaConverterHandle,
-            long requestToJavaConverterHandle,
-            Object requestMessage);
-    public static native void nativeSendServiceResponse(
-            long serviceHandle,
-            Object header,
-            long responseFromJavaConverterHandle,
-            long responseToJavaConverterHandle,
-            Object responseMessage);
-    public static native Object nativeTakeResponse(
-            long clientHandle,
-            long responseFromJavaConverterHandle,
-            long responseToJavaConverterHandle,
-            Object responseMessage);
     private static native long nativeConvertQoSProfileToHandle(
             int history, int depth, int reliability, int durability, boolean avoidRos);
     private static native void nativeDisposeQoSProfile(
@@ -289,11 +256,9 @@ public final class RCLJava {
      *     structure.
      */
     public static Node createNode(final String namespace, final String defaultName) {
-
 //        String fullName = GraphName.getFullName(ns, nodeName);
         return new NativeNode(namespace, defaultName, RCLJava.arguments);
     }
-
 
     /**
      * Wait for once loop.
@@ -314,9 +279,9 @@ public final class RCLJava {
             node.getServices().size() > 0 ||
             node.getSubscriptions().size() > 0) {
 
-            final long waitSetHandle = RCLJava.nativeGetZeroInitializedWaitSet();
+            final long waitSetHandle = NativeExecutor.nativeGetZeroInitializedWaitSet();
 
-            RCLJava.nativeWaitSetInit(
+            NativeExecutor.nativeWaitSetInit(
                     waitSetHandle,
                     node.getSubscriptions().size(),
                     0,
@@ -325,31 +290,31 @@ public final class RCLJava {
                     node.getServices().size());
 
             // Clean Waitset components.
-            RCLJava.nativeWaitSetClearSubscriptions(waitSetHandle);
-            RCLJava.nativeWaitSetClearTimers(waitSetHandle);
-            RCLJava.nativeWaitSetClearServices(waitSetHandle);
-            RCLJava.nativeWaitSetClearClients(waitSetHandle);
+            NativeExecutor.nativeWaitSetClearSubscriptions(waitSetHandle);
+            NativeExecutor.nativeWaitSetClearTimers(waitSetHandle);
+            NativeExecutor.nativeWaitSetClearServices(waitSetHandle);
+            NativeExecutor.nativeWaitSetClearClients(waitSetHandle);
 
             // Subscribe waiset components.
             for (final NativeSubscription<?> subscription : nativeNode.getNativeSubscriptions()) {
-                RCLJava.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
+                NativeExecutor.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
             }
 
             for (final NativeWallTimer timer : nativeNode.getNativeWallTimers()) {
-                RCLJava.nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
+                NativeExecutor.nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
             }
 
             for (final NativeService<?> service : nativeNode.getNativeServices()) {
-                RCLJava.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
+                NativeExecutor.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
             }
 
             for (final NativeClient<?> client : nativeNode.getNativeClients()) {
-                RCLJava.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
+                NativeExecutor.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
             }
 
             // Wait...
-            RCLJava.nativeWait(waitSetHandle);
-            RCLJava.nativeWaitSetFini(waitSetHandle);
+            NativeExecutor.nativeWait(waitSetHandle, 1000);
+            NativeExecutor.nativeWaitSetFini(waitSetHandle);
 
             // Take all components.
             for (final NativeSubscription<? extends Message> subscription : nativeNode.getNativeSubscriptions()) {
@@ -357,7 +322,7 @@ public final class RCLJava {
                 final Subscription<Message> safeSubscription = (Subscription<Message>) subscription;
                 final NativeSubscription<Message> nativeSubscription = (NativeSubscription<Message>) subscription;
 
-                final Message message = RCLJava.nativeTake(
+                final Message message = NativeExecutor.nativeTake(
                         nativeSubscription.getSubscriptionHandle(),
                         nativeSubscription.getMessageType());
 
@@ -391,7 +356,7 @@ public final class RCLJava {
                     continue;
                 }
 
-                final RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeRequest(
+                final RMWRequestId rmwRequestId = (RMWRequestId) NativeExecutor.nativeTakeRequest(
                         service.getServiceHandle(),
                         service.getRequest().getFromJavaConverterHandle(),
                         service.getRequest().getToJavaConverterHandle(),
@@ -399,7 +364,7 @@ public final class RCLJava {
 
                 if (rmwRequestId != null) {
                     service.getCallback().dispatch(rmwRequestId, requestMessage, responseMessage);
-                    RCLJava.nativeSendServiceResponse(
+                    NativeExecutor.nativeSendServiceResponse(
                             service.getServiceHandle(),
                             rmwRequestId,
                             service.getResponse().getFromJavaConverterHandle(),
@@ -422,7 +387,7 @@ public final class RCLJava {
                     continue;
                 }
 
-                final RMWRequestId rmwRequestId = (RMWRequestId) RCLJava.nativeTakeResponse(
+                final RMWRequestId rmwRequestId = (RMWRequestId) NativeExecutor.nativeTakeResponse(
                         client.getClientHandle(),
                         client.getResponse().getFromJavaConverterHandle(),
                         client.getResponse().getToJavaConverterHandle(),
@@ -523,6 +488,7 @@ public final class RCLJava {
      * @param rmwImplementation
      * @throws NoImplementationAvailableException
      */
+    @SuppressWarnings("PMD.AvoidUsingNativeCode")
     public static void setRMWImplementation(final String rmwImplementation)
             throws NoImplementationAvailableException, ImplementationAlreadyImportedException {
 
@@ -555,6 +521,7 @@ public final class RCLJava {
      * <i>load from java.library.path .</i>
      * @param name Name of the library.
      */
+    @SuppressWarnings("PMD.AvoidUsingNativeCode")
     public static void loadLibrary(final String name) {
         synchronized(RCLJava.class) {
             RCLJava.logger.debug("Load native file : lib" + name + ".so");

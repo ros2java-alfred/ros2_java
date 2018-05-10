@@ -17,8 +17,8 @@
 
 /* Header for class org_ros2_rcljava_node_NativeNode */
 
-#ifndef RCLJAVA__ORG_ROS2_RCLJAVA_NODE_NATIVENODE_H_
-#define RCLJAVA__ORG_ROS2_RCLJAVA_NODE_NATIVENODE_H_
+#ifndef RCLJAVA__ORG_ROS2_RCLJAVA_NODE_NATIVENODE_HPP_
+#define RCLJAVA__ORG_ROS2_RCLJAVA_NODE_NATIVENODE_HPP_
 
 #include <jni.h>
 
@@ -102,4 +102,4 @@ JNIEXPORT jobject JNICALL
 #ifdef __cplusplus
 }
 #endif
-#endif  // RCLJAVA__ORG_ROS2_RCLJAVA_NODE_NATIVENODE_H_
+#endif  // RCLJAVA__ORG_ROS2_RCLJAVA_NODE_NATIVENODE_HPP_

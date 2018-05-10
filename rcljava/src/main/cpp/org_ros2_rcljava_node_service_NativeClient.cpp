@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <jni.h>
+#include <rcljava/org_ros2_rcljava_node_service_NativeClient.hpp>
 #include <rcljava/utils.hpp>
 
 #include <cassert>
@@ -28,9 +29,6 @@
 
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
-
-#include "rcljava/org_ros2_rcljava_node_service_NativeClient.h"
-
 
 /*
  * nativeCreateClientHandle
@@ -136,6 +134,7 @@ Java_org_ros2_rcljava_node_service_NativeClient_nativeDispose(
   rcl_client_t * client = handle2Instance<rcl_client_t>(jclient_handle);
 
   rcl_ret_t ret = rcl_client_fini(client, node);
+  free(client);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to destroy client: " +
       std::string(rcl_get_error_string_safe()));
