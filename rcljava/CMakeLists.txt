@@ -130,6 +130,7 @@ set(${PROJECT_NAME}_sources_java
 
   "src/main/java/org/ros2/rcljava/executor/AnyExecutable.java"
   "src/main/java/org/ros2/rcljava/executor/BaseThreadedExecutor.java"
+  "src/main/java/org/ros2/rcljava/executor/DefaultThreadedExecutor.java"
   "src/main/java/org/ros2/rcljava/executor/MemoryStrategy.java"
   "src/main/java/org/ros2/rcljava/executor/MultiThreadedExecutor.java"
   "src/main/java/org/ros2/rcljava/executor/NativeExecutor.java"

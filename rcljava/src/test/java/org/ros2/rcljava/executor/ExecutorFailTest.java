@@ -92,7 +92,12 @@ public class ExecutorFailTest extends AbstractRosTest {
             executor.addNode(subscriptionNodeOne);
             executor.addNode(subscriptionNodeTwo);
 
-            executor.spin();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    executor.spin();
+                }
+            }).start();
 
             final UInt32 msg = new UInt32();
             msg.setData(54321);

@@ -19,7 +19,6 @@ package org.ros2.rcljava.exception;
 /**
  * Raised on select_rmw_implemenation() after import_rmw_implementation() has
  * been called.
- *
  */
 public class ImplementationAlreadyImportedException extends Exception {
 

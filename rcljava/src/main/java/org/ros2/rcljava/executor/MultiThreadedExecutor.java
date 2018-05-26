@@ -16,14 +16,13 @@
 package org.ros2.rcljava.executor;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Pool-multiple-threaded executor implementation
- * This is the default executor created by {@link RCLJava::spin}.
+ * This is the default executor created by {@link org.ros2.rcljava.RCLJava#spin(Node)}.
  */
 public final class MultiThreadedExecutor extends BaseThreadedExecutor {
 
@@ -69,14 +68,8 @@ public final class MultiThreadedExecutor extends BaseThreadedExecutor {
             }
         }
 
-        if (!this.executorService.isShutdown()) {
-            this.executorService.shutdown();
-            try {
-                this.executorService.awaitTermination(2, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        this.awaitTermination();
+        this.cancel();
     }
 
     public int getNumberOfThreads() {

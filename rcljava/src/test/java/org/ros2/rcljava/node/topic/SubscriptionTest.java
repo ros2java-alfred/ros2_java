@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import org.ros2.rcljava.AbstractRosTest;
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.RCLJavaTest;
 import org.ros2.rcljava.node.NativeNode;
 
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class SubscriptionTest extends AbstractRosTest {
         final NativeSubscription<String> subscription =
                 (NativeSubscription<String>) node.<String>createSubscription(
                         String.class,
-                        "test_topic",
+                        RCLJavaTest.TEST_TOPIC,
                         new SubscriptionCallback<String>() {
                             public void dispatch(final String msg) {
 

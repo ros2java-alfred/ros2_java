@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import org.ros2.rcljava.AbstractRosTest;
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.RCLJavaTest;
 import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.node.topic.Publisher;
@@ -129,12 +130,12 @@ public class NodeTest extends AbstractRosTest {
 
         final Publisher<std_msgs.msg.String> publisher = node.<std_msgs.msg.String>createPublisher(
                 std_msgs.msg.String.class,
-                "test_topic");
+                RCLJavaTest.TEST_TOPIC);
 
         final RCLFuture<std_msgs.msg.String> future = new RCLFuture<std_msgs.msg.String>(new WeakReference<Node>(node));
 
         final Subscription<std_msgs.msg.String> subscription = node.<std_msgs.msg.String>createSubscription(
-                std_msgs.msg.String.class, "test_topic", new TestConsumer<std_msgs.msg.String>(future));
+                std_msgs.msg.String.class, RCLJavaTest.TEST_TOPIC, new TestConsumer<std_msgs.msg.String>(future));
 
         final std_msgs.msg.String msg = new std_msgs.msg.String();
         msg.setData("Hello");

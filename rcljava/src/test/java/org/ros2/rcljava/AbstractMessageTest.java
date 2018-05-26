@@ -29,7 +29,6 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.node.topic.Subscription;
-import org.ros2.rcljava.node.topic.SubscriptionCallback;
 
 import std_msgs.msg.Header;
 
@@ -72,7 +71,7 @@ public abstract class AbstractMessageTest extends AbstractRosTest {
                 headerInit(header);
             }
         } catch (Exception ignore) {
-
+            // Empty
         }
 
         if (header != null) {
@@ -93,13 +92,13 @@ public abstract class AbstractMessageTest extends AbstractRosTest {
     @SuppressWarnings("unchecked")
     protected <T extends Message> T pubSubTest(final T msg) throws InterruptedException, ExecutionException {
         final Class<T> msgClass = (Class<T>) msg.getClass();
-        final Publisher<T> publisher = this.node.createPublisher(msgClass, "test_topic");
+        final Publisher<T> publisher = this.node.createPublisher(msgClass, RCLJavaTest.TEST_TOPIC);
 
         final Header header = this.headerInit(msg);
 
         final RCLFuture<T> future = new RCLFuture<T>(new WeakReference<Node>(this.node));
         final Subscription<T> subscription = this.node.createSubscription(
-                msgClass, "test_topic", new TestConsumer<T>(future));
+                msgClass, RCLJavaTest.TEST_TOPIC, new TestConsumer<T>(future));
 
         while (RCLJava.ok() && !future.isDone()) {
             publisher.publish(msg);
@@ -118,19 +117,5 @@ public abstract class AbstractMessageTest extends AbstractRosTest {
         }
 
         return value;
-    }
-
-    public class TestConsumer<T extends Message> implements SubscriptionCallback<T> {
-        private final RCLFuture<T> future;
-
-        TestConsumer(final RCLFuture<T> future) {
-            this.future = future;
-        }
-
-        public final void dispatch(final T msg) {
-            if (!this.future.isDone()) {
-                this.future.set(msg);
-            }
-        }
     }
 }

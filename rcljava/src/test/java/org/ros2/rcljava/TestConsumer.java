@@ -1,5 +1,4 @@
-/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
- * Copyright 2016-2018 Mickael Gaillard <mick.gaillard@gmail.com>
+/* Copyright 2017-2018 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +13,22 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava.node.topic;
+package org.ros2.rcljava;
 
 import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.node.service.RCLFuture;
+import org.ros2.rcljava.node.topic.SubscriptionCallback;
 
-/**
- * Callback when receive message.
- *
- * @param <T> - the type of the input to the operation
- */
-public interface SubscriptionCallback<T extends Message> {
+public class TestConsumer<T extends Message> implements SubscriptionCallback<T> {
+    private final RCLFuture<T> future;
 
-    /**
-      * Performs this operation on the given argument.
-      *
-      * @param message - the input argument
-      */
-    void dispatch(T message);
+    TestConsumer(final RCLFuture<T> future) {
+        this.future = future;
+    }
+
+    public final void dispatch(final T msg) {
+        if (!this.future.isDone()) {
+            this.future.set(msg);
+        }
+    }
 }

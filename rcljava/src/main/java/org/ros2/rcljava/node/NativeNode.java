@@ -102,10 +102,9 @@ public class NativeNode extends BaseNode {
     /**
      * Constructor.
      *
-     * @param nodeHandle A pointer to the underlying ROS2 node structure. Must not
-     *     be zero.
      * @param namespace prefix path of node.
      * @param defaultName name of node.
+     * @param args options
      */
     public NativeNode(final String namespace, final String defaultName, final String... args) {
         super(namespace, defaultName, args);
@@ -165,9 +164,9 @@ public class NativeNode extends BaseNode {
      * Create and return a Publisher.
      *
      * @param <T> Message definition.
-     * @param message Message class.
+     * @param messageType Message class.
      * @param topicName The topic for this publisher to publish on.
-     * @param qos The quality of service profile to pass on to the rmw implementation.
+     * @param qosProfile The quality of service profile to pass on to the rmw implementation.
      * @return Publisher instance of the created publisher.
      */
     @Override
@@ -190,11 +189,11 @@ public class NativeNode extends BaseNode {
      * Create and return a Subscription.
      *
      * @param <T> Message definition.
-     * @param message Message Class
+     * @param messageType Message Class
      * @param topicName The topic to subscribe on.
      * @param callback The user-defined callback function.
-     * @param qos The quality of service profile to pass on to the rmw implementation.
-     * @param ignoreLocalPublications True to ignore local publications.
+     * @param qosProfile The quality of service profile to pass on to the rmw implementation.
+     * @param ignoreLocalPublication True to ignore local publications.
      * @return Subscription instance of the created subscription.
      */
     @Override
@@ -247,7 +246,7 @@ public class NativeNode extends BaseNode {
      * @param <T> Message definition.
      * @param serviceType Service Class
      * @param serviceName The service to subscribe on.
-     * @param qos The quality of service profile to pass on to the rmw implementation.
+     * @param qosProfile The quality of service profile to pass on to the rmw implementation.
      * @return Client instance of the service.
      * @throws SecurityException
      * @throws NoSuchFieldException
@@ -287,7 +286,7 @@ public class NativeNode extends BaseNode {
      * @param serviceType Service Class
      * @param serviceName The service for this publisher to publish on.
      * @param callback The user-defined callback function.
-     * @param qos The quality of service profile to pass on to the rmw implementation.
+     * @param qosProfile The quality of service profile to pass on to the rmw implementation.
      * @return Service instance of the service.
      * @throws SecurityException
      * @throws NoSuchFieldException

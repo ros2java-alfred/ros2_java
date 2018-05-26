@@ -57,9 +57,9 @@ public class NativeClient<T extends MessageService> extends BaseClient<T> {
             Object requestMessage);
 
     /**
+     * Constructor.
      *
      * @param nodeReference
-     * @param clientHandle
      * @param serviceType
      * @param serviceName
      * @param request

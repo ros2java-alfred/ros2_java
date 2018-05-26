@@ -23,6 +23,9 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.topic.Topics;
 
+/**
+ * Graph-name API.
+ */
 public final class GraphName {
 
     private static final String EMPTY = "";
@@ -38,20 +41,31 @@ public final class GraphName {
      */
     private static Queue<Node> nodes = new LinkedBlockingQueue<Node>();
 
-    private GraphName() {}
+    private GraphName() { super(); }
 
+    /**
+     * Add Node to Graph API.
+     * @param node to add to Graph.
+     */
     public static void addNode(final Node node) {
 //        if (initialized) {
         GraphName.nodes.add(node);
 //        }
     }
 
+    /**
+     * Remove Node to Graph API.
+     * @param node to remove to Graph.
+     */
     public static void removeNode(final Node node) {
 //        if (initialized) {
         GraphName.nodes.remove(node);
 //        }
     }
 
+    /**
+     * Release Graph API.
+     */
     public static void dispose() {
         for (final Node node : GraphName.nodes) {
             node.dispose();
@@ -70,6 +84,13 @@ public final class GraphName {
         return topicName;
     }
 
+    /**
+     * Make a valid full-name for ROS.
+     *
+     * @param nameSpace
+     * @param nodeName
+     * @return Generate Full name.
+     */
     public static String getFullName(final String nameSpace, final String nodeName) {
         String result = nodeName;
         String ns = nameSpace;
@@ -105,7 +126,7 @@ public final class GraphName {
      * @param node
      * @param name
      * @param options
-     * @return
+     * @return Full path of node.
      */
     public static String getFullName(final Node node, final String name, final List<String> options) {
         String result = name;
@@ -151,8 +172,8 @@ public final class GraphName {
      * Check if name is valid.
      *
      * For testing : https://regex101.com/r/b3R65h/1
-     * @param topicName
-     * @return
+     * @param name Topic name.
+     * @return true if valid topic.
      */
     public static boolean isValidTopic(final String name) {
         // Delete sample Regex : https://regex101.com/delete/7qMZiThwlEla6eAKIIee3251
@@ -180,8 +201,8 @@ public final class GraphName {
     /**
      * Check if substitution is valid.
      *
-     * @param substitution
-     * @return
+     * @param substitution Substitution string.
+     * @return true if substitution is valid.
      */
     public static boolean isValidSubstitution(final String substitution) {
         return substitution != null &&
@@ -194,9 +215,9 @@ public final class GraphName {
      * Chack if Full Qualify Name is valid.
      *
      * @param fqn
-     * @return
+     * @return true if Full Qualified Domain Name is valid.
      */
-    public static boolean isValideFQDN(final String fqn) {
+    public static boolean isValidFQDN(final String fqn) {
         boolean result = fqn != null;
 
         if (result) {

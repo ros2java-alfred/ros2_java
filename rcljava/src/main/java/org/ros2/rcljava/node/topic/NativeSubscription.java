@@ -58,10 +58,7 @@ public class NativeSubscription<T extends Message> extends BaseSubscription<T> {
     /**
      * Constructor.
      *
-     * @param nodeHandle A pointer to the underlying ROS2 node structure that
-     *     created this subscription, as an integer. Must not be zero.
-     * @param subscriptionHandle A pointer to the underlying ROS2 subscription
-     *     structure, as an integer. Must not be zero.
+     * @param node Node structure that created this subscription.
      * @param messageType The <code>Class</code> of the messages that this
      *     subscription will receive. We need this because of Java's type erasure,
      *     which doesn't allow us to use the generic parameter of
@@ -69,6 +66,7 @@ public class NativeSubscription<T extends Message> extends BaseSubscription<T> {
      * @param topicName The topic to which this subscription will be subscribed.
      * @param callback The callback function that will be triggered when a new
      *     message is received.
+     * @param qosProfile Quality of Service profile.
      */
     public NativeSubscription(
             final NativeNode node,

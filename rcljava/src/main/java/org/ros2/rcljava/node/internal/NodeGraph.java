@@ -86,7 +86,7 @@ public interface NodeGraph {
      *
      * This is typically only used by the rclcpp::graph_listener::GraphListener.
      *
-     * @return Return a graph event, which will be set anytime a graph change occurs.
+     * return Return a graph event, which will be set anytime a graph change occurs.
      * @throws RCLBaseError (a child of that exception) when an rcl error occurs
      */
     void notifyGraphChange();

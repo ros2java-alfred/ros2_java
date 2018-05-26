@@ -27,7 +27,8 @@ public interface ParameterCallback {
 
     /**
      *
-     * @param event
+     * @param config
+     * @return
      */
     SetParametersResult onParamChange(final List<ParameterVariant<?>>  config);
 }

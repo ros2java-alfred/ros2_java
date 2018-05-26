@@ -140,18 +140,18 @@ public class GraphNameTest extends AbstractRosTest {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         // must start with a forward slash (/), i.e. they must be absolute
-        Assert.assertTrue("FQN must start with a forward slash.", GraphName.isValideFQDN("/foo"));
-        Assert.assertFalse("FQN must start with a forward slash.", GraphName.isValideFQDN("foo"));
+        Assert.assertTrue("FQN must start with a forward slash.", GraphName.isValidFQDN("/foo"));
+        Assert.assertFalse("FQN must start with a forward slash.", GraphName.isValidFQDN("foo"));
 
         // must not contain tilde (~) or curly braces ({})
-        Assert.assertFalse("FQN must not contain tilde.", GraphName.isValideFQDN("~foo"));
-        Assert.assertFalse("FQN must not contain curly braces.", GraphName.isValideFQDN("foo/{bar}"));
+        Assert.assertFalse("FQN must not contain tilde.", GraphName.isValidFQDN("~foo"));
+        Assert.assertFalse("FQN must not contain curly braces.", GraphName.isValidFQDN("foo/{bar}"));
 
-        Assert.assertTrue(GraphName.isValideFQDN("/foo"));
-        Assert.assertTrue(GraphName.isValideFQDN("/bar/baz"));
-        Assert.assertTrue(GraphName.isValideFQDN(Topics.SCHEME + "/ping"));
-        Assert.assertTrue(GraphName.isValideFQDN("/_private/thing"));
-        Assert.assertTrue(GraphName.isValideFQDN("/public_namespace/_private/thing"));
+        Assert.assertTrue(GraphName.isValidFQDN("/foo"));
+        Assert.assertTrue(GraphName.isValidFQDN("/bar/baz"));
+        Assert.assertTrue(GraphName.isValidFQDN(Topics.SCHEME + "/ping"));
+        Assert.assertTrue(GraphName.isValidFQDN("/_private/thing"));
+        Assert.assertTrue(GraphName.isValidFQDN("/public_namespace/_private/thing"));
     }
 
     @Test

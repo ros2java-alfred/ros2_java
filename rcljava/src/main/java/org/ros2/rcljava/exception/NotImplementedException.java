@@ -18,7 +18,6 @@ package org.ros2.rcljava.exception;
 
 /**
  * Raised when there is no implementation.
- *
  */
 public class NotImplementedException extends RuntimeException {
 

@@ -49,7 +49,7 @@ public class RCLFuture<V> implements Future<V> {
         if(this.value == null) {
             while (RCLJava.ok() && !this.isDone()) {
                 if (this.executor != null) {
-                    this.executor.spinOnce(0);
+                    this.executor.spinOnce(-1);
                 } else {
                     final Node node = nodeReference.get();
                     if (node == null) {

@@ -16,21 +16,33 @@
 
 package org.ros2.rcljava;
 
+import java.lang.ref.WeakReference;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.ros2.rcljava.exception.NotInitializedException;
-import org.ros2.rcljava.node.NativeNode;
+import org.ros2.rcljava.executor.DefaultThreadedExecutor;
 import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.service.RCLFuture;
+import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.node.topic.Subscription;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import std_msgs.msg.Bool;
+
 //@FixMethodOrder(MethodSorters.JVM)
 public class RCLJavaTest extends AbstractRosTest {
     private static final Logger logger = LoggerFactory.getLogger(RCLJavaTest.class);
+
+    public static final String TEST_TOPIC = "_test_topic";
+
+    public static final String ERROR_RUNTIME = "Expected Runtime error.";
 
     @Before
     public void setUp() {
@@ -43,7 +55,7 @@ public class RCLJavaTest extends AbstractRosTest {
     }
 
     @Test
-    public void testInit() {
+    public final void testInit() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         boolean test = true;
@@ -62,7 +74,7 @@ public class RCLJavaTest extends AbstractRosTest {
     }
 
     @Test
-    public void testInitShutdown() {
+    public final void testInitShutdown() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         boolean test = true;
@@ -78,7 +90,7 @@ public class RCLJavaTest extends AbstractRosTest {
     }
 
     @Test
-    public void testInitShutdownSequence() {
+    public final void testInitShutdownSequence() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         boolean test = true;
@@ -97,7 +109,7 @@ public class RCLJavaTest extends AbstractRosTest {
     }
 
     @Test
-    public void testShutdownDouble() {
+    public final void testShutdownDouble() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         boolean test = false;
@@ -115,7 +127,7 @@ public class RCLJavaTest extends AbstractRosTest {
     }
 
     @Test
-    public void testCreateNode() {
+    public final void testCreateNode() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         boolean test = true;
@@ -123,7 +135,7 @@ public class RCLJavaTest extends AbstractRosTest {
 
         this.initRCLjava();
         try {
-            node = (NativeNode)RCLJava.createNode("testNode");
+            node = RCLJava.createNode("testNode");
             node.getName();
             node.close();
         } catch (Exception e) {
@@ -132,11 +144,11 @@ public class RCLJavaTest extends AbstractRosTest {
             this.releaseRCLjava();
         }
 
-        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertTrue(ERROR_RUNTIME, test);
     }
 
     @Test
-    public void testOk() {
+    public final void testOk() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
 
         boolean test = true;
@@ -149,7 +161,7 @@ public class RCLJavaTest extends AbstractRosTest {
         } catch (Exception e) {
             test = false;
         }
-        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertTrue(ERROR_RUNTIME, test);
 
         try {
             this.releaseRCLjava();
@@ -162,7 +174,98 @@ public class RCLJavaTest extends AbstractRosTest {
         } catch (Exception e) {
             test = false;
         }
-        Assert.assertTrue("Expected Runtime error.", test);
+        Assert.assertTrue(ERROR_RUNTIME, test);
     }
 
+    @Test
+    public final void testSpin() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
+        boolean test = true;
+
+        try {
+            this.initRCLjava();
+            final Node node = RCLJava.createNode("_" + RCLJavaTest.class.getSimpleName());
+            final Publisher<Bool> publisher = node.createPublisher(Bool.class, RCLJavaTest.TEST_TOPIC);
+
+            final Bool msg = new Bool();
+            msg.setData(true);
+
+            final RCLFuture<Bool> future = new RCLFuture<Bool>(new WeakReference<Node>(node));
+            final Subscription<Bool> subscription = node.createSubscription(
+                    Bool.class, RCLJavaTest.TEST_TOPIC, new TestConsumer<Bool>(future));
+
+            final Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    RCLJava.spin(node);
+                }
+            });
+            thread.start();
+
+            while (RCLJava.ok() && !future.isDone()) {
+                publisher.publish(msg);
+            }
+
+            final Bool value = future.get();
+            Assert.assertNotNull(value);
+
+            publisher.dispose();
+            subscription.dispose();
+
+            DefaultThreadedExecutor.getInstance().removeNode(node);
+
+            node.dispose();
+            this.releaseRCLjava();
+        } catch (Exception e) {
+            test = false;
+        }
+
+        Assert.assertTrue(ERROR_RUNTIME, test);
+    }
+
+    @Test
+    @Ignore
+    public final void testSpinOnce() {
+        logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
+
+        boolean test = true;
+
+        try {
+            this.initRCLjava();
+            final Node node = RCLJava.createNode("_" + RCLJavaTest.class.getSimpleName());
+            final Publisher<Bool> publisher = node.createPublisher(Bool.class, RCLJavaTest.TEST_TOPIC);
+
+            final Bool msg = new Bool();
+            msg.setData(true);
+
+            final RCLFuture<Bool> future = new RCLFuture<Bool>(new WeakReference<Node>(node));
+            final Subscription<Bool> subscription = node.createSubscription(
+                    Bool.class, RCLJavaTest.TEST_TOPIC, new TestConsumer<Bool>(future));
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    RCLJava.spinOnce(node);
+                }
+            }).start();
+
+            while (RCLJava.ok() && !future.isDone()) {
+                publisher.publish(msg);
+            }
+
+            final Bool value = future.get();
+            Assert.assertNotNull(value);
+
+            publisher.dispose();
+            subscription.dispose();
+
+            node.dispose();
+            this.releaseRCLjava();
+        } catch (Exception e) {
+            test = false;
+        }
+
+        Assert.assertTrue(ERROR_RUNTIME, test);
+    }
 }

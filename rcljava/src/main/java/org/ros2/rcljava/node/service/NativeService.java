@@ -45,14 +45,15 @@ public class NativeService<T extends MessageService> extends BaseService<T> {
     private static native void nativeDispose(long nodeHandle, long serviceHandle);
 
     /**
+     * Constructor.
      *
-     * @param node
-     * @param serviceHandle
+     * @param nodeReference
      * @param serviceType
      * @param serviceName
      * @param callback
      * @param request
      * @param response
+     * @param qosProfile
      */
     public NativeService(
             final NativeNode nodeReference,

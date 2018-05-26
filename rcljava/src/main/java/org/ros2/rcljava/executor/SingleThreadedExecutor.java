@@ -22,16 +22,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Single-threaded executor implementation
- * This is the default executor created by {@link RCLJava::spin}.
+ * This is the default executor created by {@link org.ros2.rcljava.RCLJava#spin(Node)}.
  */
 public final class SingleThreadedExecutor extends BaseThreadedExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(SingleThreadedExecutor.class);
-
-    private static volatile SingleThreadedExecutor instance = new SingleThreadedExecutor();
-    public static ThreadedExecutor getInstance() {
-        return instance;
-    }
 
     /**
      * Default constructor. See the default constructor for Executor.
@@ -55,9 +50,8 @@ public final class SingleThreadedExecutor extends BaseThreadedExecutor {
             this.executorService.submit(this);
         }
 
-        if (!this.executorService.isShutdown()) {
-            this.executorService.shutdown();
-        }
+        this.awaitTermination();
+        this.cancel();
     }
 
 }

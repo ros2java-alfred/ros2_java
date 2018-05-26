@@ -31,40 +31,49 @@ import rcl_interfaces.msg.SetParametersResult;
 public interface NodeParameters {
 
     /**
+     * Define list of parameters.
      *
-     * @param parameters
-     * @return
+     * @param parameters to set.
+     * @return Result of parameters list set.
      */
     List<SetParametersResult> setParameters(final List<ParameterVariant<?>> parameters);
 
     /**
+     * Define list of parameters.
      *
-     * @param parameters
-     * @return
+     * @param parameters to set.
+     * @return Result of parameters list set.
      */
     SetParametersResult setParametersAtomically(final List<ParameterVariant<?>> parameters);
 
     /**
+     * Define parameter if not set.
      *
-     * @param name
-     * @param value
+     * @param name of parameter.
+     * @param value of the parameter.
      */
     <T> void setParameterIfNotSet(final String name, final T value);
 
     /**
+     * Get parameters with names list.
      *
-     * @param names
-     * @return
+     * @param names to find.
+     * @return List of Parameters.
      */
     List<ParameterVariant<?>> getParameters(final List<String> names);
 
+    /**
+     * Get parameters names.
+     *
+     * @return List of names of parameters.
+     */
     List<String> getParametersNames();
 
     /**
+     * Get parameter by name.
      *
-     * @param name
-     *            The name of the parameter to get.
-     * @return
+     * @param name The name of the parameter to get.
+     * @return Parameter instance.
      */
     ParameterVariant<?> getParameter(final String name);
 
@@ -73,10 +82,8 @@ public interface NodeParameters {
      * parameter was not set, then the "parameter" argument is never assigned a
      * value.
      *
-     * @param name
-     *            The name of the parameter to get.
-     * @param parameter
-     *            The output where the value of the parameter should be assigned.
+     * @param name The name of the parameter to get.
+     * @param parameter The output where the value of the parameter should be assigned.
      * @return true if the parameter was set, false otherwise
      */
     boolean getParameter(final String name, ParameterVariant<?> parameter);
@@ -87,36 +94,40 @@ public interface NodeParameters {
      * assigned the "alternative_value". In all cases, the parameter remains not set
      * after this function is called.
      *
-     * @param name
-     *            The name of the parameter to get.
-     * @param value
-     *            The output where the value of the parameter should be assigned.
-     * @param alternativeParameter
-     *            Value to be stored in output if the parameter was not set.
+     * @param name The name of the parameter to get.
+     * @param value The output where the value of the parameter should be assigned.
+     * @param alternativeParameter Value to be stored in output if the parameter was not set.
      * @return true if the parameter was set, false otherwise
      */
     boolean getParameterOr(final String name, ParameterVariant<?> value, ParameterVariant<?> alternativeParameter);
 
     /**
+     * Get description of parameters filtered by name.
      *
      * @param names
-     * @return
+     * @return List of Parameter Descriptor.
      */
     List<ParameterDescriptor> describeParameters(final List<String> names);
 
     /**
      *
      * @param names
-     * @return
+     * @return Types list of parameter.
      */
     List<Class<?>> getParameterTypes(final List<String> names);
+
+    /**
+     *
+     * @param names
+     * @return
+     */
     List<Byte>     getParametersTypes(final List<String> names);
 
     /**
      *
      * @param names
      * @param depth
-     * @return
+     * @return ParameterResult
      */
     ListParametersResult listParameters(final List<String> names, final int depth);
 
@@ -124,7 +135,7 @@ public interface NodeParameters {
      * Register the callback for parameter changes. Repeated invocations of this
      * function will overwrite previous callbacks
      *
-     * @param User
+     * @param callback
      *            defined callback function, It is expected to atomically set
      *            parameters.
      */

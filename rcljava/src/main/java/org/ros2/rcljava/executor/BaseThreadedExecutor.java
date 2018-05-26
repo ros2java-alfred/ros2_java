@@ -25,13 +25,17 @@ import org.ros2.rcljava.node.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Base-threaded executor implementation.
+ */
 public abstract class BaseThreadedExecutor implements ThreadedExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseThreadedExecutor.class);
 
     protected final Object mutex = new Object();
+
     protected final NativeExecutor baseExecutor;
-    protected volatile ExecutorService executorService;
+    protected ExecutorService executorService;
 
     protected final BlockingQueue<Node> nodes = new LinkedBlockingQueue<Node>();
 
@@ -76,7 +80,7 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     @Override
     public void spinSome() {
         AnyExecutable anyExecutable = this.baseExecutor.getNextExecutable();
-        while (RCLJava.ok() && anyExecutable != null) {
+        while (!Thread.currentThread().isInterrupted() && RCLJava.ok() && anyExecutable != null) {
             BaseThreadedExecutor.executeAnyExecutable(anyExecutable);
             anyExecutable = this.baseExecutor.getNextExecutable(0);
         }
@@ -86,7 +90,7 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     public void spinOnce(final long timeout) {
         final AnyExecutable anyExecutable = this.baseExecutor.getNextExecutable(timeout);
 
-        if (anyExecutable != null) {
+        if (RCLJava.ok() && anyExecutable != null) {
             BaseThreadedExecutor.executeAnyExecutable(anyExecutable);
         }
     }
@@ -117,27 +121,30 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     public void run() {
         logger.debug("Starting Executor.");
 
-        while (RCLJava.ok() && !this.executorService.isTerminated()) {
-            this.spinOnce(0);
+        synchronized (mutex) {
+            while (!this.executorService.isShutdown()) {
+                this.spinOnce(-1);
+            }
         }
     }
 
     @Override
     public void cancel() {
-        this.executorService.shutdown();
-        try {
-            if (!this.executorService.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+        if (!this.executorService.isShutdown()) {
+            this.executorService.shutdown();
+            try {
+                if (!this.executorService.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
+                    this.executorService.shutdownNow();
+                }
+            } catch (InterruptedException e) {
                 this.executorService.shutdownNow();
             }
-        } catch (InterruptedException e) {
-            this.executorService.shutdownNow();
         }
-
     }
 
     public void awaitTermination() {
         try {
-            while (!this.executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES)) { }
+            while (!this.executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES)) { /* Empty */ }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

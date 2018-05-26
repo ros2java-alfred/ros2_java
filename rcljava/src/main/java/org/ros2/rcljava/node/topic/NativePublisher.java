@@ -70,8 +70,6 @@ public class NativePublisher<T extends Message> extends BasePublisher<T> {
      * Constructor.
      *
      * @param node Node instance associated.
-     * @param publisherHandle A pointer to the underlying ROS2 publisher
-     *     structure, as an integer. Must not be zero.
      * @param messageType
      * @param topicName The topic to which this publisher will publish messages.
      * @param qosProfile Quality of Service profile.

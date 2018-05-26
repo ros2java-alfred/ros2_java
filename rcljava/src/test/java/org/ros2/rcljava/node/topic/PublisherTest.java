@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import org.ros2.rcljava.AbstractRosTest;
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.RCLJavaTest;
 import org.ros2.rcljava.node.NativeNode;
 
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public class PublisherTest extends AbstractRosTest {
 
         final NativeNode node = (NativeNode) RCLJava.createNode("test_node");
         final NativePublisher<String> publisher = (NativePublisher<String>) node.<String>createPublisher(String.class,
-                "test_topic");
+                RCLJavaTest.TEST_TOPIC);
 
         Assert.assertEquals(node, publisher.getNode());
         Assert.assertNotNull(publisher.getNode());

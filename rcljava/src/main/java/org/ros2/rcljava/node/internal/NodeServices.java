@@ -29,7 +29,7 @@ public interface NodeServices {
     /**
      * Create and return a Client.
      *
-     * @param <T> Message definition.
+     * @param <T> Service definition.
      * @param serviceType Message Class
      * @param serviceName The service to subscribe on.
      * @param qos The quality of service profile to pass on to the rmw implementation.
@@ -43,7 +43,7 @@ public interface NodeServices {
     /**
      * Create and return a Client. (Retro-compatibility)
      *
-     * @param <T> Message definition.
+     * @param <T> Service definition.
      * @param serviceType Message Class
      * @param serviceName The service to subscribe on.
      * @return Client instance of the service.
@@ -61,8 +61,8 @@ public interface NodeServices {
     /**
      * Create and return a Service.
      *
-     * @param <T> Message definition.
-     * @param message Message Class
+     * @param <T> Service definition.
+     * @param serviceType Service Class
      * @param serviceName The service for this publisher to publish on.
      * @param callback The user-defined callback function.
      * @param qos The quality of service profile to pass on to the rmw implementation.
@@ -77,8 +77,8 @@ public interface NodeServices {
     /**
      * Create and return a Service. (Retro-compatibility)
      *
-     * @param <T> Message definition.
-     * @param message Message Class
+     * @param <T> Service definition.
+     * @param serviceType Service Class
      * @param serviceName The service for this publisher to publish on.
      * @param callback The user-defined callback function.
      * @return Service instance of the service.

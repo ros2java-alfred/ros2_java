@@ -18,7 +18,6 @@ package org.ros2.rcljava.exception;
 
 /**
  * Raised when an invalid RCLJAVAImplementation is requested.
- *
  */
 public class InvalidRCLJAVAImplementation extends RuntimeException {
 

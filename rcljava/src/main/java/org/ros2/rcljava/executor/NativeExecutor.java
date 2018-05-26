@@ -38,12 +38,6 @@ public class NativeExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(NativeExecutor.class);
 
-    /**
-     * An integer that represents a pointer to the underlying ROS2 waitset
-     * structure (rcl_waitset_t).
-     */
-    private long waitSetHandle;
-
     private final BaseThreadedExecutor executor;
     private final MemoryStrategy memoryStrategy;
 
@@ -53,12 +47,6 @@ public class NativeExecutor {
 
         this.executor = executor;
         this.memoryStrategy = new MemoryStrategy();
-
-//        this.waitSetHandle = NativeExecutor.nativeGetZeroInitializedWaitSet();
-    }
-
-    public void dispose() {
-//        NativeExecutor.nativeWaitSetFini(this.waitSetHandle);
     }
 
     public void getNextTimer(final AnyExecutable anyExecutable) {
@@ -96,10 +84,10 @@ public class NativeExecutor {
 
         // If any topics exist.
         if (subscriptionsSize > 0 || timersSize > 0 || clientsSize > 0 || servicesSize > 0) {
-            this.waitSetHandle = NativeExecutor.nativeGetZeroInitializedWaitSet();
+            final long waitSetHandle = NativeExecutor.nativeGetZeroInitializedWaitSet();
 
             NativeExecutor.nativeWaitSetInit(
-                    this.waitSetHandle,
+                    waitSetHandle,
                     subscriptionsSize,
                     0,
                     timersSize,
@@ -107,10 +95,10 @@ public class NativeExecutor {
                     servicesSize);
 
             // Clean Waitset components.
-            NativeExecutor.nativeWaitSetClearSubscriptions(this.waitSetHandle);
-            NativeExecutor.nativeWaitSetClearTimers(this.waitSetHandle);
-            NativeExecutor.nativeWaitSetClearServices(this.waitSetHandle);
-            NativeExecutor.nativeWaitSetClearClients(this.waitSetHandle);
+            NativeExecutor.nativeWaitSetClearSubscriptions(waitSetHandle);
+            NativeExecutor.nativeWaitSetClearTimers(waitSetHandle);
+            NativeExecutor.nativeWaitSetClearServices(waitSetHandle);
+            NativeExecutor.nativeWaitSetClearClients(waitSetHandle);
 
 
             for (final Node node : this.executor.nodes) {
@@ -118,25 +106,25 @@ public class NativeExecutor {
 
                 // Subscribe waiset components.
                 for (final NativeSubscription<?> subscription : nativeNode.getNativeSubscriptions()) {
-                    NativeExecutor.nativeWaitSetAddSubscription(this.waitSetHandle, subscription.getSubscriptionHandle());
+                    NativeExecutor.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
                 }
 
                 for (final NativeWallTimer timer : nativeNode.getNativeWallTimers()) {
-                    NativeExecutor.nativeWaitSetAddTimer(this.waitSetHandle, timer.getHandle());
+                    NativeExecutor.nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
                 }
 
                 for (final NativeService<?> service : nativeNode.getNativeServices()) {
-                    NativeExecutor.nativeWaitSetAddService(this.waitSetHandle, service.getServiceHandle());
+                    NativeExecutor.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
                 }
 
                 for (final NativeClient<?> client : nativeNode.getNativeClients()) {
-                    NativeExecutor.nativeWaitSetAddClient(this.waitSetHandle, client.getClientHandle());
+                    NativeExecutor.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
                 }
             }
 
             // Wait...
             NativeExecutor.nativeWait(waitSetHandle, timeout);
-            NativeExecutor.nativeWaitSetFini(this.waitSetHandle);
+            NativeExecutor.nativeWaitSetFini(waitSetHandle);
         }
     }
 

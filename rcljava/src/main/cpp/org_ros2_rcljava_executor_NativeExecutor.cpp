@@ -45,17 +45,6 @@ Java_org_ros2_rcljava_executor_NativeExecutor_nativeGetZeroInitializedWaitSet(
 {
   rcl_wait_set_t * wait_set = makeInstance<rcl_wait_set_t>();
   *wait_set = rcl_get_zero_initialized_wait_set();
-//  wait_set->subscriptions = nullptr;
-//  wait_set->size_of_subscriptions = 0;
-//  wait_set->guard_conditions = nullptr;
-//  wait_set->size_of_guard_conditions = 0;
-//  wait_set->timers = nullptr;
-//  wait_set->size_of_timers = 0;
-//  wait_set->clients = nullptr;
-//  wait_set->size_of_clients = 0;
-//  wait_set->services = nullptr;
-//  wait_set->size_of_services = 0;
-//  wait_set->impl = nullptr;
 
   jlong wait_set_handle = instance2Handle(wait_set);
   return wait_set_handle;

@@ -17,27 +17,19 @@
 package org.ros2.rcljava;
 
 import java.lang.management.ManagementFactory;
-import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.ros2.rcljava.exception.ImplementationAlreadyImportedException;
 import org.ros2.rcljava.exception.NoImplementationAvailableException;
 import org.ros2.rcljava.exception.NotInitializedException;
-import org.ros2.rcljava.executor.NativeExecutor;
-import org.ros2.rcljava.executor.SingleThreadedExecutor;
+import org.ros2.rcljava.executor.DefaultThreadedExecutor;
 import org.ros2.rcljava.internal.NativeUtils;
-import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.namespace.GraphName;
 import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
-import org.ros2.rcljava.node.service.NativeClient;
-import org.ros2.rcljava.node.service.NativeService;
-import org.ros2.rcljava.node.service.RMWRequestId;
-import org.ros2.rcljava.node.topic.NativeSubscription;
-import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.qos.QoSProfile;
-import org.ros2.rcljava.time.NativeWallTimer;
-import org.ros2.rcljava.time.WallTimer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +46,7 @@ public final class RCLJava {
     /**
      * The identifier of the currently active RMW implementation.
      */
-    private static String rmwImplementation = null;
+    private static String rmwImplementation;
 
     /**
      * Flag to indicate if RCLJava has been fully initialized, with a valid RMW
@@ -62,12 +54,12 @@ public final class RCLJava {
      */
     private static volatile boolean initialized = false;
 
-    private static volatile String[] arguments = null;
+    private static String[] arguments;
 
     /**
-     * A mapping between RMW implementations and their typesupports.
+     * A mapping between RMW implementations and their type supports.
      */
-    private static final Map<String, String> RMW_TO_TYPESUPPORT = new ConcurrentSkipListMap<String, String>() {
+    private static final ConcurrentMap<String, String> RMW_TO_TYPESUPPORT = new ConcurrentSkipListMap<String, String>() {
         /** Serial Id */
         private static final long serialVersionUID = 1L;
 
@@ -116,22 +108,7 @@ public final class RCLJava {
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                synchronized (RCLJava.class) {
-                    if (RCLJava.isInitialized()) {
-                        RCLJava.logger.debug("Final Shutdown...");
-
-                        // List loaded libraries.
-                        final String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
-                        final StringBuilder msgLog = new StringBuilder();
-                        for (final String key : list) {
-                            msgLog.append(key);
-                            msgLog.append('\n');
-                        }
-                        RCLJava.logger.debug("Native libraries Loaded: \n" + msgLog.toString());
-                    }
-
-                    GraphName.dispose();
-                }
+                RCLJava.shutdownHook();
             }
         });
     }
@@ -230,7 +207,7 @@ public final class RCLJava {
     /**
      * @return true if RCLJava has been fully initialized, false otherwise.
      */
-    public synchronized static boolean isInitialized() {
+    public static boolean isInitialized() {
         return RCLJava.initialized;
     }
 
@@ -243,6 +220,7 @@ public final class RCLJava {
      */
     public static Node createNode(final String defaultName) {
         RCLJava.logger.debug("Initialize Node stack...");
+
         return RCLJava.createNode(null, defaultName);
     }
 
@@ -256,7 +234,6 @@ public final class RCLJava {
      *     structure.
      */
     public static Node createNode(final String namespace, final String defaultName) {
-//        String fullName = GraphName.getFullName(ns, nodeName);
         return new NativeNode(namespace, defaultName, RCLJava.arguments);
     }
 
@@ -265,147 +242,10 @@ public final class RCLJava {
      *
      * @param node Node to spin once only.
      */
-    @SuppressWarnings({ "resource", "unchecked" })
     public static void spinOnce(final Node node) {
-        synchronized (RCLJava.class) {
-            if (!RCLJava.isInitialized()) {
-                throw new NotInitializedException();
-            }
-        }
+        RCLJava.lockAndCheckInitialized();
 
-        final NativeNode nativeNode = (NativeNode) node;
-        if (node.getClients().size() > 0 ||
-            node.getPublishers().size() > 0 ||
-            node.getServices().size() > 0 ||
-            node.getSubscriptions().size() > 0) {
-
-            final long waitSetHandle = NativeExecutor.nativeGetZeroInitializedWaitSet();
-
-            NativeExecutor.nativeWaitSetInit(
-                    waitSetHandle,
-                    node.getSubscriptions().size(),
-                    0,
-                    node.getWallTimers().size(),
-                    node.getClients().size(),
-                    node.getServices().size());
-
-            // Clean Waitset components.
-            NativeExecutor.nativeWaitSetClearSubscriptions(waitSetHandle);
-            NativeExecutor.nativeWaitSetClearTimers(waitSetHandle);
-            NativeExecutor.nativeWaitSetClearServices(waitSetHandle);
-            NativeExecutor.nativeWaitSetClearClients(waitSetHandle);
-
-            // Subscribe waiset components.
-            for (final NativeSubscription<?> subscription : nativeNode.getNativeSubscriptions()) {
-                NativeExecutor.nativeWaitSetAddSubscription(waitSetHandle, subscription.getSubscriptionHandle());
-            }
-
-            for (final NativeWallTimer timer : nativeNode.getNativeWallTimers()) {
-                NativeExecutor.nativeWaitSetAddTimer(waitSetHandle, timer.getHandle());
-            }
-
-            for (final NativeService<?> service : nativeNode.getNativeServices()) {
-                NativeExecutor.nativeWaitSetAddService(waitSetHandle, service.getServiceHandle());
-            }
-
-            for (final NativeClient<?> client : nativeNode.getNativeClients()) {
-                NativeExecutor.nativeWaitSetAddClient(waitSetHandle, client.getClientHandle());
-            }
-
-            // Wait...
-            NativeExecutor.nativeWait(waitSetHandle, 1000);
-            NativeExecutor.nativeWaitSetFini(waitSetHandle);
-
-            // Take all components.
-            for (final NativeSubscription<? extends Message> subscription : nativeNode.getNativeSubscriptions()) {
-
-                final Subscription<Message> safeSubscription = (Subscription<Message>) subscription;
-                final NativeSubscription<Message> nativeSubscription = (NativeSubscription<Message>) subscription;
-
-                final Message message = NativeExecutor.nativeTake(
-                        nativeSubscription.getSubscriptionHandle(),
-                        nativeSubscription.getMessageType());
-
-                if (message != null) {
-                    safeSubscription.getCallback().dispatch(message);
-                }
-            }
-
-            for (final WallTimer timer : node.getWallTimers()) {
-                if (timer.isReady()) {
-                    timer.callTimer();
-                    timer.getCallback().tick();
-                }
-            }
-
-            for (@SuppressWarnings("rawtypes") final NativeService service : nativeNode.getNativeServices()) {
-                final Class<?> requestType = service.getRequestType();
-                final Class<?> responseType = service.getResponseType();
-
-                Message requestMessage = null;
-                Message responseMessage = null;
-
-                try {
-                    requestMessage = (Message) requestType.newInstance();
-                    responseMessage = (Message) responseType.newInstance();
-                } catch (InstantiationException ie) {
-                    ie.printStackTrace();
-                    continue;
-                } catch (IllegalAccessException iae) {
-                    iae.printStackTrace();
-                    continue;
-                }
-
-                final RMWRequestId rmwRequestId = (RMWRequestId) NativeExecutor.nativeTakeRequest(
-                        service.getServiceHandle(),
-                        service.getRequest().getFromJavaConverterHandle(),
-                        service.getRequest().getToJavaConverterHandle(),
-                        requestMessage);
-
-                if (rmwRequestId != null) {
-                    service.getCallback().dispatch(rmwRequestId, requestMessage, responseMessage);
-                    NativeExecutor.nativeSendServiceResponse(
-                            service.getServiceHandle(),
-                            rmwRequestId,
-                            service.getResponse().getFromJavaConverterHandle(),
-                            service.getResponse().getToJavaConverterHandle(),
-                            responseMessage);
-                }
-            }
-
-            for (final NativeClient<?> client : nativeNode.getNativeClients()) {
-                final Class<?> responseType = client.getResponse().getType();
-
-                Message responseMessage = null;
-                try {
-                    responseMessage = (Message)responseType.newInstance();
-                } catch (InstantiationException ie) {
-                    ie.printStackTrace();
-                    continue;
-                } catch (IllegalAccessException iae) {
-                    iae.printStackTrace();
-                    continue;
-                }
-
-                final RMWRequestId rmwRequestId = (RMWRequestId) NativeExecutor.nativeTakeResponse(
-                        client.getClientHandle(),
-                        client.getResponse().getFromJavaConverterHandle(),
-                        client.getResponse().getToJavaConverterHandle(),
-                        responseMessage);
-
-
-                if (rmwRequestId != null) {
-                    client.handleResponse(rmwRequestId, responseMessage);
-                }
-            }
-        } else {
-            // TODO fix to rate sleep.
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        DefaultThreadedExecutor.getInstance().spinNodeOnce(node, -1);
     }
 
     /**
@@ -413,24 +253,18 @@ public final class RCLJava {
      * @param node Node to spin.
      */
     public static void spin(final Node node) {
-        while(RCLJava.ok()) {
-            RCLJava.spinOnce(node);
-        }
+        RCLJava.lockAndCheckInitialized();
+
+        DefaultThreadedExecutor.getInstance().spinNodeSome(node);
     }
 
     /**
      * Return true if rcl is currently initialized, otherwise false.
      *
-     * @{link rcl_ok()}
-     *
      * @return true if RCLJava hasn't been shut down, false otherwise.
      */
     public static boolean ok() {
-        synchronized (RCLJava.class) {
-            if (!RCLJava.isInitialized()) {
-                throw new NotInitializedException();
-            }
-        }
+        RCLJava.lockAndCheckInitialized();
 
         return RCLJava.nativeOk();
     }
@@ -444,15 +278,25 @@ public final class RCLJava {
      * <p>This function can only be called once after each call to RCLJava.rclJavaInit.</p>
      */
     public static void shutdown() {
+        RCLJava.shutdown(false);
+    }
+
+    private static void shutdown(final boolean force) {
         RCLJava.logger.debug("Shutdown...");
 
-        synchronized (RCLJava.class) {
-            if (!RCLJava.isInitialized()) {
-                throw new NotInitializedException();
-            }
+        if (!force) {
+            RCLJava.lockAndCheckInitialized();
+        }
 
-            RCLJava.nativeShutdown();
-            RCLJava.initialized = false;
+        if (DefaultThreadedExecutor.hasInstance()) {
+            DefaultThreadedExecutor.dispose();
+        }
+
+        synchronized (RCLJava.class) {
+            if (RCLJava.isInitialized()) {
+                RCLJava.nativeShutdown();
+                RCLJava.initialized = false;
+            }
         }
     }
 
@@ -460,11 +304,7 @@ public final class RCLJava {
      * @return The identifier of the currently active RMW implementation.
      */
     public static String getRMWIdentifier() {
-        synchronized (RCLJava.class) {
-            if (!RCLJava.isInitialized()) {
-                throw new NotInitializedException();
-            }
-        }
+        RCLJava.lockAndCheckInitialized();
 
         return RCLJava.nativeGetRMWIdentifier();
     }
@@ -523,18 +363,13 @@ public final class RCLJava {
      */
     @SuppressWarnings("PMD.AvoidUsingNativeCode")
     public static void loadLibrary(final String name) {
-        synchronized(RCLJava.class) {
-            RCLJava.logger.debug("Load native file : lib" + name + ".so");
+        RCLJava.logger.debug("Load native file : lib" + name + ".so");
+        RCLJava.lockAndCheckInitialized();
 
-            if (!RCLJava.initialized) {
-                throw new NotInitializedException();
-            }
-
-            try {
-                System.loadLibrary(name);  //__" + RCLJava.getRMWIdentifier());
-            } catch (UnsatisfiedLinkError e) {
-                RCLJava.logger.error("Native code library failed to load.", e);
-            }
+        try {
+            System.loadLibrary(name);  //__" + RCLJava.getRMWIdentifier());
+        } catch (UnsatisfiedLinkError e) {
+            RCLJava.logger.error("Native code library failed to load.", e);
         }
     }
 
@@ -542,7 +377,7 @@ public final class RCLJava {
      * Load RMW.
      */
     private static void autoLoadRmw() {
-        for (final Map.Entry<String, String> entry : RMW_TO_TYPESUPPORT.entrySet()) {
+        for (final ConcurrentMap.Entry<String, String> entry : RMW_TO_TYPESUPPORT.entrySet()) {
             try {
                 RCLJava.logger.debug("Try to load native " + entry.getKey() + "...");
                 RCLJava.setRMWImplementation(entry.getKey());
@@ -556,11 +391,35 @@ public final class RCLJava {
         }
     }
 
+    protected static void shutdownHook() {
+        RCLJava.shutdown(true);
+
+        RCLJava.logger.debug("Final Shutdown...");
+
+        // List loaded libraries.
+        final String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
+        final StringBuilder msgLog = new StringBuilder();
+        for (final String key : list) {
+            msgLog.append(key);
+            msgLog.append('\n');
+        }
+        RCLJava.logger.debug("Native libraries Loaded: \n" + msgLog.toString());
+
+        GraphName.dispose();
+    }
+
+    private static void lockAndCheckInitialized() {
+        synchronized (RCLJava.class) {
+            if (!RCLJava.isInitialized()) {
+                throw new NotInitializedException();
+            }
+        }
+    }
 
     /**
      * Convert Java QOS to JNI.
      * @param qosProfile
-     * @return
+     * @return handler id.
      */
     public static long convertQoSProfileToHandle(final QoSProfile qosProfile) {
         final int history = qosProfile.getHistory().getValue();

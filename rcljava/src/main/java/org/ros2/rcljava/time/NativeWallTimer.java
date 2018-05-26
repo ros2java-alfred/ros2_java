@@ -51,9 +51,9 @@ public class NativeWallTimer extends BaseWallTimer {
     private static native void nativeDispose(long handle);
 
     /**
+     * Constructor.
      *
      * @param nodeReference
-     * @param handle
      * @param callback
      * @param timerPeriodNS
      */

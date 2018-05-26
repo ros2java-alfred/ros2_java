@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.rules.Timeout;
 import org.ros2.rcljava.AbstractRosTest;
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.RCLJavaTest;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.RCLFuture;
 import org.ros2.rcljava.node.topic.NativePublisher;
@@ -40,13 +41,13 @@ public class ExecutorTest extends AbstractRosTest {
     private static final String TOPIC_PUB = "publisher_node";
     private static final String TOPIC_SUB1 = "subscription_node_one";
     private static final String TOPIC_SUB2 = "subscription_node_two";
-    private static final String TEST_TOPIC_MULTI = "test_topic_multiple";
-    private static final String TEST_TOPIC_SINGLE = "test_topic_single";
+    private static final String TEST_TOPIC_MULTI = RCLJavaTest.TEST_TOPIC + "_multiple";
+    private static final String TEST_TOPIC_SINGLE = RCLJavaTest.TEST_TOPIC + "_single";
 
     private static final String ERROR_MSG = "Expected Runtime error.";
 
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(30); // 30 seconds max per method tested
+    public Timeout globalTimeout = Timeout.seconds(200); // 30 seconds max per method tested
 
     private Node publisherNode;
     private NativePublisher<UInt32> publisher;
@@ -93,7 +94,7 @@ public class ExecutorTest extends AbstractRosTest {
         final UInt32 valueOne = this.futureOne.get();
         Assert.assertEquals(54321, valueOne.getData());
 
-        final UInt32 valueTwo = futureTwo.get();
+        final UInt32 valueTwo = this.futureTwo.get();
         Assert.assertEquals(54321, valueTwo.getData());
 
         executor.removeNode(this.subscriptionNodeTwo);
@@ -120,9 +121,9 @@ public class ExecutorTest extends AbstractRosTest {
             final ThreadedExecutor executor = new MultiThreadedExecutor();
             this.processInit(executor, TEST_TOPIC_MULTI);
 
-            while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
+            while (!(futureOne.isDone() && futureTwo.isDone())) {
                 publisher.publish(msg);
-                executor.spinOnce(0);
+                executor.spinOnce(-1);
             }
 
             this.processResult(executor);
@@ -143,8 +144,14 @@ public class ExecutorTest extends AbstractRosTest {
             final ThreadedExecutor executor = new MultiThreadedExecutor();
             this.processInit(executor, TEST_TOPIC_MULTI);
 
-            executor.spin();
-            while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    executor.spin();
+                }
+            }).start();
+
+            while (!(futureOne.isDone() && futureTwo.isDone())) {
                 publisher.publish(msg);
             }
 
@@ -166,8 +173,14 @@ public class ExecutorTest extends AbstractRosTest {
             final ThreadedExecutor executor = new SingleThreadedExecutor();
             this.processInit(executor, TEST_TOPIC_SINGLE);
 
-            executor.spin();
-            while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    executor.spin();
+                }
+            }).start();
+
+            while (!(this.futureOne.isDone() && this.futureTwo.isDone())) {
                 publisher.publish(msg);
             }
 
@@ -189,9 +202,9 @@ public class ExecutorTest extends AbstractRosTest {
             final ThreadedExecutor executor = new SingleThreadedExecutor();
             this.processInit(executor, TEST_TOPIC_SINGLE);
 
-            while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
+            while (!(futureOne.isDone() && futureTwo.isDone())) {
                 publisher.publish(msg);
-                executor.spinOnce(0);
+                executor.spinOnce(-1);
             }
 
             this.processResult(executor);

@@ -18,7 +18,6 @@ package org.ros2.rcljava.exception;
 
 /**
  * Raised when there is no rmw implementation with a Java extension available.
- *
  */
 public class NoImplementationAvailableException extends Exception {
 

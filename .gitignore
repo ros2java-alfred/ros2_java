@@ -91,5 +91,6 @@ gradle-app.setting
 .project
 .cproject
 .pydevproject
+Debug/
 
 docs/source/**

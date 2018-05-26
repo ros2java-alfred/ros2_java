@@ -18,7 +18,6 @@ package org.ros2.rcljava.exception;
 
 /**
  * Raised when the rcljava implementation is accessed before RclJava().
- *
  */
 public class NotInitializedException extends RuntimeException {
 
