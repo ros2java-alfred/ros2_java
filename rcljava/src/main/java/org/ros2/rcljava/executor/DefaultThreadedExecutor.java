@@ -15,10 +15,15 @@
 
 package org.ros2.rcljava.executor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Default Utility of ThreadedExecutor.
  */
 public final class DefaultThreadedExecutor {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultThreadedExecutor.class);
 
     private static SingleThreadedExecutor instance;
 
@@ -26,6 +31,7 @@ public final class DefaultThreadedExecutor {
         if (instance == null) {
             synchronized (SingleThreadedExecutor.class) {
                 if (instance == null) {
+                    logger.debug("Create Default Executor.");
                     instance = new SingleThreadedExecutor();
                 }
             }
@@ -37,7 +43,11 @@ public final class DefaultThreadedExecutor {
         return (instance != null);
     }
 
+    @SuppressWarnings("PMD.NullAssignment")
     public static void dispose() {
+        logger.debug("Stop & Destroy Default Executor.");
+
+        instance.clear();
         instance.cancel();
         instance = null;
     }

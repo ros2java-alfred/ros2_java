@@ -132,6 +132,7 @@ function(add_junit_tests TARGET_NAME)
   ament_add_test(
     ${TARGET_NAME}
     GENERATE_RESULT_FOR_RETURN_CODE_ZERO
+    TIMEOUT 200
     COMMAND ${Java_JAVA_EXECUTABLE}
     ${JVMARGS} -classpath ${${TARGET_NAME}_jar_dependencies} -Djava.library.path=${_library_paths}
     org.junit.runner.JUnitCore ${_add_junit_tests_TESTS}

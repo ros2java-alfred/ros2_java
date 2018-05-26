@@ -269,10 +269,8 @@ add_jar("${PROJECT_NAME}_jar"
   "${PROJECT_NAME}"
   INCLUDE_JARS
   "${std_msgs_JARS}"
-  "${geometry_msgs_JARS}"
-  "${sensor_msgs_JARS}"
-  "${rcl_interfaces_JARS}"
   "${builtin_interfaces_JARS}"
+  "${rcl_interfaces_JARS}"
   "${rcljava_common_JARS}"
   "${_jar_file}"
 )

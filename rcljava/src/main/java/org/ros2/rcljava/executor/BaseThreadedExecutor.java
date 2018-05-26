@@ -78,6 +78,12 @@ public abstract class BaseThreadedExecutor implements ThreadedExecutor {
     }
 
     @Override
+    public void clear() {
+        logger.debug("Remove all nodes.");
+        this.nodes.clear();
+    }
+
+    @Override
     public void spinSome() {
         AnyExecutable anyExecutable = this.baseExecutor.getNextExecutable();
         while (!Thread.currentThread().isInterrupted() && RCLJava.ok() && anyExecutable != null) {

@@ -15,13 +15,15 @@
 
 package org.ros2.rcljava.node.internal;
 
+import java.time.Clock;
+
 /**
  * Interface of Node Clock stack.
  */
 public interface NodeClock {
 
-//    /**
-//     * @return Get a ROS clock which will be kept up to date by the node.
-//     */
-//    Clock getClock();
+    /**
+     * @return Get a ROS clock which will be kept up to date by the node.
+     */
+    Clock getClock();
 }

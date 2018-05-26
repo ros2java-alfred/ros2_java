@@ -60,6 +60,11 @@ public interface ThreadedExecutor extends Runnable {
     void removeNode(Node node, boolean notify);
 
     /**
+     * Remove all nodes from executor.
+     */
+    void clear();
+
+    /**
      * Do work periodically as it becomes available to us. Blocking call, may block indefinitely.
      * It is up to the implementation of Executor to implement spin.
      */

@@ -24,6 +24,7 @@ import builtin_interfaces.msg.Time;
 
 import org.ros2.rcljava.internal.message.Message;
 import org.ros2.rcljava.internal.service.MessageService;
+import org.ros2.rcljava.node.internal.NodeClock;
 import org.ros2.rcljava.node.internal.NodeGraph;
 import org.ros2.rcljava.node.internal.NodeLogging;
 import org.ros2.rcljava.node.internal.NodeParameters;
@@ -39,7 +40,7 @@ import org.ros2.rcljava.node.topic.Subscription;
  * ROS2 Client API.
  */
 public interface Node extends
-//        NodeClock,
+        NodeClock,
         NodeGraph,
         NodeLogging,
         NodeParameters,
