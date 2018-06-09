@@ -4,24 +4,29 @@
 set -e
 
 # Install default OSX stack.
-time brew update
-time brew tap osrf/ros2
-time brew tap ros/deps
-time brew install python3 wget cppcheck gtest tinyxml eigen pcre # cmake already installed
-time brew install asio tinyxml2
-#brew install Caskroom/cask/java
-time brew install gradle
-time brew tap homebrew/science
+brew update
+brew tap osrf/ros2
+brew tap ros/deps
+brew upgrade python
+brew install cppcheck tinyxml eigen pcre # wget cmake  python3 already installed
+brew install asio tinyxml2
+brew install gradle
+brew tap caskroom/versions
+brew cask install java8
+#brew tap homebrew/science
 #  - brew install opencv --without-python
-time sudo -H python3 -m pip install empy setuptools nose vcstool pep8 pydocstyle pyflakes flake8 mock coverage
+sudo -H python3 -m pip install argcomplete catkin_pkg coverage empy flake8 flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-import-order flake8-quotes mock nose pep8 pydocstyle pyflakes pyparsing pytest pytest-cov pytest-runner pyyaml vcstool
+# setuptools already installed
 gem install xcpretty
+
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_172.jdk/Contents/Home/
 
 echo "INSTALL/BUILD ROS2 AMENT..."
 mkdir -p $HOME_BUILD/ament_ws/src
 cd $HOME_BUILD/ament_ws
 wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos
 vcs import $HOME_BUILD/ament_ws/src < ament_java.repos
-time src/ament/ament_tools/scripts/ament.py build --parallel --symlink-install --isolated
+src/ament/ament_tools/scripts/ament.py build --parallel --symlink-install --isolated
 
 echo "INSTALL ROS2 WS..."
 mkdir -p $ROS2WS/src

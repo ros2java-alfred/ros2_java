@@ -58,7 +58,6 @@ public final class MultiThreadedExecutor extends BaseThreadedExecutor {
      * Pool-multiple threaded implementation of spin.
      * This function will block until work comes in, execute it, and keep blocking.
      * It will only be interrupt by a CTRL-C (managed by the global signal handler).
-     * @throws InterruptedException
      */
     @Override
     public void spin() {

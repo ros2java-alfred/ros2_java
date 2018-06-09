@@ -49,6 +49,7 @@ public interface NodeParameters {
     /**
      * Define parameter if not set.
      *
+     * @param <T> Generic.
      * @param name of parameter.
      * @param value of the parameter.
      */
@@ -104,30 +105,30 @@ public interface NodeParameters {
     /**
      * Get description of parameters filtered by name.
      *
-     * @param names
+     * @param names List of names filter.
      * @return List of Parameter Descriptor.
      */
     List<ParameterDescriptor> describeParameters(final List<String> names);
 
     /**
      *
-     * @param names
+     * @param names List of names filter.
      * @return Types list of parameter.
      */
     List<Class<?>> getParameterTypes(final List<String> names);
 
     /**
      *
-     * @param names
-     * @return
+     * @param names List of names filter.
+     * @return Types list of parameter.
      */
     List<Byte>     getParametersTypes(final List<String> names);
 
     /**
      *
-     * @param names
-     * @param depth
-     * @return ParameterResult
+     * @param names List of names filter.
+     * @param depth Depth of filter.
+     * @return List of parameters result.
      */
     ListParametersResult listParameters(final List<String> names, final int depth);
 
@@ -135,6 +136,7 @@ public interface NodeParameters {
      * Register the callback for parameter changes. Repeated invocations of this
      * function will overwrite previous callbacks
      *
+     * @param <T> Message.
      * @param callback
      *            defined callback function, It is expected to atomically set
      *            parameters.

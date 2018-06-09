@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class serves as a bridge between ROS2's rcl_publisher_t and RCLJava.
  * A Publisher must be created via
- * @{link Node#createPublisher(Class&lt;T&gt;, String)}
+ * {@link Node#createPublisher(Class&lt;T&gt;, String)}
  *
  * @param <T> The type of the messages that this publisher will publish.
  */

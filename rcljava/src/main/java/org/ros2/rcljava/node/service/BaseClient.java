@@ -45,8 +45,6 @@ public abstract class BaseClient<T extends MessageService> implements Client<T> 
     private final Class<? extends Message> requestType;
     private final Class<? extends Message> responseType;
 
-    private long sequenceNumber;
-
     /**
      *
      * @param ownerNode
@@ -114,7 +112,7 @@ public abstract class BaseClient<T extends MessageService> implements Client<T> 
         synchronized(pendingRequests) {
             final long sequenceNumber = header.sequenceNumber;
             @SuppressWarnings("unchecked")
-            final RCLFuture<V> future = (RCLFuture<V>) pendingRequests.remove(sequenceNumber);
+            final RCLFuture<V> future = (RCLFuture<V>) this.pendingRequests.remove(sequenceNumber);
             future.set(response);
         }
     }
@@ -128,20 +126,13 @@ public abstract class BaseClient<T extends MessageService> implements Client<T> 
     public Node getNode() {
         return this.ownerNode;
     }
+
     /* (non-Javadoc)
      * @see org.ros2.rcljava.node.topic.Publisher#getQosProfile()
      */
 //    @Override
     public QoSProfile getQosProfile() {
         return this.qosProfile;
-    }
-
-    public long getSequenceNumber() {
-        return this.sequenceNumber;
-    }
-
-    public void incrementSequenceNumber() {
-        this.sequenceNumber++;
     }
 
     public Map<Long, RCLFuture<?>> getPendingRequests() {

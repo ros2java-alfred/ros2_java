@@ -38,11 +38,11 @@ JNIEXPORT jlong JNICALL
 /*
  * Class:     org_ros2_rcljava_node_service_NativeClient
  * Method:    nativeSendClientRequest
- * Signature: (JJJJLjava/lang/Object;)V
+ * Signature: (JJJLjava/lang/Object;)J
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jlong JNICALL
   Java_org_ros2_rcljava_node_service_NativeClient_nativeSendClientRequest
-  (JNIEnv *, jclass, jlong, jlong, jlong, jlong, jobject);
+  (JNIEnv *, jclass, jlong, jlong, jlong, jobject);
 
 /*
  * Class:     org_ros2_rcljava_node_service_NativeClient

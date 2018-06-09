@@ -340,27 +340,27 @@ if(BUILD_TESTING)
     )
   endforeach()
 
-  create_javadoc("${PROJECT_NAME}_docs"
-    FILES "${${PROJECT_NAME}_sources_java}"
-    SOURCEPATH "src/main/java/"
-    CLASSPATH
-    "${CMAKE_JAVA_INCLUDE_PATH}"
-    "${rcljava_common_JARS}"
-    "${rcljava_test_msgs_JARS}"
-    "${std_msgs_JARS}"
-    "${geometry_msgs_JARS}"
-    "${sensor_msgs_JARS}"
-    "${builtin_interfaces_JARS}"
-    "${rcl_interfaces_JARS}"
-    "${_${PROJECT_NAME}_jar_file}"
-    "${_jar_file}"
-    INSTALLPATH "docs"
-    WINDOWTITLE "ROS2 Java"
-    DOCTITLE "<h1>ROS2 Java</h1>"
-    AUTHOR TRUE
-    USE TRUE
-    VERSION TRUE
-  )
+#  create_javadoc("${PROJECT_NAME}_docs"
+#    FILES "${${PROJECT_NAME}_sources_java}"
+#    SOURCEPATH "src/main/java/"
+#    CLASSPATH
+#    "${CMAKE_JAVA_INCLUDE_PATH}"
+#    "${rcljava_common_JARS}"
+#    "${rcljava_test_msgs_JARS}"
+#    "${std_msgs_JARS}"
+#    "${geometry_msgs_JARS}"
+#    "${sensor_msgs_JARS}"
+#    "${builtin_interfaces_JARS}"
+#    "${rcl_interfaces_JARS}"
+#    "${_${PROJECT_NAME}_jar_file}"
+#    "${_jar_file}"
+#    INSTALLPATH "docs"
+#    WINDOWTITLE "ROS2 Java"
+#    DOCTITLE "<h1>ROS2 Java</h1>"
+#    AUTHOR TRUE
+#    USE TRUE
+#    VERSION TRUE
+#  )
 
 #  execute_process(COMMAND "javasphinx-apidoc -o ../docs/source/ --title='ROS2 for Java' src/main/java/")
 

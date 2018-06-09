@@ -15,6 +15,8 @@
 
 package org.ros2.rcljava.node.parameter;
 
+import rcl_interfaces.msg.ParameterEvent;
+
 /**
  * Parameter Event Consumer.
  *
@@ -23,7 +25,7 @@ public interface ParameterEventCallback {
 
     /**
      *
-     * @param event
+     * @param event Parameter event.
      */
-    void onEvent(final rcl_interfaces.msg.ParameterEvent event);
+    void onEvent(final ParameterEvent event);
 }

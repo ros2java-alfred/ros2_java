@@ -49,9 +49,8 @@ public class NativeClient<T extends MessageService> extends BaseClient<T> {
 
     private static native void nativeDispose(long nodeHandle, long clientHandle);
 
-    private static native void nativeSendClientRequest(
+    private static native long nativeSendClientRequest(
             long clientHandle,
-            long sequenceNumber,
             long requestFromJavaConverterHandle,
             long requestToJavaConverterHandle,
             Object requestMessage);
@@ -126,20 +125,19 @@ public class NativeClient<T extends MessageService> extends BaseClient<T> {
 
     @Override
     public <U extends Message, V extends Message> Future<V> sendRequest(final U request) {
-        synchronized(this.getPendingRequests()) {
-              this.incrementSequenceNumber();
+        final RCLFuture<V> future;
 
-              NativeClient.nativeSendClientRequest(
+        synchronized(this.getPendingRequests()) {
+              final Long sequenceNumber = NativeClient.nativeSendClientRequest(
                       this.clientHandle,
-                      this.getSequenceNumber(),
                       this.request.getFromJavaConverterHandle(),
                       this.request.getToJavaConverterHandle(),
                       request);
 
-              final RCLFuture<V> future = new RCLFuture<V>(new WeakReference<Node>(this.getNode()));
-              getPendingRequests().put(this.getSequenceNumber(), future);
-              return future;
-            }
+              future = new RCLFuture<V>(new WeakReference<Node>(this.getNode()));
+              this.getPendingRequests().put(sequenceNumber, future);
+        }
+        return future;
     }
 
     public long getClientHandle() {

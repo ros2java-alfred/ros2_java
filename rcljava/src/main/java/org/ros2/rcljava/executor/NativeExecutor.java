@@ -254,7 +254,7 @@ public class NativeExecutor {
         }
 
         if (requestMessage != null && responseMessage != null) {
-            final RMWRequestId rmwRequestId = (RMWRequestId) NativeExecutor.nativeTakeRequest(
+            final RMWRequestId rmwRequestId = NativeExecutor.nativeTakeRequest(
                     nativeService.getServiceHandle(),
                     nativeService.getRequest().getFromJavaConverterHandle(),
                     nativeService.getRequest().getToJavaConverterHandle(),
@@ -301,7 +301,7 @@ public class NativeExecutor {
     public static native void nativeWaitSetFini(long waitSetHandle);
 
     public static native Message nativeTake(long SubscriptionHandle, Class<?> msgType);
-    public static native Object nativeTakeRequest(
+    public static native RMWRequestId nativeTakeRequest(
             long serviceHandle,
             long requestFromJavaConverterHandle,
             long requestToJavaConverterHandle,

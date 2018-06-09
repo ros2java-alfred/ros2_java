@@ -43,6 +43,9 @@ public final class RCLJava {
 
     private static final Logger logger = LoggerFactory.getLogger(RCLJava.class);
 
+    private static final String DISPLAY_SEPARATOR =
+            "===============================================================";
+
     /**
      * The identifier of the currently active RMW implementation.
      */
@@ -53,6 +56,8 @@ public final class RCLJava {
      *   implementation.
      */
     private static volatile boolean initialized = false;
+
+    private static String libExtention = ".unknow";
 
     private static String[] arguments;
 
@@ -129,16 +134,26 @@ public final class RCLJava {
     }
 
     private static void displayContext() {
+        RCLJava.logger.debug(DISPLAY_SEPARATOR);
+        // https://docs.oracle.com/javase/7/docs/api/java/lang/System.html#getProperties
+        // http://lopica.sourceforge.net/os.html
         final String libpath = System.getProperty("java.library.path");
         final String arch    = System.getProperty("os.arch");
         final String os      = System.getProperty("os.name");
+        final String osVer   = System.getProperty("os.version");
 
         final String pidAndHost = ManagementFactory.getRuntimeMXBean().getName();
         final String pid = pidAndHost.substring(0, pidAndHost.indexOf('@'));
         // For JAVA9 : long pid = ProcessHandle.current().getPid();
 
+        final String user = System.getProperty("user.name");
+        final String pathSeparator = System.getProperty("path.separator");
+
         // Java Value
         RCLJava.logger.debug(String.format("Process ID : %s", pid));
+        RCLJava.logger.debug(String.format("Process User : %s", user));
+
+        RCLJava.logger.debug(String.format("Java Home : %s", System.getProperty("java.home")));
         RCLJava.logger.debug(String.format("Java JVM : %s %s %s",
                 System.getProperty("java.vm.vendor"),
                 System.getProperty("java.vm.name"),
@@ -151,9 +166,24 @@ public final class RCLJava {
                 System.getProperty("java.specification.version")));
 
         // Native Value
-        RCLJava.logger.debug(String.format("Native Library OS : %s", os));
+        RCLJava.logger.debug(String.format("Native Library OS : %s %s", os, osVer));
         RCLJava.logger.debug(String.format("Native Library Archi : %s", arch));
-        RCLJava.logger.debug(String.format("Native Library path : \n\t%s", libpath.replace(":", "\n\t")));
+        RCLJava.logger.debug(String.format("Native Library path : %n\t%s", libpath.replace(pathSeparator, System.lineSeparator() + "\t")));
+        RCLJava.logger.debug(DISPLAY_SEPARATOR);
+    }
+
+    private static void displayReport() {
+        RCLJava.logger.debug(DISPLAY_SEPARATOR);
+
+        // List loaded libraries.
+        final String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
+        final StringBuilder msgLog = new StringBuilder();
+        for (final String key : list) {
+            msgLog.append(key);
+            msgLog.append(System.lineSeparator());
+        }
+        RCLJava.logger.debug(String.format("Native libraries Loaded: %n", msgLog.toString()));
+        RCLJava.logger.debug(DISPLAY_SEPARATOR);
     }
 
     /**
@@ -336,7 +366,7 @@ public final class RCLJava {
             if (rmwImplementation != null && !rmwImplementation.isEmpty()) {
                 if (!rmwImplementation.equals(RCLJava.rmwImplementation)) {
                     final String file = "rcljava"+ RCLJava.getRmwImplementationSuffix(rmwImplementation);
-                    RCLJava.logger.debug("Load native RMW file : lib" + file + ".so");
+                    RCLJava.logger.debug("Load native RMW file : " + System.mapLibraryName(file));
 
                     try {
                         System.loadLibrary(file);
@@ -363,7 +393,7 @@ public final class RCLJava {
      */
     @SuppressWarnings("PMD.AvoidUsingNativeCode")
     public static void loadLibrary(final String name) {
-        RCLJava.logger.debug("Load native file : lib" + name + ".so");
+        RCLJava.logger.debug("Load native file :" + System.mapLibraryName(name));
         RCLJava.lockAndCheckInitialized();
 
         try {
@@ -392,20 +422,12 @@ public final class RCLJava {
     }
 
     protected static void shutdownHook() {
-        RCLJava.shutdown(true);
-
         RCLJava.logger.debug("Final Shutdown...");
 
-        // List loaded libraries.
-        final String[] list = NativeUtils.getLoadedLibraries(RCLJava.class.getClassLoader());
-        final StringBuilder msgLog = new StringBuilder();
-        for (final String key : list) {
-            msgLog.append(key);
-            msgLog.append('\n');
-        }
-        RCLJava.logger.debug("Native libraries Loaded: \n" + msgLog.toString());
-
+        RCLJava.shutdown(true);
         GraphName.dispose();
+
+        RCLJava.displayReport();
     }
 
     private static void lockAndCheckInitialized() {

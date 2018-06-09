@@ -28,9 +28,9 @@ public class JavaWallTimer extends BaseWallTimer {
 
     /**
      *
-     * @param nodeReference
-     * @param callback
-     * @param timerPeriodNS
+     * @param nodeReference Node.
+     * @param callback Call-back.
+     * @param timerPeriodNS Time period in nano-second.
      */
     public JavaWallTimer(
             final WeakReference<Node> nodeReference,

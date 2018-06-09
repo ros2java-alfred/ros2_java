@@ -25,13 +25,13 @@ public interface NodeGraph {
 
     /**
      * This is typically only used by the rclcpp::graph_listener::GraphListener.
-     * Return the number of on loan graph events, see get_graph_event().
+     * @return The number of on loan graph events, see get_graph_event().
      */
     int countGraphUsers();
 
     /**
      *
-     * @return
+     * @return Map of Services with list of type.
      */
     Map<String, List<String>> getServiceNamesAndTypes();
 
@@ -60,13 +60,13 @@ public interface NodeGraph {
     List<String> getNodeNames();
 
     /**
-     * @param topic
+     * @param topic Topic name filter.
      * @return Return the number of publishers that are advertised on a given topic.
      */
     int countPublishers(final String topic);
 
     /**
-     * @param topic
+     * @param topic Topic name filter.
      * @return Return the number of subscribers who have created a subscription for a given topic.
      */
     int countSubscribers(final String topic);
@@ -87,7 +87,7 @@ public interface NodeGraph {
      * This is typically only used by the rclcpp::graph_listener::GraphListener.
      *
      * return Return a graph event, which will be set anytime a graph change occurs.
-     * @throws RCLBaseError (a child of that exception) when an rcl error occurs
+     * throws RCLBaseError (a child of that exception) when an rcl error occurs
      */
     void notifyGraphChange();
 
@@ -108,9 +108,12 @@ public interface NodeGraph {
      *
      * The given Event must be acquire through the get_graph_event() method.
      *
-     * @throws InvalidEventError if the given event is nullptr
-     * @throws EventNotRegisteredError if the given event was not acquired with
+     * throws InvalidEventError if the given event is nullptr
+     * throws EventNotRegisteredError if the given event was not acquired with
      *   get_graph_event().
+     *
+     * @param event Event.
+     * @param timeout Timeout.
      */
     void waitForGraphChange(final Object event, final int timeout);
 

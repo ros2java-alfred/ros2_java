@@ -114,7 +114,6 @@ Java_org_ros2_rcljava_node_topic_NativePublisher_nativeDispose(
   rcl_publisher_t * publisher = handle2Instance<rcl_publisher_t>(jpublisher_handle);
 
   rcl_ret_t ret = rcl_publisher_fini(publisher, node);
-  free(publisher);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to destroy publisher: " +
       std::string(rcl_get_error_string_safe()));

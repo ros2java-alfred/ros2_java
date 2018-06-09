@@ -53,9 +53,9 @@ public class NativeWallTimer extends BaseWallTimer {
     /**
      * Constructor.
      *
-     * @param nodeReference
-     * @param callback
-     * @param timerPeriodNS
+     * @param nodeReference Node.
+     * @param callback Call-back.
+     * @param timerPeriodNS Time period in nano-second.
      */
     public NativeWallTimer(
             final WeakReference<Node> nodeReference,
@@ -143,7 +143,7 @@ public class NativeWallTimer extends BaseWallTimer {
     }
 
     /**
-     * @return
+     * @return Handle.
      */
     public long getHandle() {
         return this.wallTimerHandle;

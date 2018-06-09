@@ -88,12 +88,11 @@ Java_org_ros2_rcljava_node_service_NativeClient_nativeCreateClientHandle(
 /*
  * nativeSendClientRequest
  */
-JNIEXPORT void JNICALL
+JNIEXPORT jlong JNICALL
 Java_org_ros2_rcljava_node_service_NativeClient_nativeSendClientRequest(
   JNIEnv * env,
   jclass,
   jlong client_handle,
-  jlong sequence_number,
   jlong jrequest_from_java_converter_handle,
   jlong jrequest_to_java_converter_handle,
   jobject jrequest_msg)
@@ -109,8 +108,9 @@ Java_org_ros2_rcljava_node_service_NativeClient_nativeSendClientRequest(
     reinterpret_cast<convert_from_java_signature>(jrequest_from_java_converter_handle);
 
   void * request_msg = convert_from_java(jrequest_msg, nullptr);
+  int64_t seq_number;
 
-  rcl_ret_t ret = rcl_send_request(client, request_msg, &sequence_number);
+  rcl_ret_t ret = rcl_send_request(client, request_msg, &seq_number);
 
   if (ret != RCL_RET_OK) {
     std::string message("Failed to send request from a client: " +
@@ -118,6 +118,8 @@ Java_org_ros2_rcljava_node_service_NativeClient_nativeSendClientRequest(
     rcl_reset_error();
     throwException(env, message);
   }
+
+  return seq_number;
 }
 
 /*
@@ -134,7 +136,6 @@ Java_org_ros2_rcljava_node_service_NativeClient_nativeDispose(
   rcl_client_t * client = handle2Instance<rcl_client_t>(jclient_handle);
 
   rcl_ret_t ret = rcl_client_fini(client, node);
-  free(client);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to destroy client: " +
       std::string(rcl_get_error_string_safe()));

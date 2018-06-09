@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class serves as a bridge between ROS2's rcl_subscription_t and RCLJava.
  * A Subscription must be created via
- * @{link Node#createSubscription(Class&lt;T&gt;, String, Consumer&lt;T&gt;)}
+ * {@link Node#createSubscription(Class&lt;T&gt;, String, Consumer&lt;T&gt;)}
  *
  * @param <T> The type of the messages that this subscription will receive.
  */
@@ -62,7 +62,7 @@ public class NativeSubscription<T extends Message> extends BaseSubscription<T> {
      * @param messageType The <code>Class</code> of the messages that this
      *     subscription will receive. We need this because of Java's type erasure,
      *     which doesn't allow us to use the generic parameter of
-     *     @{link org.ros2.rcljava.Subscription} directly.
+     *     {@link org.ros2.rcljava.Subscription} directly.
      * @param topicName The topic to which this subscription will be subscribed.
      * @param callback The callback function that will be triggered when a new
      *     message is received.

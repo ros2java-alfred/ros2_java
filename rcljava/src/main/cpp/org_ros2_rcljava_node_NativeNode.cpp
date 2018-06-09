@@ -81,7 +81,6 @@ Java_org_ros2_rcljava_node_NativeNode_nativeDispose(
   rcl_node_t * node = handle2Instance<rcl_node_t>(jnode_handle);
 
   rcl_ret_t ret = rcl_node_fini(node);
-  free(node);
   if (ret != RCL_RET_OK) {
     std::string message("Failed finish node: " +
       std::string(rcl_get_error_string_safe()));

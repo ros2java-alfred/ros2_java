@@ -47,7 +47,6 @@ matrix:
       env:
         - PYTHON_PATH="/usr/local/opt/python3/bin/python3.6"
         - TRAVIS_OS_NAME="osx"
-        - PKG_EXCLUDE="$PKG_EXCLUDE console_bridge orocos_kdl class_loader rosidl_generator_py pendulum_msgs rttest rclcpp dummy_map_server tf2 tf2_msgs tf2_ros tf2_eigen urdfdom_headers urdfdom urdf kdl_parser robot_state_publisher dummy_robot_bringup common_interfaces test_msgs dummy_sensors image_geometry sros2 test_security tf2_geometry_msgs nav_msgs actionlib_msgs diagnostic_msgs rcljava_utils rcl_lifecycle"
       osx_image: xcode9.1
   allow_failures:
     - env: DOCKER_DIST="debian-stable"

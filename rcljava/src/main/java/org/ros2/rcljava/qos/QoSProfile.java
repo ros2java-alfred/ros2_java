@@ -107,10 +107,10 @@ public class QoSProfile {
 
     /**
      * Constructor.
-     * @param history
-     * @param depth
-     * @param reliability
-     * @param durability
+     * @param history History
+     * @param depth Depth
+     * @param reliability Reliability
+     * @param durability Durability
      */
     public QoSProfile(final History history, final int depth, final Reliability reliability, final Durability durability) {
         this.history = history;

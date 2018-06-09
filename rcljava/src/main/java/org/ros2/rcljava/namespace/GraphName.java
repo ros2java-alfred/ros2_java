@@ -116,7 +116,7 @@ public final class GraphName {
     /**
      *
      *
-     * <table>
+     * <table summary="Definition of rules.">
      * <tr><td>Input Name	</td><td>Node: my_node NS: none	</td><td>Node: my_node NS: /my_ns</td></tr>
      * <tr><td>ping			</td><td>/ping					</td><td>/my_ns/ping</td></tr>
      * <tr><td>/ping		</td><td>/ping					</td><td>/ping</td></tr>

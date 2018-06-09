@@ -248,11 +248,6 @@ public class NativeNode extends BaseNode {
      * @param serviceName The service to subscribe on.
      * @param qosProfile The quality of service profile to pass on to the rmw implementation.
      * @return Client instance of the service.
-     * @throws SecurityException
-     * @throws NoSuchFieldException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws NoSuchMethodException
      */
     @Override
     public <T extends MessageService> Client<T> createClient(
@@ -288,11 +283,6 @@ public class NativeNode extends BaseNode {
      * @param callback The user-defined callback function.
      * @param qosProfile The quality of service profile to pass on to the rmw implementation.
      * @return Service instance of the service.
-     * @throws SecurityException
-     * @throws NoSuchFieldException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws NoSuchMethodException
      */
     @Override
     public <T extends MessageService> Service<T> createService(
@@ -415,7 +405,7 @@ public class NativeNode extends BaseNode {
     /**
      * TODO REMOVE !!!
      * Return the rcl_node_t node handle (non-const version).
-     * @return
+     * @return Node handler.
      */
     public long getNodeHandle() {
         return this.nodeHandle;

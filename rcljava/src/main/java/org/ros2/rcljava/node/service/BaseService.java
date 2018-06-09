@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is Service Server of RCLJava.
  *
- * @param <T> Service Type.
+ * param <T> Service Type.
  */
 public class BaseService<T extends MessageService> implements Service<T> {
 

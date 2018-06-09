@@ -86,7 +86,6 @@ Java_org_ros2_rcljava_node_service_NativeService_nativeDispose(
   rcl_service_t * service = handle2Instance<rcl_service_t>(jservice_handle);
 
   rcl_ret_t ret = rcl_service_fini(service, node);
-  free(service);
   if (ret != RCL_RET_OK) {
     std::string message("Failed to destroy service: " +
       std::string(rcl_get_error_string_safe()));

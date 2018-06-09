@@ -36,9 +36,9 @@ public abstract class BaseWallTimer implements WallTimer {
 
     /**
      *
-     * @param nodeReference
-     * @param callback
-     * @param timerPeriodNS
+     * @param nodeReference Node.
+     * @param callback Call-back.
+     * @param timerPeriodNS Time period in nano-second.
      */
     public BaseWallTimer(
             final WeakReference<Node> nodeReference,
@@ -99,7 +99,7 @@ public abstract class BaseWallTimer implements WallTimer {
     }
 
     /**
-     * @return
+     * @return Node.
      */
     public Node getNode() {
         return this.nodeReference.get();
