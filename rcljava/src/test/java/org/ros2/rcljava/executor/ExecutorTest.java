@@ -72,12 +72,14 @@ public class ExecutorTest extends AbstractRosTest {
 
         this.futureOne = new RCLFuture<UInt32>(executor);
         this.subscriptionOne = (NativeSubscription<UInt32>)this.subscriptionNodeOne.<UInt32>createSubscription(
-                UInt32.class, topic,
+                UInt32.class,
+                topic,
                 new TestConsumer<UInt32>(this.futureOne));
 
         this.futureTwo = new RCLFuture<UInt32>(executor);
         this.subscriptionTwo = (NativeSubscription<UInt32>)this.subscriptionNodeTwo.<UInt32>createSubscription(
-                UInt32.class, topic,
+                UInt32.class,
+                topic,
                 new TestConsumer<UInt32>(futureTwo));
 
         this.msg = new UInt32();
@@ -114,7 +116,6 @@ public class ExecutorTest extends AbstractRosTest {
     @Test
     public final void testLinkMultipleProcess() {
         logger.debug(new Object(){}.getClass().getEnclosingMethod().getName());
-
         boolean test = true;
 
         try {
@@ -122,7 +123,7 @@ public class ExecutorTest extends AbstractRosTest {
             this.processInit(executor, TEST_TOPIC_MULTI);
 
             while (!(futureOne.isDone() && futureTwo.isDone())) {
-                publisher.publish(msg);
+                publisher.publish(this.msg);
                 executor.spinOnce(-1);
             }
 

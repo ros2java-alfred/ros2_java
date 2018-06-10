@@ -1,0 +1,159 @@
+#---------------------------------#
+#      general configuration      #
+#---------------------------------#
+
+# version format
+version: 0.4.0.{build}
+
+# Do not build on tags (GitHub and BitBucket)
+#skip_tags: true
+
+# Start builds on tags only (GitHub and BitBucket)
+#skip_non_tags: true
+
+# Do not build feature branch with open Pull Requests
+pull_requests:
+  do_not_increment_build_number: true
+
+# Maximum number of concurrent jobs for the project
+#max_jobs: 1
+
+#---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+
+# Build worker image (VM template)
+image: Visual Studio 2017
+#os: Windows Server 2016
+
+# scripts that are called at very beginning, before repo cloning
+init:
+  - git config --global core.autocrlf true
+
+# clone directory
+clone_folder: C:\projects\appveyor\ros2-java
+
+# fetch repository as zip archive
+#shallow_clone: true                 # default is "false"
+
+# set clone depth
+#clone_depth: 5                      # clone entire repository history if not defined
+
+# environment variables
+environment:
+  global:
+    HOME: C:\projects\appveyor
+    HOME_REPO: ${HOME}\ros2-java
+    HOME_BUILD: ${HOME}\build
+    ROS2WS: ${HOME_BUILD}\ros2_java_ws
+    COMMIT: ${APPVEYOR_REPO_COMMIT}
+    PYTHON_PATH: C:\Python36-x64
+    ENV_PATH: ${HOME_BUILD}\.env
+    VisualStudioVersion: 14.0
+    PKG_EXCLUDE: launch launch_testing tlsf_cpp tlsf composition visualization_msgs trajectory_msgs topic_monitor pendulum_control test_rclcpp test_communication stereo_msgs shape_msgs intra_process_demo image_tools demo_nodes_cpp ros1_bridge lifecycle rclcpp_lifecycle examples_rclpy_minimal_subscriber examples_rclpy_minimal_service examples_rclpy_minimal_publisher examples_rclpy_minimal_client examples_rclpy_executors demo_nodes_py rclpy examples_rclcpp_minimal_client examples_rclcpp_minimal_composition examples_rclcpp_minimal_publisher examples_rclcpp_minimal_service examples_rclcpp_minimal_subscriber examples_rclcpp_minimal_timer demo_nodes_cpp_native opensplice_cmake_module rmw_opensplice_cpp rosidl_typesupport_opensplice_cpp rosidl_typesupport_opensplice_c connext_cmake_module rmw_connext_shared_cpp rosidl_typesupport_connext_cpp rosidl_typesupport_connext_c rmw_connext_cpp ros2cli ros2msg ros2node ros2pkg ros2run ros2srv ros2topic ros2service libcurl_vendor resource_retriever rttest logging_demo test_msgs test_security class_loader pluginlib dummy_map_server tf2_eigen kdl_parser robot_state_publisher
+
+
+
+# already install : git, python, cmake
+install:
+  - SET PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%path%
+  - cinst patch curl cppcheck wget
+
+
+#---------------------------------#
+#       build configuration       #
+#---------------------------------#
+
+# build platform, i.e. x86, x64, Any CPU. This setting is optional.
+platform: x64
+
+# to add several platforms to build matrix:
+#platform:
+#  - x86
+#  - Any CPU
+
+# build Configuration, i.e. Debug, Release, etc.
+configuration: Release
+
+build:
+  parallel: true      
+
+# scripts to run before build
+before_build:
+  - .\scripts\appveyor\windows_prepare.bat
+
+# scripts to run *after* solution is built and *before* automatic packaging occurs (web apps, NuGet packages, Azure Cloud Services)
+#before_package:
+
+# scripts to run after build
+#after_build:
+
+# to run your custom scripts instead of automatic MSBuild
+build_script:
+  - .\scripts\appveyor\windows_run.bat
+
+# to disable automatic builds
+#build: off
+
+#---------------------------------#
+#       tests configuration       #
+#---------------------------------#
+
+# to run tests again only selected assemblies and/or categories
+#test:
+
+# scripts to run before tests
+#before_test:
+
+# scripts to run after tests
+#after_test:
+
+# to run your custom scripts instead of automatic tests
+#test_script:
+
+# to disable automatic tests
+test: off
+
+#---------------------------------#
+#        global handlers          #
+#---------------------------------#
+
+# on successful build
+on_success:
+  - .\scripts\appveyor\windows_success.bat
+
+# on build failure
+#on_failure:
+
+# after build failure or success
+#on_finish:
+
+#---------------------------------#
+#         notifications           #
+#---------------------------------#
+
+notifications:
+
+#  # Email
+#  - provider: Email
+#    to:
+#      - user1@email.com
+#      - user2@email.com
+#    subject: 'Build {{status}}'                  # optional
+#    message: "{{message}}, {{commitId}}, ..."    # optional
+#    on_build_status_changed: true
+
+#  # Slack
+#  - provider: Slack
+#    incoming_webhook: http://incoming-webhook-url
+
+  # Webhook
+  - provider: Webhook
+    url: https://webhooks.gitter.im/e/4aac82b42245203edceb
+#    headers:
+#      User-Agent: myapp 1.0
+#      Authorization:
+#        secure: GhD+5xhLz/tkYY6AO3fcfQ==
+    on_build_success: true
+    on_build_failure: true
+    on_build_status_changed: true

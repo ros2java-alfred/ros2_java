@@ -57,8 +57,6 @@ public final class RCLJava {
      */
     private static volatile boolean initialized = false;
 
-    private static String libExtention = ".unknow";
-
     private static String[] arguments;
 
     /**
@@ -182,7 +180,7 @@ public final class RCLJava {
             msgLog.append(key);
             msgLog.append(System.lineSeparator());
         }
-        RCLJava.logger.debug(String.format("Native libraries Loaded: %n", msgLog.toString()));
+        RCLJava.logger.debug(String.format("Native libraries Loaded: %n%s", msgLog.toString()));
         RCLJava.logger.debug(DISPLAY_SEPARATOR);
     }
 
@@ -351,7 +349,7 @@ public final class RCLJava {
     }
 
     /**
-     * Switch of ROS2 middleware implementation
+     * Switch of ROS2 middle-ware implementation
      *
      * <p>TODO need to check implementation available.</p>
      *
