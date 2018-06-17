@@ -42,9 +42,6 @@ vcs import %ROS2WS%\src < ros2_java_desktop.repos
 ECHO. & ECHO Sync with git trigger
 RMDIR /Q /S %ROS2WS%\src\ros2_java\ros2_java && MKLINK /D %ROS2WS%\src\ros2_java\ros2_java %HOME_REPO%
 
-ECHO. & ECHO Patch for Java support.
-CD %ROS2WS%\src\ros2\rosidl_typesupport && patch -p1 < ..\..\ros2_java\ros2_java\rosidl_ros2_android.diff
-
 ECHO. & ECHO BUILD ROS2 WS...
 CD %HOME_BUILD%
 CALL "%HOME_BUILD%\ament_ws\install\setup.bat"

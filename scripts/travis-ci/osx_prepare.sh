@@ -37,9 +37,6 @@ vcs import $ROS2WS/src < ros2_java_desktop.repos
 # Sync with git trigger
 rm -rf $ROS2WS/src/ros2_java/ros2_java && ln -s $HOME/build/ros2java-alfred/ros2_java  $ROS2WS/src/ros2_java/ros2_java
 
-# Patch for Java support.
-cd $ROS2WS/src/ros2/rosidl_typesupport && patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_android.diff
-
 echo "BUILD ROS2 WS..."
 cd $HOME_BUILD
 . ./ament_ws/install_isolated/local_setup.sh

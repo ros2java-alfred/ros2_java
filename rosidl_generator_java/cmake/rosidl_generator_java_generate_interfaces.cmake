@@ -18,16 +18,7 @@ find_package(rmw_implementation_cmake REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rcljava_common REQUIRED)
 
-include(CrossCompilingExtra)
-
-if(ANDROID)
-  find_host_package(Java COMPONENTS Development REQUIRED)
-else()
-  find_package(Java COMPONENTS Development REQUIRED)
-  find_package(JNI REQUIRED)
-endif()
-
-include(UseJava)
+include(JavaExtra)
 
 # Windows flags
 if(NOT WIN32)
@@ -38,9 +29,6 @@ if(NOT WIN32)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined,error")
   endif()
 endif()
-
-# Java version profile (<1.6 for old-android)
-set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
 # Get a list of typesupport implementations from valid rmw implementations.
 rosidl_generator_java_get_typesupports(_typesupport_impls)
@@ -201,6 +189,11 @@ foreach(generated_source_file ${generated_source_files})
     "${generated_source_file}"
   )
 
+  set(_extension_compile_flags "")
+  if(NOT WIN32)
+    set(_extension_compile_flags "-Wall -Wextra")
+  endif()
+
   set_target_properties("${_library_name}" PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY "${_output_path}/${_parent_folder}"
@@ -236,11 +229,6 @@ foreach(generated_source_file ${generated_source_files})
     ${rosidl_generate_interfaces_TARGET}__rosidl_generator_c
     ${rosidl_generate_interfaces_TARGET}${_target_suffix}
   )
-
-  set(_extension_compile_flags "")
-  if(NOT WIN32)
-    set(_extension_compile_flags "-Wall -Wextra")
-  endif()
 
   target_link_libraries(
     "${_library_name}"

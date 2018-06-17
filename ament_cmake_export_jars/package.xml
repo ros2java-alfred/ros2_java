@@ -3,7 +3,7 @@
 
 <package format="3">
   <name>ament_cmake_export_jars</name>
-  <version>0.4.0</version>
+  <version>0.5.0</version>
   <description>The ability to export Java archives to downstream packages in the ament buildsystem in CMake.</description>
   <maintainer email="esteve@apache.org">Esteve Fernandez</maintainer>
   <license>Apache License 2.0</license>
