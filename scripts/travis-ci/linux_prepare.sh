@@ -24,7 +24,7 @@ mkdir -p $HOME_BUILD/ament_ws/src
 cd $HOME_BUILD/ament_ws
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos"
 docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "/usr/bin/vcs import src < ament_java.repos"
-docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "src/ament/ament_tools/scripts/ament.py build --parallel --symlink-install --isolated"
+docker run -u "$UID" -it --rm -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMG sh -c "colcon build --symlink-install"
 
 echo "INSTALL ROS2 WS..."
 mkdir -p $ROS2WS/src
@@ -37,4 +37,6 @@ rm -rf $ROS2WS/src/ros2_java/ros2_java && cp -r $HOME_BUILD/ros2java-alfred/ros2
 
 echo "BUILD ROS2 WS..."
 cd $HOME_BUILD
-docker run -u "$UID" -it --rm -v $(pwd):$(pwd) --env-file $ENV_PATH -w $(pwd) $DOCKER_IMG sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament build --parallel --symlink-install --isolated --skip-packages $PKG_EXCLUDE --ament-gradle-args --parallel --daemon --configure-on-demand"
+docker run -u "$UID" -it --rm -v $(pwd):$(pwd) --env-file $ENV_PATH -w $(pwd) $DOCKER_IMG sh -c "echo $SHELL && . $HOME_BUILD/ament_ws/install/local_setup.sh && cd /home/travis/build/ros2_java_ws && colcon build --symlink-install --packages-skip $PKG_EXCLUDE"
+
+# Disable parameter : "--ament-gradle-args --parallel --daemon --configure-on-demand"
