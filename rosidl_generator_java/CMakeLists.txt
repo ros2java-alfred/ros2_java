@@ -39,6 +39,7 @@ if(BUILD_TESTING)
     "msg/Int8.msg"
     "msg/Nested.msg"
     "msg/Primitives.msg"
+    "msg/StringArrays.msg"
     "msg/Strings.msg"
     "msg/Uint16.msg"
     "msg/Uint32.msg"
@@ -98,8 +99,6 @@ if(BUILD_TESTING)
         "${rcljava_common_JARS}"
         "${rosidl_generator_java_JARS}"
         "${_${PROJECT_NAME}_messages_jar_file}"
-        APPEND_LIBRARY_DIRS
-        "${_deps_library_dirs}"
       )
 
       add_dependencies("${PROJECT_NAME}_tests_${testsuite}" "${PROJECT_NAME}_messages_jar")

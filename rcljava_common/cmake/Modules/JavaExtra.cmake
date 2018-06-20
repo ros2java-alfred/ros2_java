@@ -30,7 +30,7 @@ include(UseJava)
 
 ### Definitions ###
 # Java version profile (<1.6 for old-android)
-set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
+#set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
 # Bug in find_jar for Junit4 : https://sourceforge.net/p/rdkit/mailman/message/35301727/
 set(JUNIT_JAR "/usr/share/java/junit4.jar")

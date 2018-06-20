@@ -110,13 +110,6 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
 
     return 0
 
-
-def escape_string(s):
-    s = s.replace('\\', '\\\\')
-    s = s.replace("'", "\\'")
-    return s
-
-
 def value_to_java(type_, value):
     assert type_.is_primitive_type()
     assert value is not None
@@ -131,18 +124,35 @@ def value_to_java(type_, value):
     return '{%s}' % ', '.join(java_values)
 
 def default_value(type_):
-    assert type_.is_primitive_type()
+
+    if type_.type == 'bool':
+        return 'false'
+
+    if type_.type == 'char':
+        return '(char)0'
+
+    if type_.type == 'float32':
+        return '0.0f'
+
+    if type_.type == 'float64':
+        return '0.0d'
 
     if type_.type in [
         'byte',
-        'char',
         'int8', 'uint8',
-        'int16', 'uint16',
-        'int32', 'uint32',
-        'int64', 'uint64',
-        'float64',
     ]:
-        return str(0)
+        return '(byte)0'
+
+    if type_.type in ['int16', 'uint16']:
+        return '(short)0'
+
+    if type_.type in [
+        'int32', 'uint32'
+    ]:
+        return '0'
+
+    if type_.type in ['int64', 'uint64']:
+        return '0L'
 
     return
 
@@ -154,24 +164,36 @@ def primitive_value_to_java(type_, value):
     if type_.type == 'bool':
         return 'true' if value else 'false'
 
+    if type_.type == 'char':
+        return '%s' % str(value)
+
+    if type_.type == 'float32':
+        return '%sf' % str(value)
+
+    if type_.type == 'float64':
+        return '%sd' % str(value)
+
     if type_.type in [
         'byte',
-        'char',
         'int8', 'uint8',
-        'int16', 'uint16',
+    ]:
+        return '(byte)%s' % str(value)
+
+    if type_.type in ['int16', 'uint16']:
+        return '(short)%s' % str(value)
+
+    if type_.type in [
         'int32', 'uint32',
-        'int64', 'uint64',
-        'float64',
     ]:
         return str(value)
 
-    if type_.type == 'float32':
-        return '%sf' % value
+    if type_.type in ['int64', 'uint64']:
+        return '%sL' % str(value)
 
     if type_.type == 'string':
         return '"%s"' % escape_string(value)
 
-    assert False, "unknown primitive type '%s'" % type_
+    assert False, "unknown primitive type '%s'" % type_.type
 
 
 def constant_value_to_java(type_, value):
@@ -180,19 +202,31 @@ def constant_value_to_java(type_, value):
     if type_ == 'bool':
         return 'true' if value else 'false'
 
+    if type_ == 'char':
+        return '%s' % str(value)
+
+    if type_ == 'float32':
+        return '%sf' % str(value)
+
+    if type_ == 'float64':
+        return '%sd' % str(value)
+
     if type_ in [
         'byte',
-        'char',
         'int8', 'uint8',
-        'int16', 'uint16',
+    ]:
+        return '(byte)%s' % str(value)
+
+    if type_ in ['int16', 'uint16']:
+        return '(short)%s' % str(value)
+
+    if type_ in [
         'int32', 'uint32',
-        'int64', 'uint64',
-        'float64',
     ]:
         return str(value)
 
-    if type_ == 'float32':
-        return '%sf' % value
+    if type_ in ['int64', 'uint64']:
+        return '%sL' % str(value)
 
     if type_ == 'string':
         return '"%s"' % escape_string(value)
@@ -240,6 +274,10 @@ def get_java_type(type_, use_primitives=True):
 
     return get_builtin_java_type(type_.type, use_primitives=use_primitives)
 
+def escape_string(s):
+    s = s.replace('\\', '\\\\')
+    s = s.replace("'", "\\'")
+    return s
 
 def convert_lower_case_underscore_to_camel_case(value):
     components = value.split('_')
